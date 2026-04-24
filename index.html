@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cowboy Pool Tracker</title>
+    <title>Cowboy Pool - Alternating Guide</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #1a3c1a; color: white; text-align: center; margin: 0; padding: 10px; }
@@ -16,15 +16,20 @@
         .score { font-size: 3.5em; font-weight: 900; display: block; line-height: 1; }
         .player-label { font-size: 0.9em; color: #bbb; text-transform: uppercase; }
 
+        /* INSTRUKSRAD */
         .next-move-box { 
-            background: #2980b9; 
+            background: #2c3e50; 
             padding: 15px; 
             border-radius: 12px; 
             margin: 15px 0; 
-            border: 2px solid #3498db;
+            border-left: 6px solid #f1c40f;
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
-        .move-label { font-size: 0.75em; text-transform: uppercase; opacity: 0.8; margin-bottom: 5px; letter-spacing: 1px; }
-        .move-text { font-weight: 900; font-size: 1.3em; color: #fff; }
+        .move-label { font-size: 0.7em; text-transform: uppercase; color: #f1c40f; font-weight: bold; margin-bottom: 3px; }
+        .move-text { font-weight: 900; font-size: 1.2em; color: #fff; letter-spacing: 0.5px; }
 
         .ball-row { display: flex; justify-content: space-around; margin: 20px 0; }
         .ball-btn { width: 85px; height: 85px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: inset -8px -8px 15px rgba(0,0,0,0.6), 0 5px 10px rgba(0,0,0,0.4); position: relative; }
@@ -63,7 +68,7 @@
     </div>
 
     <div class="next-move-box" id="moveBox">
-        <div class="move-label">Neste trekk:</div>
+        <div class="move-label" id="instrLabel">DIN OPPGAVE:</div>
         <div class="move-text" id="moveText">SENK 3-BALLEN (BREAK)</div>
     </div>
 
@@ -90,6 +95,7 @@
     let currentPlayer = 0;
     let scoreAtStart = [0, 0];
     let breakDone = false;
+    let lastActionType = null; // 'pocket' eller 'carom'
     let history = [];
     let seconds = 0;
 
@@ -107,41 +113,60 @@
 
         if (!breakDone) {
             moveText.innerText = "SENK 3-BALLEN (BREAK)";
-            moveBox.style.background = "#2980b9";
+            moveBox.style.borderLeftColor = "#f1c40f";
         } else if (s >= 101) {
             moveText.innerText = "🏆 MATCH VINNER! 🏆";
-            moveBox.style.background = "#27ae60";
+            moveBox.style.borderLeftColor = "#27ae60";
             confetti();
         } else if (s === 100) {
             moveText.innerText = "SENK HVIT VIA 1-BALLEN";
-            moveBox.style.background = "#d35400";
+            moveBox.style.borderLeftColor = "#d35400";
         } else if (s >= 90) {
             moveText.innerText = "GJØR EN CAROM";
-            moveBox.style.background = "#8e44ad";
+            moveBox.style.borderLeftColor = "#8e44ad";
         } else {
-            // Standard fase etter brekk
-            moveText.innerText = "GJØR EN CAROM / SENK KULE";
-            moveBox.style.background = "#2980b9";
+            // Fase 1 vekslingslogikk
+            if (lastActionType === 'pocket') {
+                moveText.innerText = "GJØR EN CAROM";
+                moveBox.style.borderLeftColor = "#8e44ad";
+            } else if (lastActionType === 'carom') {
+                moveText.innerText = "SENK EN BALL";
+                moveBox.style.background = "#2c3e50";
+                moveBox.style.borderLeftColor = "#2980b9";
+            } else {
+                moveText.innerText = "CAROM ELLER SENK KULE";
+                moveBox.style.borderLeftColor = "#f1c40f";
+            }
         }
 
-        document.getElementById('b1').disabled = s >= 90;
-        document.getElementById('b3').disabled = s >= 90;
-        document.getElementById('b5').disabled = s >= 90;
+        // Disable knapper basert på veksling eller fase
+        const pocketDisabled = (s >= 90 || (breakDone && lastActionType === 'pocket'));
+        const caromDisabled = (breakDone && lastActionType === 'carom' && s < 90);
+
+        document.getElementById('b1').disabled = pocketDisabled;
+        document.getElementById('b3').disabled = pocketDisabled;
+        document.getElementById('b5').disabled = pocketDisabled;
+        
+        // Deaktiver carom-knapper hvis man må senke ball (kun i fase 1)
+        const caromBtns = document.querySelectorAll('.btn-carom');
+        caromBtns.forEach(btn => btn.disabled = caromDisabled);
     }
 
     function action(type, val) {
         const s = scores[currentPlayer];
         if (s < 90 && s + val > 90) return alert("Må ha nøyaktig 90!");
-        if (s >= 90 && s < 100 && s + val > 100) return alert("Må have nøyaktig 100!");
+        if (s >= 90 && s < 100 && s + val > 100) return alert("Må ha nøyaktig 100!");
 
-        history.push({scores: [...scores], breakDone, currentPlayer});
+        history.push({scores: [...scores], breakDone, lastActionType, currentPlayer});
         
         if (!breakDone) breakDone = true;
+        lastActionType = type;
         scores[currentPlayer] += val;
         updateUI();
     }
 
     function nextTurn() {
+        lastActionType = null;
         currentPlayer = currentPlayer === 0 ? 1 : 0;
         scoreAtStart[currentPlayer] = scores[currentPlayer];
         updateUI();
@@ -159,6 +184,7 @@
             let state = history.pop();
             scores = state.scores;
             breakDone = state.breakDone;
+            lastActionType = state.lastActionType;
             currentPlayer = state.currentPlayer;
             updateUI();
         }
@@ -169,6 +195,7 @@
             scores = [0, 0];
             scoreAtStart = [0, 0];
             breakDone = false;
+            lastActionType = null;
             seconds = 0;
             history = [];
             updateUI();
