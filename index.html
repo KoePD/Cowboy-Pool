@@ -9,58 +9,64 @@
         body { font-family: 'Segoe UI', sans-serif; background: #1a3c1a; color: white; text-align: center; margin: 0; padding: 10px; overflow-x: hidden; }
         .container { max-width: 480px; margin: auto; background: #222; padding: 15px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
         .names-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        .names-row input { flex: 1; padding: 10px; border-radius: 8px; border: none; background: #444; color: white; text-align: center; font-weight: bold; }
+        .names-row input { flex: 1; padding: 10px; border-radius: 8px; border: none; background: #444; color: white; text-align: center; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
         
         .scoreboard { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 10px; }
         .player-box { flex: 1; padding: 15px 5px; border-radius: 15px; background: #333; border: 4px solid transparent; transition: 0.3s; position: relative; }
-        .active { border-color: #f1c40f; background: #3d3d3d; }
-        .score { font-size: 3.5em; font-weight: 900; display: block; line-height: 1; }
-        .player-label { font-size: 0.9em; color: #bbb; text-transform: uppercase; }
+        .active { border-color: #f1c40f; background: #3d3d3d; box-shadow: 0 0 15px rgba(241, 196, 15, 0.2); }
+        .score { font-size: 3.5em; font-weight: 900; display: block; line-height: 1; color: #fff; }
+        .player-label { font-size: 0.8em; color: #aaa; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
         
-        /* NY: Poeng i tur indikator */
-        .turn-score { font-size: 0.8em; color: #f1c40f; font-weight: bold; margin-top: 5px; min-height: 1.2em; visibility: hidden; }
-        .active .turn-score { visibility: visible; }
+        /* PRO BREAK COUNTER */
+        .series-label { font-size: 0.7em; color: #f1c40f; text-transform: uppercase; letter-spacing: 2px; margin-top: 8px; font-weight: 800; opacity: 0.5; }
+        .active .series-label { opacity: 1; }
+        .series-value { font-size: 1.2em; color: #f1c40f; font-weight: 900; }
 
-        .foul-dots { display: flex; justify-content: center; gap: 5px; margin-top: 5px; }
-        .dot { width: 10px; height: 10px; border-radius: 50%; background: #444; border: 1px solid #000; }
-        .dot.active { background: #c0392b; box-shadow: 0 0 5px #ff0000; }
+        .foul-dots { display: flex; justify-content: center; gap: 6px; margin-top: 10px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; background: #444; border: 1px solid #111; }
+        .dot.active { background: #e74c3c; box-shadow: 0 0 8px #ff4d4d; }
 
-        .timer-row { display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 15px 0; padding: 10px 0; border-top: 1px solid #333; border-bottom: 1px solid #333; gap: 5px; }
-        .timer-display { font-family: monospace; font-size: 1.6em; color: #f1c40f; letter-spacing: 1px; font-weight: bold; }
-        .inning-display { font-size: 0.8em; color: #888; text-transform: uppercase; letter-spacing: 2px; }
-        .btn-timer-ctrl { background: #e67e22; color: white; border: none; padding: 8px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.8em; text-transform: uppercase; margin-top: 5px; }
+        .timer-row { display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 15px 0; padding: 12px 0; border-top: 1px solid #333; border-bottom: 1px solid #333; gap: 4px; }
+        .timer-display { font-family: 'Courier New', monospace; font-size: 1.8em; color: #f1c40f; letter-spacing: 2px; font-weight: bold; }
+        .inning-display { font-size: 0.75em; color: #666; text-transform: uppercase; letter-spacing: 3px; font-weight: bold; }
+        .btn-timer-ctrl { background: #e67e22; color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: 800; font-size: 0.75em; text-transform: uppercase; margin-top: 8px; transition: 0.2s; }
+        .btn-timer-ctrl:hover { background: #d35400; }
 
-        .next-move-box { background: #2c3e50; padding: 15px; border-radius: 12px; margin: 15px 0; border-left: 6px solid #f1c40f; min-height: 65px; display: flex; flex-direction: column; justify-content: center; }
-        .move-label { font-size: 0.7em; text-transform: uppercase; color: #f1c40f; font-weight: bold; margin-bottom: 3px; }
-        .move-text { font-weight: 900; font-size: 1.15em; color: #fff; letter-spacing: 0.5px; }
+        .next-move-box { background: #2c3e50; padding: 15px; border-radius: 12px; margin: 15px 0; border-left: 6px solid #f1c40f; min-height: 65px; display: flex; flex-direction: column; justify-content: center; text-align: left; padding-left: 20px; }
+        .move-label { font-size: 0.65em; text-transform: uppercase; color: #f1c40f; font-weight: 800; letter-spacing: 1px; margin-bottom: 2px; }
+        .move-text { font-weight: 900; font-size: 1.1em; color: #fff; letter-spacing: 0.5px; text-transform: uppercase; }
 
-        .ball-row { display: flex; justify-content: space-around; margin: 20px 0; align-items: flex-start; min-height: 120px; }
-        .ball-group { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .ball-btn { width: 85px; height: 85px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: inset -8px -8px 15px rgba(0,0,0,0.6), 0 5px 10px rgba(0,0,0,0.4); position: relative; }
+        .ball-row { display: flex; justify-content: space-around; margin: 25px 0; align-items: flex-start; min-height: 120px; }
+        .ball-group { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .ball-btn { width: 85px; height: 85px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: inset -8px -8px 15px rgba(0,0,0,0.6), 0 5px 12px rgba(0,0,0,0.5); position: relative; transition: 0.1s; }
+        .ball-btn:active { transform: scale(0.95); }
         .ball-number { width: 42px; height: 42px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; font-size: 1.6em; border: 2px solid #000; }
         #b1 { background: radial-gradient(circle at 40% 40%, #f1c40f, #b38f00); }
         #b3 { background: radial-gradient(circle at 40% 40%, #e74c3c, #962d22); }
         #b5 { background: radial-gradient(circle at 40% 40%, #f39c12, #a36504); }
-        .btn-sub-carom { background: #3498db; color: white; border: none; padding: 5px 8px; border-radius: 5px; font-size: 0.7em; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        #bWin { background: radial-gradient(circle at 40% 40%, #fff, #bbb); color: black; display: none; flex-direction: column; }
+        .btn-sub-carom { background: #3498db; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 0.7em; font-weight: 900; cursor: pointer; text-transform: uppercase; box-shadow: 0 3px #2980b9; }
+        .btn-sub-carom:active { transform: translateY(2px); box-shadow: 0 1px #2980b9; }
 
-        .ball-btn:disabled, .btn-sub-carom:disabled, .btn-carom:disabled { opacity: 0.2; filter: grayscale(1); cursor: not-allowed; }
+        #bWin { background: radial-gradient(circle at 40% 40%, #fff, #bbb); color: black; display: none; flex-direction: column; font-weight: 900; }
 
-        .control-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
-        button.ctrl { padding: 12px 5px; font-size: 0.8em; border: none; border-radius: 12px; cursor: pointer; color: white; font-weight: bold; box-shadow: 0 4px rgba(0,0,0,0.3); }
+        .ball-btn:disabled, .btn-sub-carom:disabled, .btn-carom:disabled { opacity: 0.15; filter: grayscale(1); cursor: not-allowed; }
+
+        .control-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+        button.ctrl { padding: 14px 5px; font-size: 0.8em; border: none; border-radius: 12px; cursor: pointer; color: white; font-weight: 900; box-shadow: 0 4px rgba(0,0,0,0.4); text-transform: uppercase; }
         .btn-carom { background: #2980b9; }
-        .btn-foul-reset { background: #c0392b; grid-column: span 2; font-size: 1em; }
+        .btn-foul-reset { background: #c0392b; grid-column: span 2; font-size: 0.9em; }
         .btn-undo { background: #8e44ad; }
         .btn-rules { background: #555; }
         .btn-minus { background: #7f8c8d; font-size: 1.2em; }
-        .btn-turn { background: #27ae60; grid-column: span 3; font-size: 1.2em; margin-top: 5px; padding: 15px; }
-        .btn-reset { background: #34495e; grid-column: span 3; padding: 10px; margin-top: 5px; }
-        .match-log { margin-top: 20px; background: #111; border-radius: 10px; padding: 10px; text-align: left; font-size: 0.8em; color: #888; max-height: 100px; overflow-y: auto; }
-        .log-entry { border-bottom: 1px solid #222; padding: 3px 0; }
+        .btn-turn { background: #27ae60; grid-column: span 3; font-size: 1.1em; margin-top: 8px; padding: 18px; letter-spacing: 2px; }
+        .btn-reset { background: #34495e; grid-column: span 3; padding: 10px; margin-top: 8px; font-size: 0.7em; opacity: 0.7; }
         
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); }
-        .modal-content { background-color: #222; margin: 15% auto; padding: 20px; border: 1px solid #f1c40f; width: 80%; border-radius: 15px; text-align: left; line-height: 1.5; font-size: 0.9em; }
-        .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+        .match-log { margin-top: 20px; background: #111; border-radius: 12px; padding: 12px; text-align: left; font-size: 0.75em; color: #666; max-height: 100px; overflow-y: auto; font-family: monospace; }
+        .log-entry { border-bottom: 1px solid #222; padding: 4px 0; }
+        
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); backdrop-filter: blur(5px); }
+        .modal-content { background-color: #222; margin: 10% auto; padding: 25px; border: 2px solid #f1c40f; width: 80%; border-radius: 20px; text-align: left; line-height: 1.6; }
+        .close { color: #f1c40f; float: right; font-size: 32px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -68,11 +74,13 @@
 <div id="rulesModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeRules()">&times;</span>
-        <h3 style="color:#f1c40f">COWBOY POOL REGLER</h3>
-        <p>• <b>0-90:</b> Veksle kule og carom. Alt gir poeng.</p>
-        <p>• <b>91-100:</b> Kun Caroms gir poeng. Pocket = Foul.</p>
-        <p>• <b>101:</b> Vinnerstøt: Hazard via 1-ballen.</p>
-        <p>• <b>Foul:</b> Du mister kun poengene du har tatt i denne turen!</p>
+        <h2 style="color:#f1c40f; margin-top:0; letter-spacing:2px;">OFFISIELLE REGLER</h2>
+        <p>• <b>GOAL:</b> Nøyaktig 101 poeng.</p>
+        <p>• <b>0-90:</b> Veksle mellom pocket og carom.</p>
+        <p>• <b>91-100:</b> Kun carom gir poeng. Pocket = FOUL.</p>
+        <p>• <b>WINNING SHOT:</b> Hazard (senk hvit via 1-ballen).</p>
+        <p>• <b>FOUL:</b> Du mister poengene i gjeldende serie (Break).</p>
+        <p>• <b>3-FOUL RULE:</b> Tre fouls på rad er tap av match.</p>
     </div>
 </div>
 
@@ -85,13 +93,15 @@
         <div id="p1-box" class="player-box active">
             <span id="p1-label" class="player-label">SPILLER 1</span>
             <span id="p1-score" class="score">0</span>
-            <div id="p1-turn-score" class="turn-score">I DENNE TUR: 0</div>
+            <div class="series-label">Current Break</div>
+            <div id="p1-turn-score" class="series-value">0</div>
             <div class="foul-dots" id="p1-fouls"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
         </div>
         <div id="p2-box" class="player-box">
             <span id="p2-label" class="player-label">SPILLER 2</span>
             <span id="p2-score" class="score">0</span>
-            <div id="p2-turn-score" class="turn-score">I DENNE TUR: 0</div>
+            <div class="series-label">Current Break</div>
+            <div id="p2-turn-score" class="series-value">0</div>
             <div class="foul-dots" id="p2-fouls"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
         </div>
     </div>
@@ -99,11 +109,11 @@
     <div class="timer-row">
         <div class="timer-display" id="matchTimer">00:00:00</div>
         <div class="inning-display" id="inningText">Inning: 1</div>
-        <button class="btn-timer-ctrl" id="timerBtn" onclick="toggleTimer()">START</button>
+        <button class="btn-timer-ctrl" id="timerBtn" onclick="toggleTimer()">START CLOCK</button>
     </div>
 
     <div class="next-move-box" id="moveBox">
-        <div class="move-label">NESTE STØT:</div>
+        <div class="move-label">Next Requirement:</div>
         <div class="move-text" id="moveText">SENK 3-BALLEN (BREAK)</div>
     </div>
 
@@ -120,18 +130,18 @@
             <button class="ball-btn" onclick="action('pocket', 5)" id="b5"><div class="ball-number">5</div></button>
             <button class="btn-sub-carom" onclick="action('pocket_carom', 6)" id="sc5">+ CAROM</button>
         </div>
-        <button class="ball-btn" onclick="action('win', 1)" id="bWin"><div style="font-size:0.6em">Hazard via 1</div>WIN</button>
+        <button class="ball-btn" onclick="action('win', 1)" id="bWin" style="display:none; background: radial-gradient(circle at 40% 40%, #fff, #bbb); color: black;"><div style="font-size:0.6em; text-transform:uppercase;">Hazard</div>WIN</button>
     </div>
 
     <div class="control-grid">
-        <button class="ctrl btn-carom" onclick="action('carom', 1)" id="c1">CAROM 1p</button>
-        <button class="ctrl btn-carom" onclick="action('carom', 2)" id="c2">CAROM 2p</button>
-        <button class="ctrl btn-undo" onclick="undo()">ANGRE</button>
-        <button class="ctrl btn-rules" onclick="openRules()">REGLER</button>
+        <button class="ctrl btn-carom" onclick="action('carom', 1)" id="c1">Carom 1p</button>
+        <button class="ctrl btn-carom" onclick="action('carom', 2)" id="c2">Carom 2p</button>
+        <button class="ctrl btn-undo" onclick="undo()">Undo</button>
+        <button class="ctrl btn-rules" onclick="openRules()">Rules</button>
         <button class="ctrl btn-minus" onclick="action('adjust', -1)">−</button>
         <button class="ctrl btn-foul-reset" onclick="handleFoul()">FOUL / SCRATCH</button>
-        <button class="ctrl btn-turn" onclick="nextTurn()">BOM / BYTT TUR</button>
-        <button class="ctrl btn-reset" onclick="resetGame()">NY MATCH</button>
+        <button class="ctrl btn-turn" onclick="nextTurn()">END TURN / MISS</button>
+        <button class="ctrl btn-reset" onclick="resetGame()">NEW MATCH</button>
     </div>
     <div class="match-log" id="matchLog"></div>
 </div>
@@ -146,7 +156,7 @@
     let lastType = JSON.parse(localStorage.getItem('cb_lastType')) || null;
     let seconds = JSON.parse(localStorage.getItem('cb_time')) || 0;
     let innings = JSON.parse(localStorage.getItem('cb_innings')) || 0;
-    let logEntries = JSON.parse(localStorage.getItem('cb_log')) || ["Klar"];
+    let logEntries = JSON.parse(localStorage.getItem('cb_log')) || ["Ready to play"];
     let isPaused = true; let timerInterval = null; let history = [];
 
     function formatTime(s) { return new Date(s * 1000).toISOString().substr(11, 8); }
@@ -162,27 +172,27 @@
     function updateUI() {
         const names = [document.getElementById('p1-name').value || "S1", document.getElementById('p2-name').value || "S2"];
         document.getElementById('p1-score').innerText = scores[0]; document.getElementById('p2-score').innerText = scores[1];
-        
-        // Oppdater "I denne tur" telleren
-        document.getElementById('p1-turn-score').innerText = "I DENNE TUR: " + (scores[0] - scoreAtStart[0]);
-        document.getElementById('p2-turn-score').innerText = "I DENNE TUR: " + (scores[1] - scoreAtStart[1]);
+        document.getElementById('p1-turn-score').innerText = (scores[0] - scoreAtStart[0]);
+        document.getElementById('p2-turn-score').innerText = (scores[1] - scoreAtStart[1]);
 
         document.getElementById('p1-box').className = currentPlayer === 0 ? "player-box active" : "player-box";
         document.getElementById('p2-box').className = currentPlayer === 1 ? "player-box active" : "player-box";
         document.getElementById('matchTimer').innerText = formatTime(seconds);
         document.getElementById('inningText').innerText = "Inning: " + (Math.floor(innings/2) + 1);
+
         [0, 1].forEach(p => {
             const dots = document.getElementById(`p${p+1}-fouls`).children;
             for(let i=0; i<3; i++) dots[i].className = i < foulCounts[p] ? "dot active" : "dot";
         });
+
         const s = scores[currentPlayer]; const winBall = document.getElementById('bWin');
         if (s === 100) {
             winBall.style.display = "flex"; document.querySelectorAll('.ball-group').forEach(e => e.style.display = "none");
-            document.getElementById('moveText').innerText = "VINNERSTØT: SENK HVIT VIA 1";
+            document.getElementById('moveText').innerText = "101: HAZARD VIA 1-BALLEN";
         } else {
             winBall.style.display = "none"; document.querySelectorAll('.ball-group').forEach(e => e.style.display = "flex");
             if (!breakDone) document.getElementById('moveText').innerText = "SENK 3-BALLEN (BREAK)";
-            else if (s >= 90) document.getElementById('moveText').innerText = "90-100: KUN CAROMS!";
+            else if (s >= 90) document.getElementById('moveText').innerText = "91-100: KUN CAROMS!";
             else document.getElementById('moveText').innerText = !firstPostBreakDone ? "VELG: CAROM ELLER KULE" : (lastType === 'pocket' ? "GJØR EN CAROM" : "SENK EN BALL");
         }
         let pOff = s >= 90 || (firstPostBreakDone && lastType === 'pocket');
@@ -195,8 +205,8 @@
     function openRules() { document.getElementById('rulesModal').style.display = "block"; }
     function closeRules() { document.getElementById('rulesModal').style.display = "none"; }
     function toggleTimer() {
-        if (!isPaused) { isPaused = true; clearInterval(timerInterval); document.getElementById('timerBtn').innerText = "START"; }
-        else { isPaused = false; document.getElementById('timerBtn').innerText = "PAUSE"; timerInterval = setInterval(() => { seconds++; document.getElementById('matchTimer').innerText = formatTime(seconds); saveData(); }, 1000); }
+        if (!isPaused) { isPaused = true; clearInterval(timerInterval); document.getElementById('timerBtn').innerText = "RESUME CLOCK"; }
+        else { isPaused = false; document.getElementById('timerBtn').innerText = "PAUSE CLOCK"; timerInterval = setInterval(() => { seconds++; document.getElementById('matchTimer').innerText = formatTime(seconds); saveData(); }, 1000); }
     }
     function action(type, val) {
         if (isPaused && type !== 'adjust') toggleTimer();
