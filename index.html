@@ -46,10 +46,14 @@
         /* Match Log */
         .match-log { margin-top: 20px; background: #111; border-radius: 10px; padding: 10px; text-align: left; font-size: 0.8em; color: #888; max-height: 100px; overflow-y: auto; }
         .log-entry { border-bottom: 1px solid #222; padding: 3px 0; }
-        .log-entry:first-child { color: #f1c40f; }
 
-        /* Animasjon for milepæler */
-        @keyframes shake { 0% { transform: translate(1px, 1px) rotate(0deg); } 10% { transform: translate(-1px, -2px) rotate(-1deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 30% { transform: translate(3px, 2px) rotate(0deg); } 40% { transform: translate(1px, -1px) rotate(1deg); } 50% { transform: translate(-1px, 2px) rotate(-1deg); } 100% { transform: translate(1px, 1px) rotate(0deg); } }
+        /* Regler */
+        .rules-container { margin-top: 20px; text-align: left; background: #111; border-radius: 10px; overflow: hidden; }
+        .rules-header { padding: 10px; background: #333; cursor: pointer; font-weight: bold; display: flex; justify-content: space-between; }
+        .rules-content { padding: 15px; font-size: 0.85em; display: none; line-height: 1.4; color: #ccc; }
+
+        /* Animasjon */
+        @keyframes shake { 0% { transform: translate(1px, 1px) rotate(0deg); } 10% { transform: translate(-1px, -2px) rotate(-1deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 50% { transform: translate(-1px, 2px) rotate(-1deg); } 100% { transform: translate(1px, 1px) rotate(0deg); } }
         .shake { animation: shake 0.5s; }
     </style>
 </head>
@@ -98,8 +102,20 @@
         <button class="ctrl btn-reset" onclick="resetGame()">NULLSTILL MATCH</button>
     </div>
 
-    <div class="match-log" id="matchLog">
-        <div class="log-entry">Klar for kamp...</div>
+    <div class="match-log" id="matchLog"></div>
+
+    <div class="rules-container">
+        <div class="rules-header" onclick="toggleRules()">
+            <span>📜 Se Regler</span>
+            <span id="rule-arrow">▼</span>
+        </div>
+        <div id="rulesContent" class="rules-content">
+            <b>Mål:</b> 101 poeng nøyaktig.<br><br>
+            <b>Fase 1 (0-90):</b> Veksle mellom å senke ball og gjøre carom.<br>
+            <b>Fase 2 (90-100):</b> Kun caroms gir poeng. Baller i hull gir 0p.<br>
+            <b>Fase 3 (101):</b> Vinnerstøt: Carom av 1-ballen og senk hvit.<br><br>
+            <b>Foul:</b> Mister poeng opptjent i gjeldende tur.
+        </div>
     </div>
 </div>
 
@@ -111,7 +127,7 @@
     let firstPostBreakDone = JSON.parse(localStorage.getItem('cb_first')) || false;
     let lastType = JSON.parse(localStorage.getItem('cb_lastType')) || null;
     let seconds = JSON.parse(localStorage.getItem('cb_time')) || 0;
-    let logEntries = JSON.parse(localStorage.getItem('cb_log')) || ["Kamp startet"];
+    let logEntries = JSON.parse(localStorage.getItem('cb_log')) || ["Match klar"];
     let isPaused = true;
     let timerInterval = null;
     let history = [];
@@ -121,8 +137,7 @@
     function addLog(msg) {
         logEntries.unshift(msg);
         if(logEntries.length > 10) logEntries.pop();
-        const logContainer = document.getElementById('matchLog');
-        logContainer.innerHTML = logEntries.map(e => `<div class="log-entry">${e}</div>`).join('');
+        document.getElementById('matchLog').innerHTML = logEntries.map(e => `<div class="log-entry">${e}</div>`).join('');
         saveData();
     }
 
@@ -217,46 +232,31 @@
         if (isPaused && type !== 'adjust') toggleTimer();
         const s = scores[currentPlayer];
         const pName = document.getElementById(`p${currentPlayer+1}-name`).value;
-        
         if (type !== 'adjust') {
             if ((s < 90 && s + val > 90) || (s >= 90 && s < 100 && s + val > 100)) return alert("Nøyaktig score kreves!");
         }
-
         history.push({scores: [...scores], breakDone, firstPostBreakDone, lastType, currentPlayer, logEntries: [...logEntries]});
-        
         if (type !== 'adjust') {
             if (!breakDone) breakDone = true;
             else if (!firstPostBreakDone) firstPostBreakDone = true;
             lastType = type;
-            addLog(`${pName}: ${type === 'pocket' ? 'Senket ball' : 'Carom'} (+${val}p)`);
-        } else {
-            addLog(`${pName}: Justert poeng (${val})`);
-        }
-        
+            addLog(`${pName}: ${type==='pocket'?'Kule':'Carom'} (+${val}p)`);
+        } else { addLog(`${pName}: Justert (${val})`); }
         scores[currentPlayer] = Math.max(0, scores[currentPlayer] + val);
-        if (scores[currentPlayer] === 90 || scores[currentPlayer] === 100 || scores[currentPlayer] === 101) {
-            triggerEffect();
-            if(scores[currentPlayer] === 101) confetti();
-        }
+        if ([90, 100, 101].includes(scores[currentPlayer])) { triggerEffect(); if(scores[currentPlayer]===101) confetti(); }
         updateUI();
     }
 
     function nextTurn() {
-        const pName = document.getElementById(`p${currentPlayer+1}-name`).value;
-        addLog(`${pName}: Bom/Ferdig`);
-        firstPostBreakDone = false;
-        lastType = null;
+        addLog(`${document.getElementById(`p${currentPlayer+1}-name`).value}: Ferdig`);
+        firstPostBreakDone = false; lastType = null;
         currentPlayer = currentPlayer === 0 ? 1 : 0;
         scoreAtStart[currentPlayer] = scores[currentPlayer];
         updateUI();
     }
 
     function handleFoul() {
-        if(confirm("Foul! Mister poeng fra runden.")) {
-            addLog(`FOUL! Spiller ${currentPlayer+1}`);
-            scores[currentPlayer] = scoreAtStart[currentPlayer];
-            nextTurn();
-        }
+        if(confirm("Foul!")) { addLog(`FOUL! S${currentPlayer+1}`); scores[currentPlayer] = scoreAtStart[currentPlayer]; nextTurn(); }
     }
 
     function undo() {
@@ -264,19 +264,23 @@
             let st = history.pop();
             scores = st.scores; breakDone = st.breakDone; firstPostBreakDone = st.firstPostBreakDone;
             lastType = st.lastType; currentPlayer = st.currentPlayer; logEntries = st.logEntries;
-            updateUI();
-            addLog("Angret handling");
+            updateUI(); addLog("Angret");
         }
     }
 
-    function resetGame() {
-        if(confirm("Nullstill alt?")) { localStorage.clear(); location.reload(); }
+    function toggleRules() {
+        let c = document.getElementById('rulesContent');
+        let a = document.getElementById('rule-arrow');
+        c.style.display = (c.style.display === "block") ? "none" : "block";
+        a.innerText = (c.style.display === "block") ? "▲" : "▼";
     }
+
+    function resetGame() { if(confirm("Nullstill?")) { localStorage.clear(); location.reload(); } }
 
     if(localStorage.getItem('p1name')) document.getElementById('p1-name').value = localStorage.getItem('p1name');
     if(localStorage.getItem('p2name')) document.getElementById('p2-name').value = localStorage.getItem('p2name');
     updateUI();
-    addLog("Kamp klar");
+    addLog("Klar");
 </script>
 </body>
 </html>
