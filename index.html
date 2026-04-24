@@ -20,7 +20,7 @@
         .dot.active { background: #c0392b; box-shadow: 0 0 5px #ff0000; }
         .timer-row { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 15px 0; padding: 10px 0; border-top: 1px solid #333; border-bottom: 1px solid #333; }
         .timer-display { font-family: monospace; font-size: 1.6em; color: #f1c40f; letter-spacing: 1px; font-weight: bold; }
-        .btn-timer-ctrl { background: #e67e22; color: white; border: none; padding: 8px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9em; text-transform: uppercase; }
+        .btn-timer-ctrl { background: #e67e22; color: white; border: none; padding: 8px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.8em; text-transform: uppercase; }
         .next-move-box { background: #2c3e50; padding: 15px; border-radius: 12px; margin: 15px 0; border-left: 6px solid #f1c40f; min-height: 65px; display: flex; flex-direction: column; justify-content: center; }
         .move-label { font-size: 0.7em; text-transform: uppercase; color: #f1c40f; font-weight: bold; margin-bottom: 3px; }
         .move-text { font-weight: 900; font-size: 1.25em; color: #fff; letter-spacing: 0.5px; }
@@ -78,7 +78,7 @@
         <button class="ball-btn" onclick="action('pocket', 1)" id="b1"><div class="ball-number">1</div></button>
         <button class="ball-btn" onclick="action('pocket', 3)" id="b3"><div class="ball-number">3</div></button>
         <button class="ball-btn" onclick="action('pocket', 5)" id="b5"><div class="ball-number">5</div></button>
-        <button class="ball-btn" onclick="action('win', 1)" id="bWin"><span class="win-tag">Losing Hazard</span><span style="font-size: 1.2em; font-weight: 900;">101</span></button>
+        <button class="ball-btn" onclick="action('win', 1)" id="bWin"><span class="win-tag">Hazard</span><span style="font-size: 1.2em; font-weight: 900;">WIN</span></button>
     </div>
     <div class="control-grid">
         <button class="ctrl btn-carom" onclick="action('carom', 1)" id="c1">CAROM 1p</button>
@@ -92,7 +92,12 @@
     <div class="match-log" id="matchLog"></div>
     <div class="rules-container">
         <div class="rules-header" onclick="toggleRules()"><span>📜 Se Regler</span><span id="rule-arrow">▼</span></div>
-        <div id="rulesContent" class="rules-content"><b>0-90:</b> Veksle kule/carom.<br><b>90-100:</b> Kun caroms.<br><b>101:</b> Treff 1-ball, senk hvit.<br><b>Foul:</b> 3 på rad er tap.</div>
+        <div id="rulesContent" class="rules-content">
+            <b>0-90:</b> Veksle kule/carom.<br>
+            <b>90-100:</b> Kun caroms.<br>
+            <b>101:</b> Treff 1-ball, senk hvit. <i>Feil her er Foul!</i><br>
+            <b>Foul:</b> 3 på rad er tap.
+        </div>
     </div>
 </div>
 
@@ -139,7 +144,7 @@
         if (!breakDone) { moveText.innerText = "SENK 3-BALLEN (BREAK)"; }
         else if (s >= 101) { moveText.innerText = "🏆 VINNER! 🏆"; stopTimer(); }
         else if (s === 100) { 
-            moveText.innerText = "SENK HVIT VIA 1-BALLEN"; winBall.style.display = "flex";
+            moveText.innerText = "VINNERSTØT: SENK HVIT VIA 1"; winBall.style.display = "flex";
             document.getElementById('b1').style.display = "none"; document.getElementById('b3').style.display = "none"; document.getElementById('b5').style.display = "none";
         }
         else if (s >= 90) { moveText.innerText = "GJØR EN CAROM"; winBall.style.display = "none"; }
@@ -147,16 +152,11 @@
         
         if (s < 100) { document.getElementById('b1').style.display = "flex"; document.getElementById('b3').style.display = "flex"; document.getElementById('b5').style.display = "flex"; winBall.style.display = "none"; }
         
-        // OPPDATERT DISABLING LOGIKK
         let pOff = s >= 90 || (firstPostBreakDone && lastType === 'pocket');
         let cOff = (firstPostBreakDone && lastType === 'carom' && s < 90);
         
-        document.getElementById('b1').disabled = pOff; 
-        document.getElementById('b3').disabled = pOff; 
-        document.getElementById('b5').disabled = pOff;
-        document.getElementById('c1').disabled = cOff; 
-        document.getElementById('c2').disabled = cOff;
-        
+        document.getElementById('b1').disabled = pOff; document.getElementById('b3').disabled = pOff; document.getElementById('b5').disabled = pOff;
+        document.getElementById('c1').disabled = cOff; document.getElementById('c2').disabled = cOff;
         saveData();
     }
     function toggleTimer() {
@@ -164,23 +164,37 @@
         else { isPaused = false; document.getElementById('timerBtn').innerText = "PAUSE"; timerInterval = setInterval(() => { seconds++; document.getElementById('matchTimer').innerText = formatTime(seconds); saveData(); }, 1000); }
     }
     function stopTimer() { isPaused = true; clearInterval(timerInterval); document.getElementById('timerBtn').innerText = "START"; }
+    
     function action(type, val) {
         if (isPaused && type !== 'adjust') toggleTimer();
         const s = scores[currentPlayer];
+        const pName = document.getElementById(`p${currentPlayer+1}-name`).value;
+        
         if (type !== 'adjust') {
             if (s < 90 && s + val > 90) return alert("Må ha nøyaktig 90!");
             if (s >= 90 && s < 100 && s + val > 100) return alert("Må ha nøyaktig 100!");
             foulCounts[currentPlayer] = 0;
         }
+
         history.push({scores: [...scores], foulCounts: [...foulCounts], breakDone, firstPostBreakDone, lastType, currentPlayer, logEntries: [...logEntries]});
-        if (type !== 'adjust') {
+
+        if (type === 'win') {
+            scores[currentPlayer] = 101;
+            addLog(`${pName}: 🏆 Hazard Win!`);
+        } else if (type !== 'adjust') {
             if (!breakDone) breakDone = true; else if (!firstPostBreakDone) firstPostBreakDone = true;
-            lastType = type; addLog(`${document.getElementById(`p${currentPlayer+1}-name`).value}: +${val}p`);
+            lastType = type; 
+            addLog(`${pName}: +${val}p (${type==='pocket'?'Kule':'Carom'})`);
+            scores[currentPlayer] = Math.max(0, scores[currentPlayer] + val);
+        } else {
+            scores[currentPlayer] = Math.max(0, scores[currentPlayer] + val);
+            addLog(`${pName}: Justert (${val})`);
         }
-        scores[currentPlayer] = Math.max(0, scores[currentPlayer] + val);
-        if ([90, 100, 101].includes(scores[currentPlayer])) confetti();
+
+        if (scores[currentPlayer] >= 101 || scores[currentPlayer] === 90 || scores[currentPlayer] === 100) confetti();
         updateUI();
     }
+
     function nextTurn() { firstPostBreakDone = false; lastType = null; currentPlayer = currentPlayer === 0 ? 1 : 0; scoreAtStart[currentPlayer] = scores[currentPlayer]; updateUI(); }
     function handleFoul() {
         history.push({scores: [...scores], foulCounts: [...foulCounts], breakDone, firstPostBreakDone, lastType, currentPlayer, logEntries: [...logEntries]});
