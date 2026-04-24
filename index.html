@@ -17,8 +17,11 @@
         .score { font-size: 3.5em; font-weight: 900; display: block; line-height: 1; }
         .player-label { font-size: 0.9em; color: #bbb; text-transform: uppercase; }
 
-        /* Timer-stil */
-        .timer-display { font-family: monospace; font-size: 1.2em; color: #aaa; margin-bottom: 10px; letter-spacing: 1px; }
+        /* Timer og Pause-rad */
+        .timer-container { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 10px; }
+        .timer-display { font-family: monospace; font-size: 1.4em; color: #aaa; letter-spacing: 1px; }
+        .btn-pause { background: #e67e22; color: white; border: none; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.8em; }
+        .btn-pause.running { background: #555; }
 
         .phase-info { font-style: italic; color: #f1c40f; margin: 10px 0; min-height: 3em; font-size: 0.95em; border-bottom: 1px solid #333; padding-bottom: 10px; }
         .ball-row { display: flex; justify-content: space-around; margin: 20px 0; }
@@ -61,7 +64,10 @@
         </div>
     </div>
 
-    <div class="timer-display" id="matchTimer">00:00:00</div>
+    <div class="timer-container">
+        <div class="timer-display" id="matchTimer">00:00:00</div>
+        <button class="btn-pause" id="pauseBtn" onclick="toggleTimer()">PAUSE</button>
+    </div>
 
     <div id="phaseText" class="phase-info">Gjør klar!</div>
 
@@ -102,6 +108,7 @@
     let innings = JSON.parse(localStorage.getItem('cowboyInnings')) || 0;
     let secondsElapsed = JSON.parse(localStorage.getItem('cowboyTime')) || 0;
     let timerInterval = null;
+    let isPaused = JSON.parse(localStorage.getItem('cowboyPaused')) || false;
     let history = [];
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -114,17 +121,32 @@
     }
 
     function startTimer() {
-        if (timerInterval) return;
+        if (timerInterval || isPaused) return;
         timerInterval = setInterval(() => {
             secondsElapsed++;
             document.getElementById('matchTimer').innerText = formatTime(secondsElapsed);
             saveData();
         }, 1000);
+        document.getElementById('pauseBtn').innerText = "PAUSE";
+        document.getElementById('pauseBtn').classList.add('running');
     }
 
     function stopTimer() {
         clearInterval(timerInterval);
         timerInterval = null;
+        document.getElementById('pauseBtn').innerText = "START";
+        document.getElementById('pauseBtn').classList.remove('running');
+    }
+
+    function toggleTimer() {
+        if (timerInterval) {
+            isPaused = true;
+            stopTimer();
+        } else {
+            isPaused = false;
+            startTimer();
+        }
+        saveData();
     }
 
     function playWinSound() {
@@ -149,6 +171,7 @@
         localStorage.setItem('cowboyPlayer', JSON.stringify(currentPlayer));
         localStorage.setItem('cowboyInnings', JSON.stringify(innings));
         localStorage.setItem('cowboyTime', JSON.stringify(secondsElapsed));
+        localStorage.setItem('cowboyPaused', JSON.stringify(isPaused));
         localStorage.setItem('p1name', document.getElementById('p1-name').value);
         localStorage.setItem('p2name', document.getElementById('p2-name').value);
     }
@@ -171,6 +194,7 @@
         else if (s === 100) status += "<br>FINALE: Senk hvit via 1-ball!";
         else {
             status += "<br>🏆 VINNER! 🏆";
+            isPaused = true;
             stopTimer();
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
             playWinSound();
@@ -183,7 +207,8 @@
 
     function addScore(points) {
         if (audioCtx.state === 'suspended') audioCtx.resume();
-        startTimer(); // Starter timeren ved første poengregistrering
+        if (isPaused) toggleTimer(); // Starter automatisk hvis man legger til poeng
+        startTimer(); 
         let s = scores[currentPlayer];
         if (points > 0) {
             if (s < 90 && s + points > 90) return alert("Må være nøyaktig 90!");
@@ -211,6 +236,7 @@
 
     function resetGame() {
         if(confirm("Slette match og timer?")) {
+            isPaused = false;
             stopTimer();
             scores = [0, 0]; scoreAtStartOfTurn = [0, 0]; innings = 0; secondsElapsed = 0; history = [];
             localStorage.clear(); updateUI();
@@ -226,8 +252,8 @@
     if(localStorage.getItem('p1name')) document.getElementById('p1-name').value = localStorage.getItem('p1name');
     if(localStorage.getItem('p2name')) document.getElementById('p2-name').value = localStorage.getItem('p2name');
     
-    // Hvis det var en pågående match, fortsett timeren
-    if (secondsElapsed > 0 && scores[0] < 101 && scores[1] < 101) startTimer();
+    if (secondsElapsed > 0 && scores[0] < 101 && scores[1] < 101 && !isPaused) startTimer();
+    else stopTimer();
 
     updateUI();
 </script>
