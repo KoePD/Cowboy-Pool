@@ -15,12 +15,14 @@
 
         .names-row { display: flex; gap: 5px; margin-bottom: 10px; }
         .names-row input { flex: 1; padding: 10px 5px; border-radius: 8px; border: none; background: #444; color: white; text-align: center; font-weight: bold; font-size: 0.8em; }
+        /* Svak grå placeholder tekst */
+        .names-row input::placeholder { color: #888; font-weight: normal; font-style: italic; }
         
         .scoreboard { display: flex; justify-content: center; margin-bottom: 15px; gap: 8px; flex-wrap: wrap; }
         .player-box { flex: 1; min-width: 100px; padding: 10px 5px; border-radius: 15px; background: #333; border: 4px solid transparent; transition: 0.3s; position: relative; }
         .active { border-color: #f1c40f; background: #3d3d3d; transform: scale(1.02); }
         .score { font-size: 2.8em; font-weight: 900; display: block; line-height: 1; }
-        .player-label-display { font-size: 0.7em; color: #aaa; text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis; padding-right: 25px; }
+        .player-label-display { font-size: 0.7em; color: #aaa; text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis; padding-right: 25px; min-height: 1em; }
         
         .top-break-label { position: absolute; top: 10px; right: 10px; font-size: 0.6em; color: #f1c40f; font-weight: 900; background: rgba(0,0,0,0.3); padding: 2px 4px; border-radius: 4px; }
         .top-break-label::before { content: "★ "; font-size: 0.8em; }
@@ -122,7 +124,7 @@
     let currentPlayer = parseInt(localStorage.getItem('cb_player')) || 0;
     let breakDone = JSON.parse(localStorage.getItem('cb_break')) || false;
     let firstPostBreakDone = JSON.parse(localStorage.getItem('cb_first')) || false;
-    let lastType = localStorage.getItem('cb_lastType') || null; // Kan nå være 'pocket', 'carom' eller 'both'
+    let lastType = localStorage.getItem('cb_lastType') || null;
     let seconds = parseInt(localStorage.getItem('cb_time')) || 0;
     let innings = parseInt(localStorage.getItem('cb_innings')) || 0;
     let isPaused = true;
@@ -130,7 +132,7 @@
     let history = [];
 
     function setPlayerCount(num) {
-        if(!confirm("Endring av antall spillere vil nullstille matchen. Fortsette?")) return;
+        if(!confirm("Endring av modus vil nullstille alt. Fortsette?")) return;
         playerCount = num;
         localStorage.setItem('cb_pCount', num);
         resetGame();
@@ -146,7 +148,9 @@
             const input = document.createElement('input');
             input.type = 'text';
             input.id = `p${i}-name`;
-            input.value = localStorage.getItem(`p${i}name`) || `SPILLER ${i+1}`;
+            // Bruk lagret navn, hvis ikke tomt
+            input.value = localStorage.getItem(`p${i}name`) || "";
+            input.placeholder = "Skriv navn..."; // Svak grå tekst
             input.oninput = () => { localStorage.setItem(`p${i}name`, input.value); updateUI(); };
             inputCont.appendChild(input);
 
@@ -170,8 +174,9 @@
 
     function updateUI() {
         for(let i=0; i<playerCount; i++) {
-            const name = document.getElementById(`p${i}-name`).value;
-            document.getElementById(`p${i}-label-display`).innerText = name;
+            const inputVal = document.getElementById(`p${i}-name`).value;
+            // Hvis feltet er tomt, vis en standard tekst på tavla
+            document.getElementById(`p${i}-label-display`).innerText = inputVal || "INGEN NAVN";
             document.getElementById(`p${i}-score`).innerText = scores[i];
             const currentBreak = scores[i] - scoreAtStart[i];
             document.getElementById(`p${i}-turn-score`).innerText = currentBreak;
@@ -184,23 +189,19 @@
 
         const s = scores[currentPlayer];
         const winBall = document.getElementById('bWin');
-        const ballGroups = document.querySelectorAll('.ball-group');
-
         if (s === 100) {
             winBall.style.display = "flex";
-            ballGroups.forEach(g => g.style.display = "none");
+            document.querySelectorAll('.ball-group').forEach(el => el.style.display = "none");
             document.getElementById('moveText').innerText = "101: HAZARD VIA 1-BALLEN";
         } else {
             winBall.style.display = "none";
-            ballGroups.forEach(g => g.style.display = "flex");
+            document.querySelectorAll('.ball-group').forEach(el => el.style.display = "flex");
             if (!breakDone) document.getElementById('moveText').innerText = "BREAK SHOT (3-BALL)";
             else if (!firstPostBreakDone || lastType === 'both') document.getElementById('moveText').innerText = "VALG: CAROM ELLER KULE";
             else if (s >= 90) document.getElementById('moveText').innerText = "91-100: KUN CAROMS!";
             else document.getElementById('moveText').innerText = (lastType === 'pocket') ? "KRAV: CAROM" : "KRAV: KULE";
         }
 
-        // LOGIKK FOR LÅSING/GRAVING
-        // Hvis lastType er 'both', skal ingenting ventes på (alt er åpent)
         const pocketWait = s >= 90 || (firstPostBreakDone && lastType === 'pocket');
         const caromWait = (firstPostBreakDone && lastType === 'carom' && s < 90);
 
@@ -230,7 +231,6 @@
             scores[currentPlayer] = 101;
             confetti();
         } else if (type === 'pocket_carom') {
-            // SPESIAL: Hvis begge utføres, sett lastType til 'both'
             if (!breakDone) breakDone = true;
             firstPostBreakDone = true;
             lastType = 'both';
@@ -289,12 +289,20 @@
     }
 
     function resetGame() {
-        scores = [0, 0, 0]; topBreaks = [0, 0, 0]; foulCounts = [0, 0, 0]; scoreAtStart = [0, 0, 0];
-        currentPlayer = 0; breakDone = false; firstPostBreakDone = false; lastType = null;
-        innings = 0; seconds = 0; history = [];
-        if(timerInterval) clearInterval(timerInterval); isPaused = true;
-        localStorage.removeItem('cb_scores'); localStorage.removeItem('cb_topBreaks'); localStorage.removeItem('cb_fouls');
-        initUI();
+        if(confirm("Nullstille match og alle navn?")) {
+            scores = [0, 0, 0]; topBreaks = [0, 0, 0]; foulCounts = [0, 0, 0]; scoreAtStart = [0, 0, 0];
+            currentPlayer = 0; breakDone = false; firstPostBreakDone = false; lastType = null;
+            innings = 0; seconds = 0; history = [];
+            
+            // NYTT: Nullstill navn i lagring
+            for(let i=0; i<3; i++) {
+                localStorage.removeItem(`p${i}name`);
+            }
+            
+            if(timerInterval) clearInterval(timerInterval); isPaused = true;
+            localStorage.removeItem('cb_scores'); localStorage.removeItem('cb_topBreaks'); localStorage.removeItem('cb_fouls');
+            initUI();
+        }
     }
 
     function saveData() {
