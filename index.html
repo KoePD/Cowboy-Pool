@@ -3,50 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cowboy Pool Match</title>
+    <title>Cowboy Pool Pro Tracker</title>
     <style>
-        body { font-family: sans-serif; background: #1a3c1a; color: white; text-align: center; margin: 0; padding: 15px; }
-        .container { max-width: 450px; margin: auto; background: #222; padding: 15px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        body { font-family: 'Segoe UI', sans-serif; background: #1a3c1a; color: white; text-align: center; margin: 0; padding: 10px; }
+        .container { max-width: 480px; margin: auto; background: #222; padding: 15px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
         
-        .scoreboard { display: flex; justify-content: space-between; margin-bottom: 20px; gap: 10px; }
-        .player-box { flex: 1; padding: 15px; border-radius: 10px; background: #333; border: 3px solid transparent; transition: 0.3s; }
-        .active { border-color: #f1c40f; background: #444; transform: scale(1.05); }
-        
-        .score { font-size: 3em; font-weight: bold; display: block; }
-        .player-name { font-size: 1.2em; color: #f1c40f; text-transform: uppercase; }
+        .names-row { display: flex; gap: 10px; margin-bottom: 15px; }
+        .names-row input { flex: 1; padding: 10px; border-radius: 8px; border: none; background: #444; color: white; text-align: center; font-weight: bold; font-size: 1em; }
 
-        .phase-info { font-style: italic; color: #aaa; margin: 15px 0; min-height: 3em; font-size: 0.9em; border-top: 1px solid #444; padding-top: 10px; }
+        .scoreboard { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 10px; }
+        .player-box { flex: 1; padding: 15px 5px; border-radius: 15px; background: #333; border: 4px solid transparent; transition: 0.3s; }
+        .active { border-color: #f1c40f; background: #3d3d3d; }
+        
+        .score { font-size: 3.5em; font-weight: 900; display: block; line-height: 1; margin: 5px 0; }
+        .player-label { font-size: 0.9em; color: #bbb; text-transform: uppercase; }
+
+        .phase-info { font-style: italic; color: #f1c40f; margin: 10px 0; min-height: 2.5em; font-size: 0.95em; }
         
         .btn-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        button { padding: 15px 5px; font-size: 1em; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; }
-        
-        .btn-ball { background: #e67e22; } /* Oransje for baller */
-        .btn-carom { background: #3498db; } /* Blå for caroms */
-        .btn-turn { background: #2ecc71; grid-column: span 3; font-size: 1.2em; margin: 10px 0; } /* Grønn for neste spiller */
-        .btn-undo { background: #95a5a6; grid-column: span 1; }
-        .btn-reset { background: #e74c3c; grid-column: span 2; }
+        button { padding: 18px 5px; font-size: 1.1em; border: none; border-radius: 12px; cursor: pointer; color: white; font-weight: bold; box-shadow: 0 4px rgba(0,0,0,0.3); }
+        button:active { transform: translateY(2px); box-shadow: 0 2px rgba(0,0,0,0.3); }
 
-        button:active { transform: scale(0.95); opacity: 0.8; }
-        button:disabled { background: #444; color: #777; opacity: 0.5; }
-        
-        #log { margin-top: 15px; font-size: 0.8em; color: #888; }
+        .btn-ball { background: #d35400; } 
+        .btn-carom { background: #2980b9; }
+        .btn-foul { background: #e74c3c; grid-column: span 1; } /* Rød for feil */
+        .btn-minus { background: #7f8c8d; }
+        .btn-turn { background: #27ae60; grid-column: span 3; font-size: 1.3em; margin-top: 5px; }
+        .btn-undo { background: #8e44ad; }
+        .btn-reset { background: #34495e; grid-column: span 1; }
+
+        button:disabled { background: #444 !important; color: #777; cursor: not-allowed; box-shadow: none; }
+        #log { margin-top: 15px; font-size: 0.8em; color: #666; }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <div class="names-row">
+        <input type="text" id="p1-name" value="SPILLER 1" oninput="updateUI()">
+        <input type="text" id="p2-name" value="SPILLER 2" oninput="updateUI()">
+    </div>
+
     <div class="scoreboard">
-        <div id="p1-box" class="player-box active">
-            <span class="player-name">Spiller 1</span>
+        <div id="p1-box" class="player-box active" onclick="setTurn(0)">
+            <span id="p1-label" class="player-label">SPILLER 1</span>
             <span id="p1-score" class="score">0</span>
         </div>
-        <div id="p2-box" class="player-box">
-            <span class="player-name">Spiller 2</span>
+        <div id="p2-box" class="player-box" onclick="setTurn(1)">
+            <span id="p2-label" class="player-label">SPILLER 2</span>
             <span id="p2-score" class="score">0</span>
         </div>
     </div>
 
-    <div id="phaseText" class="phase-info">Spiller 1 sin tur.<br>Fase 1: Poeng for alt.</div>
+    <div id="phaseText" class="phase-info">Gjør klar for støt!</div>
 
     <div class="btn-grid">
         <button class="btn-ball" onclick="addScore(1)" id="b1">Ball 1</button>
@@ -54,79 +63,90 @@
         <button class="btn-ball" onclick="addScore(5)" id="b5">Ball 5</button>
         
         <button class="btn-carom" onclick="addScore(1)">Carom 1p</button>
-        <button class="btn-carom" onclick="addScore(2)" style="grid-column: span 2;">Carom 3 baller (2p)</button>
-        
-        <button class="btn-turn" onclick="switchTurn()">NESTE SPILLER (Ferdig)</button>
+        <button class="btn-carom" onclick="addScore(2)">Carom 2p</button>
+        <button class="btn-minus" onclick="addScore(-1)">−</button>
+
+        <button class="btn-foul" onclick="handleFoul()">FOUL!</button>
         <button class="btn-undo" onclick="undo()">Angre</button>
-        <button class="btn-reset" onclick="resetGame()">Nullstill Match</button>
+        <button class="btn-reset" onclick="resetGame()">Reset</button>
+
+        <button class="btn-turn" onclick="switchTurn()">NESTE SPILLER (Ferdig)</button>
     </div>
 
-    <div id="log">Kamp startet!</div>
+    <div id="log">Logg: Klar.</div>
 </div>
 
 <script>
     let scores = [0, 0];
-    let currentPlayer = 0; // 0 for Spiller 1, 1 for Spiller 2
+    let scoreAtStartOfTurn = [0, 0]; // For å håndtere fouls
+    let currentPlayer = 0;
     let history = [];
 
-    const scoreEls = [document.getElementById('p1-score'), document.getElementById('p2-score')];
-    const boxEls = [document.getElementById('p1-box'), document.getElementById('p2-box')];
-    const phaseEl = document.getElementById('phaseText');
-    const logEl = document.getElementById('log');
-    
-    const ballBtns = [document.getElementById('b1'), document.getElementById('b3'), document.getElementById('b5')];
-
     function updateUI() {
-        scoreEls[0].innerText = scores[0];
-        scoreEls[1].innerText = scores[1];
+        const p1Name = document.getElementById('p1-name').value || "Spiller 1";
+        const p2Name = document.getElementById('p2-name').value || "Spiller 2";
         
-        // Marker aktiv spiller
-        boxEls[0].classList.toggle('active', currentPlayer === 0);
-        boxEls[1].classList.toggle('active', currentPlayer === 1);
+        document.getElementById('p1-label').innerText = p1Name;
+        document.getElementById('p2-label').innerText = p2Name;
+        document.getElementById('p1-score').innerText = scores[0];
+        document.getElementById('p2-score').innerText = scores[1];
+        
+        document.getElementById('p1-box').classList.toggle('active', currentPlayer === 0);
+        document.getElementById('p2-box').classList.toggle('active', currentPlayer === 1);
 
         let s = scores[currentPlayer];
-        let pName = "Spiller " + (currentPlayer + 1);
-        
+        let phaseText = (currentPlayer === 0 ? p1Name : p2Name) + "<br>";
+
         if (s < 90) {
-            phaseEl.innerHTML = `<b>${pName}</b> sin tur.<br>Fase 1: Alle poeng teller.`;
-            ballBtns.forEach(b => b.disabled = false);
+            phaseText += "Fase 1: Alle poeng teller";
+            disableBalls(false);
         } else if (s < 100) {
-            phaseEl.innerHTML = `<b>${pName}</b> sin tur.<br>Fase 2: Kun Caroms (90-100).`;
-            ballBtns.forEach(b => b.disabled = true);
+            phaseText += "Fase 2: Kun Caroms (90-100)";
+            disableBalls(true);
         } else if (s === 100) {
-            phaseEl.innerHTML = `<b>${pName}</b>: FINALE!<br>Senk hvit via 1-ball!`;
-            ballBtns.forEach(b => b.disabled = true);
-        } else if (s === 101) {
-            phaseEl.innerHTML = `🏆 <b>${pName} VANT!</b> 🏆`;
-            ballBtns.forEach(b => b.disabled = true);
+            phaseText += "FINALE: Senk hvit via 1-ball!";
+            disableBalls(true);
+        } else {
+            phaseText += "🏆 Vinner! 🏆";
         }
+        document.getElementById('phaseText').innerHTML = phaseText;
+    }
+
+    function disableBalls(disabled) {
+        document.getElementById('b1').disabled = disabled;
+        document.getElementById('b3').disabled = disabled;
+        document.getElementById('b5').disabled = disabled;
     }
 
     function addScore(points) {
         let s = scores[currentPlayer];
-        
-        // Sjekk regler for nøyaktig score
-        if (s < 90 && s + points > 90) {
-            alert("Du må treffe nøyaktig 90!");
-            return;
+        if (points > 0) {
+            if (s < 90 && s + points > 90) return alert("Må være nøyaktig 90!");
+            if (s >= 90 && s < 100 && s + points > 100) return alert("Må være nøyaktig 100!");
         }
-        if (s >= 90 && s < 100 && s + points > 100) {
-            alert("Du må treffe nøyaktig 100!");
-            return;
-        }
-        if (s === 100 && points !== 1) return;
-
-        // Lagre historikk for angre-funksjon
         history.push({player: currentPlayer, scoreBefore: scores[currentPlayer]});
-        
-        scores[currentPlayer] += points;
-        logEl.innerText = `Spiller ${currentPlayer+1} fikk ${points} poeng.`;
+        scores[currentPlayer] = Math.max(0, scores[currentPlayer] + points);
         updateUI();
+    }
+
+    function handleFoul() {
+        if(confirm("Foul? Dette nullstiller poengene for denne runden.")) {
+            history.push({player: currentPlayer, scoreBefore: scores[currentPlayer]});
+            scores[currentPlayer] = scoreAtStartOfTurn[currentPlayer];
+            switchTurn();
+        }
     }
 
     function switchTurn() {
         currentPlayer = currentPlayer === 0 ? 1 : 0;
-        logEl.innerText = `Neste spiller: Spiller ${currentPlayer+1}`;
+        scoreAtStartOfTurn[currentPlayer] = scores[currentPlayer]; // Lagre start-score for ny spiller
+        document.getElementById('log').innerText = "Tur byttet.";
+        updateUI();
+    }
+
+    function setTurn(idx) {
+        currentPlayer = idx;
+        scoreAtStartOfTurn[currentPlayer] = scores[currentPlayer];
         updateUI();
     }
 
@@ -134,21 +154,20 @@
         if (history.length > 0) {
             let last = history.pop();
             scores[last.player] = last.scoreBefore;
-            currentPlayer = last.player;
-            logEl.innerText = "Siste poeng ble angret.";
             updateUI();
         }
     }
 
     function resetGame() {
-        if(confirm("Vil du slette matchen og starte på nytt?")) {
+        if(confirm("Nullstille alt?")) {
             scores = [0, 0];
-            currentPlayer = 0;
+            scoreAtStartOfTurn = [0, 0];
             history = [];
-            logEl.innerText = "Match nullstilt.";
             updateUI();
         }
     }
+
+    updateUI();
 </script>
 
 </body>
