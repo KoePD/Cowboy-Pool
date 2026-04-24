@@ -22,7 +22,6 @@
         .score { font-size: 2.8em; font-weight: 900; display: block; line-height: 1; }
         .player-label-display { font-size: 0.7em; color: #aaa; text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis; padding-right: 25px; }
         
-        /* TOP BREAK STYLING */
         .top-break-label { position: absolute; top: 10px; right: 10px; font-size: 0.6em; color: #f1c40f; font-weight: 900; background: rgba(0,0,0,0.3); padding: 2px 4px; border-radius: 4px; }
         .top-break-label::before { content: "★ "; font-size: 0.8em; }
 
@@ -105,7 +104,7 @@
         <button class="ctrl btn-carom" onclick="action('carom', 1)" id="c1">Carom 1p</button>
         <button class="ctrl btn-carom" onclick="action('carom', 2)" id="c2">Carom 2p</button>
         <button class="ctrl" style="background:#8e44ad" onclick="undo()">Angre</button>
-        <button class="ctrl" style="background:#555" onclick="alert('Cowboy Pool:\n1. 0-90: Veksle kule/carom.\n2. 91-100: Kun caroms.\n3. 101: Hazard via 1-ball.\n4. 3 fouls på rad er tap.')">Regler</button>
+        <button class="ctrl" style="background:#555" onclick="alert('Cowboy Pool:\n1. 0-90: Veksle kule/carom.\n2. Kombinasjon (begge): Ingen låsing på neste støt!\n3. 91-100: Kun caroms.\n4. 101: Hazard via 1-ball.')">Regler</button>
         <button class="ctrl btn-adj" onclick="action('adjust', 1)">+</button>
         <button class="ctrl btn-adj" onclick="action('adjust', -1)">−</button>
         <button class="ctrl btn-foul-reset" onclick="handleFoul()">FOUL / SCRATCH</button>
@@ -123,7 +122,7 @@
     let currentPlayer = parseInt(localStorage.getItem('cb_player')) || 0;
     let breakDone = JSON.parse(localStorage.getItem('cb_break')) || false;
     let firstPostBreakDone = JSON.parse(localStorage.getItem('cb_first')) || false;
-    let lastType = localStorage.getItem('cb_lastType') || null;
+    let lastType = localStorage.getItem('cb_lastType') || null; // Kan nå være 'pocket', 'carom' eller 'both'
     let seconds = parseInt(localStorage.getItem('cb_time')) || 0;
     let innings = parseInt(localStorage.getItem('cb_innings')) || 0;
     let isPaused = true;
@@ -174,16 +173,10 @@
             const name = document.getElementById(`p${i}-name`).value;
             document.getElementById(`p${i}-label-display`).innerText = name;
             document.getElementById(`p${i}-score`).innerText = scores[i];
-            
             const currentBreak = scores[i] - scoreAtStart[i];
             document.getElementById(`p${i}-turn-score`).innerText = currentBreak;
-            
-            // Oppdater Top Break hvis nåværende break er høyere
-            if (currentBreak > topBreaks[i]) {
-                topBreaks[i] = currentBreak;
-            }
+            if (currentBreak > topBreaks[i]) topBreaks[i] = currentBreak;
             document.getElementById(`p${i}-top-break`).innerText = topBreaks[i];
-
             document.getElementById(`p${i}-box`).className = (currentPlayer === i) ? 'player-box active' : 'player-box';
             const dots = document.getElementById(`p${i}-fouls`).children;
             for(let d=0; d<3; d++) dots[d].className = (d < foulCounts[i]) ? 'dot active' : 'dot';
@@ -201,22 +194,24 @@
             winBall.style.display = "none";
             ballGroups.forEach(g => g.style.display = "flex");
             if (!breakDone) document.getElementById('moveText').innerText = "BREAK SHOT (3-BALL)";
-            else if (!firstPostBreakDone) document.getElementById('moveText').innerText = "VALG: CAROM ELLER KULE";
+            else if (!firstPostBreakDone || lastType === 'both') document.getElementById('moveText').innerText = "VALG: CAROM ELLER KULE";
             else if (s >= 90) document.getElementById('moveText').innerText = "91-100: KUN CAROMS!";
             else document.getElementById('moveText').innerText = (lastType === 'pocket') ? "KRAV: CAROM" : "KRAV: KULE";
         }
 
-        const pWait = s >= 90 || (firstPostBreakDone && lastType === 'pocket');
-        const cWait = (firstPostBreakDone && lastType === 'carom' && s < 90);
+        // LOGIKK FOR LÅSING/GRAVING
+        // Hvis lastType er 'both', skal ingenting ventes på (alt er åpent)
+        const pocketWait = s >= 90 || (firstPostBreakDone && lastType === 'pocket');
+        const caromWait = (firstPostBreakDone && lastType === 'carom' && s < 90);
 
         document.querySelectorAll('.ball-btn, .btn-sub-carom').forEach(el => {
             if(!el.id.includes('Win')) {
-                el.classList.toggle('waiting', pWait);
+                el.classList.toggle('waiting', pocketWait);
                 el.disabled = (s >= 90);
             }
         });
-        document.getElementById('c1').classList.toggle('waiting', cWait);
-        document.getElementById('c2').classList.toggle('waiting', cWait);
+        document.getElementById('c1').classList.toggle('waiting', caromWait);
+        document.getElementById('c2').classList.toggle('waiting', caromWait);
         document.getElementById('inningText').innerText = "Inning: " + (Math.floor(innings/playerCount) + 1);
         saveData();
     }
@@ -230,12 +225,24 @@
             foulCounts[currentPlayer] = 0;
         }
         saveHistory();
-        if (type === 'win') { scores[currentPlayer] = 101; confetti(); }
-        else if (type !== 'adjust') {
-            if (!breakDone) breakDone = true; else if (!firstPostBreakDone) firstPostBreakDone = true;
-            lastType = (type === 'pocket_carom' || type === 'pocket') ? 'pocket' : 'carom';
+
+        if (type === 'win') {
+            scores[currentPlayer] = 101;
+            confetti();
+        } else if (type === 'pocket_carom') {
+            // SPESIAL: Hvis begge utføres, sett lastType til 'both'
+            if (!breakDone) breakDone = true;
+            firstPostBreakDone = true;
+            lastType = 'both';
             scores[currentPlayer] += val;
-        } else { scores[currentPlayer] = Math.max(0, scores[currentPlayer] + val); }
+        } else if (type !== 'adjust') {
+            if (!breakDone) breakDone = true;
+            else if (!firstPostBreakDone) firstPostBreakDone = true;
+            lastType = type;
+            scores[currentPlayer] += val;
+        } else {
+            scores[currentPlayer] = Math.max(0, scores[currentPlayer] + val);
+        }
         updateUI();
     }
 
