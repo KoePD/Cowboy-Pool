@@ -13,18 +13,22 @@
         .names-row input { flex: 1; padding: 10px; border-radius: 8px; border: none; background: #444; color: white; text-align: center; font-weight: bold; }
         
         .scoreboard { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 10px; }
-        .player-box { flex: 1; padding: 15px 5px; border-radius: 15px; background: #333; border: 4px solid transparent; transition: 0.3s; }
+        .player-box { flex: 1; padding: 15px 5px; border-radius: 15px; background: #333; border: 4px solid transparent; transition: 0.3s; position: relative; }
         .active { border-color: #f1c40f; background: #3d3d3d; }
         .score { font-size: 3.5em; font-weight: 900; display: block; line-height: 1; }
         .player-label { font-size: 0.9em; color: #bbb; text-transform: uppercase; }
+        
+        /* Foul Dots */
+        .foul-dots { display: flex; justify-content: center; gap: 5px; margin-top: 5px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: #444; border: 1px solid #000; }
+        .dot.active { background: #c0392b; box-shadow: 0 0 5px #ff0000; }
 
-        /* SENTRERT TIMER OG START/PAUSE */
         .timer-row { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 15px 0; padding: 10px 0; border-top: 1px solid #333; border-bottom: 1px solid #333; }
         .timer-display { font-family: monospace; font-size: 1.6em; color: #f1c40f; letter-spacing: 1px; font-weight: bold; }
-        .btn-timer-ctrl { background: #e67e22; color: white; border: none; padding: 8px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9em; text-transform: uppercase; box-shadow: 0 4px rgba(0,0,0,0.3); }
+        .btn-timer-ctrl { background: #e67e22; color: white; border: none; padding: 8px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9em; text-transform: uppercase; }
         .btn-timer-ctrl.running { background: #c0392b; }
 
-        .next-move-box { background: #2c3e50; padding: 15px; border-radius: 12px; margin: 15px 0; border-left: 6px solid #f1c40f; min-height: 65px; display: flex; flex-direction: column; justify-content: center; transition: 0.3s; }
+        .next-move-box { background: #2c3e50; padding: 15px; border-radius: 12px; margin: 15px 0; border-left: 6px solid #f1c40f; min-height: 65px; display: flex; flex-direction: column; justify-content: center; }
         .move-label { font-size: 0.7em; text-transform: uppercase; color: #f1c40f; font-weight: bold; margin-bottom: 3px; }
         .move-text { font-weight: 900; font-size: 1.25em; color: #fff; letter-spacing: 0.5px; }
 
@@ -39,7 +43,6 @@
         .control-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         button.ctrl { padding: 15px 5px; font-size: 0.9em; border: none; border-radius: 12px; cursor: pointer; color: white; font-weight: bold; }
         .btn-carom { background: #2980b9; }
-        .btn-carom:disabled { opacity: 0.2; cursor: not-allowed; }
         .btn-foul { background: #c0392b; }
         .btn-undo { background: #8e44ad; }
         .btn-turn { background: #27ae60; grid-column: span 3; font-size: 1.2em; margin-top: 5px; padding: 15px; }
@@ -68,10 +71,16 @@
         <div id="p1-box" class="player-box active">
             <span id="p1-label" class="player-label">SPILLER 1</span>
             <span id="p1-score" class="score">0</span>
+            <div class="foul-dots" id="p1-fouls">
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            </div>
         </div>
         <div id="p2-box" class="player-box">
             <span id="p2-label" class="player-label">SPILLER 2</span>
             <span id="p2-score" class="score">0</span>
+            <div class="foul-dots" id="p2-fouls">
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            </div>
         </div>
     </div>
 
@@ -110,9 +119,8 @@
         </div>
         <div id="rulesContent" class="rules-content">
             <b>Mål:</b> 101 poeng nøyaktig.<br><br>
-            <b>Fase 1 (0-90):</b> Veksle mellom å senke ball og gjøre carom.<br>
-            <b>Fase 2 (90-100):</b> Kun caroms gir poeng. Baller i hull gir 0p.<br>
-            <b>Fase 3 (101):</b> Vinnerstøt: Carom av 1-ballen og senk hvit.<br><br>
+            <b>Veksling:</b> Mellom kule og carom i fase 1.<br>
+            <b>3-Foul regel:</b> 3 fouls på rad resulterer i tap av spill (forfeit).<br>
             <b>Foul:</b> Mister poeng opptjent i gjeldende tur.
         </div>
     </div>
@@ -120,6 +128,7 @@
 
 <script>
     let scores = JSON.parse(localStorage.getItem('cb_scores')) || [0, 0];
+    let foulCounts = JSON.parse(localStorage.getItem('cb_fouls')) || [0, 0];
     let scoreAtStart = JSON.parse(localStorage.getItem('cb_startScore')) || [0, 0];
     let currentPlayer = JSON.parse(localStorage.getItem('cb_player')) || 0;
     let breakDone = JSON.parse(localStorage.getItem('cb_break')) || false;
@@ -140,14 +149,9 @@
         saveData();
     }
 
-    function triggerEffect() {
-        const cont = document.getElementById('mainContainer');
-        cont.classList.add('shake');
-        setTimeout(() => cont.classList.remove('shake'), 500);
-    }
-
     function saveData() {
         localStorage.setItem('cb_scores', JSON.stringify(scores));
+        localStorage.setItem('cb_fouls', JSON.stringify(foulCounts));
         localStorage.setItem('cb_startScore', JSON.stringify(scoreAtStart));
         localStorage.setItem('cb_player', JSON.stringify(currentPlayer));
         localStorage.setItem('cb_break', JSON.stringify(breakDone));
@@ -167,11 +171,27 @@
         document.getElementById('p2-score').innerText = scores[1];
         document.getElementById('p1-box').className = currentPlayer === 0 ? "player-box active" : "player-box";
         document.getElementById('p2-box').className = currentPlayer === 1 ? "player-box active" : "player-box";
-        document.getElementById('matchTimer').innerText = formatTime(seconds);
+
+        // Update Foul Dots
+        [0, 1].forEach(pIdx => {
+            const dots = document.getElementById(`p${pIdx+1}-fouls`).children;
+            for(let i=0; i<3; i++) {
+                dots[i].className = i < foulCounts[pIdx] ? "dot active" : "dot";
+            }
+        });
 
         const s = scores[currentPlayer];
         const moveText = document.getElementById('moveText');
         const moveBox = document.getElementById('moveBox');
+
+        if (foulCounts[0] >= 3 || foulCounts[1] >= 3) {
+            const winner = foulCounts[0] >= 3 ? names[1] : names[0];
+            const loser = foulCounts[0] >= 3 ? names[0] : names[1];
+            moveText.innerText = `FORFEIT: ${winner} VINNER!`;
+            moveBox.style.background = "#c0392b";
+            stopTimer();
+            return;
+        }
 
         if (!breakDone) {
             moveText.innerText = "SENK 3-BALLEN (BREAK)";
@@ -182,29 +202,16 @@
             stopTimer();
         } else if (s === 100) {
             moveText.innerText = "SENK HVIT VIA 1-BALLEN";
-            moveBox.style.borderLeftColor = "#d35400";
         } else if (s >= 90) {
             moveText.innerText = "GJØR EN CAROM";
-            moveBox.style.borderLeftColor = "#8e44ad";
         } else if (!firstPostBreakDone) {
             moveText.innerText = "VALG: CAROM ELLER SENK KULE";
-            moveBox.style.borderLeftColor = "#f1c40f";
         } else {
-            if (lastType === 'pocket') {
-                moveText.innerText = "GJØR EN CAROM";
-                moveBox.style.borderLeftColor = "#8e44ad";
-            } else {
-                moveText.innerText = "SENK EN BALL";
-                moveBox.style.borderLeftColor = "#2980b9";
-            }
+            moveText.innerText = lastType === 'pocket' ? "GJØR EN CAROM" : "SENK EN BALL";
         }
 
-        let pocketOff = false, caromOff = false;
-        if (s >= 90) pocketOff = true;
-        else if (firstPostBreakDone) {
-            if (lastType === 'pocket') pocketOff = true;
-            if (lastType === 'carom') caromOff = true;
-        }
+        let pocketOff = s >= 90 || (firstPostBreakDone && lastType === 'pocket');
+        let caromOff = (firstPostBreakDone && lastType === 'carom');
 
         document.getElementById('b1').disabled = pocketOff;
         document.getElementById('b3').disabled = pocketOff;
@@ -218,38 +225,41 @@
         if (!isPaused) {
             isPaused = true; clearInterval(timerInterval);
             document.getElementById('timerBtn').innerText = "START";
-            document.getElementById('timerBtn').classList.remove('running');
         } else {
             isPaused = false;
             document.getElementById('timerBtn').innerText = "PAUSE";
-            document.getElementById('timerBtn').classList.add('running');
             timerInterval = setInterval(() => { seconds++; document.getElementById('matchTimer').innerText = formatTime(seconds); saveData(); }, 1000);
         }
     }
 
-    function stopTimer() { isPaused = true; clearInterval(timerInterval); document.getElementById('timerBtn').innerText = "START"; document.getElementById('timerBtn').classList.remove('running');}
+    function stopTimer() { isPaused = true; clearInterval(timerInterval); document.getElementById('timerBtn').innerText = "START"; }
 
     function action(type, val) {
         if (isPaused && type !== 'adjust') toggleTimer();
         const s = scores[currentPlayer];
         const pName = document.getElementById(`p${currentPlayer+1}-name`).value;
+        
         if (type !== 'adjust') {
-            if ((s < 90 && s + val > 90) || (s >= 90 && s < 100 && s + val > 100)) return alert("Nøyaktig score kreves!");
+            if ((s < 90 && s + val > 90) || (s >= 90 && s < 100 && s + val > 100)) return alert("Nøyaktig score!");
+            // Nullstill fouls ved gyldig poengstøt
+            foulCounts[currentPlayer] = 0;
         }
-        history.push({scores: [...scores], breakDone, firstPostBreakDone, lastType, currentPlayer, logEntries: [...logEntries]});
+
+        history.push({scores: [...scores], foulCounts: [...foulCounts], breakDone, firstPostBreakDone, lastType, currentPlayer, logEntries: [...logEntries]});
+        
         if (type !== 'adjust') {
             if (!breakDone) breakDone = true;
             else if (!firstPostBreakDone) firstPostBreakDone = true;
             lastType = type;
-            addLog(`${pName}: ${type==='pocket'?'Kule':'Carom'} (+${val}p)`);
-        } else { addLog(`${pName}: Justert (${val})`); }
+            addLog(`${pName}: +${val}p`);
+        }
+        
         scores[currentPlayer] = Math.max(0, scores[currentPlayer] + val);
-        if ([90, 100, 101].includes(scores[currentPlayer])) { triggerEffect(); if(scores[currentPlayer]===101) confetti(); }
+        if ([90, 100, 101].includes(scores[currentPlayer])) confetti();
         updateUI();
     }
 
     function nextTurn() {
-        addLog(`${document.getElementById(`p${currentPlayer+1}-name`).value}: Ferdig`);
         firstPostBreakDone = false; lastType = null;
         currentPlayer = currentPlayer === 0 ? 1 : 0;
         scoreAtStart[currentPlayer] = scores[currentPlayer];
@@ -257,26 +267,37 @@
     }
 
     function handleFoul() {
-        if(confirm("Foul!")) { addLog(`FOUL! S${currentPlayer+1}`); scores[currentPlayer] = scoreAtStart[currentPlayer]; nextTurn(); }
+        const pName = document.getElementById(`p${currentPlayer+1}-name`).value;
+        history.push({scores: [...scores], foulCounts: [...foulCounts], breakDone, firstPostBreakDone, lastType, currentPlayer, logEntries: [...logEntries]});
+        
+        foulCounts[currentPlayer]++;
+        addLog(`FOUL ${foulCounts[currentPlayer]}/3: ${pName}`);
+        
+        if (foulCounts[currentPlayer] >= 3) {
+            addLog(`FORFEIT! ${pName} tapte.`);
+            updateUI();
+        } else {
+            scores[currentPlayer] = scoreAtStart[currentPlayer];
+            nextTurn();
+        }
     }
 
     function undo() {
         if (history.length > 0) {
             let st = history.pop();
-            scores = st.scores; breakDone = st.breakDone; firstPostBreakDone = st.firstPostBreakDone;
-            lastType = st.lastType; currentPlayer = st.currentPlayer; logEntries = st.logEntries;
-            updateUI(); addLog("Angret");
+            scores = st.scores; foulCounts = st.foulCounts; breakDone = st.breakDone; 
+            firstPostBreakDone = st.firstPostBreakDone; lastType = st.lastType; 
+            currentPlayer = st.currentPlayer; logEntries = st.logEntries;
+            updateUI();
         }
     }
 
     function toggleRules() {
         let c = document.getElementById('rulesContent');
-        let a = document.getElementById('rule-arrow');
         c.style.display = (c.style.display === "block") ? "none" : "block";
-        a.innerText = (c.style.display === "block") ? "▲" : "▼";
     }
 
-    function resetGame() { if(confirm("Nullstill?")) { localStorage.clear(); location.reload(); } }
+    function resetGame() { if(confirm("Reset?")) { localStorage.clear(); location.reload(); } }
 
     if(localStorage.getItem('p1name')) document.getElementById('p1-name').value = localStorage.getItem('p1name');
     if(localStorage.getItem('p2name')) document.getElementById('p2-name').value = localStorage.getItem('p2name');
