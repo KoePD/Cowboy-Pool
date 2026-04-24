@@ -20,26 +20,45 @@
         /* Statusfelt */
         .phase-info { font-style: italic; color: #f1c40f; margin: 10px 0; min-height: 2.5em; font-size: 0.95em; border-bottom: 1px solid #333; padding-bottom: 10px; }
         
-        /* Knapper */
-        .btn-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        button { padding: 18px 5px; font-size: 1.1em; border: none; border-radius: 12px; cursor: pointer; color: white; font-weight: bold; box-shadow: 0 4px rgba(0,0,0,0.3); }
-        button:active { transform: translateY(2px); box-shadow: 0 2px rgba(0,0,0,0.3); }
+        /* Kule-knapper (Nye) */
+        .ball-row { display: flex; justify-content: space-around; margin: 15px 0; }
+        .ball-btn { 
+            width: 80px; height: 80px; border-radius: 50%; border: none; cursor: pointer;
+            font-size: 2em; font-weight: bold; color: black; display: flex; align-items: center; justify-content: center;
+            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.5), 0 5px 10px rgba(0,0,0,0.3);
+            position: relative; transition: 0.1s;
+        }
+        /* "Glans" på kula */
+        .ball-btn::after {
+            content: ''; position: absolute; top: 10px; left: 15px; width: 25px; height: 15px;
+            background: rgba(255,255,255,0.3); border-radius: 50%; transform: rotate(-20deg);
+        }
+        .ball-btn:active { transform: scale(0.95) translateY(3px); box-shadow: inset -5px -5px 10px rgba(0,0,0,0.5), 0 2px 5px rgba(0,0,0,0.3); }
+        .ball-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-        .btn-ball { background: #d35400; } 
-        .btn-carom { background: #2980b9; }
-        .btn-foul { background: #e74c3c; }
+        #b1 { background: radial-gradient(circle at 30% 30%, #f1c40f, #cca30e); } /* Gul */
+        #b3 { background: radial-gradient(circle at 30% 30%, #e74c3c, #b03a2e); } /* Rød */
+        #b5 { background: radial-gradient(circle at 30% 30%, #f39c12, #ba780e); } /* Oransje */
+
+        /* Andre knapper */
+        .control-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        button.ctrl { padding: 15px 5px; font-size: 1em; border: none; border-radius: 12px; cursor: pointer; color: white; font-weight: bold; box-shadow: 0 4px rgba(0,0,0,0.3); }
+        button.ctrl:active { transform: translateY(2px); box-shadow: 0 2px rgba(0,0,0,0.3); }
+
+        .btn-carom { background: #2980b9; grid-column: span 1; }
+        .btn-carom2 { background: #2980b9; grid-column: span 1; }
         .btn-minus { background: #7f8c8d; }
-        .btn-turn { background: #27ae60; grid-column: span 3; font-size: 1.3em; margin-top: 5px; }
+        .btn-foul { background: #555; }
         .btn-undo { background: #8e44ad; }
         .btn-reset { background: #34495e; }
+        .btn-turn { background: #27ae60; grid-column: span 3; font-size: 1.3em; margin-top: 5px; }
 
-        /* Regler-seksjon */
+        /* Regler */
         .rules-container { margin-top: 20px; text-align: left; background: #111; border-radius: 10px; overflow: hidden; }
         .rules-header { padding: 10px; background: #333; cursor: pointer; font-weight: bold; display: flex; justify-content: space-between; }
         .rules-content { padding: 15px; font-size: 0.85em; display: none; line-height: 1.4; color: #ccc; }
         .rules-content b { color: #f1c40f; }
         
-        button:disabled { background: #444 !important; color: #777; box-shadow: none; opacity: 0.5; }
     </style>
 </head>
 <body>
@@ -63,20 +82,22 @@
 
     <div id="phaseText" class="phase-info">Gjør klar!</div>
 
-    <div class="btn-grid">
-        <button class="btn-ball" onclick="addScore(1)" id="b1">Ball 1</button>
-        <button class="btn-ball" onclick="addScore(3)" id="b3">Ball 3</button>
-        <button class="btn-ball" onclick="addScore(5)" id="b5">Ball 5</button>
-        
-        <button class="btn-carom" onclick="addScore(1)">Carom 1p</button>
-        <button class="btn-carom" onclick="addScore(2)">Carom 2p</button>
-        <button class="btn-minus" onclick="addScore(-1)">−</button>
+    <div class="ball-row">
+        <button class="ball-btn" onclick="addScore(1)" id="b1">1</button>
+        <button class="ball-btn" onclick="addScore(3)" id="b3">3</button>
+        <button class="ball-btn" onclick="addScore(5)" id="b5">5</button>
+    </div>
 
-        <button class="btn-foul" onclick="handleFoul()">FOUL!</button>
-        <button class="btn-undo" onclick="undo()">Angre</button>
-        <button class="btn-reset" onclick="resetGame()">Reset</button>
+    <div class="control-grid">
+        <button class="ctrl btn-carom" onclick="addScore(1)">Carom 1p</button>
+        <button class="ctrl btn-carom2" onclick="addScore(2)">Carom 2p</button>
+        <button class="ctrl btn-minus" onclick="addScore(-1)">−</button>
 
-        <button class="btn-turn" onclick="switchTurn()">NESTE SPILLER</button>
+        <button class="ctrl btn-foul" onclick="handleFoul()">FOUL!</button>
+        <button class="ctrl btn-undo" onclick="undo()">Angre</button>
+        <button class="ctrl btn-reset" onclick="resetGame()">Reset</button>
+
+        <button class="ctrl btn-turn" onclick="switchTurn()">NESTE SPILLER</button>
     </div>
 
     <div class="rules-container">
@@ -89,8 +110,8 @@
             <b>Fase 1 (0-90):</b> Poeng for å senke kuler (1, 3, 5) og caroms. 
             Carom på 2 baller gir 1p, på 3 baller gir 2p.<br><br>
             <b>Fase 2 (90-100):</b> Kun poeng for caroms. Senkede baller gir 0p og spottes.<br><br>
-            <b>Nøyaktighet:</b> Du må treffe 90 og 100 nøyaktig. Går du over, teller ikke støtet.<br><br>
             <b>Fase 3 (101):</b> Vinnerstøtet må være en carom fra 1-ballen og i en kalt lomme med hvit ball.<br><br>
+            <b>Nøyaktighet:</b> Du må treffe 90 og 100 nøyaktig. Går du over, teller ikke støtet.<br><br>
             <b>Foul:</b> Spilleren mister alle poeng opptjent i den gjeldende turen.
         </div>
     </div>
@@ -171,13 +192,8 @@
     function toggleRules() {
         let content = document.getElementById('rulesContent');
         let arrow = document.getElementById('rule-arrow');
-        if (content.style.display === "block") {
-            content.style.display = "none";
-            arrow.innerText = "▼";
-        } else {
-            content.style.display = "block";
-            arrow.innerText = "▲";
-        }
+        content.style.display = (content.style.display === "block") ? "none" : "block";
+        arrow.innerText = (content.style.display === "block") ? "▲" : "▼";
     }
 
     updateUI();
