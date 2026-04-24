@@ -10,11 +10,16 @@
         .container { max-width: 480px; margin: auto; background: #222; padding: 15px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
         .names-row { display: flex; gap: 10px; margin-bottom: 10px; }
         .names-row input { flex: 1; padding: 10px; border-radius: 8px; border: none; background: #444; color: white; text-align: center; font-weight: bold; }
-        .scoreboard { display: flex; justify-content: space-between; margin-bottom: 10px; gap: 10px; }
+        
+        .scoreboard { display: flex; justify-content: space-between; margin-bottom: 5px; gap: 10px; }
         .player-box { flex: 1; padding: 15px 5px; border-radius: 15px; background: #333; border: 4px solid transparent; }
         .active { border-color: #f1c40f; background: #3d3d3d; }
         .score { font-size: 3.5em; font-weight: 900; display: block; line-height: 1; }
         .player-label { font-size: 0.9em; color: #bbb; text-transform: uppercase; }
+
+        /* Timer-stil */
+        .timer-display { font-family: monospace; font-size: 1.2em; color: #aaa; margin-bottom: 10px; letter-spacing: 1px; }
+
         .phase-info { font-style: italic; color: #f1c40f; margin: 10px 0; min-height: 3em; font-size: 0.95em; border-bottom: 1px solid #333; padding-bottom: 10px; }
         .ball-row { display: flex; justify-content: space-around; margin: 20px 0; }
         .ball-btn { width: 85px; height: 85px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: inset -8px -8px 15px rgba(0,0,0,0.6), 0 5px 10px rgba(0,0,0,0.4); position: relative; transition: 0.1s; padding: 0; }
@@ -23,11 +28,9 @@
         #b1 { background: radial-gradient(circle at 40% 40%, #f1c40f, #b38f00); }
         #b3 { background: radial-gradient(circle at 40% 40%, #e74c3c, #962d22); }
         #b5 { background: radial-gradient(circle at 40% 40%, #f39c12, #a36504); }
-        .ball-btn:active { transform: scale(0.95); }
-        .ball-btn:disabled { opacity: 0.2; filter: grayscale(1); }
+
         .control-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         button.ctrl { padding: 15px 5px; font-size: 1em; border: none; border-radius: 12px; cursor: pointer; color: white; font-weight: bold; box-shadow: 0 4px rgba(0,0,0,0.3); }
-        button.ctrl:active { transform: translateY(2px); box-shadow: 0 2px rgba(0,0,0,0.3); }
         .btn-carom { background: #2980b9; }
         .btn-minus { background: #7f8c8d; }
         .btn-foul { background: #c0392b; }
@@ -58,6 +61,8 @@
         </div>
     </div>
 
+    <div class="timer-display" id="matchTimer">00:00:00</div>
+
     <div id="phaseText" class="phase-info">Gjør klar!</div>
 
     <div class="ball-row">
@@ -82,11 +87,10 @@
             <span id="rule-arrow">▼</span>
         </div>
         <div id="rulesContent" class="rules-content">
-            <b>Mål:</b> Nøyaktig 101 poeng.<br><br>
+            <b>Mål:</b> 101 poeng.<br>
             <b>Fase 1 (0-90):</b> Baller + Caroms.<br>
             <b>Fase 2 (90-100):</b> Kun Caroms.<br>
-            <b>Fase 3 (101):</b> Senk hvit via 1-ball.<br><br>
-            <b>Foul:</b> Mister poeng opptjent i turen.
+            <b>Fase 3 (101):</b> Senk hvit via 1-ball.
         </div>
     </div>
 </div>
@@ -96,9 +100,32 @@
     let scoreAtStartOfTurn = JSON.parse(localStorage.getItem('cowboyStartScore')) || [0, 0];
     let currentPlayer = JSON.parse(localStorage.getItem('cowboyPlayer')) || 0;
     let innings = JSON.parse(localStorage.getItem('cowboyInnings')) || 0;
+    let secondsElapsed = JSON.parse(localStorage.getItem('cowboyTime')) || 0;
+    let timerInterval = null;
     let history = [];
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function formatTime(sec) {
+        let h = Math.floor(sec / 3600).toString().padStart(2, '0');
+        let m = Math.floor((sec % 3600) / 60).toString().padStart(2, '0');
+        let s = (sec % 60).toString().padStart(2, '0');
+        return `${h}:${m}:${s}`;
+    }
+
+    function startTimer() {
+        if (timerInterval) return;
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            document.getElementById('matchTimer').innerText = formatTime(secondsElapsed);
+            saveData();
+        }, 1000);
+    }
+
+    function stopTimer() {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
 
     function playWinSound() {
         const notes = [523.25, 659.25, 783.99, 1046.50];
@@ -121,13 +148,9 @@
         localStorage.setItem('cowboyStartScore', JSON.stringify(scoreAtStartOfTurn));
         localStorage.setItem('cowboyPlayer', JSON.stringify(currentPlayer));
         localStorage.setItem('cowboyInnings', JSON.stringify(innings));
+        localStorage.setItem('cowboyTime', JSON.stringify(secondsElapsed));
         localStorage.setItem('p1name', document.getElementById('p1-name').value);
         localStorage.setItem('p2name', document.getElementById('p2-name').value);
-    }
-
-    function loadNames() {
-        if(localStorage.getItem('p1name')) document.getElementById('p1-name').value = localStorage.getItem('p1name');
-        if(localStorage.getItem('p2name')) document.getElementById('p2-name').value = localStorage.getItem('p2name');
     }
 
     function updateUI() {
@@ -139,6 +162,7 @@
         document.getElementById('p2-score').innerText = scores[1];
         document.getElementById('p1-box').classList.toggle('active', currentPlayer === 0);
         document.getElementById('p2-box').classList.toggle('active', currentPlayer === 1);
+        document.getElementById('matchTimer').innerText = formatTime(secondsElapsed);
 
         let s = scores[currentPlayer];
         let status = (currentPlayer === 0 ? p1Name : p2Name);
@@ -147,6 +171,7 @@
         else if (s === 100) status += "<br>FINALE: Senk hvit via 1-ball!";
         else {
             status += "<br>🏆 VINNER! 🏆";
+            stopTimer();
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
             playWinSound();
         }
@@ -158,6 +183,7 @@
 
     function addScore(points) {
         if (audioCtx.state === 'suspended') audioCtx.resume();
+        startTimer(); // Starter timeren ved første poengregistrering
         let s = scores[currentPlayer];
         if (points > 0) {
             if (s < 90 && s + points > 90) return alert("Må være nøyaktig 90!");
@@ -183,23 +209,10 @@
         updateUI();
     }
 
-    function setTurn(idx) {
-        currentPlayer = idx;
-        scoreAtStartOfTurn[currentPlayer] = scores[currentPlayer];
-        updateUI();
-    }
-
-    function undo() {
-        if (history.length > 0) {
-            let last = history.pop();
-            scores[last.player] = last.scoreBefore;
-            updateUI();
-        }
-    }
-
     function resetGame() {
-        if(confirm("Slette match?")) {
-            scores = [0, 0]; scoreAtStartOfTurn = [0, 0]; innings = 0; history = [];
+        if(confirm("Slette match og timer?")) {
+            stopTimer();
+            scores = [0, 0]; scoreAtStartOfTurn = [0, 0]; innings = 0; secondsElapsed = 0; history = [];
             localStorage.clear(); updateUI();
         }
     }
@@ -210,7 +223,12 @@
         content.style.display = (content.style.display === "block") ? "none" : "block";
     }
 
-    loadNames();
+    if(localStorage.getItem('p1name')) document.getElementById('p1-name').value = localStorage.getItem('p1name');
+    if(localStorage.getItem('p2name')) document.getElementById('p2-name').value = localStorage.getItem('p2name');
+    
+    // Hvis det var en pågående match, fortsett timeren
+    if (secondsElapsed > 0 && scores[0] < 101 && scores[1] < 101) startTimer();
+
     updateUI();
 </script>
 </body>
