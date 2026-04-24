@@ -3,34 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cowboy Pool - Pro Tracker</title>
+    <title>Cowboy Pool Pro Tracker</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #1a3c1a; color: white; text-align: center; margin: 0; padding: 10px; overflow-x: hidden; }
         .container { max-width: 480px; margin: auto; background: #222; padding: 15px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
-        
         .names-row { display: flex; gap: 10px; margin-bottom: 10px; }
         .names-row input { flex: 1; padding: 10px; border-radius: 8px; border: none; background: #444; color: white; text-align: center; font-weight: bold; }
-        
         .scoreboard { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 10px; }
         .player-box { flex: 1; padding: 15px 5px; border-radius: 15px; background: #333; border: 4px solid transparent; transition: 0.3s; position: relative; }
         .active { border-color: #f1c40f; background: #3d3d3d; }
         .score { font-size: 3.5em; font-weight: 900; display: block; line-height: 1; }
         .player-label { font-size: 0.9em; color: #bbb; text-transform: uppercase; }
-        
         .foul-dots { display: flex; justify-content: center; gap: 5px; margin-top: 5px; }
         .dot { width: 10px; height: 10px; border-radius: 50%; background: #444; border: 1px solid #000; }
         .dot.active { background: #c0392b; box-shadow: 0 0 5px #ff0000; }
-
         .timer-row { display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 15px 0; padding: 10px 0; border-top: 1px solid #333; border-bottom: 1px solid #333; gap: 5px; }
         .timer-display { font-family: monospace; font-size: 1.6em; color: #f1c40f; letter-spacing: 1px; font-weight: bold; }
         .inning-display { font-size: 0.8em; color: #888; text-transform: uppercase; letter-spacing: 2px; }
         .btn-timer-ctrl { background: #e67e22; color: white; border: none; padding: 8px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.8em; text-transform: uppercase; margin-top: 5px; }
-
         .next-move-box { background: #2c3e50; padding: 15px; border-radius: 12px; margin: 15px 0; border-left: 6px solid #f1c40f; min-height: 65px; display: flex; flex-direction: column; justify-content: center; }
         .move-label { font-size: 0.7em; text-transform: uppercase; color: #f1c40f; font-weight: bold; margin-bottom: 3px; }
         .move-text { font-weight: 900; font-size: 1.25em; color: #fff; letter-spacing: 0.5px; }
-
         .ball-row { display: flex; justify-content: space-around; margin: 20px 0; align-items: flex-start; min-height: 120px; }
         .ball-group { display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .ball-btn { width: 85px; height: 85px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: inset -8px -8px 15px rgba(0,0,0,0.6), 0 5px 10px rgba(0,0,0,0.4); position: relative; }
@@ -40,22 +34,18 @@
         #b5 { background: radial-gradient(circle at 40% 40%, #f39c12, #a36504); }
         .btn-sub-carom { background: #3498db; color: white; border: none; padding: 5px 8px; border-radius: 5px; font-size: 0.7em; font-weight: bold; cursor: pointer; text-transform: uppercase; }
         #bWin { background: radial-gradient(circle at 40% 40%, #fff, #bbb); color: black; display: none; flex-direction: column; }
-
         .ball-btn:disabled, .btn-sub-carom:disabled, .btn-carom:disabled { opacity: 0.2; filter: grayscale(1); cursor: not-allowed; }
-
         .control-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
-        button.ctrl { padding: 12px 5px; font-size: 0.85em; border: none; border-radius: 12px; cursor: pointer; color: white; font-weight: bold; box-shadow: 0 4px rgba(0,0,0,0.3); }
+        button.ctrl { padding: 12px 5px; font-size: 0.8em; border: none; border-radius: 12px; cursor: pointer; color: white; font-weight: bold; box-shadow: 0 4px rgba(0,0,0,0.3); }
         .btn-carom { background: #2980b9; }
-        .btn-foul-reset { background: #c0392b; } /* Den store foul-knappen */
+        .btn-foul-reset { background: #c0392b; }
         .btn-undo { background: #8e44ad; }
         .btn-rules { background: #555; }
-        .btn-minus { background: #7f8c8d; } /* Den lille foul-knappen */
+        .btn-minus { background: #7f8c8d; }
         .btn-turn { background: #27ae60; grid-column: span 3; font-size: 1.2em; margin-top: 5px; padding: 15px; }
         .btn-reset { background: #34495e; grid-column: span 3; padding: 10px; margin-top: 5px; }
-        
         .match-log { margin-top: 20px; background: #111; border-radius: 10px; padding: 10px; text-align: left; font-size: 0.8em; color: #888; max-height: 100px; overflow-y: auto; }
         .log-entry { border-bottom: 1px solid #222; padding: 3px 0; }
-        
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); }
         .modal-content { background-color: #222; margin: 15% auto; padding: 20px; border: 1px solid #f1c40f; width: 80%; border-radius: 15px; text-align: left; line-height: 1.5; font-size: 0.9em; }
         .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
@@ -67,12 +57,10 @@
     <div class="modal-content">
         <span class="close" onclick="closeRules()">&times;</span>
         <h3 style="color:#f1c40f">COWBOY POOL REGLER</h3>
-        <p>• <b>Mål:</b> Nøyaktig 101 poeng.</p>
-        <p>• <b>0-90:</b> Veksle mellom kule og carom. Alt gir poeng.</p>
-        <p>• <b>90-100:</b> Kun Caroms gir poeng.</p>
-        <p>• <b>101:</b> Carom av 1-ballen og senk hvit kule (Hazard).</p>
-        <p>• <b>3-Foul:</b> Tre fouls på rad (reset-knappen) betyr tap.</p>
-        <p>• <b>Foul (-1):</b> Brukes for mindre forseelser.</p>
+        <p>• <b>Mål:</b> 101 poeng nøyaktig.</p>
+        <p>• <b>Foul/Scratch:</b> Begge mister poeng i turen. Ved scratch får motstander ball i hånd fra kjøkkenet. Ved vanlig foul spilles det fra der ballen ligger.</p>
+        <p>• <b>Vinnerstøt:</b> Hazard (senke hvit via 1-ballen) er påkrevd. Scratch her er <i>ikke</i> foul hvis poenget scores korrekt.</p>
+        <p>• <b>3-Foul:</b> 3 fouls på rad (reset-knappen) er tap.</p>
     </div>
 </div>
 
@@ -127,7 +115,7 @@
         <button class="ctrl btn-undo" onclick="undo()">ANGRE</button>
         <button class="ctrl btn-rules" onclick="openRules()">REGLER</button>
         <button class="ctrl btn-minus" onclick="action('adjust', -1)">FOUL (-1)</button>
-        <button class="ctrl btn-foul-reset" onclick="handleFoul()">FOUL (RESET)</button>
+        <button class="ctrl btn-foul-reset" onclick="handleFoul('normal')">FOUL / SCRATCH</button>
         <button class="ctrl btn-turn" onclick="nextTurn()">BOM / BYTT TUR</button>
         <button class="ctrl btn-reset" onclick="resetGame()">NULLSTILL MATCH</button>
     </div>
@@ -193,13 +181,6 @@
             else if (s >= 90) moveText.innerText = "GJØR EN CAROM";
             else moveText.innerText = !firstPostBreakDone ? "VELG: CAROM ELLER KULE" : (lastType === 'pocket' ? "GJØR EN CAROM" : "SENK EN BALL");
         }
-
-        let pOff = s >= 90 || (firstPostBreakDone && lastType === 'pocket');
-        let cOff = s < 90 && firstPostBreakDone && lastType === 'carom';
-        document.getElementById('b1').disabled = document.getElementById('sc1').disabled = pOff;
-        document.getElementById('b3').disabled = document.getElementById('sc3').disabled = pOff;
-        document.getElementById('b5').disabled = document.getElementById('sc5').disabled = pOff;
-        document.getElementById('c1').disabled = document.getElementById('c2').disabled = cOff;
         saveData();
     }
 
@@ -221,38 +202,31 @@
             foulCounts[currentPlayer] = 0;
         }
         history.push({scores: [...scores], foulCounts: [...foulCounts], breakDone, firstPostBreakDone, lastType, currentPlayer, logEntries: [...logEntries], innings});
-        
-        if (type === 'win') scores[currentPlayer] = 101;
+        if (type === 'win') { scores[currentPlayer] = 101; addLog("🏆 HAZARD WIN!"); confetti(); }
         else if (type !== 'adjust') {
             if (!breakDone) breakDone = true; else if (!firstPostBreakDone) firstPostBreakDone = true;
             lastType = (type === 'pocket_carom') ? 'pocket' : type;
-            scores[currentPlayer] += val;
-            addLog(`+${val}p`);
-        } else { 
-            scores[currentPlayer] = Math.max(0, scores[currentPlayer] + val); 
-            addLog(`Trekk: ${val}p`);
-        }
-        if (scores[currentPlayer] >= 101) confetti();
+            scores[currentPlayer] += val; addLog(`+${val}p`);
+        } else { scores[currentPlayer] = Math.max(0, scores[currentPlayer] + val); addLog(`Trekk: ${val}p`); }
         updateUI();
     }
 
-    function nextTurn() { 
-        innings++;
-        firstPostBreakDone = false; lastType = null; 
-        currentPlayer = currentPlayer === 0 ? 1 : 0; 
-        scoreAtStart[currentPlayer] = scores[currentPlayer]; 
-        updateUI(); 
-    }
+    function nextTurn() { innings++; firstPostBreakDone = false; lastType = null; currentPlayer = currentPlayer === 0 ? 1 : 0; scoreAtStart[currentPlayer] = scores[currentPlayer]; updateUI(); }
+    
     function handleFoul() {
+        const s = scores[currentPlayer];
         history.push({scores: [...scores], foulCounts: [...foulCounts], breakDone, firstPostBreakDone, lastType, currentPlayer, logEntries: [...logEntries], innings});
-        foulCounts[currentPlayer]++; addLog(`FOUL (RESET)`);
-        if (foulCounts[currentPlayer] >= 3) updateUI(); else { scores[currentPlayer] = scoreAtStart[currentPlayer]; nextTurn(); }
+        foulCounts[currentPlayer]++;
+        
+        let msg = s === 100 ? "BOM PÅ HAZARD" : "FOUL/SCRATCH";
+        addLog(`${msg} (${foulCounts[currentPlayer]}/3)`);
+        
+        if (foulCounts[currentPlayer] >= 3) updateUI(); 
+        else { scores[currentPlayer] = scoreAtStart[currentPlayer]; nextTurn(); }
     }
+
     function undo() { if (history.length > 0) { let st = history.pop(); scores = st.scores; foulCounts = st.foulCounts; breakDone = st.breakDone; firstPostBreakDone = st.firstPostBreakDone; lastType = st.lastType; currentPlayer = st.currentPlayer; logEntries = st.logEntries; innings = st.innings; updateUI(); } }
     function resetGame() { if(confirm("Reset?")) { localStorage.clear(); location.reload(); } }
-    
-    if(localStorage.getItem('p1name')) document.getElementById('p1-name').value = localStorage.getItem('p1name');
-    if(localStorage.getItem('p2name')) document.getElementById('p2-name').value = localStorage.getItem('p2name');
     updateUI();
 </script>
 </body>
