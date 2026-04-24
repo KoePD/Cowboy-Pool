@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cowboy Pool - Alternating Guide</title>
+    <title>Cowboy Pool - Pro Guide</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #1a3c1a; color: white; text-align: center; margin: 0; padding: 10px; }
@@ -16,20 +16,19 @@
         .score { font-size: 3.5em; font-weight: 900; display: block; line-height: 1; }
         .player-label { font-size: 0.9em; color: #bbb; text-transform: uppercase; }
 
-        /* INSTRUKSRAD */
         .next-move-box { 
             background: #2c3e50; 
             padding: 15px; 
             border-radius: 12px; 
             margin: 15px 0; 
             border-left: 6px solid #f1c40f;
-            min-height: 60px;
+            min-height: 65px;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
         .move-label { font-size: 0.7em; text-transform: uppercase; color: #f1c40f; font-weight: bold; margin-bottom: 3px; }
-        .move-text { font-weight: 900; font-size: 1.2em; color: #fff; letter-spacing: 0.5px; }
+        .move-text { font-weight: 900; font-size: 1.25em; color: #fff; letter-spacing: 0.5px; }
 
         .ball-row { display: flex; justify-content: space-around; margin: 20px 0; }
         .ball-btn { width: 85px; height: 85px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: inset -8px -8px 15px rgba(0,0,0,0.6), 0 5px 10px rgba(0,0,0,0.4); position: relative; }
@@ -37,11 +36,12 @@
         #b1 { background: radial-gradient(circle at 40% 40%, #f1c40f, #b38f00); }
         #b3 { background: radial-gradient(circle at 40% 40%, #e74c3c, #962d22); }
         #b5 { background: radial-gradient(circle at 40% 40%, #f39c12, #a36504); }
-        .ball-btn:disabled { opacity: 0.2; filter: grayscale(1); }
+        .ball-btn:disabled { opacity: 0.2; filter: grayscale(1); cursor: not-allowed; }
 
         .control-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         button.ctrl { padding: 15px 5px; font-size: 0.9em; border: none; border-radius: 12px; cursor: pointer; color: white; font-weight: bold; }
         .btn-carom { background: #2980b9; }
+        .btn-carom:disabled { opacity: 0.2; cursor: not-allowed; }
         .btn-foul { background: #c0392b; }
         .btn-undo { background: #8e44ad; }
         .btn-turn { background: #27ae60; grid-column: span 3; font-size: 1.2em; margin-top: 5px; padding: 15px; }
@@ -68,7 +68,7 @@
     </div>
 
     <div class="next-move-box" id="moveBox">
-        <div class="move-label" id="instrLabel">DIN OPPGAVE:</div>
+        <div class="move-label">NESTE STØT:</div>
         <div class="move-text" id="moveText">SENK 3-BALLEN (BREAK)</div>
     </div>
 
@@ -79,8 +79,8 @@
     </div>
 
     <div class="control-grid">
-        <button class="ctrl btn-carom" onclick="action('carom', 1)">CAROM 1p</button>
-        <button class="ctrl btn-carom" onclick="action('carom', 2)">CAROM 2p</button>
+        <button class="ctrl btn-carom" onclick="action('carom', 1)" id="c1">CAROM 1p</button>
+        <button class="ctrl btn-carom" onclick="action('carom', 2)" id="c2">CAROM 2p</button>
         <button class="ctrl btn-foul" onclick="handleFoul()">FOUL!</button>
         <button class="ctrl btn-undo" onclick="undo()">ANGRE</button>
         <button class="ctrl btn-turn" onclick="nextTurn()">BOM / BYTT TUR</button>
@@ -95,7 +95,8 @@
     let currentPlayer = 0;
     let scoreAtStart = [0, 0];
     let breakDone = false;
-    let lastActionType = null; // 'pocket' eller 'carom'
+    let firstPostBreakDone = false; // Tracker for det frie valget etter brekk
+    let lastActionType = null; 
     let history = [];
     let seconds = 0;
 
@@ -124,32 +125,39 @@
         } else if (s >= 90) {
             moveText.innerText = "GJØR EN CAROM";
             moveBox.style.borderLeftColor = "#8e44ad";
+        } else if (!firstPostBreakDone) {
+            moveText.innerText = "VALG: CAROM ELLER SENK KULE";
+            moveBox.style.borderLeftColor = "#f1c40f";
         } else {
-            // Fase 1 vekslingslogikk
+            // Vekslingslogikk etter første valgstøt
             if (lastActionType === 'pocket') {
                 moveText.innerText = "GJØR EN CAROM";
                 moveBox.style.borderLeftColor = "#8e44ad";
-            } else if (lastActionType === 'carom') {
-                moveText.innerText = "SENK EN BALL";
-                moveBox.style.background = "#2c3e50";
-                moveBox.style.borderLeftColor = "#2980b9";
             } else {
-                moveText.innerText = "CAROM ELLER SENK KULE";
-                moveBox.style.borderLeftColor = "#f1c40f";
+                moveText.innerText = "SENK EN BALL";
+                moveBox.style.borderLeftColor = "#2980b9";
             }
         }
 
-        // Disable knapper basert på veksling eller fase
-        const pocketDisabled = (s >= 90 || (breakDone && lastActionType === 'pocket'));
-        const caromDisabled = (breakDone && lastActionType === 'carom' && s < 90);
+        // Knapp-sperrer
+        let pocketDisabled = false;
+        let caromDisabled = false;
+
+        if (!breakDone) {
+            // Kun 3-ball er lov i brekket (eller alt hvis man bare tracker poeng)
+            caromDisabled = false; 
+        } else if (s >= 90) {
+            pocketDisabled = true;
+        } else if (firstPostBreakDone) {
+            if (lastActionType === 'pocket') pocketDisabled = true;
+            if (lastActionType === 'carom') caromDisabled = true;
+        }
 
         document.getElementById('b1').disabled = pocketDisabled;
         document.getElementById('b3').disabled = pocketDisabled;
         document.getElementById('b5').disabled = pocketDisabled;
-        
-        // Deaktiver carom-knapper hvis man må senke ball (kun i fase 1)
-        const caromBtns = document.querySelectorAll('.btn-carom');
-        caromBtns.forEach(btn => btn.disabled = caromDisabled);
+        document.getElementById('c1').disabled = caromDisabled;
+        document.getElementById('c2').disabled = caromDisabled;
     }
 
     function action(type, val) {
@@ -157,15 +165,22 @@
         if (s < 90 && s + val > 90) return alert("Må ha nøyaktig 90!");
         if (s >= 90 && s < 100 && s + val > 100) return alert("Må ha nøyaktig 100!");
 
-        history.push({scores: [...scores], breakDone, lastActionType, currentPlayer});
+        history.push({scores: [...scores], breakDone, firstPostBreakDone, lastActionType, currentPlayer});
         
-        if (!breakDone) breakDone = true;
+        if (!breakDone) {
+            breakDone = true;
+        } else if (!firstPostBreakDone) {
+            firstPostBreakDone = true;
+        }
+
         lastActionType = type;
         scores[currentPlayer] += val;
         updateUI();
     }
 
     function nextTurn() {
+        // Når man bommer, nullstilles vekslingen for neste spiller (nytt fritt valg)
+        firstPostBreakDone = false;
         lastActionType = null;
         currentPlayer = currentPlayer === 0 ? 1 : 0;
         scoreAtStart[currentPlayer] = scores[currentPlayer];
@@ -184,6 +199,7 @@
             let state = history.pop();
             scores = state.scores;
             breakDone = state.breakDone;
+            firstPostBreakDone = state.firstPostBreakDone;
             lastActionType = state.lastActionType;
             currentPlayer = state.currentPlayer;
             updateUI();
@@ -192,12 +208,9 @@
 
     function resetGame() {
         if(confirm("Starte ny match?")) {
-            scores = [0, 0];
-            scoreAtStart = [0, 0];
-            breakDone = false;
-            lastActionType = null;
-            seconds = 0;
-            history = [];
+            scores = [0, 0]; scoreAtStart = [0, 0];
+            breakDone = false; firstPostBreakDone = false;
+            lastActionType = null; seconds = 0; history = [];
             updateUI();
         }
     }
