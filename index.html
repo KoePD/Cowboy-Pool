@@ -10,28 +10,22 @@
         .container { max-width: 480px; margin: auto; background: #222; padding: 15px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
         .names-row { display: flex; gap: 10px; margin-bottom: 10px; }
         .names-row input { flex: 1; padding: 10px; border-radius: 8px; border: none; background: #444; color: white; text-align: center; font-weight: bold; text-transform: uppercase; }
-        
         .scoreboard { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 10px; }
         .player-box { flex: 1; padding: 15px 5px; border-radius: 15px; background: #333; border: 4px solid transparent; transition: 0.3s; position: relative; }
         .active { border-color: #f1c40f; background: #3d3d3d; }
         .score { font-size: 3.5em; font-weight: 900; display: block; line-height: 1; }
-        
         .series-label { font-size: 0.65em; color: #f1c40f; text-transform: uppercase; letter-spacing: 1px; margin-top: 5px; font-weight: 800; }
         .series-value { font-size: 1.1em; color: #f1c40f; font-weight: 900; }
-        
         .foul-dots { display: flex; justify-content: center; gap: 5px; margin-top: 5px; }
         .dot { width: 10px; height: 10px; border-radius: 50%; background: #444; border: 1px solid #000; }
         .dot.active { background: #c0392b; box-shadow: 0 0 5px #ff0000; }
-
         .timer-row { display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 15px 0; padding: 10px 0; border-top: 1px solid #333; border-bottom: 1px solid #333; gap: 5px; }
         .timer-display { font-family: monospace; font-size: 1.6em; color: #f1c40f; letter-spacing: 1px; font-weight: bold; }
-        .inning-display { font-size: 0.8em; color: #888; text-transform: uppercase; letter-spacing: 2px; font-weight: bold; }
+        .inning-display { font-size: 0.8em; color: #888; text-transform: uppercase; letter-spacing: 2px; }
         .btn-timer-ctrl { background: #e67e22; color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.75em; text-transform: uppercase; }
-
         .next-move-box { background: #2c3e50; padding: 15px; border-radius: 12px; margin: 15px 0; border-left: 6px solid #f1c40f; min-height: 65px; display: flex; flex-direction: column; justify-content: center; text-align: left; padding-left: 20px; }
         .move-label { font-size: 0.65em; text-transform: uppercase; color: #f1c40f; font-weight: 800; }
-        .move-text { font-weight: 900; font-size: 1.1em; color: #fff; text-transform: uppercase; }
-
+        .move-text { font-weight: 900; font-size: 1.1em; color: #fff; }
         .ball-row { display: flex; justify-content: space-around; margin: 20px 0; align-items: flex-start; min-height: 120px; }
         .ball-group { display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .ball-btn { width: 85px; height: 85px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: inset -8px -8px 15px rgba(0,0,0,0.6), 0 5px 10px rgba(0,0,0,0.4); position: relative; }
@@ -40,12 +34,9 @@
         #b3 { background: radial-gradient(circle at 40% 40%, #e74c3c, #962d22); }
         #b5 { background: radial-gradient(circle at 40% 40%, #f39c12, #a36504); }
         .btn-sub-carom { background: #3498db; color: white; border: none; padding: 5px 8px; border-radius: 5px; font-size: 0.7em; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        
         #bWin { background: radial-gradient(circle at 40% 40%, #fff, #bbb); color: black; display: none; flex-direction: column; }
-        
         .waiting { opacity: 0.2; }
         .ball-btn:disabled, .btn-sub-carom:disabled, .btn-carom:disabled { opacity: 0.1; cursor: not-allowed; }
-
         .control-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
         button.ctrl { padding: 14px 5px; font-size: 0.8em; border: none; border-radius: 12px; cursor: pointer; color: white; font-weight: bold; box-shadow: 0 4px rgba(0,0,0,0.3); text-transform: uppercase; }
         .btn-carom { background: #2980b9; }
@@ -55,9 +46,7 @@
         .btn-adj { background: #7f8c8d; font-size: 1.2em; }
         .btn-turn { background: #27ae60; grid-column: span 3; font-size: 1.1em; margin-top: 8px; padding: 18px; }
         .btn-reset { background: #34495e; grid-column: span 3; padding: 10px; margin-top: 8px; font-size: 0.7em; opacity: 0.6; }
-        
         .match-log { margin-top: 20px; background: #111; border-radius: 10px; padding: 10px; text-align: left; font-size: 0.75em; color: #888; max-height: 100px; overflow-y: auto; }
-        
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(4px); }
         .modal-content { background: #222; margin: 15% auto; padding: 20px; border: 1px solid #f1c40f; width: 80%; border-radius: 15px; text-align: left; line-height: 1.6; }
     </style>
@@ -69,11 +58,9 @@
         <span onclick="closeRules()" style="color:#aaa; float:right; font-size:28px; cursor:pointer;">&times;</span>
         <h3 style="color:#f1c40f; margin-top:0;">COWBOY POOL REGLER</h3>
         <p>• <b>Goal:</b> Nøyaktig 101 poeng.</p>
-        <p>• <b>Break:</b> Må strike 3-ballen først.</p>
-        <p>• <b>0-90:</b> Veksle kule og carom. Superstøt er tillatt.</p>
+        <p>• <b>0-90:</b> Veksle kule og carom.</p>
         <p>• <b>91-100:</b> Kun rene Caroms.</p>
-        <p>• <b>101:</b> Hazard via 1-ballen.</p>
-        <p>• <b>Foul:</b> Mister alle poeng i gjeldende "Break".</p>
+        <p>• <b>Foul:</b> Du mister poengene tatt i gjeldende serie (Break).</p>
     </div>
 </div>
 
@@ -155,12 +142,18 @@
 
     function formatTime(s) { return new Date(s * 1000).toISOString().substr(11, 8); }
     function saveData() {
-        localStorage.setItem('cb_scores', JSON.stringify(scores)); localStorage.setItem('cb_fouls', JSON.stringify(foulCounts));
-        localStorage.setItem('cb_startScore', JSON.stringify(scoreAtStart)); localStorage.setItem('cb_player', JSON.stringify(currentPlayer));
-        localStorage.setItem('cb_break', JSON.stringify(breakDone)); localStorage.setItem('cb_first', JSON.stringify(firstPostBreakDone));
-        localStorage.setItem('cb_lastType', JSON.stringify(lastType)); localStorage.setItem('cb_time', JSON.stringify(seconds));
-        localStorage.setItem('cb_log', JSON.stringify(logEntries)); localStorage.setItem('cb_innings', JSON.stringify(innings));
-        localStorage.setItem('p1name', document.getElementById('p1-name').value); localStorage.setItem('p2name', document.getElementById('p2-name').value);
+        localStorage.setItem('cb_scores', JSON.stringify(scores));
+        localStorage.setItem('cb_fouls', JSON.stringify(foulCounts));
+        localStorage.setItem('cb_startScore', JSON.stringify(scoreAtStart));
+        localStorage.setItem('cb_player', JSON.stringify(currentPlayer));
+        localStorage.setItem('cb_break', JSON.stringify(breakDone));
+        localStorage.setItem('cb_first', JSON.stringify(firstPostBreakDone));
+        localStorage.setItem('cb_lastType', JSON.stringify(lastType));
+        localStorage.setItem('cb_time', JSON.stringify(seconds));
+        localStorage.setItem('cb_log', JSON.stringify(logEntries));
+        localStorage.setItem('cb_innings', JSON.stringify(innings));
+        localStorage.setItem('p1name', document.getElementById('p1-name').value);
+        localStorage.setItem('p2name', document.getElementById('p2-name').value);
     }
 
     function updateUI() {
@@ -168,13 +161,18 @@
         const p2n = document.getElementById('p2-name').value || "S2";
         document.getElementById('p1-label-display').innerText = p1n;
         document.getElementById('p2-label-display').innerText = p2n;
-        document.getElementById('p1-score').innerText = scores[0]; document.getElementById('p2-score').innerText = scores[1];
-        document.getElementById('p1-turn-score').innerText = (scores[0] - scoreAtStart[0]);
-        document.getElementById('p2-turn-score').innerText = (scores[1] - scoreAtStart[1]);
+        document.getElementById('p1-score').innerText = scores[0];
+        document.getElementById('p2-score').innerText = scores[1];
+        
+        // OPPDATERT: Beregn break basert på nåværende score minus score ved turstart
+        document.getElementById('p1-turn-score').innerText = Math.max(0, scores[0] - scoreAtStart[0]);
+        document.getElementById('p2-turn-score').innerText = Math.max(0, scores[1] - scoreAtStart[1]);
+
         document.getElementById('p1-box').className = currentPlayer === 0 ? "player-box active" : "player-box";
         document.getElementById('p2-box').className = currentPlayer === 1 ? "player-box active" : "player-box";
         document.getElementById('matchTimer').innerText = formatTime(seconds);
         document.getElementById('inningText').innerText = "Inning: " + (Math.floor(innings/2) + 1);
+
         [0, 1].forEach(p => {
             const dots = document.getElementById(`p${p+1}-fouls`).children;
             for(let i=0; i<3; i++) dots[i].className = i < foulCounts[p] ? "dot active" : "dot";
@@ -196,12 +194,10 @@
 
         const pocketWaiting = s >= 90 || (firstPostBreakDone && lastType === 'pocket');
         const caromWaiting = (firstPostBreakDone && lastType === 'carom' && s < 90);
-        const isFase2 = s >= 90;
-
         document.querySelectorAll('.ball-btn, .btn-sub-carom').forEach(el => {
             if(!el.id.includes('Win')) {
                 el.classList.toggle('waiting', pocketWaiting);
-                el.disabled = isFase2;
+                el.disabled = s >= 90;
             }
         });
         document.getElementById('c1').classList.toggle('waiting', caromWaiting);
@@ -217,17 +213,18 @@
             if (s >= 90 && s < 100 && s + val > 100) return alert("Exact 100 required!");
             foulCounts[currentPlayer] = 0;
         }
-        history.push({scores: [...scores], foulCounts: [...foulCounts], breakDone, firstPostBreakDone, lastType, currentPlayer, innings, scoreAtStart: [...scoreAtStart]});
+        history.push({scores: [...scores], foulCounts: [...foulCounts], breakDone, firstPostBreakDone, lastType, currentPlayer, innings, scoreAtStart: [...scoreAtStart], logEntries: [...logEntries]});
         
-        if (type === 'win') { scores[currentPlayer] = 101; confetti(); }
-        else if (type !== 'adjust') {
-            if (!breakDone) breakDone = true; else if (!firstPostBreakDone) firstPostBreakDone = true;
+        if (type === 'win') { 
+            scores[currentPlayer] = 101; 
+            confetti(); 
+        } else if (type !== 'adjust') {
+            if (!breakDone) breakDone = true; 
+            else if (!firstPostBreakDone) firstPostBreakDone = true;
             lastType = (type === 'pocket_carom' || type === 'pocket') ? 'pocket' : 'carom';
             scores[currentPlayer] += val;
-            addLog(`+${val}p`);
         } else { 
             scores[currentPlayer] = Math.max(0, scores[currentPlayer] + val);
-            addLog(`Adj: ${val}p`);
         }
         updateUI();
     }
@@ -236,15 +233,38 @@
         if (!isPaused) { isPaused = true; clearInterval(timerInterval); document.getElementById('timerBtn').innerText = "RESUME"; }
         else { isPaused = false; document.getElementById('timerBtn').innerText = "PAUSE"; timerInterval = setInterval(() => { seconds++; document.getElementById('matchTimer').innerText = formatTime(seconds); saveData(); }, 1000); }
     }
+
+    function nextTurn() { 
+        innings++; 
+        firstPostBreakDone = false; 
+        lastType = null; 
+        currentPlayer = currentPlayer === 0 ? 1 : 0; 
+        scoreAtStart[currentPlayer] = scores[currentPlayer]; // Setter ny startscore for telleren
+        updateUI(); 
+    }
+
+    function handleFoul() {
+        history.push({scores: [...scores], foulCounts: [...foulCounts], breakDone, firstPostBreakDone, lastType, currentPlayer, innings, scoreAtStart: [...scoreAtStart], logEntries: [...logEntries]});
+        foulCounts[currentPlayer]++; 
+        scores[currentPlayer] = scoreAtStart[currentPlayer]; 
+        nextTurn();
+    }
+
+    function undo() { 
+        if (history.length > 0) { 
+            let st = history.pop(); 
+            scores = st.scores; foulCounts = st.foulCounts; breakDone = st.breakDone; 
+            firstPostBreakDone = st.firstPostBreakDone; lastType = st.lastType; 
+            currentPlayer = st.currentPlayer; innings = st.innings; 
+            scoreAtStart = st.scoreAtStart; logEntries = st.logEntries;
+            updateUI(); 
+        } 
+    }
+
     function openRules() { document.getElementById('rulesModal').style.display = "block"; }
     function closeRules() { document.getElementById('rulesModal').style.display = "none"; }
-    function nextTurn() { innings++; firstPostBreakDone = false; lastType = null; currentPlayer = currentPlayer === 0 ? 1 : 0; scoreAtStart[currentPlayer] = scores[currentPlayer]; updateUI(); }
-    function handleFoul() {
-        history.push({scores: [...scores], foulCounts: [...foulCounts], breakDone, firstPostBreakDone, lastType, currentPlayer, innings, scoreAtStart: [...scoreAtStart]});
-        foulCounts[currentPlayer]++; scores[currentPlayer] = scoreAtStart[currentPlayer]; nextTurn();
-    }
-    function undo() { if (history.length > 0) { let st = history.pop(); scores = st.scores; foulCounts = st.foulCounts; breakDone = st.breakDone; firstPostBreakDone = st.firstPostBreakDone; lastType = st.lastType; currentPlayer = st.currentPlayer; innings = st.innings; scoreAtStart = st.scoreAtStart; updateUI(); } }
     function resetGame() { if(confirm("New match?")) { localStorage.clear(); location.reload(); } }
+    
     updateUI();
 </script>
 </body>
