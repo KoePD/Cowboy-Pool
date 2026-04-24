@@ -12,15 +12,17 @@
         .names-row { display: flex; gap: 10px; margin-bottom: 10px; }
         .names-row input { flex: 1; padding: 10px; border-radius: 8px; border: none; background: #444; color: white; text-align: center; font-weight: bold; }
         
-        .scoreboard { display: flex; justify-content: space-between; margin-bottom: 5px; gap: 10px; }
+        .scoreboard { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 10px; }
         .player-box { flex: 1; padding: 15px 5px; border-radius: 15px; background: #333; border: 4px solid transparent; transition: 0.3s; }
         .active { border-color: #f1c40f; background: #3d3d3d; }
         .score { font-size: 3.5em; font-weight: 900; display: block; line-height: 1; }
         .player-label { font-size: 0.9em; color: #bbb; text-transform: uppercase; }
 
-        .timer-row { display: flex; align-items: center; justify-content: center; gap: 15px; margin-bottom: 10px; }
-        .timer-display { font-family: monospace; font-size: 1.4em; color: #aaa; letter-spacing: 1px; }
-        .btn-timer-ctrl { background: #e67e22; color: white; border: none; padding: 6px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.8em; }
+        /* SENTRERT TIMER OG START/PAUSE */
+        .timer-row { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 15px 0; padding: 10px 0; border-top: 1px solid #333; border-bottom: 1px solid #333; }
+        .timer-display { font-family: monospace; font-size: 1.6em; color: #f1c40f; letter-spacing: 1px; font-weight: bold; }
+        .btn-timer-ctrl { background: #e67e22; color: white; border: none; padding: 8px 18px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.9em; text-transform: uppercase; box-shadow: 0 4px rgba(0,0,0,0.3); }
+        .btn-timer-ctrl.running { background: #c0392b; }
 
         .next-move-box { background: #2c3e50; padding: 15px; border-radius: 12px; margin: 15px 0; border-left: 6px solid #f1c40f; min-height: 65px; display: flex; flex-direction: column; justify-content: center; transition: 0.3s; }
         .move-label { font-size: 0.7em; text-transform: uppercase; color: #f1c40f; font-weight: bold; margin-bottom: 3px; }
@@ -43,16 +45,13 @@
         .btn-turn { background: #27ae60; grid-column: span 3; font-size: 1.2em; margin-top: 5px; padding: 15px; }
         .btn-reset { background: #34495e; grid-column: span 3; padding: 10px; margin-top: 5px; }
 
-        /* Match Log */
         .match-log { margin-top: 20px; background: #111; border-radius: 10px; padding: 10px; text-align: left; font-size: 0.8em; color: #888; max-height: 100px; overflow-y: auto; }
         .log-entry { border-bottom: 1px solid #222; padding: 3px 0; }
 
-        /* Regler */
         .rules-container { margin-top: 20px; text-align: left; background: #111; border-radius: 10px; overflow: hidden; }
         .rules-header { padding: 10px; background: #333; cursor: pointer; font-weight: bold; display: flex; justify-content: space-between; }
         .rules-content { padding: 15px; font-size: 0.85em; display: none; line-height: 1.4; color: #ccc; }
 
-        /* Animasjon */
         @keyframes shake { 0% { transform: translate(1px, 1px) rotate(0deg); } 10% { transform: translate(-1px, -2px) rotate(-1deg); } 20% { transform: translate(-3px, 0px) rotate(1deg); } 50% { transform: translate(-1px, 2px) rotate(-1deg); } 100% { transform: translate(1px, 1px) rotate(0deg); } }
         .shake { animation: shake 0.5s; }
     </style>
@@ -219,14 +218,16 @@
         if (!isPaused) {
             isPaused = true; clearInterval(timerInterval);
             document.getElementById('timerBtn').innerText = "START";
+            document.getElementById('timerBtn').classList.remove('running');
         } else {
             isPaused = false;
             document.getElementById('timerBtn').innerText = "PAUSE";
+            document.getElementById('timerBtn').classList.add('running');
             timerInterval = setInterval(() => { seconds++; document.getElementById('matchTimer').innerText = formatTime(seconds); saveData(); }, 1000);
         }
     }
 
-    function stopTimer() { isPaused = true; clearInterval(timerInterval); document.getElementById('timerBtn').innerText = "START"; }
+    function stopTimer() { isPaused = true; clearInterval(timerInterval); document.getElementById('timerBtn').innerText = "START"; document.getElementById('timerBtn').classList.remove('running');}
 
     function action(type, val) {
         if (isPaused && type !== 'adjust') toggleTimer();
@@ -280,7 +281,6 @@
     if(localStorage.getItem('p1name')) document.getElementById('p1-name').value = localStorage.getItem('p1name');
     if(localStorage.getItem('p2name')) document.getElementById('p2-name').value = localStorage.getItem('p2name');
     updateUI();
-    addLog("Klar");
 </script>
 </body>
 </html>
