@@ -15,22 +15,21 @@
 
         .names-row { display: flex; gap: 5px; margin-bottom: 10px; }
         .names-row input { flex: 1; padding: 10px 5px; border-radius: 8px; border: none; background: #444; color: white; text-align: center; font-weight: bold; font-size: 0.8em; }
-        /* Svak grå placeholder tekst */
         .names-row input::placeholder { color: #888; font-weight: normal; font-style: italic; }
         
         .scoreboard { display: flex; justify-content: center; margin-bottom: 15px; gap: 8px; flex-wrap: wrap; }
-        .player-box { flex: 1; min-width: 100px; padding: 10px 5px; border-radius: 15px; background: #333; border: 4px solid transparent; transition: 0.3s; position: relative; }
+        .player-box { flex: 1; min-width: 100px; padding: 10px 5px; border-radius: 15px; background: #333; border: 4px solid transparent; transition: 0.3s; position: relative; cursor: pointer; }
         .active { border-color: #f1c40f; background: #3d3d3d; transform: scale(1.02); }
-        .score { font-size: 2.8em; font-weight: 900; display: block; line-height: 1; }
-        .player-label-display { font-size: 0.7em; color: #aaa; text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis; padding-right: 25px; min-height: 1em; }
+        .score { font-size: 2.8em; font-weight: 900; display: block; line-height: 1; pointer-events: none; }
+        .player-label-display { font-size: 0.7em; color: #aaa; text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis; padding-right: 25px; min-height: 1em; pointer-events: none; }
         
         .top-break-label { position: absolute; top: 10px; right: 10px; font-size: 0.6em; color: #f1c40f; font-weight: 900; background: rgba(0,0,0,0.3); padding: 2px 4px; border-radius: 4px; }
         .top-break-label::before { content: "★ "; font-size: 0.8em; }
 
-        .series-label { font-size: 0.55em; color: #f1c40f; text-transform: uppercase; font-weight: 800; margin-top: 5px; }
-        .series-value { font-size: 1em; color: #f1c40f; font-weight: 900; }
+        .series-label { font-size: 0.55em; color: #f1c40f; text-transform: uppercase; font-weight: 800; margin-top: 5px; pointer-events: none; }
+        .series-value { font-size: 1em; color: #f1c40f; font-weight: 900; pointer-events: none; }
         
-        .foul-dots { display: flex; justify-content: center; gap: 4px; margin-top: 5px; }
+        .foul-dots { display: flex; justify-content: center; gap: 4px; margin-top: 5px; pointer-events: none; }
         .dot { width: 10px; height: 10px; border-radius: 50%; background: #444; border: 1px solid #111; }
         .dot.active { background: #c0392b; box-shadow: 0 0 8px #ff0000; }
 
@@ -106,7 +105,7 @@
         <button class="ctrl btn-carom" onclick="action('carom', 1)" id="c1">Carom 1p</button>
         <button class="ctrl btn-carom" onclick="action('carom', 2)" id="c2">Carom 2p</button>
         <button class="ctrl" style="background:#8e44ad" onclick="undo()">Angre</button>
-        <button class="ctrl" style="background:#555" onclick="alert('Cowboy Pool:\n1. 0-90: Veksle kule/carom.\n2. Kombinasjon (begge): Ingen låsing på neste støt!\n3. 91-100: Kun caroms.\n4. 101: Hazard via 1-ball.')">Regler</button>
+        <button class="ctrl" style="background:#555" onclick="alert('Regler:\n• 0-90: Veksle kule/carom.\n• 91-100: Kun caroms.\n• 101: Hazard via 1-ball.\n• Kombinasjon (begge): Neste støt er fritt valg.\n• 3 fouls på rad er tap.')">Regler</button>
         <button class="ctrl btn-adj" onclick="action('adjust', 1)">+</button>
         <button class="ctrl btn-adj" onclick="action('adjust', -1)">−</button>
         <button class="ctrl btn-foul-reset" onclick="handleFoul()">FOUL / SCRATCH</button>
@@ -132,7 +131,7 @@
     let history = [];
 
     function setPlayerCount(num) {
-        if(!confirm("Endring av modus vil nullstille alt. Fortsette?")) return;
+        if(!confirm("Nullstille for ny modus?")) return;
         playerCount = num;
         localStorage.setItem('cb_pCount', num);
         resetGame();
@@ -148,15 +147,15 @@
             const input = document.createElement('input');
             input.type = 'text';
             input.id = `p${i}-name`;
-            // Bruk lagret navn, hvis ikke tomt
             input.value = localStorage.getItem(`p${i}name`) || "";
-            input.placeholder = "Skriv navn..."; // Svak grå tekst
+            input.placeholder = "Skriv navn...";
             input.oninput = () => { localStorage.setItem(`p${i}name`, input.value); updateUI(); };
             inputCont.appendChild(input);
 
             const box = document.createElement('div');
             box.id = `p${i}-box`;
             box.className = 'player-box';
+            box.onclick = () => selectStarter(i); // La spilleren velge hvem som starter
             box.innerHTML = `
                 <div id="p${i}-top-break" class="top-break-label">0</div>
                 <span id="p${i}-label-display" class="player-label-display"></span>
@@ -172,11 +171,18 @@
         updateUI();
     }
 
+    function selectStarter(idx) {
+        // Kan kun velge starter før spillet/klokka har begynt
+        if (!breakDone && seconds === 0 && isPaused) {
+            currentPlayer = idx;
+            updateUI();
+        }
+    }
+
     function updateUI() {
         for(let i=0; i<playerCount; i++) {
             const inputVal = document.getElementById(`p${i}-name`).value;
-            // Hvis feltet er tomt, vis en standard tekst på tavla
-            document.getElementById(`p${i}-label-display`).innerText = inputVal || "INGEN NAVN";
+            document.getElementById(`p${i}-label-display`).innerText = inputVal || "SPILLER " + (i+1);
             document.getElementById(`p${i}-score`).innerText = scores[i];
             const currentBreak = scores[i] - scoreAtStart[i];
             document.getElementById(`p${i}-turn-score`).innerText = currentBreak;
@@ -226,11 +232,8 @@
             foulCounts[currentPlayer] = 0;
         }
         saveHistory();
-
-        if (type === 'win') {
-            scores[currentPlayer] = 101;
-            confetti();
-        } else if (type === 'pocket_carom') {
+        if (type === 'win') { scores[currentPlayer] = 101; confetti(); stopTimer(); }
+        else if (type === 'pocket_carom') {
             if (!breakDone) breakDone = true;
             firstPostBreakDone = true;
             lastType = 'both';
@@ -240,9 +243,7 @@
             else if (!firstPostBreakDone) firstPostBreakDone = true;
             lastType = type;
             scores[currentPlayer] += val;
-        } else {
-            scores[currentPlayer] = Math.max(0, scores[currentPlayer] + val);
-        }
+        } else { scores[currentPlayer] = Math.max(0, scores[currentPlayer] + val); }
         updateUI();
     }
 
@@ -284,23 +285,20 @@
     }
 
     function toggleTimer() {
-        if (!isPaused) { isPaused = true; clearInterval(timerInterval); document.getElementById('timerBtn').innerText = "START KLOKKE"; }
-        else { isPaused = false; document.getElementById('timerBtn').innerText = "PAUSE KLOKKE"; timerInterval = setInterval(() => { seconds++; document.getElementById('matchTimer').innerText = new Date(seconds * 1000).toISOString().substr(11, 8); }, 1000); }
+        if (!isPaused) { isPaused = true; clearInterval(timerInterval); document.getElementById('timerBtn').innerText = "FORTSETT"; }
+        else { isPaused = false; document.getElementById('timerBtn').innerText = "PAUSE"; timerInterval = setInterval(() => { seconds++; document.getElementById('matchTimer').innerText = new Date(seconds * 1000).toISOString().substr(11, 8); saveData(); }, 1000); }
     }
 
+    function stopTimer() { isPaused = true; clearInterval(timerInterval); document.getElementById('timerBtn').innerText = "START KLOKKE"; }
+
     function resetGame() {
-        if(confirm("Nullstille match og alle navn?")) {
+        if(confirm("Nullstille alt?")) {
             scores = [0, 0, 0]; topBreaks = [0, 0, 0]; foulCounts = [0, 0, 0]; scoreAtStart = [0, 0, 0];
             currentPlayer = 0; breakDone = false; firstPostBreakDone = false; lastType = null;
             innings = 0; seconds = 0; history = [];
-            
-            // NYTT: Nullstill navn i lagring
-            for(let i=0; i<3; i++) {
-                localStorage.removeItem(`p${i}name`);
-            }
-            
+            for(let i=0; i<3; i++) localStorage.removeItem(`p${i}name`);
             if(timerInterval) clearInterval(timerInterval); isPaused = true;
-            localStorage.removeItem('cb_scores'); localStorage.removeItem('cb_topBreaks'); localStorage.removeItem('cb_fouls');
+            localStorage.clear();
             initUI();
         }
     }
