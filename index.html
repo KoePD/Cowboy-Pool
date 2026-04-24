@@ -25,6 +25,7 @@
         .next-move-box { background: #2c3e50; padding: 15px; border-radius: 12px; margin: 15px 0; border-left: 6px solid #f1c40f; min-height: 65px; display: flex; flex-direction: column; justify-content: center; }
         .move-label { font-size: 0.7em; text-transform: uppercase; color: #f1c40f; font-weight: bold; margin-bottom: 3px; }
         .move-text { font-weight: 900; font-size: 1.25em; color: #fff; letter-spacing: 0.5px; }
+        
         .ball-row { display: flex; justify-content: space-around; margin: 20px 0; align-items: flex-start; min-height: 120px; }
         .ball-group { display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .ball-btn { width: 85px; height: 85px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: inset -8px -8px 15px rgba(0,0,0,0.6), 0 5px 10px rgba(0,0,0,0.4); position: relative; }
@@ -34,14 +35,16 @@
         #b5 { background: radial-gradient(circle at 40% 40%, #f39c12, #a36504); }
         .btn-sub-carom { background: #3498db; color: white; border: none; padding: 5px 8px; border-radius: 5px; font-size: 0.7em; font-weight: bold; cursor: pointer; text-transform: uppercase; }
         #bWin { background: radial-gradient(circle at 40% 40%, #fff, #bbb); color: black; display: none; flex-direction: column; }
+        
         .ball-btn:disabled, .btn-sub-carom:disabled, .btn-carom:disabled { opacity: 0.2; filter: grayscale(1); cursor: not-allowed; }
+
         .control-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
         button.ctrl { padding: 12px 5px; font-size: 0.8em; border: none; border-radius: 12px; cursor: pointer; color: white; font-weight: bold; box-shadow: 0 4px rgba(0,0,0,0.3); }
         .btn-carom { background: #2980b9; }
-        .btn-foul-reset { background: #c0392b; }
+        .btn-foul-reset { background: #c0392b; grid-column: span 2; font-size: 1em; }
         .btn-undo { background: #8e44ad; }
         .btn-rules { background: #555; }
-        .btn-minus { background: #7f8c8d; }
+        .btn-minus { background: #7f8c8d; font-size: 1.2em; }
         .btn-turn { background: #27ae60; grid-column: span 3; font-size: 1.2em; margin-top: 5px; padding: 15px; }
         .btn-reset { background: #34495e; grid-column: span 3; padding: 10px; margin-top: 5px; }
         .match-log { margin-top: 20px; background: #111; border-radius: 10px; padding: 10px; text-align: left; font-size: 0.8em; color: #888; max-height: 100px; overflow-y: auto; }
@@ -56,11 +59,11 @@
 <div id="rulesModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeRules()">&times;</span>
-        <h3 style="color:#f1c40f">COWBOY POOL REGLER</h3>
-        <p>• <b>Mål:</b> 101 poeng nøyaktig.</p>
-        <p>• <b>Foul/Scratch:</b> Begge mister poeng i turen. Ved scratch får motstander ball i hånd fra kjøkkenet. Ved vanlig foul spilles det fra der ballen ligger.</p>
-        <p>• <b>Vinnerstøt:</b> Hazard (senke hvit via 1-ballen) er påkrevd. Scratch her er <i>ikke</i> foul hvis poenget scores korrekt.</p>
-        <p>• <b>3-Foul:</b> 3 fouls på rad (reset-knappen) er tap.</p>
+        <h3 style="color:#f1c40f">COWBOY POOL (WIKIPEDIA)</h3>
+        <p>• <b>0-90:</b> Poeng for kuler og caroms. Må treffe 90 nøyaktig.</p>
+        <p>• <b>91-100:</b> KUN CAROMS. Baller i hull gir 0p og er FOUL.</p>
+        <p>• <b>101:</b> Vinnerstøt: Carom av 1-ballen og senk hvit i valgt hull. Kan ikke røre andre baller.</p>
+        <p>• <b>Foul:</b> Mister alle poeng i nåværende inning.</p>
     </div>
 </div>
 
@@ -106,7 +109,7 @@
             <button class="ball-btn" onclick="action('pocket', 5)" id="b5"><div class="ball-number">5</div></button>
             <button class="btn-sub-carom" onclick="action('pocket_carom', 6)" id="sc5">+ CAROM</button>
         </div>
-        <button class="ball-btn" onclick="action('win', 1)" id="bWin"><div style="font-size:0.6em">Hazard</div>WIN</button>
+        <button class="ball-btn" onclick="action('win', 1)" id="bWin"><div style="font-size:0.6em">Hazard via 1</div>WIN</button>
     </div>
 
     <div class="control-grid">
@@ -114,10 +117,10 @@
         <button class="ctrl btn-carom" onclick="action('carom', 2)" id="c2">CAROM 2p</button>
         <button class="ctrl btn-undo" onclick="undo()">ANGRE</button>
         <button class="ctrl btn-rules" onclick="openRules()">REGLER</button>
-        <button class="ctrl btn-minus" onclick="action('adjust', -1)">FOUL (-1)</button>
-        <button class="ctrl btn-foul-reset" onclick="handleFoul('normal')">FOUL / SCRATCH</button>
+        <button class="ctrl btn-minus" onclick="action('adjust', -1)">−</button>
+        <button class="ctrl btn-foul-reset" onclick="handleFoul()">FOUL / SCRATCH</button>
         <button class="ctrl btn-turn" onclick="nextTurn()">BOM / BYTT TUR</button>
-        <button class="ctrl btn-reset" onclick="resetGame()">NULLSTILL MATCH</button>
+        <button class="ctrl btn-reset" onclick="resetGame()">NY MATCH</button>
     </div>
     <div class="match-log" id="matchLog"></div>
 </div>
@@ -152,81 +155,83 @@
 
     function updateUI() {
         const names = [document.getElementById('p1-name').value || "S1", document.getElementById('p2-name').value || "S2"];
-        document.getElementById('p1-label').innerText = names[0]; document.getElementById('p2-label').innerText = names[1];
         document.getElementById('p1-score').innerText = scores[0]; document.getElementById('p2-score').innerText = scores[1];
         document.getElementById('p1-box').className = currentPlayer === 0 ? "player-box active" : "player-box";
         document.getElementById('p2-box').className = currentPlayer === 1 ? "player-box active" : "player-box";
         document.getElementById('matchTimer').innerText = formatTime(seconds);
         document.getElementById('inningText').innerText = "Inning: " + (Math.floor(innings/2) + 1);
-
+        
         [0, 1].forEach(p => {
             const dots = document.getElementById(`p${p+1}-fouls`).children;
             for(let i=0; i<3; i++) dots[i].className = i < foulCounts[p] ? "dot active" : "dot";
         });
 
         const s = scores[currentPlayer];
-        const moveText = document.getElementById('moveText');
         const winBall = document.getElementById('bWin');
         
-        if (foulCounts[0] >= 3 || foulCounts[1] >= 3) { moveText.innerText = "FORFEIT!"; stopTimer(); return; }
+        if (foulCounts[0] >= 3 || foulCounts[1] >= 3) { document.getElementById('moveText').innerText = "FORFEIT!"; stopTimer(); return; }
 
         if (s === 100) {
-            winBall.style.display = "flex";
-            document.getElementById('group1').style.display = document.getElementById('group3').style.display = document.getElementById('group5').style.display = "none";
-            moveText.innerText = "SENK HVIT VIA 1-BALLEN";
+            winBall.style.display = "flex"; document.getElementById('group1').style.display = document.getElementById('group3').style.display = document.getElementById('group5').style.display = "none";
+            document.getElementById('moveText').innerText = "101: HAZARD VIA 1-BALLEN";
         } else {
-            winBall.style.display = "none";
-            document.getElementById('group1').style.display = document.getElementById('group3').style.display = document.getElementById('group5').style.display = "flex";
-            if (!breakDone) moveText.innerText = "SENK 3-BALLEN (BREAK)";
-            else if (s >= 90) moveText.innerText = "GJØR EN CAROM";
-            else moveText.innerText = !firstPostBreakDone ? "VELG: CAROM ELLER KULE" : (lastType === 'pocket' ? "GJØR EN CAROM" : "SENK EN BALL");
+            winBall.style.display = "none"; document.getElementById('group1').style.display = document.getElementById('group3').style.display = document.getElementById('group5').style.display = "flex";
+            
+            if (!breakDone) document.getElementById('moveText').innerText = "SENK 3-BALLEN (BREAK)";
+            else if (s >= 90) {
+                document.getElementById('moveText').innerText = "90-100: KUN CAROMS!";
+            } else {
+                document.getElementById('moveText').innerText = !firstPostBreakDone ? "VELG: CAROM ELLER KULE" : (lastType === 'pocket' ? "GJØR EN CAROM" : "SENK EN BALL");
+            }
         }
+
+        // Wikipedia-logikk for deaktivering:
+        // Ved 90 poeng deaktiveres pocket-knappene permanent til man når 100.
+        let pocketOff = s >= 90;
+        let caromOff = s < 90 && firstPostBreakDone && lastType === 'carom';
+
+        document.getElementById('b1').disabled = document.getElementById('sc1').disabled = pocketOff;
+        document.getElementById('b3').disabled = document.getElementById('sc3').disabled = pocketOff;
+        document.getElementById('b5').disabled = document.getElementById('sc5').disabled = pocketOff;
+        document.getElementById('c1').disabled = document.getElementById('c2').disabled = caromOff;
+        
         saveData();
     }
 
     function openRules() { document.getElementById('rulesModal').style.display = "block"; }
     function closeRules() { document.getElementById('rulesModal').style.display = "none"; }
 
+    function action(type, val) {
+        if (isPaused && type !== 'adjust') toggleTimer();
+        const s = scores[currentPlayer];
+        if (type !== 'adjust') {
+            if (s < 90 && s + val > 90) return alert("Må treffe 90 nøyaktig!");
+            if (s >= 90 && s < 100 && s + val > 100) return alert("Må treffe 100 nøyaktig!");
+            foulCounts[currentPlayer] = 0;
+        }
+        history.push({scores: [...scores], foulCounts: [...foulCounts], breakDone, firstPostBreakDone, lastType, currentPlayer, logEntries: [...logEntries], innings});
+        
+        if (type === 'win') { scores[currentPlayer] = 101; addLog("🏆 WINNER SHOT!"); confetti(); }
+        else if (type !== 'adjust') {
+            if (!breakDone) breakDone = true; else if (!firstPostBreakDone) firstPostBreakDone = true;
+            lastType = (type === 'pocket_carom') ? 'pocket' : type; scores[currentPlayer] += val; addLog(`+${val}p`);
+        } else { scores[currentPlayer] = Math.max(0, scores[currentPlayer] + val); }
+        updateUI();
+    }
+
     function toggleTimer() {
         if (!isPaused) { isPaused = true; clearInterval(timerInterval); document.getElementById('timerBtn').innerText = "START"; }
         else { isPaused = false; document.getElementById('timerBtn').innerText = "PAUSE"; timerInterval = setInterval(() => { seconds++; document.getElementById('matchTimer').innerText = formatTime(seconds); saveData(); }, 1000); }
     }
     function stopTimer() { isPaused = true; clearInterval(timerInterval); document.getElementById('timerBtn').innerText = "START"; }
-
-    function action(type, val) {
-        if (isPaused && type !== 'adjust') toggleTimer();
-        const s = scores[currentPlayer];
-        if (type !== 'adjust') {
-            if (s < 90 && s + val > 90) return alert("Må ha nøyaktig 90!");
-            if (s >= 90 && s < 100 && s + val > 100) return alert("Må ha nøyaktig 100!");
-            foulCounts[currentPlayer] = 0;
-        }
-        history.push({scores: [...scores], foulCounts: [...foulCounts], breakDone, firstPostBreakDone, lastType, currentPlayer, logEntries: [...logEntries], innings});
-        if (type === 'win') { scores[currentPlayer] = 101; addLog("🏆 HAZARD WIN!"); confetti(); }
-        else if (type !== 'adjust') {
-            if (!breakDone) breakDone = true; else if (!firstPostBreakDone) firstPostBreakDone = true;
-            lastType = (type === 'pocket_carom') ? 'pocket' : type;
-            scores[currentPlayer] += val; addLog(`+${val}p`);
-        } else { scores[currentPlayer] = Math.max(0, scores[currentPlayer] + val); addLog(`Trekk: ${val}p`); }
-        updateUI();
-    }
-
     function nextTurn() { innings++; firstPostBreakDone = false; lastType = null; currentPlayer = currentPlayer === 0 ? 1 : 0; scoreAtStart[currentPlayer] = scores[currentPlayer]; updateUI(); }
-    
     function handleFoul() {
-        const s = scores[currentPlayer];
         history.push({scores: [...scores], foulCounts: [...foulCounts], breakDone, firstPostBreakDone, lastType, currentPlayer, logEntries: [...logEntries], innings});
-        foulCounts[currentPlayer]++;
-        
-        let msg = s === 100 ? "BOM PÅ HAZARD" : "FOUL/SCRATCH";
-        addLog(`${msg} (${foulCounts[currentPlayer]}/3)`);
-        
-        if (foulCounts[currentPlayer] >= 3) updateUI(); 
-        else { scores[currentPlayer] = scoreAtStart[currentPlayer]; nextTurn(); }
+        foulCounts[currentPlayer]++; addLog("FOUL/SCRATCH");
+        if (foulCounts[currentPlayer] >= 3) updateUI(); else { scores[currentPlayer] = scoreAtStart[currentPlayer]; nextTurn(); }
     }
-
     function undo() { if (history.length > 0) { let st = history.pop(); scores = st.scores; foulCounts = st.foulCounts; breakDone = st.breakDone; firstPostBreakDone = st.firstPostBreakDone; lastType = st.lastType; currentPlayer = st.currentPlayer; logEntries = st.logEntries; innings = st.innings; updateUI(); } }
-    function resetGame() { if(confirm("Reset?")) { localStorage.clear(); location.reload(); } }
+    function resetGame() { if(confirm("Ny match?")) { localStorage.clear(); location.reload(); } }
     updateUI();
 </script>
 </body>
