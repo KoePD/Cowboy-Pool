@@ -59,6 +59,10 @@
         .modal-body h4 { color: #f1c40f; margin-bottom: 5px; margin-top: 15px; text-transform: uppercase; }
         .modal-body p, .modal-body li { margin-bottom: 8px; }
         .close-btn { position: absolute; top: 15px; right: 20px; color: #aaa; font-size: 30px; font-weight: bold; cursor: pointer; }
+
+        #bWin { display: none; background: radial-gradient(circle at 40% 40%, #fff, #bbb); color: black; flex-direction: column; justify-content: center; align-items: center; line-height: 1.1; }
+        #hazardTxt { font-size: 0.45em; text-transform: uppercase; font-weight: bold; opacity: 0.8; }
+        #winTxt { font-size: 1.3em; font-weight: 900; }
     </style>
 </head>
 <body>
@@ -103,7 +107,10 @@
             <button class="ball-btn" onclick="action('pocket', 5)" id="b5"><div class="ball-number">5</div></button>
             <button class="btn-sub-carom" onclick="action('pocket_carom', 6)" id="sc5">+ CAROM</button>
         </div>
-        <button class="ball-btn" onclick="action('win', 1)" id="bWin" style="display:none; background: radial-gradient(circle at 40% 40%, #fff, #bbb); color: black;"><div style="font-size:0.5em" id="hazardTxt">Hazard</div>WIN</button>
+        <button class="ball-btn" onclick="action('win', 1)" id="bWin">
+            <div id="hazardTxt">Hazard</div>
+            <div id="winTxt">WIN</div>
+        </button>
     </div>
     <div class="control-grid">
         <button class="ctrl btn-carom" onclick="action('carom', 1)" id="c1">Carom 1p</button>
@@ -123,24 +130,24 @@
         no: {
             mode: "MODUS:", starter: "START KLOKKE", resume: "FORTSETT", pause: "PAUSE",
             krav: "KRAV:", break: "BREAK SHOT (3-BALL)", open: "VALG: CAROM ELLER KULE",
-            lockedPocket: "KRAV: CAROM", lockedCarom: "KRAV: KULE", fase2: "91-100: KUN CAROMS!",
+            lockedPocket: "KRAV: CAROM", lockedCarom: "KRAV: KULE",
             winner: "101: HAZARD VIA 1-BALLEN", statusWinner: "STATUS: VINNERSTØT",
             undo: "Angre", rules: "Regler", foul: "FOUL / SCRATCH", turn: "AVSLUTT TUR / BOM",
             reset: "NULLSTILL ALT", placeholder: "Skriv navn...", noName: "INGEN NAVN",
             confirmReset: "Nullstille alt?", confirmMode: "Nullstille for ny modus?",
             modalHeader: "Regler: Cowboy Pool",
-            modalBody: `<h4>Mål</h4><p>Nøyaktig <b>101 poeng</b>.</p><h4>Break</h4><p>Må treffe <b>3-ball først</b>.</p><h4>Veksling (0-90p)</h4><ul><li><b>Open Table:</b> Hver tur starter åpen. Valgfritt.</li><li><b>Jokeren:</b> Pocket+Carom holder bordet åpent.</li><li><b>Locked:</b> Kun Pocket/Carom låser rekkefølgen.</li></ul><h4>Sluttspill</h4><p>90-100p: Kun carom. Pocket = FOUL.<br>101p: Hazard via 1-ball.</p><h4>Foul</h4><p>Poeng i nåværende serie tapes.</p>`
+            modalBody: `<h4>Mål</h4><p>Nøyaktig <b>101 poeng</b>.</p><h4>Break</h4><p>Må treffe <b>3-ball først</b>.</p><h4>Veksling (0-90p)</h4><ul><li><b>Open Table:</b> Hver tur starter åpen. Valgfritt.</li><li><b>Jokeren:</b> Pocket+Carom holder bordet åpent.</li><li><b>Locked:</b> Kun Pocket/Carom låser rekkefølgen.</li></ul><h4>Sluttspill</h4><p>90-100p: Kun carom. Pocket = FOUL.<br>101p: Carom hvitball av 1-ball og scratch. Senking av 1-ball uten scratch er <b>ikke foul</b>, man bare fortsetter forsøket.</p><h4>Foul</h4><p>Poeng i nåværende serie tapes.</p>`
         },
         en: {
             mode: "MODE:", starter: "START CLOCK", resume: "RESUME", pause: "PAUSE",
             krav: "REQ:", break: "BREAK SHOT (3-BALL)", open: "OPEN TABLE: CHOOSE ANY",
-            lockedPocket: "REQ: CAROM", lockedCarom: "REQ: POCKET", fase2: "91-100: CAROMS ONLY!",
+            lockedPocket: "REQ: CAROM", lockedCarom: "REQ: POCKET",
             winner: "101: HAZARD VIA 1-BALL", statusWinner: "STATUS: WINNING SHOT",
             undo: "Undo", rules: "Rules", foul: "FOUL / SCRATCH", turn: "END TURN / MISS",
             reset: "RESET MATCH", placeholder: "Enter name...", noName: "NO NAME",
             confirmReset: "Reset everything?", confirmMode: "Reset for new mode?",
             modalHeader: "Rules: Cowboy Pool",
-            modalBody: `<h4>Objective</h4><p>Exactly <b>101 points</b>.</p><h4>The Break</h4><p>Must strike <b>3-ball first</b>.</p><h4>Rotation (0-90p)</h4><ul><li><b>Open Table:</b> Turn starts open. Your choice.</li><li><b>The Joker:</b> Pocket+Carom keeps table open.</li><li><b>Locked:</b> Single type locks sequence.</li></ul><h4>Endgame</h4><p>90-100p: Carom only. Pocket = FOUL.<br>101p: Hazard via 1-ball.</p><h4>Foul</h4><p>Loss of points in current break.</p>`
+            modalBody: `<h4>Objective</h4><p>Exactly <b>101 points</b>.</p><h4>The Break</h4><p>Must strike <b>3-ball first</b>.</p><h4>Rotation (0-90p)</h4><ul><li><b>Open Table:</b> Turn starts open. Your choice.</li><li><b>The Joker:</b> Pocket+Carom keeps table open.</li><li><b>Locked:</b> Single type locks sequence.</li></ul><h4>Endgame</h4><p>90-100p: Carom only. Pocket = FOUL.<br>101p: Carom off 1-ball and scratch. Pocketing the 1-ball without a scratch is <b>not a foul</b>, just continue your attempt.</p><h4>Foul</h4><p>Loss of points in current break.</p>`
         }
     };
 
@@ -218,14 +225,12 @@
             document.getElementById('moveLabel').innerText = t.statusWinner; document.getElementById('moveText').innerText = t.winner;
         } else {
             winBall.style.display = "none"; document.querySelectorAll('.ball-group').forEach(el => el.style.display = "flex");
-            
-            // HER ER RETTELSEN: Sjekker 90 poeng først
             if (!breakDone) {
                 document.getElementById('moveLabel').innerText = t.krav;
                 document.getElementById('moveText').innerText = t.break;
             } else if (s >= 90) {
                 document.getElementById('moveLabel').innerText = t.krav;
-                document.getElementById('moveText').innerText = t.lockedPocket; // Krav: Carom
+                document.getElementById('moveText').innerText = t.lockedPocket; 
             } else if (tableStatus === 'open') {
                 document.getElementById('moveLabel').innerText = "STATUS:";
                 document.getElementById('moveText').innerText = t.open;
