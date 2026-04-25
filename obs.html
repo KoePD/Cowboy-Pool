@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { background: transparent; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        .obs-score-row { 
+            display: flex; background: rgba(0,0,0,0.8); border-left: 5px solid #f1c40f; 
+            padding: 10px; border-radius: 0 10px 10px 0; width: 350px; margin-bottom: 5px;
+        }
+        .active-player { border-left: 5px solid #27ae60; background: rgba(40,40,40,0.9); }
+        .name { flex: 1; font-weight: bold; text-transform: uppercase; }
+        .score { font-size: 1.5em; font-weight: 900; color: #f1c40f; width: 50px; text-align: right; }
+        .fouls { display: flex; gap: 3px; align-items: center; margin-left: 10px; }
+        .dot { width: 8px; height: 8px; background: #444; border-radius: 50%; }
+        .dot.active { background: #ff0000; box-shadow: 0 0 5px #ff0000; }
+    </style>
+</head>
+<body>
+    <div id="display"></div>
+
+    <script>
+        function update() {
+            const scores = JSON.parse(localStorage.getItem('cb_scores')) || [0,0,0];
+            const fouls = JSON.parse(localStorage.getItem('cb_fouls')) || [0,0,0];
+            const active = parseInt(localStorage.getItem('cb_player')) || 0;
+            const pCount = parseInt(localStorage.getItem('cb_pCount')) || 2;
+            
+            let html = '';
+            for(let i=0; i < pCount; i++) {
+                const name = localStorage.getItem(`p${i}name`) || `Player ${i+1}`;
+                const isActive = (active === i) ? 'active-player' : '';
+                
+                let foulDots = '';
+                for(let d=0; d<3; d++) {
+                    foulDots += `<div class="dot ${d < fouls[i] ? 'active' : ''}"></div>`;
+                }
+
+                html += `
+                    <div class="obs-score-row ${isActive}">
+                        <div class="name">${name}</div>
+                        <div class="score">${scores[i]}</div>
+                        <div class="fouls">${foulDots}</div>
+                    </div>
+                `;
+            }
+            document.getElementById('display').innerHTML = html;
+        }
+        setInterval(update, 1000); // Oppdaterer hvert sekund
+        update();
+    </script>
+</body>
+</html>
