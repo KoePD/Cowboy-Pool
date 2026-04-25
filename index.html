@@ -19,6 +19,13 @@
         .active { border-color: #f1c40f; background: #3d3d3d; }
         .score { font-size: 2.8em; font-weight: 900; display: block; line-height: 1; }
         .player-label-display { font-size: 0.75em; color: #aaa; text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 8px; }
+        
+        /* NY SERIE-LAYOUT */
+        .series-container { display: flex; justify-content: space-around; margin-top: 5px; border-top: 1px solid #444; padding-top: 5px; }
+        .series-box { display: flex; flex-direction: column; }
+        .series-label { font-size: 0.5em; color: #aaa; text-transform: uppercase; font-weight: 800; }
+        .series-val { font-size: 0.9em; color: #f1c40f; font-weight: 900; }
+
         .foul-dots { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
         .dot { width: 12px; height: 12px; border-radius: 50%; background: #444; border: 1px solid #111; }
         .dot.active { background: #c0392b; box-shadow: 0 0 8px #ff0000; }
@@ -93,7 +100,6 @@
 </div>
 
 <script>
-    // LOKAL KONFIGURASJON - Husk din egen databaseURL!
     const firebaseConfig = {
         databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app"
     };
@@ -104,7 +110,8 @@
     let state = {
         playerCount: 2, scores: [0, 0, 0], foulCounts: [0, 0, 0], scoreAtStart: [0, 0, 0],
         currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null,
-        innings: 0, seconds: 0, names: ["Spiller 1", "Spiller 2", "Spiller 3"]
+        innings: 0, seconds: 0, names: ["Spiller 1", "Spiller 2", "Spiller 3"],
+        bestSeries: [0, 0, 0] // NYTT: Lagrer rekord per spiller
     };
 
     let timerInterval = null; let isPaused = true; let history = [];
@@ -122,7 +129,16 @@
         inputCont.innerHTML = ''; scoreCont.innerHTML = '';
         for(let i=0; i<state.playerCount; i++) {
             inputCont.innerHTML += `<input id="p${i}-name-in" value="${state.names[i]}" oninput="saveName(${i}, this.value)">`;
-            scoreCont.innerHTML += `<div id="p${i}-box" class="player-box"><span id="p${i}-label" class="player-label-display">${state.names[i]}</span><span id="p${i}-score" class="score">${state.scores[i]}</span><div style="font-size:0.55em; color:#f1c40f; text-transform:uppercase; font-weight:800; margin-top:5px;">Serie</div><div id="p${i}-turn-score" style="font-size:0.95em; color:#f1c40f; font-weight:900;">0</div><div class="foul-dots" id="p${i}-fouls"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
+            scoreCont.innerHTML += `
+                <div id="p${i}-box" class="player-box">
+                    <span id="p${i}-label" class="player-label-display">${state.names[i]}</span>
+                    <span id="p${i}-score" class="score">${state.scores[i]}</span>
+                    <div class="series-container">
+                        <div class="series-box"><span class="series-label">Nå</span><div id="p${i}-turn-score" class="series-val">0</div></div>
+                        <div class="series-box"><span class="series-label">Høyest</span><div id="p${i}-best-score" class="series-val">0</div></div>
+                    </div>
+                    <div class="foul-dots" id="p${i}-fouls"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+                </div>`;
         }
     }
 
@@ -132,16 +148,10 @@
         if(isPaused) toggleTimer();
         saveHistory();
         let s = state.scores[state.currentPlayer];
-        
-        // Sjekk for poenggrenser (90/100)
         if (s < 90 && s + val > 90) return;
         if (s >= 90 && s < 100 && s + val > 100) return;
-
-        // Hvis man trykker på poeng, regnes brekket som fullført
         if(!state.breakDone) state.breakDone = true;
-
         state.foulCounts[state.currentPlayer] = 0;
-        
         if (type === 'pocket_carom') {
             if (state.tableStatus === 'locked') state.lastType = (state.lastType === 'pocket') ? 'carom' : 'pocket';
             else state.tableStatus = 'open';
@@ -149,7 +159,6 @@
             state.tableStatus = 'locked'; 
             state.lastType = type; 
         }
-        
         state.scores[state.currentPlayer] += val;
         pushData();
     }
@@ -159,12 +168,13 @@
     function nextTurn() {
         saveHistory();
         
-        // FIKS: Hvis brekket avsluttes uten poeng, åpne bordet uansett
-        if (!state.breakDone) {
-            state.breakDone = true;
+        // Sjekk om nåværende serie er ny rekord for spilleren
+        let currentSeries = state.scores[state.currentPlayer] - state.scoreAtStart[state.currentPlayer];
+        if (currentSeries > state.bestSeries[state.currentPlayer]) {
+            state.bestSeries[state.currentPlayer] = currentSeries;
         }
 
-        // Nullstill fouls hvis spilleren har tatt poeng i denne serien
+        if (!state.breakDone) state.breakDone = true;
         if (state.scores[state.currentPlayer] > state.scoreAtStart[state.currentPlayer]) {
             state.foulCounts[state.currentPlayer] = 0;
         }
@@ -179,19 +189,10 @@
 
     function handleFoul() {
         saveHistory();
-        
-        // FIKS: Foul i brekket åpner også bordet
-        if (!state.breakDone) {
-            state.breakDone = true;
-        }
-
+        if (!state.breakDone) state.breakDone = true;
         state.foulCounts[state.currentPlayer]++;
         state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer];
-        
-        if (state.foulCounts[state.currentPlayer] >= 3) {
-            alert("3 FOULS!");
-        }
-        
+        if (state.foulCounts[state.currentPlayer] >= 3) alert("3 FOULS!");
         nextTurn(); 
     }
 
@@ -207,6 +208,7 @@
             document.getElementById(`p${i}-label`).innerText = state.names[i];
             document.getElementById(`p${i}-score`).innerText = state.scores[i];
             document.getElementById(`p${i}-turn-score`).innerText = state.scores[i] - state.scoreAtStart[i];
+            document.getElementById(`p${i}-best-score`).innerText = state.bestSeries[i] || 0;
             document.getElementById(`p${i}-box`).className = (state.currentPlayer === i) ? 'player-box active' : 'player-box';
             const dots = document.getElementById(`p${i}-fouls`).children;
             for(let d=0; d<3; d++) dots[d].className = (d < state.foulCounts[i]) ? 'dot active' : 'dot';
@@ -219,8 +221,6 @@
 
         const isLockedPocket = (state.tableStatus === 'locked' && state.lastType === 'pocket');
         const isAtEnd = state.scores[state.currentPlayer] >= 90;
-        
-        // Visuelle knappe-sperrer
         document.getElementById('b1').className = (!state.breakDone || isLockedPocket || isAtEnd) ? 'ball-btn waiting' : 'ball-btn';
         document.getElementById('b3').className = (isLockedPocket || isAtEnd) ? 'ball-btn waiting' : 'ball-btn';
         document.getElementById('b5').className = (!state.breakDone || isLockedPocket || isAtEnd) ? 'ball-btn waiting' : 'ball-btn';
@@ -233,11 +233,10 @@
     }
 
     function setPlayerCount(n) { state.playerCount = n; resetGame(); }
-    function resetGame() { state.scores=[0,0,0]; state.foulCounts=[0,0,0]; state.scoreAtStart=[0,0,0]; state.breakDone=false; state.tableStatus='open'; state.innings=0; state.seconds=0; pushData(); }
+    function resetGame() { state.scores=[0,0,0]; state.foulCounts=[0,0,0]; state.scoreAtStart=[0,0,0]; state.bestSeries=[0,0,0]; state.breakDone=false; state.tableStatus='open'; state.innings=0; state.seconds=0; pushData(); }
     function rotateBreaker() { if(!state.breakDone) { state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; pushData(); } }
     function saveHistory() { history.push(JSON.stringify(state)); }
     function undo() { if(history.length) { state = JSON.parse(history.pop()); pushData(); } }
-    
     window.onload = initUI;
 </script>
 </body>
