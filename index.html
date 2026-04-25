@@ -20,7 +20,6 @@
         .score { font-size: 2.8em; font-weight: 900; display: block; line-height: 1; }
         .player-label-display { font-size: 0.75em; color: #aaa; text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 8px; }
         
-        /* NY SERIE-LAYOUT SOM PASSER INN */
         .series-info { display: flex; justify-content: space-around; margin-top: 8px; border-top: 1px solid #444; padding-top: 5px; }
         .series-box { display: flex; flex-direction: column; }
         .series-label { font-size: 0.55em; color: #aaa; text-transform: uppercase; font-weight: 800; }
@@ -111,7 +110,7 @@
         playerCount: 2, scores: [0, 0, 0], foulCounts: [0, 0, 0], scoreAtStart: [0, 0, 0],
         currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null,
         innings: 0, seconds: 0, names: ["Spiller 1", "Spiller 2", "Spiller 3"],
-        bestSeries: [0, 0, 0] // Lagrer personlig rekord i denne kampen
+        bestSeries: [0, 0, 0]
     };
 
     let timerInterval = null; let isPaused = true; let history = [];
@@ -134,8 +133,8 @@
                     <span id="p${i}-label" class="player-label-display">${state.names[i]}</span>
                     <span id="p${i}-score" class="score">${state.scores[i]}</span>
                     <div class="series-info">
-                        <div class="series-box"><span class="series-label">Nå</span><div id="p${i}-now" class="series-val">0</div></div>
-                        <div class="series-box"><span class="series-label">Pers</span><div id="p${i}-best" class="series-val">0</div></div>
+                        <div class="series-box"><span class="series-label">Nå</span><div id="p${i}-turn-score" class="series-val">0</div></div>
+                        <div class="series-box"><span class="series-label">Pers</span><div id="p${i}-best-score" class="series-val">0</div></div>
                     </div>
                     <div class="foul-dots" id="p${i}-fouls"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
                 </div>`;
@@ -167,18 +166,14 @@
 
     function nextTurn() {
         saveHistory();
-        
-        // Oppdaterer personlig rekord før spillerbytte
         let currentSeries = state.scores[state.currentPlayer] - state.scoreAtStart[state.currentPlayer];
         if (currentSeries > (state.bestSeries[state.currentPlayer] || 0)) {
             state.bestSeries[state.currentPlayer] = currentSeries;
         }
-
         if (!state.breakDone) state.breakDone = true;
         if (state.scores[state.currentPlayer] > state.scoreAtStart[state.currentPlayer]) {
             state.foulCounts[state.currentPlayer] = 0;
         }
-
         state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
         state.innings++;
         state.tableStatus = 'open';
@@ -207,8 +202,8 @@
         for(let i=0; i<state.playerCount; i++) {
             document.getElementById(`p${i}-label`).innerText = state.names[i];
             document.getElementById(`p${i}-score`).innerText = state.scores[i];
-            document.getElementById(`p${i}-now`).innerText = state.scores[i] - state.scoreAtStart[i];
-            document.getElementById(`p${i}-best`).innerText = state.bestSeries ? (state.bestSeries[i] || 0) : 0;
+            document.getElementById(`p${i}-turn-score`).innerText = state.scores[i] - state.scoreAtStart[i];
+            document.getElementById(`p${i}-best-score`).innerText = state.bestSeries ? (state.bestSeries[i] || 0) : 0;
             document.getElementById(`p${i}-box`).className = (state.currentPlayer === i) ? 'player-box active' : 'player-box';
             const dots = document.getElementById(`p${i}-fouls`).children;
             for(let d=0; d<3; d++) dots[d].className = (d < state.foulCounts[i]) ? 'dot active' : 'dot';
@@ -233,7 +228,22 @@
     }
 
     function setPlayerCount(n) { state.playerCount = n; resetGame(); }
-    function resetGame() { state.scores=[0,0,0]; state.foulCounts=[0,0,0]; state.scoreAtStart=[0,0,0]; state.bestSeries=[0,0,0]; state.breakDone=false; state.tableStatus='open'; state.innings=0; state.seconds=0; pushData(); }
+
+    function resetGame() { 
+        // HER ER DEN NYE ADVARSELEN
+        if (confirm("Er du sikker på at du vil starte spillet helt på nytt? Alle poeng og personlige rekorder blir slettet!")) {
+            state.scores=[0,0,0]; 
+            state.foulCounts=[0,0,0]; 
+            state.scoreAtStart=[0,0,0]; 
+            state.bestSeries=[0,0,0]; 
+            state.breakDone=false; 
+            state.tableStatus='open'; 
+            state.innings=0; 
+            state.seconds=0; 
+            pushData(); 
+        }
+    }
+
     function rotateBreaker() { if(!state.breakDone) { state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; pushData(); } }
     function saveHistory() { history.push(JSON.stringify(state)); }
     function undo() { if(history.length) { state = JSON.parse(history.pop()); pushData(); } }
