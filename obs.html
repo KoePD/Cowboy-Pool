@@ -12,14 +12,15 @@
         }
 
         .scoreline-wrapper {
-            margin-bottom: 30px; display: flex; flex-direction: column;
+            margin-bottom: 20px; display: flex; flex-direction: column;
             align-items: center; width: 95%; max-width: 850px;
         }
 
+        /* 1. ULTRA KOMPAKT TOPP */
         .compact-top {
-            display: flex; align-items: center; gap: 15px;
-            background: #000; padding: 4px 20px;
-            border-radius: 15px 15px 0 0; border: 2px solid #111; border-bottom: none;
+            display: flex; align-items: center; gap: 12px;
+            background: #000; padding: 3px 15px;
+            border-radius: 12px 12px 0 0; border: 2px solid #111; border-bottom: none;
             position: relative; overflow: hidden; z-index: 10;
         }
 
@@ -32,21 +33,21 @@
         .inning-text {
             font-size: 10px; font-weight: 900; color: #f1c40f;
             text-transform: uppercase; position: relative; z-index: 2;
-            border-right: 1px solid rgba(255,255,255,0.2); padding-right: 10px;
+            border-right: 1px solid rgba(255,255,255,0.2); padding-right: 8px;
         }
 
         .status-msg {
             font-size: 10px; font-weight: 900; text-transform: uppercase;
-            letter-spacing: 0.5px; position: relative; z-index: 2; color: white;
+            position: relative; z-index: 2; color: white;
         }
 
-        .balls-row { display: flex; gap: 6px; position: relative; z-index: 2; }
+        .balls-row { display: flex; gap: 5px; position: relative; z-index: 2; }
 
         .table-ball {
-            width: 18px; height: 18px; border-radius: 50%;
+            width: 16px; height: 16px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-weight: 900; color: black; font-size: 10px;
-            border: 1px solid #000; transition: 0.3s;
+            font-weight: 900; color: black; font-size: 9px;
+            border: 1px solid #000;
         }
 
         .ball-1 { background: radial-gradient(circle at 35% 35%, #f1c40f, #b38f00); }
@@ -54,43 +55,51 @@
         .ball-5 { background: radial-gradient(circle at 35% 35%, #f39c12, #a36504); }
         .ball-dimmed { opacity: 0.15; filter: grayscale(1); }
 
+        /* 2. HOVEDSCORE (KRYMPET HØYDE) */
         .scoreline {
             display: flex; justify-content: center; align-items: center;
-            border-radius: 30px; background: #000; border: 2px solid #111;
-            overflow: hidden; width: 100%; height: 70px; position: relative; z-index: 5;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+            border-radius: 25px; background: #000; border: 2px solid #111;
+            overflow: hidden; width: 100%; height: 60px; position: relative; z-index: 5;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
         }
 
+        /* 3. SPILLER 3 RAD - MED SVART BAKGRUNN */
         .player3-row {
-            display: none; width: 50%; height: 45px; background: #000; margin-top: -8px;
-            border-radius: 0 0 20px 20px; border: 2px solid #111; border-top: none;
+            display: none; width: 45%; height: 38px; background: #000; margin-top: -6px;
+            border-radius: 0 0 18px 18px; border: 2px solid #111; border-top: none;
             overflow: hidden; position: relative; z-index: 4;
         }
 
         .player { display: flex; align-items: center; flex: 1; height: 100%; color: white; position: relative; z-index: 2; min-width: 0; }
-        .player--A { padding-left: 20px; }
-        .player--B { padding-right: 20px; justify-content: flex-end; }
+        
+        /* Mer padding på sidene for å gi luft mellom foul dots og navn */
+        .player--A { padding-left: 25px; }
+        .player--B { padding-right: 25px; justify-content: flex-end; }
+        
         .is-not-turn { opacity: 0.4; }
-        .name { font-size: 22px; font-weight: 800; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .name { font-size: 20px; font-weight: 800; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
         .break-ball {
-            width: 18px; height: 18px; border-radius: 50%; display: inline-block; margin: 0 10px;
-            background: 
-                radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 25%),
-                radial-gradient(circle at 50% 15%, #ff0000 8%, transparent 10%),
-                radial-gradient(circle at 20% 70%, #ff0000 8%, transparent 10%),
-                radial-gradient(circle at 85% 55%, #ff0000 8%, transparent 10%),
-                radial-gradient(circle at 35% 35%, #fff 0%, #ddd 60%, #aaa 100%);
+            width: 16px; height: 16px; border-radius: 50%; display: inline-block; margin: 0 8px;
+            background: radial-gradient(circle at 35% 35%, #fff 0%, #aaa 100%);
             border: 1px solid #111; box-shadow: 0 0 8px #fff;
         }
 
+        /* SVART FIRKANT POENGBOKS */
         .score-box {
-            background: #000; min-width: 100px; height: 100%; display: flex;
-            justify-content: center; align-items: center; font-size: 42px; font-weight: 900;
+            background: #000; min-width: 90px; height: 100%; display: flex;
+            justify-content: center; align-items: center; font-size: 36px; font-weight: 900;
             color: #f1c40f; z-index: 10; border-left: 2px solid #111; border-right: 2px solid #111;
         }
 
-        .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(0,0,0,0.6); margin: 0 2px;}
+        .score-box-p3 {
+            background: #000; min-width: 50px; height: 100%; display: flex;
+            justify-content: center; align-items: center; font-size: 24px; font-weight: 900;
+            color: #f1c40f; border-left: 2px solid #111; position: relative; z-index: 3;
+        }
+
+        /* Foul dots med litt margin-right for luft mot navnet */
+        .dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(0,0,0,0.6); margin: 0 4px; margin-right: 15px; }
         .dot.active { background: #ff0000; box-shadow: 0 0 8px #ff0000; }
     </style>
 </head>
@@ -112,15 +121,15 @@
             <div class="player player--A" id="p0-row">
                 <div class="fouls" id="p0-fouls"></div>
                 <div id="p0-break" style="display:none;" class="break-ball"></div>
-                <div class="name" id="p0-name">P1</div>
+                <div class="name" id="p0-name">Spiller 1</div>
             </div>
             <div class="score-box">
                 <span id="p0-score">0</span>
-                <span style="color:#333; margin: 0 8px;">-</span>
+                <span style="color:#333; margin: 0 6px;">-</span>
                 <span id="p1-score">0</span>
             </div>
             <div class="player player--B" id="p1-row">
-                <div class="name" id="p1-name">P2</div>
+                <div class="name" id="p1-name">Spiller 2</div>
                 <div id="p1-break" style="display:none;" class="break-ball"></div>
                 <div class="fouls" id="p1-fouls"></div>
             </div>
@@ -128,13 +137,13 @@
 
         <div class="player3-row" id="p2-container">
             <div class="gradient-bg"></div>
-            <div class="player" style="justify-content: space-between; padding: 0 25px;" id="p2-row">
-                <div class="fouls" id="p2-fouls"></div>
-                <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="player" style="justify-content: space-between; padding: 0;" id="p2-row">
+                <div style="display: flex; align-items: center; padding-left: 20px; gap: 8px;">
+                    <div class="fouls" id="p2-fouls"></div>
                     <div id="p2-break" style="display:none;" class="break-ball"></div>
-                    <div class="name" style="font-size: 16px;" id="p2-name">P3</div>
+                    <div class="name" style="font-size: 14px;" id="p2-name">Ole Andreas Sandvik</div>
                 </div>
-                <div style="font-size: 26px; color:#f1c40f; font-weight:900;" id="p2-score">0</div>
+                <div class="score-box-p3" id="p2-score">0</div>
             </div>
         </div>
     </div>
@@ -150,8 +159,8 @@
             const lastType = localStorage.getItem('cb_lastType') || null;
             const innings = parseInt(localStorage.getItem('cb_innings')) || 0;
 
-            document.getElementById('p0-name').innerText = localStorage.getItem('p0name') || "P1";
-            document.getElementById('p1-name').innerText = localStorage.getItem('p1name') || "P2";
+            document.getElementById('p0-name').innerText = localStorage.getItem('p0name') || "Spiller 1";
+            document.getElementById('p1-name').innerText = localStorage.getItem('p1name') || "Spiller 2";
             document.getElementById('p0-score').innerText = scores[0];
             document.getElementById('p1-score').innerText = scores[1];
             document.getElementById('inning-text').innerText = "Inn " + (Math.floor(innings/pCount) + 1);
@@ -162,7 +171,6 @@
             const b5 = document.getElementById('table-ball-5');
             const curS = scores[active];
 
-            // Reset visuelt
             [b1, b3, b5].forEach(b => b.classList.remove('ball-dimmed'));
             msgEl.innerText = "";
 
@@ -171,25 +179,21 @@
                 msgEl.innerText = "Break";
                 msgEl.style.color = "white";
             } else if (curS >= 90 || (tableStatus === 'locked' && lastType === 'pocket')) {
-                // Låst til Carom
                 [b1, b3, b5].forEach(b => b.classList.add('ball-dimmed'));
                 msgEl.innerText = "Krav: Carom"; 
                 msgEl.style.color = "#3498db";
             } else if (tableStatus === 'locked' && lastType === 'carom') {
-                // Låst til Pocket
                 msgEl.innerText = "Krav: Pocket"; 
                 msgEl.style.color = "#f39c12";
             } else { 
-                // Open (Joker-støt eller start på serie)
-                msgEl.innerText = "Open Table"; 
+                msgEl.innerText = "Open"; 
                 msgEl.style.color = "white"; 
             }
 
-            // P3 visning
             const p2Cont = document.getElementById('p2-container');
             if (pCount === 3) {
                 p2Cont.style.display = "block";
-                document.getElementById('p2-name').innerText = localStorage.getItem('p2name') || "P3";
+                document.getElementById('p2-name').innerText = localStorage.getItem('p2name') || "Ole Andreas Sandvik";
                 document.getElementById('p2-score').innerText = scores[2];
             } else { p2Cont.style.display = "none"; }
 
