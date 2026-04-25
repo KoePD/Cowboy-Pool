@@ -11,7 +11,7 @@
         .lang-toggle { position: absolute; top: 15px; right: 15px; background: #444; color: #f1c40f; border: 1px solid #555; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.7em; z-index: 10; }
         .mode-selector { margin-bottom: 15px; background: #333; padding: 10px; border-radius: 10px; display: flex; justify-content: center; gap: 10px; align-items: center; margin-right: 60px; }
         .mode-selector button { background: #444; color: white; border: 1px solid #555; padding: 5px 15px; border-radius: 5px; cursor: pointer; transition: 0.2s; }
-        .mode-selector button.active { background: #f1c40f; color: #000; font-weight: bold; }
+        .mode-selector button.active { background: #f1c40f !important; color: #000 !important; font-weight: bold; }
         .names-row { display: flex; gap: 5px; margin-bottom: 10px; }
         .names-row input { flex: 1; padding: 10px 5px; border-radius: 8px; border: none; background: #444; color: white; text-align: center; font-weight: bold; font-size: 0.8em; }
         .names-row input::placeholder { color: #888; font-weight: normal; font-style: italic; }
@@ -19,7 +19,21 @@
         .player-box { flex: 1; min-width: 100px; padding: 10px 5px; border-radius: 15px; background: #333; border: 4px solid transparent; transition: 0.3s; position: relative; cursor: pointer; }
         .active { border-color: #f1c40f; background: #3d3d3d; transform: scale(1.02); }
         .score { font-size: 2.8em; font-weight: 900; display: block; line-height: 1; pointer-events: none; }
-        .player-label-display { font-size: 0.7em; color: #aaa; text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis; padding-right: 25px; min-height: 1em; pointer-events: none; }
+        
+        .player-label-display { 
+            font-size: 0.7em; 
+            color: #aaa; 
+            text-transform: uppercase; 
+            font-weight: bold; 
+            display: block; 
+            margin-bottom: 5px; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            text-align: center; 
+            width: 100%;
+            pointer-events: none; 
+        }
+        
         .top-break-label { position: absolute; top: 10px; right: 10px; font-size: 0.6em; color: #f1c40f; font-weight: 900; background: rgba(0,0,0,0.3); padding: 2px 4px; border-radius: 4px; }
         .top-break-label::before { content: "★ "; font-size: 0.8em; }
         .series-label { font-size: 0.55em; color: #f1c40f; text-transform: uppercase; font-weight: 800; margin-top: 5px; pointer-events: none; }
@@ -80,7 +94,7 @@
     <div class="mode-selector">
         <span style="font-size: 0.8em; font-weight: bold; color: #888;" id="modeTxt">MODUS:</span>
         <button onclick="setPlayerCount(1)" id="btn-count-1">1P</button>
-        <button onclick="setPlayerCount(2)" id="btn-count-2" class="active">2P</button>
+        <button onclick="setPlayerCount(2)" id="btn-count-2">2P</button>
         <button onclick="setPlayerCount(3)" id="btn-count-3">3P</button>
     </div>
     <div class="names-row" id="inputs-container"></div>
@@ -136,7 +150,7 @@
             reset: "NULLSTILL ALT", placeholder: "Skriv navn...", noName: "INGEN NAVN",
             confirmReset: "Nullstille alt?", confirmMode: "Nullstille for ny modus?",
             modalHeader: "Regler: Cowboy Pool",
-            modalBody: `<h4>Mål</h4><p>Nøyaktig <b>101 poeng</b>.</p><h4>Break</h4><p>Må treffe <b>3-ball først</b>.</p><h4>Veksling (0-90p)</h4><ul><li><b>Open Table:</b> Hver tur starter åpen. Valgfritt.</li><li><b>Jokeren:</b> Pocket+Carom holder bordet åpent.</li><li><b>Locked:</b> Kun Pocket/Carom låser rekkefølgen.</li></ul><h4>Sluttspill</h4><p>90-100p: Kun carom. Pocket = FOUL.<br>101p: <b>Meld hull</b>, carom hvitball av 1-ball og scratch. Ingen berøring av 3 eller 5 er tillatt (Foul ved treff). Senking av 1-ball uten scratch er ikke foul.</p><h4>Foul</h4><p>Poeng i nåværende serie tapes.</p>`
+            modalBody: `<h4>Mål</h4><p>Nøyaktig <b>101 poeng</b>.</p><h4>Break</h4><p>Må treffe <b>3-ball først</b>.</p><h4>Veksling (0-90p)</h4><ul><li><b>Open Table:</b> Hver tur starter åpen. Valgfritt.</li><li><b>Jokeren:</b> Pocket+Carom holder bordet åpent.</li><li><b>Locked:</b> Kun Pocket/Carom låser rekkefølgen.</li></ul><h4>Sluttspill</h4><p>90-100p: Kun carom. Pocket = FOUL.<br>101p: <b>Meld hull</b>, carom hvitball av 1-ball og scratch. Ingen berøring av 3 eller 5 er tillatt. Senking av 1-ball uten scratch er ikke foul.</p><h4>Foul</h4><p>Poeng i nåværende serie tapes.</p>`
         },
         en: {
             mode: "MODE:", starter: "START CLOCK", resume: "RESUME", pause: "PAUSE",
@@ -147,7 +161,7 @@
             reset: "RESET MATCH", placeholder: "Enter name...", noName: "NO NAME",
             confirmReset: "Reset everything?", confirmMode: "Reset for new mode?",
             modalHeader: "Rules: Cowboy Pool",
-            modalBody: `<h4>Objective</h4><p>Exactly <b>101 points</b>.</p><h4>The Break</h4><p>Must strike <b>3-ball first</b>.</p><h4>Rotation (0-90p)</h4><ul><li><b>Open Table:</b> Turn starts open. Your choice.</li><li><b>The Joker:</b> Pocket+Carom keeps table open.</li><li><b>Locked:</b> Single type locks sequence.</li></ul><h4>Endgame</h4><p>90-100p: Carom only. Pocket = FOUL.<br>101p: <b>Call pocket</b>, carom off 1-ball and scratch. Contact with 3 or 5 is NOT allowed (Foul on hit). Pocketing 1-ball without scratch is not a foul.</p><h4>Foul</h4><p>Loss of points in current break.</p>`
+            modalBody: `<h4>Objective</h4><p>Exactly <b>101 points</b>.</p><h4>The Break</h4><p>Must strike <b>3-ball first</b>.</p><h4>Rotation (0-90p)</h4><ul><li><b>Open Table:</b> Turn starts open. Your choice.</li><li><b>The Joker:</b> Pocket+Carom keeps table open.</li><li><b>Locked:</b> Single type locks sequence.</li></ul><h4>Endgame</h4><p>90-100p: Carom only. Pocket = FOUL.<br>101p: <b>Call pocket</b>, carom off 1-ball and scratch. Contact with 3 or 5 is NOT allowed. Pocketing 1-ball without scratch is not a foul.</p><h4>Foul</h4><p>Loss of points in current break.</p>`
         }
     };
 
@@ -166,12 +180,23 @@
     let isPaused = true; let timerInterval = null; let history = [];
 
     function toggleLanguage() { lang = lang === 'no' ? 'en' : 'no'; localStorage.setItem('cb_lang', lang); updateUI(); }
-    function setPlayerCount(num) { if(!confirm(i18n[lang].confirmMode)) return; playerCount = num; localStorage.setItem('cb_pCount', num); resetGame(); }
+    
+    function setPlayerCount(num) { 
+        if(!confirm(i18n[lang].confirmMode)) return; 
+        playerCount = num; 
+        localStorage.setItem('cb_pCount', num); 
+        resetGame(); 
+    }
 
     function initUI() {
+        // OPPDARET MODUS-KNAPPER: Fjerner active fra alle og legger til på valgt
+        document.querySelectorAll('.mode-selector button').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`btn-count-${playerCount}`).classList.add('active');
+
         const inputCont = document.getElementById('inputs-container');
         const scoreCont = document.getElementById('scoreboard-container');
         inputCont.innerHTML = ''; scoreCont.innerHTML = '';
+        
         for(let i=0; i<playerCount; i++) {
             const input = document.createElement('input');
             input.type = 'text'; input.id = `p${i}-name`;
