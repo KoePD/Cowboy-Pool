@@ -56,7 +56,12 @@
         button.ctrl { padding: 12px 5px; font-size: 0.75em; border: none; border-radius: 10px; color: white; font-weight: bold; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px rgba(0,0,0,0.2); }
         button.ctrl:active { transform: translateY(2px); box-shadow: 0 1px rgba(0,0,0,0.2); }
         .btn-carom { background: #2980b9; }
-        .btn-foul-reset { background: #c0392b; grid-column: span 2; }
+        
+        /* FOUL KNAPP OVER 3 KOLONNER */
+        .btn-foul-full { background: #c0392b; grid-column: span 3; font-size: 0.9em; padding: 15px; margin-top: 2px; }
+        
+        .btn-undo { background: #8e44ad; }
+        .btn-rules { background: #555; }
         .btn-turn { background: #27ae60; grid-column: span 3; font-size: 1.1em; padding: 15px; margin-top: 5px; letter-spacing: 1px; }
         .btn-adj { background: #7f8c8d; font-size: 1.1em; }
     </style>
@@ -104,11 +109,14 @@
     <div class="control-grid">
         <button class="ctrl btn-carom" onclick="action('carom', 1)" id="c1">Carom 1p</button>
         <button class="ctrl btn-carom" onclick="action('carom', 2)" id="c2">Carom 2p</button>
-        <button class="ctrl" style="background:#8e44ad" onclick="undo()">Angre</button>
-        <button class="ctrl" style="background:#555" onclick="alert('Regler:\n• Break: Treff 3-ball først.\n• 0-90: Veksle kule/carom.\n• Kombinasjon: Utfører du begge samtidig, får du nytt valgfritt forsøk!\n• 91-100: Kun caroms.\n• 101: Hazard via 1-ball.')">Regler</button>
+        <button class="ctrl btn-undo" onclick="undo()">Angre</button>
+        
+        <button class="ctrl btn-rules" onclick="alert('Regler:\n• Break: Treff 3-ball først.\n• Etter Break: Krav carom.\n• 0-90: Veksle kule/carom.\n• Kombinasjon: Fritt valg på neste støt!\n• 91-100: Kun caroms.\n• 101: Hazard via 1-ball.')">Regler</button>
         <button class="ctrl btn-adj" onclick="action('adjust', 1)">+</button>
         <button class="ctrl btn-adj" onclick="action('adjust', -1)">−</button>
-        <button class="ctrl btn-foul-reset" onclick="handleFoul()">FOUL / SCRATCH</button>
+        
+        <button class="ctrl btn-foul-full" onclick="handleFoul()">FOUL / SCRATCH</button>
+        
         <button class="ctrl btn-turn" onclick="nextTurn()">AVSLUTT TUR / BOM</button>
         <button class="ctrl" style="background:#34495e; grid-column: span 3; font-size:0.6em; margin-top:5px; opacity:0.6;" onclick="resetGame()">NULLSTILL ALT</button>
     </div>
@@ -212,10 +220,7 @@
             }
         }
 
-        // Låselogikk
-        // pocketWait er sant hvis appen forventer carom
-        // caromWait er sant hvis appen forventer pocket
-        const pocketWait = s >= 90 || (firstPostBreakDone && lastType === 'pocket' && lastType !== 'both');
+        const pocketWait = s >= 90 || !breakDone || (firstPostBreakDone && lastType === 'pocket' && lastType !== 'both');
         const caromWait = (firstPostBreakDone && lastType === 'carom' && lastType !== 'both' && s < 90);
 
         document.querySelectorAll('.ball-btn, .btn-sub-carom').forEach(el => {
@@ -243,12 +248,12 @@
         else if (type === 'pocket_carom') {
             if (!breakDone) breakDone = true;
             firstPostBreakDone = true;
-            lastType = 'both'; // Nullstiller låsing for neste støt
+            lastType = 'both';
             scores[currentPlayer] += val;
         } else if (type !== 'adjust') {
             if (!breakDone) {
                 breakDone = true;
-                lastType = 'pocket'; // Break teller som pocket, så neste krav er carom
+                lastType = 'pocket'; 
                 firstPostBreakDone = true;
             } else {
                 if (!firstPostBreakDone) firstPostBreakDone = true;
@@ -262,7 +267,7 @@
     function nextTurn() {
         saveHistory();
         innings++;
-        firstPostBreakDone = false; 
+        firstPostBreakDone = false;
         lastType = null;
         currentPlayer = (currentPlayer + 1) % playerCount;
         scoreAtStart[currentPlayer] = scores[currentPlayer];
@@ -300,6 +305,8 @@
         if (!isPaused) { isPaused = true; clearInterval(timerInterval); document.getElementById('timerBtn').innerText = "FORTSETT"; }
         else { isPaused = false; document.getElementById('timerBtn').innerText = "PAUSE"; timerInterval = setInterval(() => { seconds++; document.getElementById('matchTimer').innerText = new Date(seconds * 1000).toISOString().substr(11, 8); saveData(); }, 1000); }
     }
+
+    function stopTimer() { isPaused = true; clearInterval(timerInterval); document.getElementById('timerBtn').innerText = "START KLOKKE"; }
 
     function resetGame() {
         if(confirm("Nullstille alt?")) {
