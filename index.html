@@ -105,7 +105,7 @@
         <button class="ctrl btn-carom" onclick="action('carom', 1)" id="c1">Carom 1p</button>
         <button class="ctrl btn-carom" onclick="action('carom', 2)" id="c2">Carom 2p</button>
         <button class="ctrl" style="background:#8e44ad" onclick="undo()">Angre</button>
-        <button class="ctrl" style="background:#555" onclick="alert('Regler:\n• 0-90: Veksle kule/carom.\n• 91-100: Kun caroms.\n• 101: Hazard via 1-ball.\n• Kombinasjon (begge): Neste støt er fritt valg.\n• 3 fouls på rad er tap.')">Regler</button>
+        <button class="ctrl" style="background:#555" onclick="alert('Regler:\n• Break: Treff 3-ball først.\n• 0-90: Veksle kule/carom.\n• Kombinasjon: Utfører du begge samtidig, får du nytt valgfritt forsøk!\n• 91-100: Kun caroms.\n• 101: Hazard via 1-ball.')">Regler</button>
         <button class="ctrl btn-adj" onclick="action('adjust', 1)">+</button>
         <button class="ctrl btn-adj" onclick="action('adjust', -1)">−</button>
         <button class="ctrl btn-foul-reset" onclick="handleFoul()">FOUL / SCRATCH</button>
@@ -155,7 +155,7 @@
             const box = document.createElement('div');
             box.id = `p${i}-box`;
             box.className = 'player-box';
-            box.onclick = () => selectStarter(i); // La spilleren velge hvem som starter
+            box.onclick = () => selectStarter(i);
             box.innerHTML = `
                 <div id="p${i}-top-break" class="top-break-label">0</div>
                 <span id="p${i}-label-display" class="player-label-display"></span>
@@ -172,7 +172,6 @@
     }
 
     function selectStarter(idx) {
-        // Kan kun velge starter før spillet/klokka har begynt
         if (!breakDone && seconds === 0 && isPaused) {
             currentPlayer = idx;
             updateUI();
@@ -202,14 +201,22 @@
         } else {
             winBall.style.display = "none";
             document.querySelectorAll('.ball-group').forEach(el => el.style.display = "flex");
-            if (!breakDone) document.getElementById('moveText').innerText = "BREAK SHOT (3-BALL)";
-            else if (!firstPostBreakDone || lastType === 'both') document.getElementById('moveText').innerText = "VALG: CAROM ELLER KULE";
-            else if (s >= 90) document.getElementById('moveText').innerText = "91-100: KUN CAROMS!";
-            else document.getElementById('moveText').innerText = (lastType === 'pocket') ? "KRAV: CAROM" : "KRAV: KULE";
+            if (!breakDone) {
+                document.getElementById('moveText').innerText = "BREAK SHOT (3-BALL)";
+            } else if (!firstPostBreakDone || lastType === 'both') {
+                document.getElementById('moveText').innerText = "VALG: CAROM ELLER KULE";
+            } else if (s >= 90) {
+                document.getElementById('moveText').innerText = "91-100: KUN CAROMS!";
+            } else {
+                document.getElementById('moveText').innerText = (lastType === 'pocket') ? "KRAV: CAROM" : "KRAV: KULE";
+            }
         }
 
-        const pocketWait = s >= 90 || (firstPostBreakDone && lastType === 'pocket');
-        const caromWait = (firstPostBreakDone && lastType === 'carom' && s < 90);
+        // Låselogikk
+        // pocketWait er sant hvis appen forventer carom
+        // caromWait er sant hvis appen forventer pocket
+        const pocketWait = s >= 90 || (firstPostBreakDone && lastType === 'pocket' && lastType !== 'both');
+        const caromWait = (firstPostBreakDone && lastType === 'carom' && lastType !== 'both' && s < 90);
 
         document.querySelectorAll('.ball-btn, .btn-sub-carom').forEach(el => {
             if(!el.id.includes('Win')) {
@@ -236,12 +243,17 @@
         else if (type === 'pocket_carom') {
             if (!breakDone) breakDone = true;
             firstPostBreakDone = true;
-            lastType = 'both';
+            lastType = 'both'; // Nullstiller låsing for neste støt
             scores[currentPlayer] += val;
         } else if (type !== 'adjust') {
-            if (!breakDone) breakDone = true;
-            else if (!firstPostBreakDone) firstPostBreakDone = true;
-            lastType = type;
+            if (!breakDone) {
+                breakDone = true;
+                lastType = 'pocket'; // Break teller som pocket, så neste krav er carom
+                firstPostBreakDone = true;
+            } else {
+                if (!firstPostBreakDone) firstPostBreakDone = true;
+                lastType = type;
+            }
             scores[currentPlayer] += val;
         } else { scores[currentPlayer] = Math.max(0, scores[currentPlayer] + val); }
         updateUI();
@@ -250,7 +262,7 @@
     function nextTurn() {
         saveHistory();
         innings++;
-        firstPostBreakDone = false;
+        firstPostBreakDone = false; 
         lastType = null;
         currentPlayer = (currentPlayer + 1) % playerCount;
         scoreAtStart[currentPlayer] = scores[currentPlayer];
@@ -289,14 +301,11 @@
         else { isPaused = false; document.getElementById('timerBtn').innerText = "PAUSE"; timerInterval = setInterval(() => { seconds++; document.getElementById('matchTimer').innerText = new Date(seconds * 1000).toISOString().substr(11, 8); saveData(); }, 1000); }
     }
 
-    function stopTimer() { isPaused = true; clearInterval(timerInterval); document.getElementById('timerBtn').innerText = "START KLOKKE"; }
-
     function resetGame() {
         if(confirm("Nullstille alt?")) {
             scores = [0, 0, 0]; topBreaks = [0, 0, 0]; foulCounts = [0, 0, 0]; scoreAtStart = [0, 0, 0];
             currentPlayer = 0; breakDone = false; firstPostBreakDone = false; lastType = null;
             innings = 0; seconds = 0; history = [];
-            for(let i=0; i<3; i++) localStorage.removeItem(`p${i}name`);
             if(timerInterval) clearInterval(timerInterval); isPaused = true;
             localStorage.clear();
             initUI();
