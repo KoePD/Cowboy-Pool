@@ -21,7 +21,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 90%;
+            width: 95%; /* Litt bredere enn containeren for TV-look */
+            max-width: 600px; /* Holder den kompakt */
+            position: relative;
         }
 
         .scoreline {
@@ -35,6 +37,18 @@
             width: 100%;
             height: 73px;
             box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+            position: relative; /* For å posisjonere gradient-bg bak */
+        }
+
+        /* NY SENTRERT GRADIENT-BAKGRUNN */
+        .gradient-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #083c2c 0%, #00af79 50%, #083c2c 100%);
+            z-index: 1; /* Ligger bak alt innhold */
         }
 
         .player {
@@ -44,26 +58,24 @@
             height: 100%;
             color: white;
             position: relative;
+            z-index: 2; /* Ligger over gradient-bg */
             transition: opacity 0.3s;
         }
 
-        /* Gradienter basert på din kode */
         .player--A {
-            background: linear-gradient(90deg, #083c2c 50%, #00af79);
             padding-left: 20px;
             justify-content: flex-start;
         }
 
         .player--B {
-            background: linear-gradient(90deg, #00af79, #083c2c 50%);
             padding-right: 20px;
             justify-content: flex-end;
             text-align: right;
         }
 
-        /* Inaktiv spiller blir litt mørkere/gjennomsiktig */
+        /* Inaktiv spiller blir litt mørkere */
         .is-not-turn {
-            opacity: 0.6;
+            opacity: 0.5;
         }
 
         .name {
@@ -84,9 +96,9 @@
             font-size: 45px;
             font-weight: 900;
             color: #f1c40f;
-            z-index: 10;
-            border-left: 1px solid #333;
-            border-right: 1px solid #333;
+            z-index: 10; /* Ligger øverst av alt */
+            border-left: 2px solid #222;
+            border-right: 2px solid #222;
         }
 
         .fouls {
@@ -99,7 +111,7 @@
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.1);
         }
 
@@ -110,7 +122,7 @@
         }
 
         .inning-tag {
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             color: #f1c40f;
             font-size: 12px;
             font-weight: bold;
@@ -119,6 +131,8 @@
             text-transform: uppercase;
             border: 1px solid #000;
             border-top: none;
+            margin-top: -1px; /* Sørger for at den klistrer seg til bunnen */
+            z-index: 11;
         }
     </style>
 </head>
@@ -126,6 +140,8 @@
 
     <div class="scoreline-wrapper">
         <div class="scoreline">
+            <div class="gradient-bg"></div>
+
             <div class="player player--A" id="p0-row">
                 <div class="fouls" id="p0-fouls"></div>
                 <div class="name" id="p0-name">PLAYER A</div>
