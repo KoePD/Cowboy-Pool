@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cowboy Pool Pro - Layout Update</title>
+    <title>Cowboy Pool Pro - Perfect Layout</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #1a3c1a; color: white; text-align: center; margin: 0; padding: 10px; overflow-x: hidden; }
@@ -26,6 +26,10 @@
         .top-break-label { position: absolute; top: 10px; right: 10px; font-size: 0.6em; color: #f1c40f; font-weight: 900; background: rgba(0,0,0,0.3); padding: 2px 4px; border-radius: 4px; }
         .top-break-label::before { content: "★ "; }
 
+        .foul-dots { display: flex; justify-content: center; gap: 4px; margin-top: 5px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: #444; border: 1px solid #111; }
+        .dot.active { background: #c0392b; box-shadow: 0 0 8px #ff0000; }
+
         .timer-row { display: flex; flex-direction: column; align-items: center; margin: 10px 0; padding: 10px 0; border-top: 1px solid #333; border-bottom: 1px solid #333; }
         .timer-display { font-family: monospace; font-size: 1.6em; color: #f1c40f; font-weight: bold; }
         
@@ -33,14 +37,15 @@
         .move-text { font-weight: 900; font-size: 1em; color: #fff; text-transform: uppercase; }
 
         .ball-row { display: flex; justify-content: space-around; margin: 15px 0; align-items: flex-start; min-height: 110px; }
+        .ball-group { display: flex; flex-direction: column; align-items: center; }
         .ball-btn { width: 75px; height: 75px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; box-shadow: inset -5px -5px 10px rgba(0,0,0,0.5); cursor: pointer; transition: 0.1s; }
         .ball-number { width: 35px; height: 35px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; font-size: 1.4em; border: 2px solid #000; }
         #b1 { background: radial-gradient(circle at 40% 40%, #f1c40f, #b38f00); }
         #b3 { background: radial-gradient(circle at 40% 40%, #e74c3c, #962d22); }
         #b5 { background: radial-gradient(circle at 40% 40%, #f39c12, #a36504); }
-        .btn-sub-carom { background: #3498db; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 0.65em; font-weight: bold; text-transform: uppercase; cursor: pointer; margin-top: 5px;}
+        .btn-sub-carom { background: #3498db; color: white; border: none; padding: 4px 8px; border-radius: 5px; font-size: 0.6em; font-weight: bold; text-transform: uppercase; cursor: pointer; margin-top: 8px; width: 70px; }
 
-        /* KONTROLL-GRID OPPDATERT */
+        .waiting { opacity: 0.15; filter: grayscale(0.8); }
         .control-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         button.ctrl { padding: 12px 5px; font-size: 0.75em; border: none; border-radius: 10px; color: white; font-weight: bold; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px rgba(0,0,0,0.2); }
         .btn-carom { background: #2980b9; }
@@ -82,10 +87,20 @@
         <div id="moveLabel" style="font-size:0.6em; text-transform:uppercase; color:#f1c40f; font-weight:800;">KRAV:</div>
         <div id="moveText" class="move-text">BREAK SHOT (3-BALL)</div>
     </div>
+    
     <div class="ball-row">
-        <div class="ball-group"><button class="ball-btn" onclick="action('pocket', 1)" id="b1"><div class="ball-number">1</div></button><button class="btn-sub-carom" onclick="action('pocket_carom', 2)" id="sc1">+ CAROM</button></div>
-        <div class="ball-group"><button class="ball-btn" onclick="action('pocket', 3)" id="b3"><div class="ball-number">3</div></button><button class="btn-sub-carom" onclick="action('pocket_carom', 4)" id="sc3">+ CAROM</button></div>
-        <div class="ball-group"><button class="ball-btn" onclick="action('pocket', 5)" id="b5"><div class="ball-number">5</div></button><button class="btn-sub-carom" onclick="action('pocket_carom', 6)" id="sc5">+ CAROM</button></div>
+        <div class="ball-group">
+            <button class="ball-btn" onclick="action('pocket', 1)" id="b1"><div class="ball-number">1</div></button>
+            <button class="btn-sub-carom" onclick="action('pocket_carom', 2)" id="sc1">+ CAROM</button>
+        </div>
+        <div class="ball-group">
+            <button class="ball-btn" onclick="action('pocket', 3)" id="b3"><div class="ball-number">3</div></button>
+            <button class="btn-sub-carom" onclick="action('pocket_carom', 4)" id="sc3">+ CAROM</button>
+        </div>
+        <div class="ball-group">
+            <button class="ball-btn" onclick="action('pocket', 5)" id="b5"><div class="ball-number">5</div></button>
+            <button class="btn-sub-carom" onclick="action('pocket_carom', 6)" id="sc5">+ CAROM</button>
+        </div>
         <button class="ball-btn" onclick="action('win', 1)" id="bWin"><div style="font-size:0.45em; text-transform:uppercase; font-weight:bold;">Hazard</div><div style="font-size:1.3em; font-weight:900;">WIN</div></button>
     </div>
 
