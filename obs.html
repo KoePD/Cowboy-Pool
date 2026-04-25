@@ -13,20 +13,24 @@
         
         .scoreline { display: flex; justify-content: center; align-items: center; border-radius: 45px; background: #000; border: 3px solid #111; width: 100%; height: 95px; position: relative; z-index: 5; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.7); }
         
+        /* SPILLER OMRÅDE */
         .player-area { display: flex; align-items: center; flex: 1; color: white; position: relative; z-index: 2; padding: 0 25px; min-width: 0; }
         .name { font-size: 32px; font-weight: 800; text-transform: uppercase; white-space: nowrap; margin: 0 15px; }
 
-        .score-block { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 115px; height: 100%; z-index: 10; background: #000; flex-shrink: 0; }
-        .score-val { font-size: 64px; font-weight: 900; color: #f1c40f; line-height: 0.85; }
-        .pers-val { font-size: 11px; font-weight: 900; color: #aaa; text-transform: uppercase; margin-top: 5px; }
+        /* SCORE OG PERS BLOKK */
+        .score-block { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 115px; height: 100%; z-index: 10; background: #000; }
+        .score-val { font-size: 60px; font-weight: 900; color: #f1c40f; line-height: 0.8; }
+        .pers-val { font-size: 11px; font-weight: 900; color: #aaa; text-transform: uppercase; margin-top: 4px; }
         .pers-val b { color: #f1c40f; font-size: 14px; margin-left: 3px; }
 
-        .score-divider { color: #222; font-size: 40px; font-weight: 900; margin: 0 5px; padding-bottom: 15px; background: #000; height: 100%; display: flex; align-items: center; }
+        .score-divider { color: #222; font-size: 40px; font-weight: 900; margin: 0 5px; display: flex; align-items: center; background: #000; height: 100%; padding-bottom: 10px; }
 
-        .fouls { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; width: 12px; }
+        /* VERTIKALE FOULS */
+        .fouls { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
         .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(0,0,0,0.2); }
         .dot.active { background: #ff0000; box-shadow: 0 0 8px #ff0000; }
 
+        /* 3D ELEMENTER */
         .ball { width: 30px; height: 30px; border-radius: 50%; position: relative; background-color: #fff; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         .ball-overlay-3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; z-index: 10; box-shadow: inset -2px -2px 4px rgba(0,0,0,0.4), inset 1.5px 1.5px 3px rgba(255,255,255,0.2); border: 1px solid rgba(0,0,0,0.1); }
         .ball-num { font-size: 10px; font-weight: 900; z-index: 5; color: black; background: white; width: 15px; height: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #000; }
@@ -120,40 +124,26 @@
                 const lang = data.lang || 'no';
                 const t = i18n[lang];
 
-                // Vis/skjul Spiller 3
                 document.getElementById('p2-container').style.display = (data.playerCount >= 3) ? "block" : "none";
                 document.querySelectorAll('.l-pers').forEach(el => el.innerText = t.pers);
 
                 for(let p=0; p < 3; p++) {
-                    // Navn og Score
-                    const nameEl = document.getElementById(`p${p}-name`);
-                    const scoreEl = document.getElementById(`p${p}-score`);
-                    const bestEl = document.getElementById(`best-${p}`);
-                    
-                    if (nameEl) nameEl.innerText = data.names[p] || "";
-                    if (scoreEl) scoreEl.innerText = data.scores[p];
-                    if (bestEl) bestEl.innerText = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
+                    if (document.getElementById(`p${p}-name`)) document.getElementById(`p${p}-name`).innerText = data.names[p] || "";
+                    if (document.getElementById(`p${p}-score`)) document.getElementById(`p${p}-score`).innerText = data.scores[p];
+                    if (document.getElementById(`best-${p}`)) document.getElementById(`best-${p}`).innerText = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
 
-                    // Aktive/Inaktive rader
                     const row = (p === 2) ? document.getElementById('p2-row') : document.getElementById(`p${p}-row`);
                     if(row) row.classList.toggle('is-not-turn', data.currentPlayer !== p);
                     
-                    // Brekkball-visning
                     const bBall = document.getElementById(`p${p}-break`);
                     if(bBall) bBall.style.visibility = (!data.breakDone && data.currentPlayer === p) ? "visible" : "hidden";
 
-                    // FOUL-LOGIKK (Her skjer magien)
+                    let fHtml = '';
+                    for(let d=0; d<3; d++) fHtml += `<div class="dot ${d < data.foulCounts[p] ? 'active' : ''}"></div>`;
                     const fDiv = document.getElementById(`p${p}-fouls`);
-                    if(fDiv) {
-                        let fHtml = '';
-                        for(let d=0; d<3; d++) {
-                            fHtml += `<div class="dot ${d < data.foulCounts[p] ? 'active' : ''}"></div>`;
-                        }
-                        fDiv.innerHTML = fHtml;
-                    }
+                    if(fDiv) fDiv.innerHTML = fHtml;
                 }
 
-                // Inning og status
                 document.getElementById('inning-text').innerText = t.inn + " " + (Math.floor(data.innings/data.playerCount) + 1);
                 const curS = data.scores[data.currentPlayer];
                 let statusText = t.break;
@@ -161,8 +151,6 @@
                     statusText = (data.tableStatus === 'locked') ? (data.lastType === 'pocket' ? t.rc : t.rp) : t.open;
                 }
                 document.getElementById('status-msg').innerText = statusText;
-                
-                // Ball-dimming
                 document.getElementById('b-1').classList.toggle('ball-dimmed', !data.breakDone || (curS >= 90));
                 document.getElementById('b-5').classList.toggle('ball-dimmed', !data.breakDone || (curS >= 90));
             }
