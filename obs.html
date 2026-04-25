@@ -35,35 +35,31 @@
             position: relative; z-index: 4; overflow: hidden;
         }
 
-        /* --- DIN NYE 3D BALL OVERLAY --- */
-        .ball-overlay-3d {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            z-index: 10;
+        .inning-text { font-size: 20px; font-weight: 900; color: #f1c40f; text-transform: uppercase; position: relative; z-index: 2; padding-right: 20px; border-right: 2px solid rgba(255,255,255,0.2); }
+        .status-msg { font-size: 18px; font-weight: 900; text-transform: uppercase; position: relative; z-index: 2; color: white; margin-left: 15px; }
+        .balls-row { display: flex; gap: 15px; position: relative; z-index: 2; }
+        
+        /* --- FELLES KULE-STIL MED 3D-SKYGGER FRA BILDET --- */
+        .table-ball { 
+            width: 36px; height: 36px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            position: relative;
+            /* 3D-effekten (skygge og lys) fra koden din */
             box-shadow: 
                 inset -3px -3px 6px rgba(0,0,0,0.4), 
                 inset 2px 2px 5px rgba(255,255,255,0.2); 
             border: 1px solid rgba(0,0,0,0.15); 
             box-sizing: border-box;
+            z-index: 10;
         }
 
-        .inning-text { font-size: 20px; font-weight: 900; color: #f1c40f; text-transform: uppercase; position: relative; z-index: 2; padding-right: 20px; border-right: 2px solid rgba(255,255,255,0.2); }
-        .status-msg { font-size: 18px; font-weight: 900; text-transform: uppercase; position: relative; z-index: 2; color: white; margin-left: 15px; }
-        .balls-row { display: flex; gap: 15px; position: relative; z-index: 2; }
+        .ball-num-circle { width: 22px; height: 22px; background: white; border-radius: 50%; color: black; font-size: 16px; font-weight: 900; display: flex; align-items: center; justify-content: center; z-index: 5; border: 1px solid #000; }
         
-        .table-ball { 
-            width: 36px; height: 36px; border-radius: 50%; border: 1px solid #000; 
-            display: flex; align-items: center; justify-content: center; position: relative;
-        }
-        .ball-num-circle { width: 22px; height: 22px; background: white; border-radius: 50%; color: black; font-size: 16px; font-weight: 900; display: flex; align-items: center; justify-content: center; z-index: 5; }
+        /* --- NYE 3D-FARGEMETODER FOR 1, 3 OG 5 --- */
+        .ball-1 { background: radial-gradient(circle at 40% 40%, #f1c40f, #b38f00); }
+        .ball-3 { background: radial-gradient(circle at 40% 40%, #e74c3c, #962d22); }
+        .ball-5 { background: radial-gradient(circle at 40% 40%, #f39c12, #a36504); }
         
-        .ball-1 { background: #f1c40f; }
-        .ball-3 { background: #e74c3c; }
-        .ball-5 { background: #f39c12; }
         .ball-dimmed { opacity: 0.15; filter: grayscale(1); }
         
         .player { display: flex; align-items: center; flex: 1; color: white; position: relative; z-index: 2; height: 100%; }
@@ -77,7 +73,18 @@
         .dot { width: 11px; height: 11px; border-radius: 50%; background: rgba(255,255,255,0.1); }
         .dot.active { background: #ff0000; box-shadow: 0 0 12px #ff0000; }
         
-        .break-ball { width: 32px; height: 32px; border-radius: 50%; margin: 0 15px; border: 1px solid #111; background: #eee; position: relative; display: flex; align-items: center; justify-content: center; }
+        /* --- HVIT BREAK-KULE MED SAMME 3D-STIL --- */
+        .break-ball { 
+            width: 32px; height: 32px; border-radius: 50%; margin: 0 15px; 
+            border: 1px solid rgba(0,0,0,0.15); 
+            background: radial-gradient(circle at 40% 40%, #eee, #ccc); 
+            position: relative; display: flex; align-items: center; justify-content: center;
+            box-shadow: 
+                inset -3px -3px 6px rgba(0,0,0,0.4), 
+                inset 2px 2px 5px rgba(255,255,255,0.2); 
+            box-sizing: border-box;
+            z-index: 10;
+        }
         .break-dot { position: absolute; width: 4px; height: 4px; background: red; border-radius: 50%; z-index: 5; }
     </style>
 </head>
@@ -87,18 +94,9 @@
             <div class="gradient-bg"></div>
             <div class="inning-text" id="inning-text">Inn 1</div>
             <div class="balls-row">
-                <div id="b-1" class="table-ball ball-1">
-                    <div class="ball-num-circle">1</div>
-                    <div class="ball-overlay-3d"></div>
-                </div>
-                <div id="b-3" class="table-ball ball-3">
-                    <div class="ball-num-circle">3</div>
-                    <div class="ball-overlay-3d"></div>
-                </div>
-                <div id="b-5" class="table-ball ball-5">
-                    <div class="ball-num-circle">5</div>
-                    <div class="ball-overlay-3d"></div>
-                </div>
+                <div id="b-1" class="table-ball ball-1"><div class="ball-num-circle">1</div></div>
+                <div id="b-3" class="table-ball ball-3"><div class="ball-num-circle">3</div></div>
+                <div id="b-5" class="table-ball ball-5"><div class="ball-num-circle">5</div></div>
             </div>
             <div id="status-msg" class="status-msg"></div>
         </div>
@@ -109,7 +107,6 @@
                 <div class="fouls" id="p0-fouls"></div>
                 <div id="p0-break" style="display:none;" class="break-ball">
                     <div class="break-dot" style="top:6px;left:14px;"></div><div class="break-dot" style="top:20px;left:6px;"></div><div class="break-dot" style="top:20px;left:22px;"></div>
-                    <div class="ball-overlay-3d"></div>
                 </div>
                 <div class="name" id="p0-name"></div>
             </div>
@@ -124,7 +121,6 @@
                 <div class="name" id="p1-name"></div>
                 <div id="p1-break" style="display:none;" class="break-ball">
                     <div class="break-dot" style="top:6px;left:14px;"></div><div class="break-dot" style="top:20px;left:6px;"></div><div class="break-dot" style="top:20px;left:22px;"></div>
-                    <div class="ball-overlay-3d"></div>
                 </div>
                 <div class="fouls" id="p1-fouls"></div>
             </div>
@@ -137,7 +133,6 @@
                     <div class="fouls" id="p2-fouls"></div>
                     <div id="p2-break" style="display:none;" class="break-ball">
                         <div class="break-dot" style="top:6px;left:14px;"></div><div class="break-dot" style="top:20px;left:6px;"></div><div class="break-dot" style="top:20px;left:22px;"></div>
-                        <div class="ball-overlay-3d"></div>
                     </div>
                     <div class="name" style="font-size:24px; margin-left:15px;" id="p2-name"></div>
                 </div>
