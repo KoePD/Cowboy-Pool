@@ -16,14 +16,22 @@
             align-items: center; width: 95%; max-width: 850px; position: relative;
         }
 
-        /* LIVE KULER PÅ BORDET - STYLET SOM SCOREBOARD */
+        /* 1. INNING TAG - HELT PÅ TOPPEN */
+        .inning-tag {
+            background: rgba(0, 0, 0, 0.95); color: #f1c40f; font-size: 11px; font-weight: 900;
+            padding: 3px 15px; border-radius: 10px 10px 0 0; text-transform: uppercase;
+            border: 2px solid #111; border-bottom: none; z-index: 12;
+            margin-bottom: -1px; /* Overlapp med boksen under */
+        }
+
+        /* 2. KULE-BOKS - NÅ KRYMPET */
         .table-state {
-            display: flex; gap: 10px; margin-bottom: -2px;
-            background: #000; padding: 10px 25px;
-            border-radius: 20px 20px 0 0; border: 2px solid #111;
+            display: flex; gap: 8px; margin-bottom: -1px; /* Overlapp med hovedscore */
+            background: #000; padding: 6px 20px;
+            border-radius: 15px 15px 0 0; border: 2px solid #111; border-bottom: none;
             align-items: center; flex-direction: column;
             position: relative; overflow: hidden;
-            width: auto; min-width: 250px;
+            width: auto; min-width: 200px; z-index: 10;
         }
 
         .gradient-bg {
@@ -33,21 +41,21 @@
         }
 
         .status-msg {
-            font-size: 11px; font-weight: 900; text-transform: uppercase;
-            margin-bottom: 5px; letter-spacing: 1px; transition: 0.3s;
-            height: 14px; position: relative; z-index: 2; color: white;
+            font-size: 10px; font-weight: 900; text-transform: uppercase;
+            margin-bottom: 3px; letter-spacing: 1px; transition: 0.3s;
+            height: 12px; position: relative; z-index: 2; color: white;
         }
         .msg-carom { color: #3498db; text-shadow: 0 0 8px #3498db; }
         .msg-pocket { color: #f39c12; text-shadow: 0 0 8px #f39c12; }
 
-        .balls-row { display: flex; gap: 15px; position: relative; z-index: 2; }
+        .balls-row { display: flex; gap: 10px; position: relative; z-index: 2; }
 
         .table-ball {
-            width: 30px; height: 30px; border-radius: 50%;
+            width: 24px; height: 24px; border-radius: 50%; /* Mindre kuler */
             display: flex; align-items: center; justify-content: center;
-            font-weight: 900; color: black; font-size: 14px;
+            font-weight: 900; color: black; font-size: 12px;
             border: 2px solid #000; transition: all 0.4s ease;
-            box-shadow: inset -3px -3px 6px rgba(0,0,0,0.4);
+            box-shadow: inset -2px -2px 4px rgba(0,0,0,0.4);
         }
 
         .ball-1 { background: radial-gradient(circle at 35% 35%, #f1c40f, #b38f00); }
@@ -55,16 +63,9 @@
         .ball-5 { background: radial-gradient(circle at 35% 35%, #f39c12, #a36504); }
 
         .ball-dimmed { opacity: 0.15; filter: grayscale(1); transform: scale(0.85); }
-        .ball-highlight { transform: scale(1.05); box-shadow: 0 0 12px rgba(255,255,255,0.4), inset -3px -3px 6px rgba(0,0,0,0.4); }
+        .ball-highlight { transform: scale(1.05); box-shadow: 0 0 10px rgba(255,255,255,0.3), inset -2px -2px 4px rgba(0,0,0,0.4); }
 
-        /* SCOREBOARD DELER */
-        .inning-tag {
-            background: rgba(0, 0, 0, 0.95); color: #f1c40f; font-size: 12px; font-weight: 900;
-            padding: 4px 18px; border-radius: 0; text-transform: uppercase;
-            border-left: 2px solid #111; border-right: 2px solid #111; z-index: 11;
-            margin-bottom: -1px;
-        }
-
+        /* 3. HOVEDSCORE */
         .scoreline {
             display: flex; justify-content: center; align-items: center;
             border-radius: 35px; background: #000; border: 2px solid #111;
@@ -112,6 +113,8 @@
 </head>
 <body>
     <div class="scoreline-wrapper">
+        <div class="inning-tag" id="inning-text">Inning 1</div>
+
         <div class="table-state">
             <div class="gradient-bg"></div>
             <div id="status-msg" class="status-msg"></div>
@@ -121,8 +124,6 @@
                 <div id="table-ball-5" class="table-ball ball-5">5</div>
             </div>
         </div>
-
-        <div class="inning-tag" id="inning-text">Inning 1</div>
 
         <div class="scoreline">
             <div class="gradient-bg"></div>
@@ -184,7 +185,7 @@
 
             if (!breakDone) {
                 ball1.classList.add('ball-dimmed'); ball5.classList.add('ball-dimmed'); ball3.classList.add('ball-highlight');
-                msgEl.innerText = "Krav: Break Shot";
+                msgEl.innerText = "Break Shot";
             } else if (currentScore >= 90 || (tableStatus === 'locked' && lastType === 'pocket')) {
                 ball1.classList.add('ball-dimmed'); ball3.classList.add('ball-dimmed'); ball5.classList.add('ball-dimmed');
                 msgEl.innerText = "KRAV: CAROM"; msgEl.classList.add('msg-carom');
