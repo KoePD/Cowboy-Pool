@@ -17,33 +17,29 @@
         .scoreboard { display: flex; justify-content: center; margin-bottom: 15px; gap: 8px; }
         .player-box { flex: 1; padding: 15px 5px; border-radius: 15px; background: #333; border: 4px solid transparent; position: relative; }
         .active { border-color: #f1c40f; background: #3d3d3d; }
-        .score { font-size: 2.5em; font-weight: 900; display: block; }
+        .score { font-size: 2.8em; font-weight: 900; display: block; line-height: 1; }
         
-        /* SERIE INFO I KONTROLLER */
-        .series-row { display: flex; justify-content: space-around; margin-top: 10px; font-size: 0.7em; font-weight: bold; text-transform: uppercase; border-top: 1px solid #444; padding-top: 5px; }
-        .series-box { display: flex; flex-direction: column; }
+        /* DE NYE SERIE-FELTENE */
+        .series-info { display: flex; justify-content: space-around; margin-top: 10px; padding-top: 8px; border-top: 1px solid #444; }
+        .series-item { display: flex; flex-direction: column; font-size: 0.65em; font-weight: 800; text-transform: uppercase; }
         .series-val { color: #f1c40f; font-size: 1.4em; }
 
         .foul-dots { display: flex; justify-content: center; gap: 6px; margin-top: 10px; }
         .dot { width: 10px; height: 10px; border-radius: 50%; background: #444; border: 1px solid #111; }
         .dot.active { background: #c0392b; box-shadow: 0 0 8px #ff0000; }
         
-        .timer-row { margin: 10px 0; padding: 10px 0; border-top: 1px solid #333; border-bottom: 1px solid #333; }
-        .next-move-box { min-height: 50px; background: #2c3e50; padding: 10px; border-radius: 12px; margin: 10px 0; border-left: 6px solid #f1c40f; text-align: left; }
+        .next-move-box { min-height: 55px; background: #2c3e50; padding: 12px; border-radius: 12px; margin: 10px 0; border-left: 6px solid #f1c40f; text-align: left; }
         
-        /* 3D BALLER I KONTROLLER */
-        .ball-row { display: flex; justify-content: space-around; margin: 20px 0; }
+        /* 3D BALLER SOM FUNGERER */
+        .ball-row { display: flex; justify-content: space-around; margin: 20px 0; min-height: 125px; }
         .ball-group { display: flex; flex-direction: column; align-items: center; }
-        .ball-btn { width: 70px; height: 70px; border-radius: 50%; border: 2px solid #000; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.5); overflow: hidden; }
-        .ball-num { width: 28px; height: 28px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; z-index: 5; border: 1px solid #000; }
-        .overlay-3d { position: absolute; top:0; left:0; width:100%; height:100%; border-radius:50%; box-shadow: inset -4px -4px 8px rgba(0,0,0,0.4), inset 3px 3px 6px rgba(255,255,255,0.2); }
+        .ball-btn { width: 75px; height: 75px; border-radius: 50%; border: 3px solid #000; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; box-shadow: inset -5px -5px 10px rgba(0,0,0,0.5); }
+        .ball-num { width: 32px; height: 32px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; z-index: 5; border: 1px solid #000; }
+        .waiting { opacity: 0.15; filter: grayscale(0.8); pointer-events: none; }
         
-        .f-1 { background: #ffcc00; } .f-3 { background: #cc0000; } .f-5 { background: #663399; }
-        .waiting { opacity: 0.15; filter: grayscale(1); pointer-events: none; }
-
         .control-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        button.ctrl { padding: 15px 5px; border: none; border-radius: 10px; color: white; font-weight: bold; text-transform: uppercase; cursor: pointer; }
-        .btn-turn { background: #27ae60; grid-column: span 3; font-size: 1.2em; }
+        button.ctrl { padding: 14px 5px; border: none; border-radius: 10px; color: white; font-weight: bold; text-transform: uppercase; cursor: pointer; }
+        .btn-turn { background: #27ae60; grid-column: span 3; font-size: 1.2em; padding: 18px; }
     </style>
 </head>
 <body>
@@ -56,25 +52,25 @@
     <div class="names-row" id="inputs-container"></div>
     <div class="scoreboard" id="scoreboard-container"></div>
     
-    <div class="timer-row">
-        <div id="matchTimer" style="font-size: 1.5em; color: #f1c40f; font-family: monospace;">00:00:00</div>
-        <button onclick="toggleTimer()" id="timerBtn" style="background:#e67e22; border:none; color:white; padding:8px 15px; border-radius:5px; margin-top:5px; font-weight:bold;">START</button>
+    <div class="timer-row" style="margin-bottom:10px;">
+        <div id="matchTimer" style="font-size: 1.8em; color: #f1c40f; font-family: monospace; font-weight:bold;">00:00:00</div>
+        <button onclick="toggleTimer()" id="timerBtn" style="background:#e67e22; border:none; color:white; padding:8px 18px; border-radius:6px; font-weight:bold; cursor:pointer;">START</button>
     </div>
 
-    <div class="next-move-box"><div id="moveText" style="font-weight:900; font-size:0.9em;">BREAK SHOT (3-BALL)</div></div>
+    <div class="next-move-box"><div id="moveText" style="font-weight:900; text-transform:uppercase;">BREAK SHOT (3-BALL)</div></div>
     
     <div class="ball-row">
         <div class="ball-group">
-            <div class="ball-btn f-1" onclick="action('pocket', 1)" id="ctrl-b1"><div class="ball-num">1</div><div class="overlay-3d"></div></div>
-            <button onclick="action('pocket_carom', 2)" style="margin-top:5px; font-size:0.7em; background:#3498db; color:white; border:none; padding:4px; border-radius:4px;">+ CAROM</button>
+            <div class="ball-btn" style="background: radial-gradient(circle at 40% 40%, #ffcc00, #b38f00);" onclick="action('pocket', 1)" id="b1"><div class="ball-num">1</div></div>
+            <button onclick="action('pocket_carom', 2)" style="margin-top:10px; background:#3498db; color:white; border:none; padding:6px 10px; border-radius:5px; font-weight:bold; cursor:pointer;">+ CAROM</button>
         </div>
         <div class="ball-group">
-            <div class="ball-btn f-3" onclick="action('pocket', 3)" id="ctrl-b3"><div class="ball-num">3</div><div class="overlay-3d"></div></div>
-            <button onclick="action('pocket_carom', 4)" style="margin-top:5px; font-size:0.7em; background:#3498db; color:white; border:none; padding:4px; border-radius:4px;">+ CAROM</button>
+            <div class="ball-btn" style="background: radial-gradient(circle at 40% 40%, #cc0000, #800000);" onclick="action('pocket', 3)" id="b3"><div class="ball-num">3</div></div>
+            <button onclick="action('pocket_carom', 4)" style="margin-top:10px; background:#3498db; color:white; border:none; padding:6px 10px; border-radius:5px; font-weight:bold; cursor:pointer;">+ CAROM</button>
         </div>
         <div class="ball-group">
-            <div class="ball-btn f-5" onclick="action('pocket', 5)" id="ctrl-b5"><div class="ball-num">5</div><div class="overlay-3d"></div></div>
-            <button onclick="action('pocket_carom', 6)" style="margin-top:5px; font-size:0.7em; background:#3498db; color:white; border:none; padding:4px; border-radius:4px;">+ CAROM</button>
+            <div class="ball-btn" style="background: radial-gradient(circle at 40% 40%, #663399, #331a4d);" onclick="action('pocket', 5)" id="b5"><div class="ball-num">5</div></div>
+            <button onclick="action('pocket_carom', 6)" style="margin-top:10px; background:#3498db; color:white; border:none; padding:6px 10px; border-radius:5px; font-weight:bold; cursor:pointer;">+ CAROM</button>
         </div>
     </div>
 
@@ -84,7 +80,7 @@
         <button class="ctrl" style="background:#8e44ad" onclick="undo()">Angre</button>
         <button class="ctrl" style="background:#c0392b; grid-column: span 3;" onclick="handleFoul()">FOUL</button>
         <button class="ctrl btn-turn" onclick="nextTurn()">AVSLUTT TUR / BOM</button>
-        <button class="ctrl" style="background:#444; grid-column: span 3; margin-top:10px; font-size:0.7em;" onclick="resetGame()">RESET GAME</button>
+        <button class="ctrl" style="background:#34495e; grid-column: span 3; margin-top:10px; font-size:0.7em;" onclick="resetGame()">HARD RESET</button>
     </div>
 </div>
 
@@ -96,7 +92,7 @@
     let state = {
         playerCount: 2, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0],
         currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null,
-        innings: 0, seconds: 0, names: ["Simen", "Lasse", "Ole Andreas"],
+        innings: 0, seconds: 0, names: ["Spiller 1", "Spiller 2", "Spiller 3"],
         bestSeries: [0,0,0]
     };
 
@@ -113,11 +109,11 @@
             inputCont.innerHTML += `<input value="${state.names[i]}" oninput="saveName(${i}, this.value)">`;
             scoreCont.innerHTML += `
                 <div id="p${i}-box" class="player-box">
-                    <span class="player-label-display">${state.names[i]}</span>
+                    <span style="font-size:0.75em; color:#aaa; font-weight:bold; text-transform:uppercase;">${state.names[i]}</span>
                     <span class="score">${state.scores[i]}</span>
-                    <div class="series-row">
-                        <div class="series-box"><span>Nå</span><span class="series-val" id="p${i}-now">0</span></div>
-                        <div class="series-box"><span>Pers</span><span class="series-val" id="p${i}-best">0</span></div>
+                    <div class="series-info">
+                        <div class="series-item"><span>Nå</span><span class="series-val" id="p${i}-now">0</span></div>
+                        <div class="series-item"><span>Pers</span><span class="series-val" id="p${i}-best">0</span></div>
                     </div>
                     <div class="foul-dots" id="p${i}-fouls"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
                 </div>`;
@@ -136,8 +132,8 @@
 
     function nextTurn() {
         saveHistory();
-        let currentS = state.scores[state.currentPlayer] - state.scoreAtStart[state.currentPlayer];
-        if (currentS > state.bestSeries[state.currentPlayer]) state.bestSeries[state.currentPlayer] = currentS;
+        let cur = state.scores[state.currentPlayer] - state.scoreAtStart[state.currentPlayer];
+        if (cur > state.bestSeries[state.currentPlayer]) state.bestSeries[state.currentPlayer] = cur;
         if (!state.breakDone) state.breakDone = true;
         state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
         state.innings++; state.tableStatus = 'open';
@@ -162,12 +158,10 @@
             const dots = document.getElementById(`p${i}-fouls`).children;
             for(let d=0; d<3; d++) dots[d].className = (d < state.foulCounts[i]) ? 'dot active' : 'dot';
         }
-        
         const isLockedPocket = (state.tableStatus === 'locked' && state.lastType === 'pocket');
-        document.getElementById('ctrl-b1').className = (!state.breakDone || isLockedPocket) ? 'ball-btn f-1 waiting' : 'ball-btn f-1';
-        document.getElementById('ctrl-b3').className = (isLockedPocket) ? 'ball-btn f-3 waiting' : 'ball-btn f-3';
-        document.getElementById('ctrl-b5').className = (!state.breakDone || isLockedPocket) ? 'ball-btn f-5 waiting' : 'ball-btn f-5';
-        
+        document.getElementById('b1').className = (!state.breakDone || isLockedPocket) ? 'ball-btn waiting' : 'ball-btn';
+        document.getElementById('b3').className = (isLockedPocket) ? 'ball-btn waiting' : 'ball-btn';
+        document.getElementById('b5').className = (!state.breakDone || isLockedPocket) ? 'ball-btn waiting' : 'ball-btn';
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
     }
 
@@ -176,7 +170,6 @@
         else { isPaused = false; timerInterval = setInterval(() => { state.seconds++; db.child('seconds').set(state.seconds); }, 1000); document.getElementById('timerBtn').innerText = "PAUSE"; }
     }
 
-    function setPlayerCount(n) { state.playerCount = n; resetGame(); }
     function resetGame() { state.scores=[0,0,0]; state.bestSeries=[0,0,0]; state.innings=0; state.breakDone=false; state.seconds=0; pushData(); }
     function saveHistory() { history.push(JSON.stringify(state)); }
     function undo() { if(history.length) { state = JSON.parse(history.pop()); pushData(); } }
