@@ -20,11 +20,11 @@
         .score { font-size: 2.8em; font-weight: 900; display: block; line-height: 1; }
         .player-label-display { font-size: 0.75em; color: #aaa; text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 8px; }
         
-        /* NY SERIE-LAYOUT */
-        .series-container { display: flex; justify-content: space-around; margin-top: 5px; border-top: 1px solid #444; padding-top: 5px; }
+        /* NY SERIE-LAYOUT SOM PASSER INN */
+        .series-info { display: flex; justify-content: space-around; margin-top: 8px; border-top: 1px solid #444; padding-top: 5px; }
         .series-box { display: flex; flex-direction: column; }
-        .series-label { font-size: 0.5em; color: #aaa; text-transform: uppercase; font-weight: 800; }
-        .series-val { font-size: 0.9em; color: #f1c40f; font-weight: 900; }
+        .series-label { font-size: 0.55em; color: #aaa; text-transform: uppercase; font-weight: 800; }
+        .series-val { font-size: 0.95em; color: #f1c40f; font-weight: 900; }
 
         .foul-dots { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
         .dot { width: 12px; height: 12px; border-radius: 50%; background: #444; border: 1px solid #111; }
@@ -111,7 +111,7 @@
         playerCount: 2, scores: [0, 0, 0], foulCounts: [0, 0, 0], scoreAtStart: [0, 0, 0],
         currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null,
         innings: 0, seconds: 0, names: ["Spiller 1", "Spiller 2", "Spiller 3"],
-        bestSeries: [0, 0, 0] // NYTT: Lagrer rekord per spiller
+        bestSeries: [0, 0, 0] // Lagrer personlig rekord i denne kampen
     };
 
     let timerInterval = null; let isPaused = true; let history = [];
@@ -133,9 +133,9 @@
                 <div id="p${i}-box" class="player-box">
                     <span id="p${i}-label" class="player-label-display">${state.names[i]}</span>
                     <span id="p${i}-score" class="score">${state.scores[i]}</span>
-                    <div class="series-container">
-                        <div class="series-box"><span class="series-label">Nå</span><div id="p${i}-turn-score" class="series-val">0</div></div>
-                        <div class="series-box"><span class="series-label">Høyest</span><div id="p${i}-best-score" class="series-val">0</div></div>
+                    <div class="series-info">
+                        <div class="series-box"><span class="series-label">Nå</span><div id="p${i}-now" class="series-val">0</div></div>
+                        <div class="series-box"><span class="series-label">Pers</span><div id="p${i}-best" class="series-val">0</div></div>
                     </div>
                     <div class="foul-dots" id="p${i}-fouls"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
                 </div>`;
@@ -168,9 +168,9 @@
     function nextTurn() {
         saveHistory();
         
-        // Sjekk om nåværende serie er ny rekord for spilleren
+        // Oppdaterer personlig rekord før spillerbytte
         let currentSeries = state.scores[state.currentPlayer] - state.scoreAtStart[state.currentPlayer];
-        if (currentSeries > state.bestSeries[state.currentPlayer]) {
+        if (currentSeries > (state.bestSeries[state.currentPlayer] || 0)) {
             state.bestSeries[state.currentPlayer] = currentSeries;
         }
 
@@ -207,8 +207,8 @@
         for(let i=0; i<state.playerCount; i++) {
             document.getElementById(`p${i}-label`).innerText = state.names[i];
             document.getElementById(`p${i}-score`).innerText = state.scores[i];
-            document.getElementById(`p${i}-turn-score`).innerText = state.scores[i] - state.scoreAtStart[i];
-            document.getElementById(`p${i}-best-score`).innerText = state.bestSeries[i] || 0;
+            document.getElementById(`p${i}-now`).innerText = state.scores[i] - state.scoreAtStart[i];
+            document.getElementById(`p${i}-best`).innerText = state.bestSeries ? (state.bestSeries[i] || 0) : 0;
             document.getElementById(`p${i}-box`).className = (state.currentPlayer === i) ? 'player-box active' : 'player-box';
             const dots = document.getElementById(`p${i}-fouls`).children;
             for(let d=0; d<3; d++) dots[d].className = (d < state.foulCounts[i]) ? 'dot active' : 'dot';
