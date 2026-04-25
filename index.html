@@ -91,7 +91,7 @@
         <button class="ctrl" style="background:#8e44ad" onclick="undo()">Angre</button>
         <button class="ctrl" style="background:#7f8c8d" onclick="adjustScore(1)">+</button>
         <button class="ctrl" style="background:#7f8c8d" onclick="adjustScore(-1)">−</button>
-        <button class="ctrl" style="background:#444" onclick="alert('Regler: Layout er fryst!')">INFO</button>
+        <button class="ctrl" style="background:#444" onclick="alert('Regler: Layout er fryst!')">REGLER</button>
         <button class="ctrl btn-foul" onclick="handleFoul()">FOUL (MISTER SERIE)</button>
         <button class="ctrl btn-turn" onclick="nextTurn()">AVSLUTT TUR / BOM</button>
         <button class="ctrl" style="background:#34495e; grid-column: span 3; margin-top:10px; font-size:0.7em;" onclick="resetGame()">HARD RESET</button>
@@ -230,7 +230,6 @@
     function setPlayerCount(n) { state.playerCount = n; resetGame(); }
 
     function resetGame() { 
-        // HER ER DEN NYE ADVARSELEN
         if (confirm("Er du sikker på at du vil starte spillet helt på nytt? Alle poeng og personlige rekorder blir slettet!")) {
             state.scores=[0,0,0]; 
             state.foulCounts=[0,0,0]; 
