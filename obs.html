@@ -106,16 +106,34 @@
             text-overflow: ellipsis;
         }
 
-        /* BREAK INDIKATOR (BALL) */
+        /* OPPDATERT BREAK INDIKATOR (HVIT KULE EFFEKT) */
         .break-ball {
-            width: 14px;
-            height: 14px;
-            background: white;
+            width: 16px;
+            height: 16px;
+            /* 3D gradient for å etterligne en biljardkule */
+            background: radial-gradient(circle at 35% 35%, #ffffff 0%, #dddddd 60%, #aaaaaa 100%);
             border-radius: 50%;
             display: inline-block;
-            margin: 0 10px;
-            box-shadow: 0 0 10px white;
+            margin: 0 12px;
+            /* Tynn mørk kant for å skille kula fra bakgrunnen */
+            border: 1px solid #111;
+            /* Hvit glød for fokus */
+            box-shadow: 0 0 12px rgba(255,255,255,0.8);
             flex-shrink: 0;
+            position: relative;
+        }
+        
+        /* Legger til et lite ekstra "glimt" for mer realisme */
+        .break-ball::after {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 15%;
+            width: 30%;
+            height: 30%;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            filter: blur(1px);
         }
 
         .score-box {
@@ -236,7 +254,6 @@
                 if (row) {
                     row.classList.toggle('is-not-turn', activePlayer !== p);
                     
-                    // Vis break-ballen kun hvis break IKKE er gjort, og det er spillerens tur
                     if (breakIcon) {
                         breakIcon.style.display = (!breakDone && activePlayer === p) ? "block" : "none";
                     }
