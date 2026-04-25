@@ -66,19 +66,19 @@
 
         /* SPILLER 3 RAD */
         .player3-row {
-            display: none; width: 50%; height: 55px; background: #000; margin-top: -10px;
+            display: none; width: 50%; height: 60px; background: #000; margin-top: -12px;
             border-radius: 0 0 30px 30px; border: 3px solid #111; border-top: none;
             overflow: hidden; position: relative; z-index: 4;
         }
 
         .player { display: flex; align-items: center; flex: 1; height: 100%; color: white; position: relative; z-index: 2; min-width: 0; }
-        .player--A { padding-left: 30px; }
-        .player--B { padding-right: 30px; justify-content: flex-end; }
+        .player--A { padding-left: 20px; }
+        .player--B { padding-right: 20px; justify-content: flex-end; }
         
         .is-not-turn { opacity: 0.4; }
         .name { font-size: 32px; font-weight: 800; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* DEN HVITE KULA MED RØDE PRIKKER (REPARERT) */
+        /* DEN HVITE KULA MED RØDE PRIKKER */
         .break-ball {
             width: 24px; height: 24px; border-radius: 50%; display: inline-block; margin: 0 15px;
             background: 
@@ -99,18 +99,21 @@
         }
 
         .score-box-p3 {
-            background: #000; min-width: 80px; height: 100%; display: flex;
+            background: #000; min-width: 100px; height: 100%; display: flex;
             justify-content: center; align-items: center; font-size: 36px; font-weight: 900;
-            color: #f1c40f; border-left: 3px solid #111; position: relative; z-index: 3;
+            color: #f1c40f; border-left: 3px solid #111; position: relative; z-index: 10;
         }
 
-        /* FOULS - HORISONTALT MED LUFT */
-        .fouls { display: flex; align-items: center; gap: 8px; }
-        .player--A .fouls { margin-right: 25px; } /* Luft til høyre for prikker mot navn */
-        .player--B .fouls { margin-left: 25px; order: 2; } /* Luft til venstre for prikker mot navn */
-        .player--C .fouls { margin-right: 25px; }
-
-        .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(0,0,0,0.5); transition: 0.3s; }
+        /* FOULS - VERTIKAL STABEL (OPPÅ HVERANDRE) */
+        .fouls { 
+            display: flex; 
+            flex-direction: column; /* Stabler dem loddrett */
+            justify-content: center; 
+            align-items: center; 
+            gap: 4px; 
+            margin: 0 15px;
+        }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(0,0,0,0.5); }
         .dot.active { background: #ff0000; box-shadow: 0 0 12px #ff0000; border-color: #ffaaaa; }
     </style>
 </head>
@@ -148,8 +151,8 @@
 
         <div class="player3-row" id="p2-container">
             <div class="gradient-bg"></div>
-            <div class="player player--C" style="justify-content: space-between; padding: 0;" id="p2-row">
-                <div style="display: flex; align-items: center; padding-left: 30px;">
+            <div class="player" style="justify-content: space-between; padding: 0;" id="p2-row">
+                <div style="display: flex; align-items: center; padding-left: 20px;">
                     <div class="fouls" id="p2-fouls"></div>
                     <div id="p2-break" style="display:none;" class="break-ball"></div>
                     <div class="name" style="font-size: 20px;" id="p2-name">Spiller 3</div>
@@ -201,12 +204,15 @@
                 msgEl.style.color = "white"; 
             }
 
+            // Sjekker pCount for å vise spiller 3
             const p2Cont = document.getElementById('p2-container');
             if (pCount === 3) {
                 p2Cont.style.display = "block";
                 document.getElementById('p2-name').innerText = localStorage.getItem('p2name') || "Spiller 3";
                 document.getElementById('p2-score').innerText = scores[2];
-            } else { p2Cont.style.display = "none"; }
+            } else { 
+                p2Cont.style.display = "none"; 
+            }
 
             for (let p = 0; p < 3; p++) {
                 const row = document.getElementById(`p${p}-row`);
