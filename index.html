@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cowboy Pool Pro - Final Layout</title>
+    <title>Cowboy Pool Pro - Final Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #1a3c1a; color: white; text-align: center; margin: 0; padding: 10px; overflow-x: hidden; }
@@ -18,11 +18,11 @@
         .names-row input { flex: 1; padding: 10px 5px; border-radius: 8px; border: none; background: #444; color: white; text-align: center; font-weight: bold; font-size: 0.8em; min-width: 0; }
         
         .scoreboard { display: flex; justify-content: center; margin-bottom: 15px; gap: 8px; }
-        .player-box { flex: 1; min-width: 0; padding: 10px 5px; border-radius: 15px; background: #333; border: 4px solid transparent; transition: 0.3s; position: relative; cursor: pointer; }
+        .player-box { flex: 1; min-width: 0; padding: 10px 5px; border-radius: 15px; background: #333; border: 4px solid transparent; transition: 0.3s; position: relative; }
         .active { border-color: #f1c40f; background: #3d3d3d; transform: scale(1.02); }
         .score { font-size: 2.8em; font-weight: 900; display: block; line-height: 1; pointer-events: none; }
         
-        .player-label-display { font-size: 0.7em; color: #aaa; text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 5px; text-align: center; width: 100%; pointer-events: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .player-label-display { font-size: 0.7em; color: #aaa; text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 5px; text-align: center; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .top-break-label { position: absolute; top: 10px; right: 8px; font-size: 0.55em; color: #f1c40f; font-weight: 900; background: rgba(0,0,0,0.3); padding: 2px 4px; border-radius: 4px; }
         .top-break-label::before { content: "★ "; }
 
@@ -83,7 +83,7 @@
         <div class="inning-display" id="inningText">Inning: 1</div>
         <div style="display:flex; gap:10px;">
             <button style="background:#e67e22; border:none; color:white; padding:6px 15px; border-radius:6px; font-size:0.75em; margin-top:8px; cursor:pointer; font-weight:800;" onclick="toggleTimer()" id="timerBtn">START KLOKKE</button>
-            <button id="changeBreakerBtn" style="background:#3498db; border:none; color:white; padding:6px 15px; border-radius:6px; font-size:0.75em; margin-top:8px; cursor:pointer; font-weight:800;" onclick="rotateBreaker()">BYTT BREAKER</button>
+            <button id="changeBreakerBtn" style="background:#3498db; border:none; color:white; padding:6px 15px; border-radius:6px; font-size:0.75em; margin-top:8px; cursor:pointer; font-weight:800;" onclick="rotateBreaker()">STARTING PLAYER</button>
         </div>
     </div>
     <div class="next-move-box">
@@ -125,13 +125,13 @@
 <script>
     const i18n = {
         no: {
-            mode: "MODUS:", starter: "START KLOKKE", resume: "FORTSETT", pause: "PAUSE", krav: "KRAV:", break: "BREAK SHOT (3-BALL)", 
+            mode: "MODUS:", starter: "START KLOKKE", resume: "FORTSETT", pause: "PAUSE", breaker: "STARTING PLAYER", krav: "KRAV:", break: "BREAK SHOT (3-BALL)", 
             open: "VALG: CAROM ELLER KULE", winner: "101: MELD HULL, CAROM VIA 1-BALLEN", undo: "Angre", rules: "Regler", foul: "FOUL / SCRATCH", turn: "AVSLUTT TUR / BOM", 
             reset: "NULLSTILL ALT", placeholder: "Skriv navn...", noName: "INGEN NAVN", confirmReset: "Vil du nullstille og starte på nytt?", gameOver: "GAME OVER!", loss: "taper pga 3 fouls!", modalHeader: "Regler",
             modalBody: `<h4>Mål</h4><p>Nøyaktig 101 poeng.</p><h4>Break</h4><p>Må treffe 3-ball først.</p><h4>Veksling</h4><ul><li>Open Table: Hver tur starter åpen.</li><li>Jokeren: Pocket+Carom holder bordet åpent.</li><li>Locked: Kun én type låser rekkefølgen.</li></ul><h4>Foul</h4><p>Poeng i nåværende serie tapes. 3 feil på rad = Tap.</p>`
         },
         en: {
-            mode: "MODE:", starter: "START CLOCK", resume: "RESUME", pause: "PAUSE", krav: "REQ:", break: "BREAK SHOT (3-BALL)", 
+            mode: "MODE:", starter: "START CLOCK", resume: "RESUME", pause: "PAUSE", breaker: "STARTING PLAYER", krav: "REQ:", break: "BREAK SHOT (3-BALL)", 
             open: "OPEN TABLE: CHOOSE ANY", winner: "101: CALL POCKET, CAROM OFF 1-BALL", undo: "Undo", rules: "Rules", foul: "FOUL / SCRATCH", turn: "END TURN / MISS", 
             reset: "RESET MATCH", placeholder: "Enter name...", noName: "NO NAME", confirmReset: "Reset match?", gameOver: "GAME OVER!", loss: "lost due to 3 fouls!", modalHeader: "Rules",
             modalBody: `<h4>Objective</h4><p>Exactly 101 points.</p><h4>Foul</h4><p>3 fouls = Loss.</p>`
@@ -146,7 +146,7 @@
     let scoreAtStart = JSON.parse(localStorage.getItem('cb_startScore')) || [0, 0, 0];
     let currentPlayer = parseInt(localStorage.getItem('cb_player')) || 0;
     let breakDone = JSON.parse(localStorage.getItem('cb_break')) || false;
-    let tableStatus = 'open', lastType = null, seconds = parseInt(localStorage.getItem('cb_time')) || 0, innings = parseInt(localStorage.getItem('cb_innings')) || 0;
+    let seconds = parseInt(localStorage.getItem('cb_time')) || 0, innings = parseInt(localStorage.getItem('cb_innings')) || 0;
     let isPaused = true, timerInterval = null, history = [];
 
     function toggleLanguage() { lang = lang === 'no' ? 'en' : 'no'; localStorage.setItem('cb_lang', lang); updateUI(); }
@@ -155,7 +155,6 @@
         if(!confirm(i18n[lang].confirmReset)) return;
         playerCount = num;
         localStorage.setItem('cb_pCount', num);
-        // Resetter score når man bytter modus
         scores = [0, 0, 0]; topBreaks = [0, 0, 0]; foulCounts = [0, 0, 0]; scoreAtStart = [0, 0, 0];
         currentPlayer = 0; breakDone = false; innings = 0; seconds = 0;
         initUI();
@@ -178,7 +177,6 @@
             inputCont.appendChild(input);
             const box = document.createElement('div');
             box.id = `p${i}-box`; box.className = 'player-box';
-            box.onclick = () => { if(!breakDone) rotateBreaker(); };
             box.innerHTML = `<div id="p${i}-top-break" class="top-break-label">0</div><span id="p${i}-label-display" class="player-label-display"></span><span id="p${i}-score" class="score">0</span><div style="font-size:0.5em; color:#f1c40f; text-transform:uppercase; font-weight:800; margin-top:5px;">Break</div><div id="p${i}-turn-score" style="font-size:0.9em; color:#f1c40f; font-weight:900;">0</div><div class="foul-dots" id="p${i}-fouls"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
             scoreCont.appendChild(box);
         }
@@ -189,6 +187,7 @@
         const t = i18n[lang];
         document.getElementById('langBtn').innerText = lang === 'no' ? 'EN' : 'NO';
         document.getElementById('timerBtn').innerText = isPaused ? (seconds === 0 ? t.starter : t.resume) : t.pause;
+        document.getElementById('changeBreakerBtn').innerText = t.breaker;
         document.getElementById('changeBreakerBtn').style.display = breakDone ? 'none' : 'block';
 
         for(let i=0; i<playerCount; i++) {
