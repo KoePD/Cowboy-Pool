@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cowboy Pool Pro - Fixed Lock Logic</title>
+    <title>Cowboy Pool Pro - Controller</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #1a3c1a; color: white; text-align: center; margin: 0; padding: 10px; overflow-x: hidden; }
@@ -55,9 +55,10 @@
             <h4>Cowboy Pool Regler</h4>
             <p>1. Nøyaktig 101 poeng vinner.</p>
             <p>2. Break: Må treffe 3-ball først.</p>
-            <p>3. Åpent bord: Du har valgfrihet helt til du utfører et støt som kun er carom eller kun er kule.</p>
-            <p>4. Låst bord: Når du først har utført et støt som bare er én type, må du veksle resten av turen.</p>
-            <p>5. Joker: Kule + Carom i samme støt holder bordet åpent (hvis det ikke allerede er låst).</p>
+            <p>3. Åpent bord: Valgfritt inntil du utfører et støt som KUN er kule eller KUN er carom.</p>
+            <p>4. Låst bord: Når bordet er låst, må du veksle resten av serien.</p>
+            <p>5. Joker: Kule + Carom holder bordet åpent, så sant det ikke allerede er låst.</p>
+            <p>6. Foul: Mister serie-poeng. 3 fouls på rad er tap. Et poenggivende støt resetter foul-telleren.</p>
         </div>
     </div>
 </div>
@@ -65,7 +66,6 @@
 <div class="container">
     <button class="lang-toggle" onclick="toggleLanguage()" id="langBtn">EN</button>
     <div class="mode-selector">
-        <span id="modeTxt" style="font-size: 0.8em; font-weight: bold; color: #888;">MODUS:</span>
         <button onclick="setPlayerCount(1)" id="btn-count-1">1P</button>
         <button onclick="setPlayerCount(2)" id="btn-count-2">2P</button>
         <button onclick="setPlayerCount(3)" id="btn-count-3">3P</button>
@@ -163,22 +163,20 @@
         }
         saveHistory();
 
-        if (type === 'pocket_carom') { 
-            if(!breakDone) breakDone = true; 
-            // Hvis bordet er låst, fortsetter det å være låst, men vi bytter lastType for veksling
-            if (tableStatus === 'locked') {
-                lastType = (lastType === 'pocket') ? 'carom' : 'pocket';
+        if (type === 'pocket_carom' || type === 'pocket' || type === 'carom') {
+            foulCounts[currentPlayer] = 0; // RESET FOULS VED POENG
+            if(!breakDone) breakDone = true;
+
+            if (type === 'pocket_carom') {
+                if (tableStatus === 'locked') {
+                    lastType = (lastType === 'pocket') ? 'carom' : 'pocket';
+                } else {
+                    tableStatus = 'open'; lastType = null;
+                }
             } else {
-                tableStatus = 'open';
-                lastType = null;
+                tableStatus = 'locked'; lastType = type;
             }
             scores[currentPlayer] += val;
-        }
-        else if (type === 'pocket' || type === 'carom') { 
-            if(!breakDone) breakDone = true; 
-            tableStatus = 'locked'; 
-            lastType = type; 
-            scores[currentPlayer] += val; 
         } 
         else if (type === 'adjust') { scores[currentPlayer] = Math.max(0, scores[currentPlayer] + val); }
         updateUI();
@@ -189,7 +187,7 @@
         document.getElementById('timerBtn').innerText = isPaused ? (seconds === 0 ? t.starter : t.resume) : t.pause;
         document.getElementById('changeBreakerBtn').style.display = breakDone ? 'none' : 'block';
         for(let i=0; i<playerCount; i++) {
-            document.getElementById(`p${i}-label-display`).innerText = localStorage.getItem(`p${i}name`) || "P" + (i+1);
+            document.getElementById(`p${i}-label-display`).innerText = localStorage.getItem(`p${i}name`) || "Spiller " + (i+1);
             document.getElementById(`p${i}-score`).innerText = scores[i];
             document.getElementById(`p${i}-turn-score`).innerText = scores[i] - scoreAtStart[i];
             document.getElementById(`p${i}-box`).className = (currentPlayer === i) ? 'player-box active' : 'player-box';
@@ -220,22 +218,26 @@
 
     function nextTurn() { 
         saveHistory(); 
-        if (scores[currentPlayer] > scoreAtStart[currentPlayer]) foulCounts[currentPlayer] = 0;
         currentPlayer=(currentPlayer+1)%playerCount; 
         innings++; 
-        tableStatus='open'; 
-        lastType=null; 
+        tableStatus='open'; lastType=null; 
         scoreAtStart[currentPlayer]=scores[currentPlayer]; 
         updateUI(); 
     }
 
-    function handleFoul() { saveHistory(); foulCounts[currentPlayer]++; scores[currentPlayer]=scoreAtStart[currentPlayer]; nextTurn(); }
-    function saveHistory() { history.push(JSON.stringify({scores:[...scores], currentPlayer, breakDone, tableStatus, lastType, foulCounts:[...foulCounts]})); }
+    function handleFoul() { 
+        saveHistory(); 
+        foulCounts[currentPlayer]++; 
+        if(foulCounts[currentPlayer] >= 3) { alert("3 FOULS!"); } 
+        scores[currentPlayer] = scoreAtStart[currentPlayer]; // TILBAKESTILL POENG I SERIE
+        nextTurn(); 
+    }
+
     function undo() { if(history.length) { const last = JSON.parse(history.pop()); scores=last.scores; currentPlayer=last.currentPlayer; breakDone=last.breakDone; tableStatus=last.tableStatus; lastType=last.lastType; foulCounts=last.foulCounts; updateUI(); } }
     function toggleTimer() { if(!isPaused){clearInterval(timerInterval);isPaused=true;} else{isPaused=false;timerInterval=setInterval(()=>{seconds++;document.getElementById('matchTimer').innerText=new Date(seconds*1000).toISOString().substr(11,8);},1000);} updateUI(); }
     function openRules(){document.getElementById('rulesModal').style.display='block';}
     function closeRules(){document.getElementById('rulesModal').style.display='none';}
-    function resetGame(f=false){if(f||confirm(i18n[lang].confirmReset)){scores=[0,0,0];foulCounts=[0,0,0];breakDone=false;tableStatus='open';lastType=null;seconds=0;innings=0;initUI();}}
+    function resetGame(f=false){if(f||confirm(i18n[lang].confirmReset)){scores=[0,0,0];foulCounts=[0,0,0];scoreAtStart=[0,0,0];breakDone=false;tableStatus='open';lastType=null;seconds=0;innings=0;initUI();}}
     function saveData(){localStorage.setItem('cb_scores',JSON.stringify(scores));localStorage.setItem('cb_player',currentPlayer);localStorage.setItem('cb_break',JSON.stringify(breakDone));localStorage.setItem('cb_tableStatus',tableStatus);localStorage.setItem('cb_lastType',lastType);localStorage.setItem('cb_pCount',playerCount);localStorage.setItem('cb_fouls',JSON.stringify(foulCounts));localStorage.setItem('cb_innings',innings);localStorage.setItem('cb_time',seconds);localStorage.setItem('cb_startScore',JSON.stringify(scoreAtStart));}
 </script>
 </body>
