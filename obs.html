@@ -14,16 +14,16 @@
         .scoreline { display: flex; justify-content: center; align-items: center; border-radius: 45px; background: #000; border: 3px solid #111; width: 100%; height: 95px; position: relative; z-index: 5; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.7); }
         
         .player-area { display: flex; align-items: center; flex: 1; color: white; position: relative; z-index: 2; padding: 0 25px; min-width: 0; }
-        .name { font-size: 32px; font-weight: 800; text-transform: uppercase; white-space: nowrap; margin: 0 15px; overflow: hidden; text-overflow: ellipsis; }
+        .name { font-size: 32px; font-weight: 800; text-transform: uppercase; white-space: nowrap; margin: 0 15px; }
 
-        .score-block { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 115px; height: 100%; z-index: 10; background: #000; }
+        .score-block { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 115px; height: 100%; z-index: 10; background: #000; flex-shrink: 0; }
         .score-val { font-size: 64px; font-weight: 900; color: #f1c40f; line-height: 0.85; }
         .pers-val { font-size: 11px; font-weight: 900; color: #aaa; text-transform: uppercase; margin-top: 5px; }
         .pers-val b { color: #f1c40f; font-size: 14px; margin-left: 3px; }
 
         .score-divider { color: #222; font-size: 40px; font-weight: 900; margin: 0 5px; padding-bottom: 15px; background: #000; height: 100%; display: flex; align-items: center; }
 
-        .fouls { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+        .fouls { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; width: 12px; }
         .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(0,0,0,0.2); }
         .dot.active { background: #ff0000; box-shadow: 0 0 8px #ff0000; }
 
@@ -44,7 +44,7 @@
         /* SPILLER 3 */
         .player3-row { display: none; width: 50%; height: 75px; background: #000; margin-top: -8px; border-radius: 0 0 35px 35px; border: 3px solid #111; border-top: none; position: relative; z-index: 4; overflow: hidden; }
         .p3-layout { display: flex; height: 100%; width: 100%; align-items: center; justify-content: space-between; }
-        .p3-info-area { display: flex; align-items: center; padding-left: 25px; min-width: 0; flex: 1; }
+        .p3-info-area { display: flex; align-items: center; padding-left: 25px; flex: 1; min-width: 0; }
     </style>
 </head>
 <body>
@@ -120,26 +120,40 @@
                 const lang = data.lang || 'no';
                 const t = i18n[lang];
 
+                // Vis/skjul Spiller 3
                 document.getElementById('p2-container').style.display = (data.playerCount >= 3) ? "block" : "none";
                 document.querySelectorAll('.l-pers').forEach(el => el.innerText = t.pers);
 
                 for(let p=0; p < 3; p++) {
-                    if (document.getElementById(`p${p}-name`)) document.getElementById(`p${p}-name`).innerText = data.names[p] || "";
-                    if (document.getElementById(`p${p}-score`)) document.getElementById(`p${p}-score`).innerText = data.scores[p];
-                    if (document.getElementById(`best-${p}`)) document.getElementById(`best-${p}`).innerText = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
+                    // Navn og Score
+                    const nameEl = document.getElementById(`p${p}-name`);
+                    const scoreEl = document.getElementById(`p${p}-score`);
+                    const bestEl = document.getElementById(`best-${p}`);
+                    
+                    if (nameEl) nameEl.innerText = data.names[p] || "";
+                    if (scoreEl) scoreEl.innerText = data.scores[p];
+                    if (bestEl) bestEl.innerText = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
 
+                    // Aktive/Inaktive rader
                     const row = (p === 2) ? document.getElementById('p2-row') : document.getElementById(`p${p}-row`);
                     if(row) row.classList.toggle('is-not-turn', data.currentPlayer !== p);
                     
+                    // Brekkball-visning
                     const bBall = document.getElementById(`p${p}-break`);
                     if(bBall) bBall.style.visibility = (!data.breakDone && data.currentPlayer === p) ? "visible" : "hidden";
 
-                    let fHtml = '';
-                    for(let d=0; d<3; d++) fHtml += `<div class="dot ${d < data.foulCounts[p] ? 'active' : ''}"></div>`;
+                    // FOUL-LOGIKK (Her skjer magien)
                     const fDiv = document.getElementById(`p${p}-fouls`);
-                    if(fDiv) fDiv.innerHTML = fHtml;
+                    if(fDiv) {
+                        let fHtml = '';
+                        for(let d=0; d<3; d++) {
+                            fHtml += `<div class="dot ${d < data.foulCounts[p] ? 'active' : ''}"></div>`;
+                        }
+                        fDiv.innerHTML = fHtml;
+                    }
                 }
 
+                // Inning og status
                 document.getElementById('inning-text').innerText = t.inn + " " + (Math.floor(data.innings/data.playerCount) + 1);
                 const curS = data.scores[data.currentPlayer];
                 let statusText = t.break;
@@ -147,6 +161,8 @@
                     statusText = (data.tableStatus === 'locked') ? (data.lastType === 'pocket' ? t.rc : t.rp) : t.open;
                 }
                 document.getElementById('status-msg').innerText = statusText;
+                
+                // Ball-dimming
                 document.getElementById('b-1').classList.toggle('ball-dimmed', !data.breakDone || (curS >= 90));
                 document.getElementById('b-5').classList.toggle('ball-dimmed', !data.breakDone || (curS >= 90));
             }
