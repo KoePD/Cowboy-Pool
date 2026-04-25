@@ -12,7 +12,7 @@
         .compact-top { 
             display: flex; align-items: center; gap: 25px; background: #000; padding: 10px 40px; 
             border-radius: 25px 25px 0 0; border: 3px solid #111; border-bottom: none; 
-            position: relative; height: 50px; overflow: hidden;
+            position: relative; height: 55px; overflow: hidden;
         }
 
         .gradient-bg { 
@@ -25,8 +25,7 @@
             display: flex; justify-content: center; align-items: center; 
             border-radius: 45px; background: #000; border: 3px solid #111; 
             width: 100%; height: 95px; position: relative; z-index: 5; 
-            overflow: hidden; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.7);
         }
 
         .player3-row { 
@@ -35,54 +34,57 @@
             position: relative; z-index: 4; overflow: hidden;
         }
 
-        .inning-text { font-size: 20px; font-weight: 900; color: #f1c40f; text-transform: uppercase; position: relative; z-index: 2; padding-right: 20px; border-right: 2px solid rgba(255,255,255,0.2); }
-        .status-msg { font-size: 18px; font-weight: 900; text-transform: uppercase; position: relative; z-index: 2; color: white; margin-left: 15px; }
-        .balls-row { display: flex; gap: 15px; position: relative; z-index: 2; }
-        
-        /* --- NYE DETALJERTE 3D-BALLER FRA BILDET --- */
-        .table-ball { 
-            width: 38px; height: 38px; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; 
-            position: relative;
-            /* Ytre skygge for dybde på bordet */
-            box-shadow: inset -4px -4px 8px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.3);
-            border: 1px solid rgba(0,0,0,0.2);
-            box-sizing: border-box;
-            z-index: 10;
+        /* --- DE AVANSERTE 3D-STILENE FRA KODEN DIN --- */
+        .ball {
+            width: 42px; height: 42px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            position: relative; overflow: hidden; background-color: #fff;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.4);
         }
 
-        .ball-num-circle { 
-            width: 20px; height: 20px; background: white; border-radius: 50%; 
-            color: black; font-size: 15px; font-weight: 900; 
-            display: flex; align-items: center; justify-content: center; 
-            z-index: 5; border: 1px solid rgba(0,0,0,0.6); 
-            /* Litt indre skygge på sirkelen */
-            box-shadow: inset 1px 1px 2px rgba(0,0,0,0.3);
+        .ball-overlay-3d {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 50%; z-index: 10;
+            box-shadow: 
+                inset -3px -3px 6px rgba(0,0,0,0.4), 
+                inset 2px 2px 5px rgba(255,255,255,0.2); 
+            border: 1px solid rgba(0,0,0,0.15); box-sizing: border-box;
         }
+
+        .num-label {
+            background: white; color: black; width: 20px; height: 20px;
+            border-radius: 50%; display: flex; justify-content: center;
+            align-items: center; font-size: 14px; font-weight: 900;
+            z-index: 5; border: 1.2px solid #000;
+        }
+
+        /* Fargeklasser basert på din kodes f-skala */
+        .f-1 { background-color: #ffcc00; } /* Gul 1-ball */
+        .f-3 { background-color: #cc0000; } /* Rød 3-ball */
+        .f-5 { background-color: #663399; } /* Lilla/Mørk 5-ball */
         
-        /* Farger og gradienter basert på bildet ditt */
-        .ball-1 { background: radial-gradient(circle at 35% 35%, #ffd700 0%, #ffbf00 50%, #b8860b 100%); } /* Gull-gul */
-        .ball-3 { background: radial-gradient(circle at 35% 35%, #ff4d4d 0%, #e60000 50%, #800000 100%); } /* Rød */
-        .ball-5 { background: radial-gradient(circle at 35% 35%, #ff8c00 0%, #e67e22 50%, #a36504 100%); } /* Oransje */
+        .ball-dimmed { opacity: 0.15; filter: grayscale(1); }
+
+        /* Status feltet */
+        .inning-text { font-size: 20px; font-weight: 900; color: #f1c40f; text-transform: uppercase; position: relative; z-index: 2; padding-right: 20px; border-right: 2px solid rgba(255,255,255,0.2); }
+        .status-msg { font-size: 18px; font-weight: 900; text-transform: uppercase; position: relative; z-index: 2; color: white; margin-left: 15px; }
+        .balls-row { display: flex; gap: 12px; position: relative; z-index: 2; }
         
-        /* Dimming når kula er ute */
-        .ball-dimmed { opacity: 0.15; filter: grayscale(1); box-shadow: none; }
-        
+        /* Navn og Score */
         .player { display: flex; align-items: center; flex: 1; color: white; position: relative; z-index: 2; height: 100%; }
         .is-not-turn { opacity: 0.3; }
         .name { font-size: 34px; font-weight: 800; text-transform: uppercase; white-space: nowrap; }
 
-        .score-box { 
-            background: #000; min-width: 170px; height: 100%; 
-            display: flex; justify-content: center; align-items: center; 
-            font-size: 68px; font-weight: 900; color: #f1c40f; 
-            border-left: 3px solid #111; border-right: 3px solid #111; z-index: 10;
-        }
-        
+        .score-box { background: #000; min-width: 170px; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 68px; font-weight: 900; color: #f1c40f; border-left: 3px solid #111; border-right: 3px solid #111; z-index: 10; }
         .score-box-p3 { background: #000; min-width: 110px; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 42px; font-weight: 900; color: #f1c40f; border-left: 3px solid #111; position: relative; z-index: 10; }
+        
         .fouls { display: flex; flex-direction: column; gap: 5px; margin: 0 20px; }
         .dot { width: 11px; height: 11px; border-radius: 50%; background: rgba(255,255,255,0.1); }
         .dot.active { background: #ff0000; box-shadow: 0 0 12px #ff0000; }
+        
+        /* Hvit Break ball */
+        .break-ball-3d { background-color: #eee !important; }
+        .break-dot { position: absolute; width: 4px; height: 4px; background: red; border-radius: 50%; z-index: 6; }
     </style>
 </head>
 <body>
@@ -91,9 +93,18 @@
             <div class="gradient-bg"></div>
             <div class="inning-text" id="inning-text">Inn 1</div>
             <div class="balls-row">
-                <div id="b-1" class="table-ball ball-1"><div class="ball-num-circle">1</div></div>
-                <div id="b-3" class="table-ball ball-3"><div class="ball-num-circle">3</div></div>
-                <div id="b-5" class="table-ball ball-5"><div class="ball-num-circle">5</div></div>
+                <div id="b-1" class="ball f-1">
+                    <div class="num-label">1</div>
+                    <div class="ball-overlay-3d"></div>
+                </div>
+                <div id="b-3" class="ball f-3">
+                    <div class="num-label">3</div>
+                    <div class="ball-overlay-3d"></div>
+                </div>
+                <div id="b-5" class="ball f-5">
+                    <div class="num-label">5</div>
+                    <div class="ball-overlay-3d"></div>
+                </div>
             </div>
             <div id="status-msg" class="status-msg"></div>
         </div>
@@ -102,15 +113,25 @@
             <div class="gradient-bg"></div>
             <div class="player" id="p0-row" style="padding-left:25px;">
                 <div class="fouls" id="p0-fouls"></div>
+                <div id="p0-break" style="display:none;" class="ball break-ball-3d" style="width:34px; height:34px; margin: 0 15px;">
+                    <div class="break-dot" style="top:8px;left:15px;"></div><div class="break-dot" style="top:22px;left:8px;"></div><div class="break-dot" style="top:22px;left:24px;"></div>
+                    <div class="ball-overlay-3d"></div>
+                </div>
                 <div class="name" id="p0-name"></div>
             </div>
+
             <div class="score-box">
                 <div id="p0-score">0</div>
                 <div style="color:#333; margin:0 15px; font-size:40px; display:flex; align-items:center;">-</div>
                 <div id="p1-score">0</div>
             </div>
+
             <div class="player" id="p1-row" style="padding-right:25px; justify-content:flex-end;">
                 <div class="name" id="p1-name"></div>
+                <div id="p1-break" style="display:none;" class="ball break-ball-3d" style="width:34px; height:34px; margin: 0 15px;">
+                    <div class="break-dot" style="top:8px;left:15px;"></div><div class="break-dot" style="top:22px;left:8px;"></div><div class="break-dot" style="top:22px;left:24px;"></div>
+                    <div class="ball-overlay-3d"></div>
+                </div>
                 <div class="fouls" id="p1-fouls"></div>
             </div>
         </div>
@@ -118,21 +139,23 @@
         <div class="player3-row" id="p2-container">
             <div class="gradient-bg"></div>
             <div class="player" id="p2-row" style="justify-content:space-between; padding:0 25px;">
-                <div style="display:flex; align-items:center;"><div class="fouls" id="p2-fouls"></div><div class="name" style="font-size:24px; margin-left:15px;" id="p2-name"></div></div>
+                <div style="display:flex; align-items:center;">
+                    <div class="fouls" id="p2-fouls"></div>
+                    <div id="p2-break" style="display:none;" class="ball break-ball-3d" style="width:30px; height:30px; margin-left: 15px;">
+                        <div class="break-dot" style="top:6px;left:13px;"></div><div class="break-dot" style="top:18px;left:6px;"></div><div class="break-dot" style="top:18px;left:20px;"></div>
+                        <div class="ball-overlay-3d"></div>
+                    </div>
+                    <div class="name" style="font-size:24px; margin-left:15px;" id="p2-name"></div>
+                </div>
                 <div class="score-box-p3" id="p2-score">0</div>
             </div>
         </div>
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSy...", // DIN KONFIGURASJON HER
-            authDomain: "cowboy-pool.firebaseapp.com",
-            databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "cowboy-pool",
-            storageBucket: "cowboy-pool.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:12345:web:abcde"
+        // HUSK Å LIME INN DIN DATABASE-URL HER!
+        const firebaseConfig = { 
+            databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" 
         };
 
         firebase.initializeApp(firebaseConfig);
@@ -161,14 +184,16 @@
                 else if (data.tableStatus === 'locked' && data.lastType === 'carom') { msgEl.innerText = "Krav: Pocket"; }
                 else { msgEl.innerText = "Open"; }
 
-                const b1 = document.getElementById('b-1'); const b3 = document.getElementById('b-3'); const b5 = document.getElementById('b-5');
-                b1.classList.toggle('ball-dimmed', !data.breakDone || (curS >= 90));
-                b3.classList.toggle('ball-dimmed', false); // 3-ball er alltid aktiv i statusfeltet
-                b5.classList.toggle('ball-dimmed', !data.breakDone || (curS >= 90));
+                // Ball dimming logikk
+                document.getElementById('b-1').classList.toggle('ball-dimmed', !data.breakDone || (curS >= 90));
+                document.getElementById('b-3').classList.toggle('ball-dimmed', false); 
+                document.getElementById('b-5').classList.toggle('ball-dimmed', !data.breakDone || (curS >= 90));
 
                 for(let p=0; p<3; p++) {
                     const row = document.getElementById(`p${p}-row`);
                     if(row) row.classList.toggle('is-not-turn', data.currentPlayer !== p);
+                    const bBall = document.getElementById(`p${p}-break`);
+                    if(bBall) bBall.style.display = (!data.breakDone && data.currentPlayer === p) ? "flex" : "none";
                     let fHtml = '';
                     for(let d=0; d<3; d++) fHtml += `<div class="dot ${d < data.foulCounts[p] ? 'active' : ''}"></div>`;
                     const foulsDiv = document.getElementById(`p${p}-fouls`);
