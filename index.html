@@ -9,9 +9,15 @@
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #1a3c1a; color: white; text-align: center; margin: 0; padding: 10px; overflow-x: hidden; }
         .container { max-width: 600px; margin: auto; background: #222; padding: 15px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); position: relative; }
-        .mode-selector { height: 50px; margin-bottom: 15px; background: #333; padding: 0 10px; border-radius: 10px; display: flex; justify-content: center; gap: 10px; align-items: center; }
+        
+        /* Layout for topp-rad med språkknapp */
+        .top-row { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; }
+        .mode-selector { flex: 1; height: 50px; background: #333; padding: 0 10px; border-radius: 10px; display: flex; justify-content: center; gap: 10px; align-items: center; }
         .mode-selector button { background: #444; color: white; border: 1px solid #555; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 60px; }
         .mode-selector button.active { background: #f1c40f !important; color: #000 !important; border-color: #f1c40f; }
+        
+        .lang-btn { background: #34495e; color: white; border: 2px solid #5d6d7e; padding: 0 15px; border-radius: 10px; cursor: pointer; font-weight: 800; height: 50px; font-size: 0.8em; }
+
         .names-row { height: 40px; display: flex; gap: 5px; margin-bottom: 10px; justify-content: center; }
         .names-row input { flex: 1; padding: 10px 5px; border-radius: 8px; border: none; background: #444; color: white; text-align: center; font-size: 0.85em; font-weight: bold; }
         .scoreboard { display: flex; justify-content: center; margin-bottom: 15px; gap: 8px; align-items: stretch; }
@@ -51,11 +57,15 @@
 <body>
 
 <div class="container">
-    <div class="mode-selector">
-        <button onclick="setPlayerCount(1)" id="btn-count-1">1P</button>
-        <button onclick="setPlayerCount(2)" id="btn-count-2">2P</button>
-        <button onclick="setPlayerCount(3)" id="btn-count-3">3P</button>
+    <div class="top-row">
+        <div class="mode-selector">
+            <button onclick="setPlayerCount(1)" id="btn-count-1">1P</button>
+            <button onclick="setPlayerCount(2)" id="btn-count-2">2P</button>
+            <button onclick="setPlayerCount(3)" id="btn-count-3">3P</button>
+        </div>
+        <button class="lang-btn" onclick="toggleLang()" id="langBtn">NO / EN</button>
     </div>
+
     <div class="names-row" id="inputs-container"></div>
     <div class="scoreboard" id="scoreboard-container"></div>
     
@@ -88,13 +98,13 @@
     <div class="control-grid">
         <button class="ctrl btn-carom" onclick="action('carom', 1)" id="c1">Carom 1p</button>
         <button class="ctrl btn-carom" onclick="action('carom', 2)" id="c2">Carom 2p</button>
-        <button class="ctrl" style="background:#8e44ad" onclick="undo()">Angre</button>
+        <button class="ctrl" style="background:#8e44ad" onclick="undo()" id="undoBtn">Angre</button>
         <button class="ctrl" style="background:#7f8c8d" onclick="adjustScore(1)">+</button>
         <button class="ctrl" style="background:#7f8c8d" onclick="adjustScore(-1)">−</button>
-        <button class="ctrl" style="background:#444" onclick="alert('Regler: Layout er fryst!')">REGLER</button>
-        <button class="ctrl btn-foul" onclick="handleFoul()">FOUL (MISTER SERIE)</button>
-        <button class="ctrl btn-turn" onclick="nextTurn()">AVSLUTT TUR / BOM</button>
-        <button class="ctrl" style="background:#34495e; grid-column: span 3; margin-top:10px; font-size:0.7em;" onclick="resetGame()">HARD RESET</button>
+        <button class="ctrl" style="background:#444" onclick="showRules()" id="rulesBtn">REGLER</button>
+        <button class="ctrl btn-foul" onclick="handleFoul()" id="foulBtn">FOUL (MISTER SERIE)</button>
+        <button class="ctrl btn-turn" onclick="nextTurn()" id="turnBtn">AVSLUTT TUR / BOM</button>
+        <button class="ctrl" style="background:#34495e; grid-column: span 3; margin-top:10px; font-size:0.7em;" onclick="resetGame()" id="resetBtn">HARD RESET</button>
     </div>
 </div>
 
@@ -106,11 +116,31 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('gameData');
 
+    // Ordbok for oversettelse
+    const i18n = {
+        no: {
+            start: "START KLOKKE", resume: "FORTSETT", pause: "PAUSE", breaker: "BYTT STARTSPILLER",
+            rules: "REGLER", foul: "FOUL (MISTER SERIE)", turn: "AVSLUTT TUR / BOM", reset: "HARD RESET",
+            undo: "Angre", inning: "Inning", now: "Nå", best: "Pers",
+            msgBreak: "BREAK SHOT (3-BALL)", msgOpen: "VALG: CAROM ELLER KULE", 
+            msgReqCarom: "KRAV: CAROM", msgReqPocket: "KRAV: POCKET",
+            confirmReset: "Er du sikker på at du vil starte spillet helt på nytt? Alle poeng og personlige rekorder blir slettet!"
+        },
+        en: {
+            start: "START CLOCK", resume: "RESUME", pause: "PAUSE", breaker: "CHANGE BREAKER",
+            rules: "RULES", foul: "FOUL (LOSE SERIES)", turn: "END TURN / MISS", reset: "HARD RESET",
+            undo: "Undo", inning: "Inning", now: "Now", best: "Best",
+            msgBreak: "BREAK SHOT (3-BALL)", msgOpen: "CHOICE: CAROM OR POCKET", 
+            msgReqCarom: "REQ: CAROM", msgReqPocket: "REQ: POCKET",
+            confirmReset: "Are you sure you want to reset the game? All scores and personal bests will be cleared!"
+        }
+    };
+
     let state = {
         playerCount: 2, scores: [0, 0, 0], foulCounts: [0, 0, 0], scoreAtStart: [0, 0, 0],
         currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null,
         innings: 0, seconds: 0, names: ["Spiller 1", "Spiller 2", "Spiller 3"],
-        bestSeries: [0, 0, 0]
+        bestSeries: [0, 0, 0], lang: 'no'
     };
 
     let timerInterval = null; let isPaused = true; let history = [];
@@ -122,10 +152,17 @@
 
     function pushData() { db.set(state); }
 
+    function toggleLang() {
+        state.lang = state.lang === 'no' ? 'en' : 'no';
+        pushData();
+    }
+
     function initUI() {
         const inputCont = document.getElementById('inputs-container');
         const scoreCont = document.getElementById('scoreboard-container');
         inputCont.innerHTML = ''; scoreCont.innerHTML = '';
+        const t = i18n[state.lang || 'no'];
+        
         for(let i=0; i<state.playerCount; i++) {
             inputCont.innerHTML += `<input id="p${i}-name-in" value="${state.names[i]}" oninput="saveName(${i}, this.value)">`;
             scoreCont.innerHTML += `
@@ -133,8 +170,8 @@
                     <span id="p${i}-label" class="player-label-display">${state.names[i]}</span>
                     <span id="p${i}-score" class="score">${state.scores[i]}</span>
                     <div class="series-info">
-                        <div class="series-box"><span class="series-label">Nå</span><div id="p${i}-turn-score" class="series-val">0</div></div>
-                        <div class="series-box"><span class="series-label">Pers</span><div id="p${i}-best-score" class="series-val">0</div></div>
+                        <div class="series-box"><span class="series-label">${t.now}</span><div id="p${i}-turn-score" class="series-val">0</div></div>
+                        <div class="series-box"><span class="series-label">${t.best}</span><div id="p${i}-best-score" class="series-val">0</div></div>
                     </div>
                     <div class="foul-dots" id="p${i}-fouls"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
                 </div>`;
@@ -192,12 +229,28 @@
     }
 
     function updateUI() {
+        const t = i18n[state.lang || 'no'];
         if (document.getElementById('scoreboard-container').children.length !== state.playerCount) initUI();
+        
         document.querySelectorAll('.mode-selector button').forEach(b => b.classList.remove('active'));
         document.getElementById(`btn-count-${state.playerCount}`).classList.add('active');
-        document.getElementById('inningText').innerText = "Inning: " + (Math.floor(state.innings/state.playerCount) + 1);
+        
+        // Tekst-oppdateringer
+        document.getElementById('inningText').innerText = t.inning + ": " + (Math.floor(state.innings/state.playerCount) + 1);
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
+        document.getElementById('changeBreakerBtn').innerText = t.breaker;
         document.getElementById('changeBreakerBtn').style.display = state.breakDone ? 'none' : 'block';
+        document.getElementById('rulesBtn').innerText = t.rules;
+        document.getElementById('foulBtn').innerText = t.foul;
+        document.getElementById('turnBtn').innerText = t.turn;
+        document.getElementById('undoBtn').innerText = t.undo;
+        document.getElementById('resetBtn').innerText = t.reset;
+
+        if(!isPaused) {
+            document.getElementById('timerBtn').innerText = t.pause;
+        } else {
+            document.getElementById('timerBtn').innerText = state.seconds > 0 ? t.resume : t.start;
+        }
 
         for(let i=0; i<state.playerCount; i++) {
             document.getElementById(`p${i}-label`).innerText = state.names[i];
@@ -207,11 +260,18 @@
             document.getElementById(`p${i}-box`).className = (state.currentPlayer === i) ? 'player-box active' : 'player-box';
             const dots = document.getElementById(`p${i}-fouls`).children;
             for(let d=0; d<3; d++) dots[d].className = (d < state.foulCounts[i]) ? 'dot active' : 'dot';
+            
+            // Oppdater labels i boksene hvis de finnes
+            const boxes = document.getElementById(`p${i}-box`).querySelectorAll('.series-label');
+            if(boxes.length === 2) {
+                boxes[0].innerText = t.now;
+                boxes[1].innerText = t.best;
+            }
         }
 
-        let reqText = "VALG: CAROM ELLER KULE";
-        if (!state.breakDone) reqText = "BREAK SHOT (3-BALL)";
-        else if (state.tableStatus === 'locked') reqText = (state.lastType === 'pocket' ? "KRAV: CAROM" : "KRAV: POCKET");
+        let reqText = t.msgOpen;
+        if (!state.breakDone) reqText = t.msgBreak;
+        else if (state.tableStatus === 'locked') reqText = (state.lastType === 'pocket' ? t.msgReqCarom : t.msgReqPocket);
         document.getElementById('moveText').innerText = reqText;
 
         const isLockedPocket = (state.tableStatus === 'locked' && state.lastType === 'pocket');
@@ -221,16 +281,25 @@
         document.getElementById('b5').className = (!state.breakDone || isLockedPocket || isAtEnd) ? 'ball-btn waiting' : 'ball-btn';
     }
 
+    function showRules() {
+        const rules = {
+            no: "REGLER:\n- Brekk må treffe 3-ball.\n- Etter pocket må du ta carom.\n- Etter carom må du ta pocket.\n- Ved 90 poeng er alt carom.",
+            en: "RULES:\n- Break must hit the 3-ball.\n- After a pocket, you must score a carom.\n- After a carom, you must score a pocket.\n- At 90 points, everything is carom."
+        };
+        alert(rules[state.lang || 'no']);
+    }
+
     function toggleTimer() {
         if(!isPaused) { clearInterval(timerInterval); isPaused = true; }
         else { isPaused = false; timerInterval = setInterval(() => { state.seconds++; db.child('gameData/seconds').set(state.seconds); }, 1000); }
-        document.getElementById('timerBtn').innerText = isPaused ? "FORTSETT" : "PAUSE";
+        updateUI();
     }
 
     function setPlayerCount(n) { state.playerCount = n; resetGame(); }
 
     function resetGame() { 
-        if (confirm("Er du sikker på at du vil starte spillet helt på nytt? Alle poeng og personlige rekorder blir slettet!")) {
+        const t = i18n[state.lang || 'no'];
+        if (confirm(t.confirmReset)) {
             state.scores=[0,0,0]; 
             state.foulCounts=[0,0,0]; 
             state.scoreAtStart=[0,0,0]; 
