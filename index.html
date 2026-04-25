@@ -3,47 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cowboy Pool Pro - Bilingual Edition</title>
+    <title>Cowboy Pool Pro - Final Bilingual</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #1a3c1a; color: white; text-align: center; margin: 0; padding: 10px; overflow-x: hidden; }
         .container { max-width: 500px; margin: auto; background: #222; padding: 15px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); position: relative; }
-        
-        /* SPRÅK KNAPP */
         .lang-toggle { position: absolute; top: 15px; right: 15px; background: #444; color: #f1c40f; border: 1px solid #555; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.7em; z-index: 10; }
-
         .mode-selector { margin-bottom: 15px; background: #333; padding: 10px; border-radius: 10px; display: flex; justify-content: center; gap: 10px; align-items: center; margin-right: 60px; }
         .mode-selector button { background: #444; color: white; border: 1px solid #555; padding: 5px 15px; border-radius: 5px; cursor: pointer; transition: 0.2s; }
         .mode-selector button.active { background: #f1c40f; color: #000; font-weight: bold; }
-
         .names-row { display: flex; gap: 5px; margin-bottom: 10px; }
         .names-row input { flex: 1; padding: 10px 5px; border-radius: 8px; border: none; background: #444; color: white; text-align: center; font-weight: bold; font-size: 0.8em; }
         .names-row input::placeholder { color: #888; font-weight: normal; font-style: italic; }
-        
         .scoreboard { display: flex; justify-content: center; margin-bottom: 15px; gap: 8px; flex-wrap: wrap; }
         .player-box { flex: 1; min-width: 100px; padding: 10px 5px; border-radius: 15px; background: #333; border: 4px solid transparent; transition: 0.3s; position: relative; cursor: pointer; }
         .active { border-color: #f1c40f; background: #3d3d3d; transform: scale(1.02); }
         .score { font-size: 2.8em; font-weight: 900; display: block; line-height: 1; pointer-events: none; }
         .player-label-display { font-size: 0.7em; color: #aaa; text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis; padding-right: 25px; min-height: 1em; pointer-events: none; }
-        
         .top-break-label { position: absolute; top: 10px; right: 10px; font-size: 0.6em; color: #f1c40f; font-weight: 900; background: rgba(0,0,0,0.3); padding: 2px 4px; border-radius: 4px; }
         .top-break-label::before { content: "★ "; font-size: 0.8em; }
-
         .series-label { font-size: 0.55em; color: #f1c40f; text-transform: uppercase; font-weight: 800; margin-top: 5px; pointer-events: none; }
         .series-value { font-size: 1em; color: #f1c40f; font-weight: 900; pointer-events: none; }
-        
         .foul-dots { display: flex; justify-content: center; gap: 4px; margin-top: 5px; pointer-events: none; }
         .dot { width: 10px; height: 10px; border-radius: 50%; background: #444; border: 1px solid #111; }
         .dot.active { background: #c0392b; box-shadow: 0 0 8px #ff0000; }
-
         .timer-row { display: flex; flex-direction: column; align-items: center; margin: 10px 0; padding: 10px 0; border-top: 1px solid #333; border-bottom: 1px solid #333; }
         .timer-display { font-family: monospace; font-size: 1.6em; color: #f1c40f; font-weight: bold; }
         .inning-display { font-size: 0.75em; color: #888; text-transform: uppercase; letter-spacing: 2px; }
-
         .next-move-box { background: #2c3e50; padding: 12px; border-radius: 12px; margin: 10px 0; border-left: 6px solid #f1c40f; text-align: left; }
         .move-label { font-size: 0.6em; text-transform: uppercase; color: #f1c40f; font-weight: 800; }
         .move-text { font-weight: 900; font-size: 1em; color: #fff; text-transform: uppercase; }
-
         .ball-row { display: flex; justify-content: space-around; margin: 15px 0; align-items: flex-start; min-height: 110px; }
         .ball-group { display: flex; flex-direction: column; align-items: center; gap: 5px; }
         .ball-btn { width: 75px; height: 75px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; box-shadow: inset -5px -5px 10px rgba(0,0,0,0.5); cursor: pointer; transition: 0.1s; }
@@ -53,7 +42,6 @@
         #b3 { background: radial-gradient(circle at 40% 40%, #e74c3c, #962d22); }
         #b5 { background: radial-gradient(circle at 40% 40%, #f39c12, #a36504); }
         .btn-sub-carom { background: #3498db; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 0.65em; font-weight: bold; text-transform: uppercase; cursor: pointer; }
-        
         .waiting { opacity: 0.15; filter: grayscale(0.8); }
         .control-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
         button.ctrl { padding: 12px 5px; font-size: 0.75em; border: none; border-radius: 10px; color: white; font-weight: bold; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px rgba(0,0,0,0.2); }
@@ -64,7 +52,6 @@
         .btn-rules { background: #555; }
         .btn-turn { background: #27ae60; grid-column: span 3; font-size: 1.1em; padding: 15px; margin-top: 5px; letter-spacing: 1px; }
         .btn-adj { background: #7f8c8d; font-size: 1.1em; }
-
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); overflow-y: auto; }
         .modal-content { background: #222; margin: 5% auto; padding: 25px; border: 2px solid #f1c40f; width: 85%; max-width: 600px; border-radius: 20px; text-align: left; position: relative; }
         .modal-header { color: #f1c40f; font-size: 1.5em; font-weight: 900; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
@@ -86,28 +73,23 @@
 
 <div class="container">
     <button class="lang-toggle" onclick="toggleLanguage()" id="langBtn">EN</button>
-    
     <div class="mode-selector">
         <span style="font-size: 0.8em; font-weight: bold; color: #888;" id="modeTxt">MODUS:</span>
         <button onclick="setPlayerCount(1)" id="btn-count-1">1P</button>
         <button onclick="setPlayerCount(2)" id="btn-count-2" class="active">2P</button>
         <button onclick="setPlayerCount(3)" id="btn-count-3">3P</button>
     </div>
-
     <div class="names-row" id="inputs-container"></div>
     <div class="scoreboard" id="scoreboard-container"></div>
-    
     <div class="timer-row">
         <div class="timer-display" id="matchTimer">00:00:00</div>
         <div class="inning-display" id="inningText">Inning: 1</div>
         <button style="background:#e67e22; border:none; color:white; padding:6px 15px; border-radius:6px; font-size:0.75em; margin-top:8px; cursor:pointer; font-weight:800;" onclick="toggleTimer()" id="timerBtn">START KLOKKE</button>
     </div>
-
     <div class="next-move-box">
         <div class="move-label" id="moveLabel">KRAV:</div>
         <div id="moveText" class="move-text">BREAK SHOT (3-BALL)</div>
     </div>
-
     <div class="ball-row">
         <div class="ball-group">
             <button class="ball-btn" onclick="action('pocket', 1)" id="b1"><div class="ball-number">1</div></button>
@@ -123,7 +105,6 @@
         </div>
         <button class="ball-btn" onclick="action('win', 1)" id="bWin" style="display:none; background: radial-gradient(circle at 40% 40%, #fff, #bbb); color: black;"><div style="font-size:0.5em" id="hazardTxt">Hazard</div>WIN</button>
     </div>
-
     <div class="control-grid">
         <button class="ctrl btn-carom" onclick="action('carom', 1)" id="c1">Carom 1p</button>
         <button class="ctrl btn-carom" onclick="action('carom', 2)" id="c2">Carom 2p</button>
@@ -138,7 +119,6 @@
 </div>
 
 <script>
-    // ORDBOK
     const i18n = {
         no: {
             mode: "MODUS:", starter: "START KLOKKE", resume: "FORTSETT", pause: "PAUSE",
@@ -149,7 +129,7 @@
             reset: "NULLSTILL ALT", placeholder: "Skriv navn...", noName: "INGEN NAVN",
             confirmReset: "Nullstille alt?", confirmMode: "Nullstille for ny modus?",
             modalHeader: "Regler: Cowboy Pool",
-            modalBody: `<h4>Mål</h4><p>Førstemann til nøyaktig <b>101 poeng</b>.</p><h4>The Break</h4><p>Må treffe <b>3-ballen først</b>.</p><h4>Open Table & Veksling</h4><ul><li><b>Open Table:</b> Hver tur starter "åpen". Du velger fritt.</li><li><b>Jokeren:</b> Gjør du både carom og pocket i samme støt, forblir bordet åpent.</li><li><b>Locked Order:</b> Gjør du <i>kun</i> én av delene, låses rekkefølgen ut breaken.</li></ul><h4>Sluttspill (91-100p)</h4><p>Kun caroms. Å senke en ball her er FOUL.</p><h4>Vinnerstøtet (101p)</h4><p>Carom av 1-ballen og senk hvitballen. Ingen berøring av 3 eller 5.</p><h4>Foul</h4><p>Du mister alle poeng tatt i nåværende tur. 3 fouls på rad = Tap.</p>`
+            modalBody: `<h4>Mål</h4><p>Nøyaktig <b>101 poeng</b>.</p><h4>Break</h4><p>Må treffe <b>3-ball først</b>.</p><h4>Veksling (0-90p)</h4><ul><li><b>Open Table:</b> Hver tur starter åpen. Valgfritt.</li><li><b>Jokeren:</b> Pocket+Carom holder bordet åpent.</li><li><b>Locked:</b> Kun Pocket/Carom låser rekkefølgen.</li></ul><h4>Sluttspill</h4><p>90-100p: Kun carom. Pocket = FOUL.<br>101p: Hazard via 1-ball.</p><h4>Foul</h4><p>Poeng i nåværende serie tapes.</p>`
         },
         en: {
             mode: "MODE:", starter: "START CLOCK", resume: "RESUME", pause: "PAUSE",
@@ -160,7 +140,7 @@
             reset: "RESET MATCH", placeholder: "Enter name...", noName: "NO NAME",
             confirmReset: "Reset everything?", confirmMode: "Reset for new mode?",
             modalHeader: "Rules: Cowboy Pool",
-            modalBody: `<h4>Objective</h4><p>First to reach exactly <b>101 points</b>.</p><h4>The Break</h4><p>Must strike the <b>3-ball first</b>.</p><h4>Open Table & Rotation</h4><ul><li><b>Open Table:</b> Each turn starts "open". Choice is yours.</li><li><b>The Joker:</b> Scoring both carom and pocket in one shot keeps the table open.</li><li><b>Locked Order:</b> Scoring <i>only</i> one type locks the sequence for this break.</li></ul><h4>Phase 2 (91-100p)</h4><p>Caroms only. Pocketing a ball is a FOUL.</p><h4>Winning Shot (101p)</h4><p>Carom off the 1-ball and scratch the cue ball. No contact with 3 or 5.</p><h4>Foul</h4><p>Loss of all points earned in the current break. 3 consecutive fouls = Match loss.</p>`
+            modalBody: `<h4>Objective</h4><p>Exactly <b>101 points</b>.</p><h4>The Break</h4><p>Must strike <b>3-ball first</b>.</p><h4>Rotation (0-90p)</h4><ul><li><b>Open Table:</b> Turn starts open. Your choice.</li><li><b>The Joker:</b> Pocket+Carom keeps table open.</li><li><b>Locked:</b> Single type locks sequence.</li></ul><h4>Endgame</h4><p>90-100p: Carom only. Pocket = FOUL.<br>101p: Hazard via 1-ball.</p><h4>Foul</h4><p>Loss of points in current break.</p>`
         }
     };
 
@@ -178,17 +158,8 @@
     let innings = parseInt(localStorage.getItem('cb_innings')) || 0;
     let isPaused = true; let timerInterval = null; let history = [];
 
-    function toggleLanguage() {
-        lang = lang === 'no' ? 'en' : 'no';
-        localStorage.setItem('cb_lang', lang);
-        document.getElementById('langBtn').innerText = lang === 'no' ? 'EN' : 'NO';
-        updateUI();
-    }
-
-    function setPlayerCount(num) {
-        if(!confirm(i18n[lang].confirmMode)) return;
-        playerCount = num; localStorage.setItem('cb_pCount', num); resetGame();
-    }
+    function toggleLanguage() { lang = lang === 'no' ? 'en' : 'no'; localStorage.setItem('cb_lang', lang); updateUI(); }
+    function setPlayerCount(num) { if(!confirm(i18n[lang].confirmMode)) return; playerCount = num; localStorage.setItem('cb_pCount', num); resetGame(); }
 
     function initUI() {
         const inputCont = document.getElementById('inputs-container');
@@ -207,8 +178,6 @@
             box.innerHTML = `<div id="p${i}-top-break" class="top-break-label">0</div><span id="p${i}-label-display" class="player-label-display"></span><span id="p${i}-score" class="score">0</span><div class="series-label">Current Break</div><div id="p${i}-turn-score" class="series-value">0</div><div class="foul-dots" id="p${i}-fouls"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
             scoreCont.appendChild(box);
         }
-        document.querySelectorAll('.mode-selector button').forEach(b => b.classList.remove('active'));
-        document.getElementById(`btn-count-${playerCount}`).classList.add('active');
         updateUI();
     }
 
@@ -249,15 +218,25 @@
             document.getElementById('moveLabel').innerText = t.statusWinner; document.getElementById('moveText').innerText = t.winner;
         } else {
             winBall.style.display = "none"; document.querySelectorAll('.ball-group').forEach(el => el.style.display = "flex");
-            document.getElementById('moveLabel').innerText = t.krav;
-            if (!breakDone) document.getElementById('moveText').innerText = t.break;
-            else if (tableStatus === 'open') document.getElementById('moveText').innerText = t.open;
-            else if (s >= 90) document.getElementById('moveText').innerText = t.fase2;
-            else document.getElementById('moveText').innerText = (lastType === 'pocket') ? t.lockedPocket : t.lockedCarom;
+            
+            // HER ER RETTELSEN: Sjekker 90 poeng først
+            if (!breakDone) {
+                document.getElementById('moveLabel').innerText = t.krav;
+                document.getElementById('moveText').innerText = t.break;
+            } else if (s >= 90) {
+                document.getElementById('moveLabel').innerText = t.krav;
+                document.getElementById('moveText').innerText = t.lockedPocket; // Krav: Carom
+            } else if (tableStatus === 'open') {
+                document.getElementById('moveLabel').innerText = "STATUS:";
+                document.getElementById('moveText').innerText = t.open;
+            } else {
+                document.getElementById('moveLabel').innerText = t.krav;
+                document.getElementById('moveText').innerText = (lastType === 'pocket') ? t.lockedPocket : t.lockedCarom;
+            }
         }
 
         const pWait = s >= 90 || !breakDone || (tableStatus === 'locked' && lastType === 'pocket');
-        const cWait = (tableStatus === 'locked' && lastType === 'carom' && s < 90);
+        const caromWait = (tableStatus === 'locked' && lastType === 'carom' && s < 90);
         document.getElementById('b1').disabled = !breakDone || s >= 90;
         document.getElementById('sc1').disabled = !breakDone || s >= 90;
         document.getElementById('b5').disabled = !breakDone || s >= 90;
@@ -265,8 +244,8 @@
         document.querySelectorAll('.ball-btn, .btn-sub-carom').forEach(el => {
             if(!el.id.includes('Win')) { el.classList.toggle('waiting', pWait); }
         });
-        document.getElementById('c1').classList.toggle('waiting', cWait);
-        document.getElementById('c2').classList.toggle('waiting', cWait);
+        document.getElementById('c1').classList.toggle('waiting', caromWait);
+        document.getElementById('c2').classList.toggle('waiting', caromWait);
         document.getElementById('inningText').innerText = "Inning: " + (Math.floor(innings/playerCount) + 1);
         saveData();
     }
@@ -275,15 +254,14 @@
         if (isPaused && type !== 'adjust') toggleTimer();
         const s = scores[currentPlayer];
         if (type !== 'adjust') {
-            if (s < 90 && s + val > 90) return alert(lang === 'no' ? "Må ha nøyaktig 90!" : "Must be exactly 90!");
-            if (s >= 90 && s < 100 && s + val > 100) return alert(lang === 'no' ? "Må ha nøyaktig 100!" : "Must be exactly 100!");
+            if (s < 90 && s + val > 90) return alert(lang === 'no' ? "Må ha nøyaktig 90!" : "Must be 90!");
+            if (s >= 90 && s < 100 && s + val > 100) return alert(lang === 'no' ? "Må ha nøyaktig 100!" : "Must be 100!");
             foulCounts[currentPlayer] = 0;
         }
         saveHistory();
         if (type === 'win') { scores[currentPlayer] = 101; confetti(); stopTimer(); }
-        else if (type === 'pocket_carom') {
-            if (!breakDone) breakDone = true; tableStatus = 'open'; scores[currentPlayer] += val;
-        } else if (type !== 'adjust') {
+        else if (type === 'pocket_carom') { if (!breakDone) breakDone = true; tableStatus = 'open'; scores[currentPlayer] += val; }
+        else if (type !== 'adjust') {
             if (!breakDone) { breakDone = true; tableStatus = 'locked'; lastType = 'pocket'; }
             else { tableStatus = 'locked'; lastType = type; }
             scores[currentPlayer] += val;
