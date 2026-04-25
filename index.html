@@ -58,7 +58,7 @@
         <div class="inning-display" id="inningText" style="color:#aaa; font-weight:bold; margin-top:5px;">Inning: 1</div>
         <div style="display:flex; gap:10px; margin-top:10px;">
             <button style="background:#e67e22; border:none; color:white; padding:8px 18px; border-radius:6px; font-size:0.8em; cursor:pointer; font-weight:800;" onclick="toggleTimer()" id="timerBtn">START KLOKKE</button>
-            <button id="changeBreakerBtn" style="background:#3498db; border:none; color:white; padding:8px 18px; border-radius:6px; font-size:0.8em; cursor:pointer; font-weight:800;" onclick="rotateBreaker()">STARTING PLAYER</button>
+            <button id="changeBreakerBtn" style="background:#3498db; border:none; color:white; padding:8px 18px; border-radius:6px; font-size:0.8em; cursor:pointer; font-weight:800;" onclick="rotateBreaker()">BYTT STARTSPILLER</button>
         </div>
     </div>
 
@@ -85,7 +85,7 @@
         <button class="ctrl" style="background:#8e44ad" onclick="undo()">Angre</button>
         <button class="ctrl" style="background:#7f8c8d" onclick="adjustScore(1)">+</button>
         <button class="ctrl" style="background:#7f8c8d" onclick="adjustScore(-1)">−</button>
-        <button class="ctrl" style="background:#444" onclick="alert('Regler er fryst!')">INFO</button>
+        <button class="ctrl" style="background:#444" onclick="alert('Regler: Layout er fryst!')">INFO</button>
         <button class="ctrl btn-foul" onclick="handleFoul()">FOUL (MISTER SERIE)</button>
         <button class="ctrl btn-turn" onclick="nextTurn()">AVSLUTT TUR / BOM</button>
         <button class="ctrl" style="background:#34495e; grid-column: span 3; margin-top:10px; font-size:0.7em;" onclick="resetGame()">HARD RESET</button>
@@ -93,14 +93,9 @@
 </div>
 
 <script>
+    // LOKAL KONFIGURASJON - Husk din egen databaseURL!
     const firebaseConfig = {
-        apiKey: "AIzaSy...", // DIN API NØKKEL HER
-        authDomain: "cowboy-pool.firebaseapp.com",
-        databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app",
-        projectId: "cowboy-pool",
-        storageBucket: "cowboy-pool.appspot.com",
-        messagingSenderId: "123456789",
-        appId: "1:12345:web:abcde"
+        databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app"
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -109,7 +104,7 @@
     let state = {
         playerCount: 2, scores: [0, 0, 0], foulCounts: [0, 0, 0], scoreAtStart: [0, 0, 0],
         currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null,
-        innings: 0, seconds: 0, names: ["Simen", "Lasse", "Ole Andreas Sandvik"]
+        innings: 0, seconds: 0, names: ["Spiller 1", "Spiller 2", "Spiller 3"]
     };
 
     let timerInterval = null; let isPaused = true; let history = [];
@@ -137,22 +132,69 @@
         if(isPaused) toggleTimer();
         saveHistory();
         let s = state.scores[state.currentPlayer];
+        
+        // Sjekk for poenggrenser (90/100)
         if (s < 90 && s + val > 90) return;
         if (s >= 90 && s < 100 && s + val > 100) return;
-        state.foulCounts[state.currentPlayer] = 0;
+
+        // Hvis man trykker på poeng, regnes brekket som fullført
         if(!state.breakDone) state.breakDone = true;
+
+        state.foulCounts[state.currentPlayer] = 0;
+        
         if (type === 'pocket_carom') {
             if (state.tableStatus === 'locked') state.lastType = (state.lastType === 'pocket') ? 'carom' : 'pocket';
             else state.tableStatus = 'open';
-        } else { state.tableStatus = 'locked'; state.lastType = type; }
+        } else { 
+            state.tableStatus = 'locked'; 
+            state.lastType = type; 
+        }
+        
         state.scores[state.currentPlayer] += val;
         pushData();
     }
 
     function adjustScore(val) { saveHistory(); state.scores[state.currentPlayer] = Math.max(0, state.scores[state.currentPlayer] + val); pushData(); }
-    function nextTurn() { saveHistory(); state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; state.innings++; state.tableStatus = 'open'; state.lastType = null; state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; pushData(); }
-    function handleFoul() { saveHistory(); state.foulCounts[state.currentPlayer]++; state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; nextTurn(); }
-    
+
+    function nextTurn() {
+        saveHistory();
+        
+        // FIKS: Hvis brekket avsluttes uten poeng, åpne bordet uansett
+        if (!state.breakDone) {
+            state.breakDone = true;
+        }
+
+        // Nullstill fouls hvis spilleren har tatt poeng i denne serien
+        if (state.scores[state.currentPlayer] > state.scoreAtStart[state.currentPlayer]) {
+            state.foulCounts[state.currentPlayer] = 0;
+        }
+
+        state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
+        state.innings++;
+        state.tableStatus = 'open';
+        state.lastType = null;
+        state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer];
+        pushData();
+    }
+
+    function handleFoul() {
+        saveHistory();
+        
+        // FIKS: Foul i brekket åpner også bordet
+        if (!state.breakDone) {
+            state.breakDone = true;
+        }
+
+        state.foulCounts[state.currentPlayer]++;
+        state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer];
+        
+        if (state.foulCounts[state.currentPlayer] >= 3) {
+            alert("3 FOULS!");
+        }
+        
+        nextTurn(); 
+    }
+
     function updateUI() {
         if (document.getElementById('scoreboard-container').children.length !== state.playerCount) initUI();
         document.querySelectorAll('.mode-selector button').forEach(b => b.classList.remove('active'));
@@ -177,6 +219,8 @@
 
         const isLockedPocket = (state.tableStatus === 'locked' && state.lastType === 'pocket');
         const isAtEnd = state.scores[state.currentPlayer] >= 90;
+        
+        // Visuelle knappe-sperrer
         document.getElementById('b1').className = (!state.breakDone || isLockedPocket || isAtEnd) ? 'ball-btn waiting' : 'ball-btn';
         document.getElementById('b3').className = (isLockedPocket || isAtEnd) ? 'ball-btn waiting' : 'ball-btn';
         document.getElementById('b5').className = (!state.breakDone || isLockedPocket || isAtEnd) ? 'ball-btn waiting' : 'ball-btn';
@@ -184,7 +228,7 @@
 
     function toggleTimer() {
         if(!isPaused) { clearInterval(timerInterval); isPaused = true; }
-        else { isPaused = false; timerInterval = setInterval(() => { state.seconds++; db.child('seconds').set(state.seconds); }, 1000); }
+        else { isPaused = false; timerInterval = setInterval(() => { state.seconds++; db.child('gameData/seconds').set(state.seconds); }, 1000); }
         document.getElementById('timerBtn').innerText = isPaused ? "FORTSETT" : "PAUSE";
     }
 
