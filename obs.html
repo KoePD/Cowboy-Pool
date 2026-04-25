@@ -13,31 +13,27 @@
         
         .scoreline { display: flex; justify-content: center; align-items: center; border-radius: 45px; background: #000; border: 3px solid #111; width: 100%; height: 95px; position: relative; z-index: 5; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.7); }
         
-        /* SPILLER OMRÅDE */
-        .player-area { display: flex; align-items: center; flex: 1; color: white; position: relative; z-index: 2; padding: 0 25px; }
-        .name { font-size: 32px; font-weight: 800; text-transform: uppercase; white-space: nowrap; margin: 0 15px; }
+        .player-area { display: flex; align-items: center; flex: 1; color: white; position: relative; z-index: 2; padding: 0 25px; min-width: 0; }
+        .name { font-size: 32px; font-weight: 800; text-transform: uppercase; white-space: nowrap; margin: 0 15px; overflow: hidden; text-overflow: ellipsis; }
 
-        /* SCORE OG PERS BLOKK */
-        .score-block { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 110px; height: 100%; z-index: 10; background: #000; }
+        .score-block { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 115px; height: 100%; z-index: 10; background: #000; }
         .score-val { font-size: 64px; font-weight: 900; color: #f1c40f; line-height: 0.85; }
         .pers-val { font-size: 11px; font-weight: 900; color: #aaa; text-transform: uppercase; margin-top: 5px; }
         .pers-val b { color: #f1c40f; font-size: 14px; margin-left: 3px; }
 
         .score-divider { color: #222; font-size: 40px; font-weight: 900; margin: 0 5px; padding-bottom: 15px; background: #000; height: 100%; display: flex; align-items: center; }
 
-        /* VERTIKALE FOULS */
-        .fouls { display: flex; flex-direction: column; gap: 4px; }
+        .fouls { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
         .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(0,0,0,0.2); }
         .dot.active { background: #ff0000; box-shadow: 0 0 8px #ff0000; }
 
-        /* BALLER */
         .ball { width: 30px; height: 30px; border-radius: 50%; position: relative; background-color: #fff; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         .ball-overlay-3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; z-index: 10; box-shadow: inset -2px -2px 4px rgba(0,0,0,0.4), inset 1.5px 1.5px 3px rgba(255,255,255,0.2); border: 1px solid rgba(0,0,0,0.1); }
         .ball-num { font-size: 10px; font-weight: 900; z-index: 5; color: black; background: white; width: 15px; height: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #000; }
         .f-1 { background: #ffcc00; } .f-3 { background: #cc0000; } .f-5 { background: #663399; }
         .ball-dimmed { opacity: 0.15; filter: grayscale(1); }
 
-        .break-ball-3d { background-color: #fdfcf0 !important; width: 26px; height: 26px; position: relative; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .break-ball-3d { background-color: #fdfcf0 !important; width: 26px; height: 26px; position: relative; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .break-dot { position: absolute; width: 4px; height: 4px; background: #d00000; border-radius: 50%; z-index: 6; top: 50%; left: 50%; margin: -2px 0 0 -2px; }
         .break-dot:nth-child(1) { transform: translate(-5px, -3px); }
         .break-dot:nth-child(2) { transform: translate(5px, -3px); }
@@ -45,10 +41,10 @@
 
         .is-not-turn { opacity: 0.35; }
 
-        /* SPILLER 3 - MED SORT BAKGRUNN PÅ SCORE */
+        /* SPILLER 3 - FIKSET LAYOUT */
         .player3-row { display: none; width: 50%; height: 75px; background: #000; margin-top: -8px; border-radius: 0 0 35px 35px; border: 3px solid #111; border-top: none; position: relative; z-index: 4; overflow: hidden; }
-        .p3-layout { display: flex; height: 100%; align-items: center; padding: 0; } /* Fjernet padding-right her for å la score-block fylle helt ut */
-        .p3-info { display: flex; flex: 1; align-items: center; padding-left: 25px; }
+        .p3-layout { display: flex; height: 100%; width: 100%; align-items: center; justify-content: space-between; }
+        .p3-info-area { display: flex; align-items: center; padding-left: 25px; min-width: 0; flex: 1; }
     </style>
 </head>
 <body>
@@ -59,7 +55,7 @@
             <div style="display:flex; gap:10px; z-index:2; margin-left:15px;">
                 <div id="b-1" class="ball f-1"><div class="ball-num">1</div><div class="ball-overlay-3d"></div></div>
                 <div id="b-3" class="ball f-3"><div class="ball-num">3</div><div class="ball-overlay-3d"></div></div>
-                <div id="b-5" class="ball f-5"><div class="ball-num">5</div><div class="ball-num-circle"></div><div class="ball-overlay-3d"></div></div>
+                <div id="b-5" class="ball f-5"><div class="ball-num">5</div><div class="ball-overlay-3d"></div></div>
             </div>
             <div id="status-msg" style="color:white; font-weight:900; z-index:2; margin-left:15px; font-size:14px;">BREAK</div>
         </div>
@@ -95,12 +91,12 @@
         <div class="player3-row" id="p2-container">
             <div class="gradient-bg"></div>
             <div class="p3-layout">
-                <div class="p3-info" id="p2-row">
+                <div class="p3-info-area" id="p2-row">
                     <div id="p2-break" class="break-ball-3d"><div class="break-dot"></div><div class="break-dot"></div><div class="break-dot"></div><div class="ball-overlay-3d"></div></div>
                     <div class="name" id="p2-name" style="font-size:24px;">PLAYER 3</div>
                     <div class="fouls" id="p2-fouls"></div>
                 </div>
-                <div class="score-block" style="border-left: 3px solid #111; min-width: 120px;">
+                <div class="score-block" style="border-left: 3px solid #111; min-width: 125px;">
                     <div class="score-val" id="p2-score" style="font-size: 44px;">0</div>
                     <div class="pers-val"><span class="l-pers">PERS</span> <b id="best-2">0</b></div>
                 </div>
@@ -124,7 +120,7 @@
                 const lang = data.lang || 'no';
                 const t = i18n[lang];
 
-                document.getElementById('p2-container').style.display = (data.playerCount >= 3) ? "flex" : "none";
+                document.getElementById('p2-container').style.display = (data.playerCount >= 3) ? "block" : "none";
                 document.querySelectorAll('.l-pers').forEach(el => el.innerText = t.pers);
 
                 for(let p=0; p < 3; p++) {
@@ -132,7 +128,7 @@
                     if (document.getElementById(`p${p}-score`)) document.getElementById(`p${p}-score`).innerText = data.scores[p];
                     if (document.getElementById(`best-${p}`)) document.getElementById(`best-${p}`).innerText = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
 
-                    const row = document.getElementById(`p${p}-row`);
+                    const row = (p === 2) ? document.getElementById('p2-row') : document.getElementById(`p${p}-row`);
                     if(row) row.classList.toggle('is-not-turn', data.currentPlayer !== p);
                     
                     const bBall = document.getElementById(`p${p}-break`);
