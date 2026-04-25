@@ -17,13 +17,13 @@
             align-items: center; width: 100%; max-width: 1200px;
         }
 
-        /* TOPP-LINJE */
+        /* TOPP-LINJE - ØKT HØYDE OG STØRRELSE */
         .compact-top {
-            display: flex; align-items: center; gap: 20px;
-            background: #000; padding: 10px 30px;
-            border-radius: 20px 20px 0 0; border: 3px solid #111; border-bottom: none;
+            display: flex; align-items: center; gap: 25px;
+            background: #000; padding: 10px 40px;
+            border-radius: 25px 25px 0 0; border: 3px solid #111; border-bottom: none;
             position: relative; overflow: hidden; z-index: 10;
-            height: 40px; 
+            height: 50px; 
         }
 
         .gradient-bg {
@@ -33,24 +33,24 @@
         }
 
         .inning-text {
-            font-size: 18px; font-weight: 900; color: #f1c40f;
+            font-size: 20px; font-weight: 900; color: #f1c40f;
             text-transform: uppercase; position: relative; z-index: 2;
-            border-right: 2px solid rgba(255,255,255,0.2); padding-right: 15px;
+            border-right: 2px solid rgba(255,255,255,0.2); padding-right: 20px;
             line-height: 1;
         }
 
         .status-msg {
-            font-size: 16px; font-weight: 900; text-transform: uppercase;
+            font-size: 18px; font-weight: 900; text-transform: uppercase;
             letter-spacing: 1px; position: relative; z-index: 2; color: white;
             line-height: 1;
         }
 
-        .balls-row { display: flex; gap: 12px; position: relative; z-index: 2; }
+        .balls-row { display: flex; gap: 15px; position: relative; z-index: 2; }
 
-        /* KULE-STIL FRA BILDET */
+        /* KULE-STIL - NÅ STØRRE (36px) */
         .table-ball {
-            width: 30px;
-            height: 30px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             border: 2px solid #000;
@@ -59,22 +59,21 @@
         }
 
         .ball-num-circle {
-            width: 18px;
-            height: 18px;
+            width: 22px; /* Økt sirkel inni kula */
+            height: 22px;
             background: white;
             border-radius: 50%;
             border: 1px solid #000;
             display: flex; align-items: center; justify-content: center;
             color: black;
-            font-size: 14px;
+            font-size: 16px; /* Tydeligere tall */
             font-weight: 900;
             line-height: 1;
         }
 
-        /* Farger for 1, 3 og 5 */
-        .ball-1 { background: radial-gradient(circle at 35% 35%, #f1c40f, #b38f00); } /* Gul */
-        .ball-3 { background: radial-gradient(circle at 35% 35%, #e74c3c, #962d22); } /* Rød */
-        .ball-5 { background: radial-gradient(circle at 35% 35%, #f39c12, #a36504); } /* Oransje */
+        .ball-1 { background: radial-gradient(circle at 35% 35%, #f1c40f, #b38f00); }
+        .ball-3 { background: radial-gradient(circle at 35% 35%, #e74c3c, #962d22); }
+        .ball-5 { background: radial-gradient(circle at 35% 35%, #f39c12, #a36504); }
         .ball-dimmed { opacity: 0.15; filter: grayscale(1); }
 
         /* BREAK-KULE */
@@ -112,14 +111,13 @@
         .is-not-turn { opacity: 0.3; }
         .name { font-size: 34px; font-weight: 800; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* POENGBOKSER - SENTRERT */
         .score-box {
             background: #000; min-width: 160px; height: 100%; display: flex;
             justify-content: center; align-items: center; 
             font-size: 68px; font-weight: 900;
             color: #f1c40f; z-index: 10; 
             border-left: 3px solid #111; border-right: 3px solid #111;
-            line-height: 95px; /* Matcher høyden på scoreline for perfekt sentrering */
+            line-height: 95px;
         }
 
         .score-box-p3 {
@@ -128,7 +126,7 @@
             font-size: 42px; font-weight: 900;
             color: #f1c40f; border-left: 3px solid #111; 
             position: relative; z-index: 10;
-            line-height: 65px; /* Matcher høyden på p3-row */
+            line-height: 65px;
         }
 
         .fouls { 
