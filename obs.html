@@ -1,52 +1,188 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <style>
-        body { background: transparent; color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        .obs-score-row { 
-            display: flex; background: rgba(0,0,0,0.8); border-left: 5px solid #f1c40f; 
-            padding: 10px; border-radius: 0 10px 10px 0; width: 350px; margin-bottom: 5px;
+        /* Din spesifikke bakgrunn og struktur */
+        body { 
+            background-color: rgba(0, 0, 0, 0); 
+            margin: 0; 
+            padding: 20px;
+            overflow: hidden; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
-        .active-player { border-left: 5px solid #27ae60; background: rgba(40,40,40,0.9); }
-        .name { flex: 1; font-weight: bold; text-transform: uppercase; }
-        .score { font-size: 1.5em; font-weight: 900; color: #f1c40f; width: 50px; text-align: right; }
-        .fouls { display: flex; gap: 3px; align-items: center; margin-left: 10px; }
-        .dot { width: 8px; height: 8px; background: #444; border-radius: 50%; }
-        .dot.active { background: #ff0000; box-shadow: 0 0 5px #ff0000; }
+
+        .scoreline {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+            border-radius: 35px; /* Basert på dine 30px, men litt rundere for 73px høyde */
+            background: #000000;
+            border: 1px solid #000000;
+            overflow: hidden;
+            width: 95vw;
+            height: 73px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .player {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            height: 100%;
+            color: white;
+            position: relative;
+        }
+
+        /* Spiller A - Venstre side */
+        .player--A {
+            background: linear-gradient(90deg, #083c2c 50%, #00af79);
+            padding-left: 25px;
+            justify-content: flex-start;
+        }
+
+        /* Spiller B - Høyre side */
+        .player--B {
+            background: linear-gradient(90deg, #00af79, #083c2c 50%);
+            padding-right: 25px;
+            justify-content: flex-end;
+            text-align: right;
+        }
+
+        /* Navnestyling basert på din --names-size */
+        .name {
+            font-size: 28px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Poengsum i midten */
+        .score-box {
+            background: #000;
+            min-width: 80px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 42px;
+            font-weight: 900;
+            color: #f1c40f; /* Cowboy Gul */
+            z-index: 10;
+        }
+
+        /* Foul-lys integrert i gradienten */
+        .fouls {
+            display: flex;
+            gap: 5px;
+            margin: 0 15px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .dot.active {
+            background: #ff0000;
+            box-shadow: 0 0 10px #ff0000;
+            border-color: #ffaaaa;
+        }
+
+        /* Markør for hvem som har turen */
+        .turn-indicator {
+            width: 10px;
+            height: 10px;
+            background: #fff;
+            border-radius: 50%;
+            margin: 0 10px;
+            box-shadow: 0 0 8px #fff;
+            opacity: 0;
+        }
+        .is-turn { opacity: 1; }
+
+        /* Inning display i midten nederst eller over */
+        .inning-tag {
+            position: absolute;
+            bottom: -5px;
+            background: #000;
+            color: #888;
+            font-size: 10px;
+            padding: 2px 10px;
+            border-radius: 5px;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
-    <div id="display"></div>
+
+    <div style="display: flex; flex-direction: column; align-items: center;">
+        <div class="scoreline">
+            <div class="player player--A" id="p0-row">
+                <div class="dot-container fouls" id="p0-fouls"></div>
+                <div class="name" id="p0-name">SPILLER 1</div>
+                <div class="turn-indicator" id="p0-turn"></div>
+            </div>
+
+            <div class="score-box">
+                <span id="p0-score">0</span>
+                <span style="color:#444; margin: 0 5px;">:</span>
+                <span id="p1-score">0</span>
+            </div>
+
+            <div class="player player--B" id="p1-row">
+                <div class="turn-indicator" id="p1-turn"></div>
+                <div class="name" id="p1-name">SPILLER 2</div>
+                <div class="dot-container fouls" id="p1-fouls"></div>
+            </div>
+        </div>
+        <div class="inning-tag" id="inning-text">INNING 1</div>
+    </div>
 
     <script>
-        function update() {
-            const scores = JSON.parse(localStorage.getItem('cb_scores')) || [0,0,0];
-            const fouls = JSON.parse(localStorage.getItem('cb_fouls')) || [0,0,0];
-            const active = parseInt(localStorage.getItem('cb_player')) || 0;
-            const pCount = parseInt(localStorage.getItem('cb_pCount')) || 2;
-            
-            let html = '';
-            for(let i=0; i < pCount; i++) {
-                const name = localStorage.getItem(`p${i}name`) || `Player ${i+1}`;
-                const isActive = (active === i) ? 'active-player' : '';
-                
-                let foulDots = '';
-                for(let d=0; d<3; d++) {
-                    foulDots += `<div class="dot ${d < fouls[i] ? 'active' : ''}"></div>`;
-                }
+        function updateScoreboard() {
+            // Henter data fra localStorage (samme nøkler som appen din bruker)
+            const scores = JSON.parse(localStorage.getItem('cb_scores')) || [0, 0, 0];
+            const fouls = JSON.parse(localStorage.getItem('cb_fouls')) || [0, 0, 0];
+            const activePlayer = parseInt(localStorage.getItem('cb_player')) || 0;
+            const innings = parseInt(localStorage.getItem('cb_innings')) || 0;
+            const playerCount = parseInt(localStorage.getItem('cb_pCount')) || 2;
 
-                html += `
-                    <div class="obs-score-row ${isActive}">
-                        <div class="name">${name}</div>
-                        <div class="score">${scores[i]}</div>
-                        <div class="fouls">${foulDots}</div>
-                    </div>
-                `;
+            // Oppdater navn
+            document.getElementById('p0-name').innerText = localStorage.getItem('p0name') || "SPILLER 1";
+            document.getElementById('p1-name').innerText = localStorage.getItem('p1name') || "SPILLER 2";
+
+            // Oppdater score
+            document.getElementById('p0-score').innerText = scores[0];
+            document.getElementById('p1-score').innerText = scores[1];
+
+            // Oppdater Inning
+            document.getElementById('inning-text').innerText = "Inning " + (Math.floor(innings/playerCount) + 1);
+
+            // Oppdater Foul-dots og Turn-indicator
+            for (let p = 0; p < 2; p++) {
+                // Turn
+                document.getElementById(`p${p}-turn`).className = (activePlayer === p) ? "turn-indicator is-turn" : "turn-indicator";
+                
+                // Fouls
+                let foulHtml = '';
+                for (let d = 0; d < 3; d++) {
+                    foulHtml += `<div class="dot ${d < fouls[p] ? 'active' : ''}"></div>`;
+                }
+                document.getElementById(`p${p}-fouls`).innerHTML = foulHtml;
             }
-            document.getElementById('display').innerHTML = html;
         }
-        setInterval(update, 1000); // Oppdaterer hvert sekund
-        update();
+
+        // Kjører oppdatering hvert sekund
+        setInterval(updateScoreboard, 1000);
+        updateScoreboard(); // Start med en gang
     </script>
 </body>
 </html>
