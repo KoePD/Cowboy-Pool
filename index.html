@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cowboy Pool Pro - Open Table Edition</title>
+    <title>Cowboy Pool Pro - Strict Joker Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #1a3c1a; color: white; text-align: center; margin: 0; padding: 10px; overflow-x: hidden; }
@@ -78,15 +78,15 @@
     </div>
 
     <div class="ball-row">
-        <div class="ball-group" id="group1">
+        <div class="ball-group">
             <button class="ball-btn" onclick="action('pocket', 1)" id="b1"><div class="ball-number">1</div></button>
             <button class="btn-sub-carom" onclick="action('pocket_carom', 2)" id="sc1">+ CAROM</button>
         </div>
-        <div class="ball-group" id="group3">
+        <div class="ball-group">
             <button class="ball-btn" onclick="action('pocket', 3)" id="b3"><div class="ball-number">3</div></button>
             <button class="btn-sub-carom" onclick="action('pocket_carom', 4)" id="sc3">+ CAROM</button>
         </div>
-        <div class="ball-group" id="group5">
+        <div class="ball-group">
             <button class="ball-btn" onclick="action('pocket', 5)" id="b5"><div class="ball-number">5</div></button>
             <button class="btn-sub-carom" onclick="action('pocket_carom', 6)" id="sc5">+ CAROM</button>
         </div>
@@ -97,7 +97,7 @@
         <button class="ctrl btn-carom" onclick="action('carom', 1)" id="c1">Carom 1p</button>
         <button class="ctrl btn-carom" onclick="action('carom', 2)" id="c2">Carom 2p</button>
         <button class="ctrl btn-undo" onclick="undo()">Angre</button>
-        <button class="ctrl btn-rules" onclick="alert('Open Table Regler:\n• Break: Må treffe 3-ball først.\n• 0-90: Veksle kule/carom.\n• Kombinasjon: Fritt valg på neste støt!\n• 91-100: Kun caroms.\n• 101: Hazard via 1-ball.')">Regler</button>
+        <button class="ctrl btn-rules" onclick="alert('Open Table Regler:\n• Start: Bordet er åpent (Fritt valg).\n• Pocket + Carom: Bordet forblir åpent!\n• Kun Pocket/Carom: Rekkefølgen låses ut breaken.\n• 91-100: Kun caroms.\n• 101: Hazard via 1-ball.')">Regler</button>
         <button class="ctrl btn-adj" onclick="action('adjust', 1)">+</button>
         <button class="ctrl btn-adj" onclick="action('adjust', -1)">−</button>
         <button class="ctrl btn-foul-full" onclick="handleFoul()">FOUL / SCRATCH</button>
@@ -114,7 +114,7 @@
     let scoreAtStart = JSON.parse(localStorage.getItem('cb_startScore')) || [0, 0, 0];
     let currentPlayer = parseInt(localStorage.getItem('cb_player')) || 0;
     let breakDone = JSON.parse(localStorage.getItem('cb_break')) || false;
-    let tableStatus = localStorage.getItem('cb_tableStatus') || 'open';
+    let tableStatus = localStorage.getItem('cb_tableStatus') || 'open'; 
     let lastType = localStorage.getItem('cb_lastType') || null; 
     let seconds = parseInt(localStorage.getItem('cb_time')) || 0;
     let innings = parseInt(localStorage.getItem('cb_innings')) || 0;
@@ -135,7 +135,6 @@
             input.value = localStorage.getItem(`p${i}name`) || ""; input.placeholder = "Skriv navn...";
             input.oninput = () => { localStorage.setItem(`p${i}name`, input.value); updateUI(); };
             inputCont.appendChild(input);
-
             const box = document.createElement('div');
             box.id = `p${i}-box`; box.className = 'player-box';
             box.onclick = () => selectStarter(i);
@@ -189,20 +188,18 @@
         const pocketWait = s >= 90 || !breakDone || (tableStatus === 'locked' && lastType === 'pocket');
         const caromWait = (tableStatus === 'locked' && lastType === 'carom' && s < 90);
 
-        // Spesial-låsing for brekk: 1 og 5 er låst til brekket er gjort
+        // Brekk-sikring
         document.getElementById('b1').disabled = !breakDone || s >= 90;
         document.getElementById('sc1').disabled = !breakDone || s >= 90;
         document.getElementById('b5').disabled = !breakDone || s >= 90;
         document.getElementById('sc5').disabled = !breakDone || s >= 90;
         
-        // Vanlig visuell dimming
         document.getElementById('b3').classList.toggle('waiting', pocketWait);
         document.getElementById('sc3').classList.toggle('waiting', pocketWait);
         document.getElementById('b1').classList.toggle('waiting', !breakDone || pocketWait);
         document.getElementById('sc1').classList.toggle('waiting', !breakDone || pocketWait);
         document.getElementById('b5').classList.toggle('waiting', !breakDone || pocketWait);
         document.getElementById('sc5').classList.toggle('waiting', !breakDone || pocketWait);
-
         document.getElementById('c1').classList.toggle('waiting', caromWait);
         document.getElementById('c2').classList.toggle('waiting', caromWait);
         document.getElementById('inningText').innerText = "Inning: " + (Math.floor(innings/playerCount) + 1);
@@ -218,16 +215,18 @@
             foulCounts[currentPlayer] = 0;
         }
         saveHistory();
+
         if (type === 'win') { scores[currentPlayer] = 101; confetti(); stopTimer(); }
         else if (type === 'pocket_carom') {
             if (!breakDone) breakDone = true;
-            tableStatus = 'open';
+            // Kombinasjon holder bordet åpent (tableStatus forblir 'open')
             scores[currentPlayer] += val;
         } else if (type !== 'adjust') {
             if (!breakDone) {
-                breakDone = true; tableStatus = 'open'; // Brekk alene åpner bordet i denne logikken
+                breakDone = true; tableStatus = 'open'; // Brekk alene åpner bordet
             } else {
-                tableStatus = 'locked'; lastType = type;
+                tableStatus = 'locked'; // Ren pocket eller carom låser rekkefølgen
+                lastType = type;
             }
             scores[currentPlayer] += val;
         } else { scores[currentPlayer] = Math.max(0, scores[currentPlayer] + val); }
@@ -240,9 +239,7 @@
         updateUI();
     }
 
-    function handleFoul() {
-        saveHistory(); foulCounts[currentPlayer]++; scores[currentPlayer] = scoreAtStart[currentPlayer]; nextTurn();
-    }
+    function handleFoul() { saveHistory(); foulCounts[currentPlayer]++; scores[currentPlayer] = scoreAtStart[currentPlayer]; nextTurn(); }
 
     function saveHistory() {
         history.push({ scores: [...scores], topBreaks: [...topBreaks], foulCounts: [...foulCounts], scoreAtStart: [...scoreAtStart], currentPlayer, breakDone, tableStatus, lastType, innings, seconds });
