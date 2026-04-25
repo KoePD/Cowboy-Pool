@@ -133,7 +133,15 @@
 
     function toggleLanguage() { lang = lang === 'no' ? 'en' : 'no'; localStorage.setItem('cb_lang', lang); updateUI(); }
     function setPlayerCount(num) { if(!confirm(i18n[lang].confirmReset)) return; playerCount = num; localStorage.setItem('cb_pCount', num); resetGame(true); }
-    function rotateBreaker() { if (!breakDone) { currentPlayer = (currentPlayer + 1) % playerCount; updateUI(); } }
+    function rotateBreaker() { 
+    if (!breakDone) { 
+        currentPlayer = (currentPlayer + 1) % playerCount; 
+        // Vi må oppdatere scoreAtStart slik at fouls fungerer korrekt for den som starter
+        scoreAtStart = [0, 0, 0]; 
+        updateUI(); 
+        saveData(); // Dette tvinger endringen over til OBS
+    } 
+}
 
     function initUI() {
         document.querySelectorAll('.mode-selector button').forEach(btn => btn.classList.remove('active'));
