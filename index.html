@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cowboy Pool Pro - Strict Joker Edition</title>
+    <title>Cowboy Pool Pro - Final Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #1a3c1a; color: white; text-align: center; margin: 0; padding: 10px; overflow-x: hidden; }
@@ -51,9 +51,53 @@
         .btn-rules { background: #555; }
         .btn-turn { background: #27ae60; grid-column: span 3; font-size: 1.1em; padding: 15px; margin-top: 5px; letter-spacing: 1px; }
         .btn-adj { background: #7f8c8d; font-size: 1.1em; }
+
+        /* Regel-modal styling */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); overflow-y: auto; }
+        .modal-content { background: #222; margin: 5% auto; padding: 25px; border: 2px solid #f1c40f; width: 85%; max-width: 600px; border-radius: 20px; text-align: left; position: relative; }
+        .modal-header { color: #f1c40f; font-size: 1.5em; font-weight: 900; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
+        .modal-body { font-size: 0.85em; line-height: 1.6; color: #ddd; }
+        .modal-body h4 { color: #f1c40f; margin-bottom: 5px; margin-top: 15px; text-transform: uppercase; }
+        .modal-body p, .modal-body li { margin-bottom: 8px; }
+        .close-btn { position: absolute; top: 15px; right: 20px; color: #aaa; font-size: 30px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
+
+<div id="rulesModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeRules()">&times;</span>
+        <div class="modal-header">Regler: Cowboy Pool</div>
+        <div class="modal-body">
+            <h4>Mål</h4>
+            <p>Førstemann til nøyaktig <b>101 poeng</b>.</p>
+            
+            <h4>The Break</h4>
+            <p>Må treffe <b>3-ballen først</b>. Treff på andre baller først er foul.</p>
+            
+            <h4>Open Table & Veksling (0-90p)</h4>
+            <ul>
+                <li><b>Open Table:</b> Hver tur starter "åpen". Du velger fritt mellom carom eller pocket.</li>
+                <li><b>Jokeren:</b> Gjør du både carom og pocket i samme støt, forblir bordet åpent for neste støt.</li>
+                <li><b>Locked Order:</b> Gjør du <i>kun</i> én av delene, låses rekkefølgen ut breaken. (Pocket -> må carome, Carom -> må pockete).</li>
+            </ul>
+
+            <h4>Sluttspill (91-100p)</h4>
+            <p>Kun caroms gir poeng. Å senke en objektball her gir 0 poeng og er en <b>FOUL</b>.</p>
+
+            <h4>Vinnerstøtet (101p)</h4>
+            <p>Carom hvitballen av 1-ballen og senk hvitballen i et valgfritt hull. Ingen berøring av 3 eller 5.</p>
+
+            <h4>Poeng og Foul</h4>
+            <ul>
+                <li>Carom 2 baller = 1p | Carom 3 baller = 2p.</li>
+                <li>Kuler i hull = ballens verdi (1, 3, 5).</li>
+                <li><b>Foul:</b> Du mister alle poeng tatt i nåværende tur (Current Break).</li>
+                <li>3 fouls på rad = Tap av match.</li>
+            </ul>
+        </div>
+    </div>
+</div>
 
 <div class="container">
     <div class="mode-selector">
@@ -97,7 +141,7 @@
         <button class="ctrl btn-carom" onclick="action('carom', 1)" id="c1">Carom 1p</button>
         <button class="ctrl btn-carom" onclick="action('carom', 2)" id="c2">Carom 2p</button>
         <button class="ctrl btn-undo" onclick="undo()">Angre</button>
-        <button class="ctrl btn-rules" onclick="alert('Open Table Regler:\n• Start: Bordet er åpent (Fritt valg).\n• Pocket + Carom: Bordet forblir åpent!\n• Kun Pocket/Carom: Rekkefølgen låses ut breaken.\n• 91-100: Kun caroms.\n• 101: Hazard via 1-ball.')">Regler</button>
+        <button class="ctrl btn-rules" onclick="openRules()">Regler</button>
         <button class="ctrl btn-adj" onclick="action('adjust', 1)">+</button>
         <button class="ctrl btn-adj" onclick="action('adjust', -1)">−</button>
         <button class="ctrl btn-foul-full" onclick="handleFoul()">FOUL / SCRATCH</button>
@@ -184,22 +228,20 @@
             }
         }
 
-        // LÅSE LOGIKK
-        const pocketWait = s >= 90 || !breakDone || (tableStatus === 'locked' && lastType === 'pocket');
+        const pWait = s >= 90 || !breakDone || (tableStatus === 'locked' && lastType === 'pocket');
         const caromWait = (tableStatus === 'locked' && lastType === 'carom' && s < 90);
 
-        // Brekk-sikring
         document.getElementById('b1').disabled = !breakDone || s >= 90;
         document.getElementById('sc1').disabled = !breakDone || s >= 90;
         document.getElementById('b5').disabled = !breakDone || s >= 90;
         document.getElementById('sc5').disabled = !breakDone || s >= 90;
         
-        document.getElementById('b3').classList.toggle('waiting', pocketWait);
-        document.getElementById('sc3').classList.toggle('waiting', pocketWait);
-        document.getElementById('b1').classList.toggle('waiting', !breakDone || pocketWait);
-        document.getElementById('sc1').classList.toggle('waiting', !breakDone || pocketWait);
-        document.getElementById('b5').classList.toggle('waiting', !breakDone || pocketWait);
-        document.getElementById('sc5').classList.toggle('waiting', !breakDone || pocketWait);
+        document.getElementById('b3').classList.toggle('waiting', pWait);
+        document.getElementById('sc3').classList.toggle('waiting', pWait);
+        document.getElementById('b1').classList.toggle('waiting', !breakDone || pWait);
+        document.getElementById('sc1').classList.toggle('waiting', !breakDone || pWait);
+        document.getElementById('b5').classList.toggle('waiting', !breakDone || pWait);
+        document.getElementById('sc5').classList.toggle('waiting', !breakDone || pWait);
         document.getElementById('c1').classList.toggle('waiting', caromWait);
         document.getElementById('c2').classList.toggle('waiting', caromWait);
         document.getElementById('inningText').innerText = "Inning: " + (Math.floor(innings/playerCount) + 1);
@@ -219,19 +261,21 @@
         if (type === 'win') { scores[currentPlayer] = 101; confetti(); stopTimer(); }
         else if (type === 'pocket_carom') {
             if (!breakDone) breakDone = true;
-            // Kombinasjon holder bordet åpent (tableStatus forblir 'open')
+            tableStatus = 'open';
             scores[currentPlayer] += val;
         } else if (type !== 'adjust') {
             if (!breakDone) {
-                breakDone = true; tableStatus = 'open'; // Brekk alene åpner bordet
+                breakDone = true; tableStatus = 'open';
             } else {
-                tableStatus = 'locked'; // Ren pocket eller carom låser rekkefølgen
-                lastType = type;
+                tableStatus = 'locked'; lastType = type;
             }
             scores[currentPlayer] += val;
         } else { scores[currentPlayer] = Math.max(0, scores[currentPlayer] + val); }
         updateUI();
     }
+
+    function openRules() { document.getElementById('rulesModal').style.display = 'block'; }
+    function closeRules() { document.getElementById('rulesModal').style.display = 'none'; }
 
     function nextTurn() {
         saveHistory(); innings++; tableStatus = 'open'; lastType = null;
@@ -258,8 +302,6 @@
         if (!isPaused) { isPaused = true; clearInterval(timerInterval); document.getElementById('timerBtn').innerText = "FORTSETT"; }
         else { isPaused = false; document.getElementById('timerBtn').innerText = "PAUSE"; timerInterval = setInterval(() => { seconds++; document.getElementById('matchTimer').innerText = new Date(seconds * 1000).toISOString().substr(11, 8); saveData(); }, 1000); }
     }
-
-    function stopTimer() { isPaused = true; clearInterval(timerInterval); document.getElementById('timerBtn').innerText = "START KLOKKE"; }
 
     function resetGame() {
         if(confirm("Nullstille alt?")) {
