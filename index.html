@@ -404,27 +404,39 @@
 
 
 
-    /* --- Finn disse funksjonene nederst i script-delen din og bytt dem ut med disse --- */
+    function nextTurn() {
 
-function nextTurn() {
-    saveHistory();
-    let currentSeries = state.scores[state.currentPlayer] - state.scoreAtStart[state.currentPlayer];
-    if (currentSeries > (state.bestSeries[state.currentPlayer] || 0)) {
-        state.bestSeries[state.currentPlayer] = currentSeries;
+        saveHistory();
+
+        let currentSeries = state.scores[state.currentPlayer] - state.scoreAtStart[state.currentPlayer];
+
+        if (currentSeries > (state.bestSeries[state.currentPlayer] || 0)) {
+
+            state.bestSeries[state.currentPlayer] = currentSeries;
+
+        }
+
+        if (!state.breakDone) state.breakDone = true;
+
+        if (state.scores[state.currentPlayer] > state.scoreAtStart[state.currentPlayer]) {
+
+            state.foulCounts[state.currentPlayer] = 0;
+
+        }
+
+        state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
+
+        state.innings++;
+
+        state.tableStatus = 'open';
+
+        state.lastType = null;
+
+        state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer];
+
+        pushData();
+
     }
-    if (!state.breakDone) state.breakDone = true;
-
-    // --- ENDRING HER: Nullstiller fouls hver gang man trykker Avslutt Tur/Bom ---
-    state.foulCounts[state.currentPlayer] = 0; 
-    // -------------------------------------------------------------------------
-
-    state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
-    state.innings++;
-    state.tableStatus = 'open';
-    state.lastType = null;
-    state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer];
-    pushData();
-}
 
 
 
