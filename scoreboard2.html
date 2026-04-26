@@ -71,22 +71,21 @@
         
         /* NYTT: Dette låser bredden på hver tekst+tall-gruppe */
         .pers-val span {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            width: 55px; /* Fast bredde gjør at de ikke flytter seg */
+            display: inline-block; /* Endret fra flex for å låse bredden bedre */
+            width: 45px;           /* Fast bredde på selve ordet (NÅ/NOW/BEST) */
             white-space: nowrap;
-        }
+            text-align: left;
+}
 
         .pers-val b { 
             color: #f1c40f; 
             font-size: 13px; 
         /* Gir tallet en fast avstand fra starten av span-boksen */
-            margin-left: 4px; 
+            margin-left: 2px; 
         /* Tvinger tallet til å ha en fast bredde slik at det ikke 'danser' */
             display: inline-block;
-            width: auto; 
-            text-align: center;
+            width: 18px; 
+            text-align: left;
 }
 
         /* FOUL-PRIKKER: 'gap' styrer avstanden mellom prikkene. 'width/height' styrer størrelsen på prikken */
