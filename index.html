@@ -260,15 +260,18 @@
     /* JUSTER: Knappene for + og - poeng */
     function adjustScore(val) { saveHistory(); state.scores[state.currentPlayer] = Math.max(0, state.scores[state.currentPlayer] + val); pushData(); }
 
-    /* NESTE TUR: Kjører ved "Avslutt tur / Bom". Nullstiller fouls og bytter spiller. */
-    function nextTurn() {
-    saveHistory();
+    /* NESTE TUR: Kjører ved "Avslutt tur / Bom" */
+function nextTurn() {
+    // Sjekker om saveHistory eksisterer før den kjøres
+    if (typeof saveHistory === "function") saveHistory();
+    
+    const p = state.currentPlayer;
     
     // 1. Regn ut poengene for runden som akkurat ble ferdig
-    const p = state.currentPlayer;
     const roundScore = state.scores[p] - state.scoreAtStart[p];
     
-    // 2. Oppdater personlig rekord (Pers)
+    // 2. Oppdater pers hvis serien er ny rekord
+    if (!state.bestSeries) state.bestSeries = [0, 0, 0];
     if (roundScore > (state.bestSeries[p] || 0)) {
         state.bestSeries[p] = roundScore;
     }
@@ -279,10 +282,11 @@
 
     if (!state.breakDone) state.breakDone = true;
 
-    // 4. Nullstill fouls for spilleren som går fra bordet
+    // 4. Nullstiller fouls for spilleren som går fra bordet
     state.foulCounts[p] = 0;
 
     // 5. Finn neste spiller som ikke har 3 fouls (hopp over eliminerte)
+    // Denne loopen sørger for at vi ikke stopper på en som har røket ut
     do {
         state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
     } while (state.foulCounts[state.currentPlayer] >= 3);
@@ -291,10 +295,14 @@
     state.innings++;
     state.tableStatus = 'open';
     state.lastType = null;
-    state.lastShotValue = 0; // Nullstiller den lille indikatoren på scoreboardet
     state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer];
     
-    saveState();
+    // VIKTIG: Bruk nøyaktig samme lagringsfunksjon som du hadde før
+    if (typeof pushData === "function") {
+        pushData();
+    } else if (typeof saveState === "function") {
+        saveState();
+    }
 }
 
     /* FOUL: Håndterer feilstøt. Mister serien og bytter tur uten å resette fouls før ETTERpå. */
