@@ -312,98 +312,84 @@
         });
 
         // --- 4. OPPDATERING AV HVER SPILLER-RAD ---
-        
         for (let p = 0; p < 3; p++) {
             const row = document.getElementById(`p${p}-row`);
             if (!row) continue;
 
             const fCount = data.foulCounts[p];
             const placement = playerPlacement[p];
-            
-            // Sjekker om spilleren skal være med eller er utslått
             const isEliminated = p >= data.playerCount || fCount >= 3;
 
-            // --- A: Synlighet og Flytting ---
-            if (!isEliminated) {
-                if (isProVersion) {
-                    // Flytter raden vertikalt basert på plassering (75px per rad)
-                    const yPosition = placement * 75;
-                    row.style.transform = `translateY(${yPosition}px)`;
-                    row.style.order = "0";
-                } else {
-                    row.style.transform = "none";
-                    row.style.order = placement;
-                }
-                row.style.display = "flex";
-                row.style.opacity = "1";
-                row.classList.remove('player-eliminated');
-            } else {
-                // Ved 3 feil: Start ut-animasjon
-                row.classList.add('player-eliminated');
-                row.style.transform = "translateY(0px) scale(0)";
+            // Hvis spilleren er ute, fjern dem helt og hopp over resten av denne spilleren
+            if (isEliminated) {
+                row.classList.remove('is-not-turn'); 
+                row.style.transform = "scale(0)";
+                row.style.opacity = "0";
                 
-                // Fjerner raden helt fra skjermen etter 0.5 sekunder
                 setTimeout(() => {
-                    if (row.classList.contains('player-eliminated')) {
-                        row.style.display = "none";
-                    }
+                    row.style.display = "none";
                 }, 500);
+                
+                continue; // Går rett til neste spiller i løkka
+            } 
+
+            // Hvis vi er her, betyr det at spilleren er aktiv
+            row.style.display = "flex";
+            row.style.opacity = "1";
+            
+            if (isProVersion) {
+                const yPosition = placement * 75;
+                row.style.transform = `translateY(${yPosition}px) scale(1)`;
+            } else {
+                row.style.transform = "scale(1)";
+                row.style.order = placement;
             }
 
-            // Toner ned rader for spillere som ikke har tur
+            // Marker hvem sin tur det er
             row.classList.toggle('is-not-turn', curP !== p);
 
-            // --- B: Tekst, Navn og Poeng ---
-            if (p < data.playerCount) {
-                // Oppdaterer navn
-                document.getElementById(`p${p}-name`).innerText = data.names[p] || "";
-                
-                // Oppdaterer hovedscore
-                const scoreEl = document.getElementById(`p${p}-score`);
-                scoreEl.innerText = data.scores[p];
+            // Oppdater navn og hovedscore
+            document.getElementById(`p${p}-name`).innerText = data.names[p] || "";
+            const scoreEl = document.getElementById(`p${p}-score`);
+            scoreEl.innerText = data.scores[p];
 
-                // Fargelegger scoren basert på plassering (Gull, Sølv, Bronse)
-                if (data.scores[p] > 0) {
-                    if (placement === 0) {
-                        scoreEl.style.color = "#f1c40f"; // Gull
-                        scoreEl.style.filter = "drop-shadow(0 0 8px rgba(241, 196, 15, 0.6))";
-                    } else if (placement === 1) {
-                        scoreEl.style.color = "#bdc3c7"; // Sølv
-                        scoreEl.style.filter = "none";
-                    } else if (placement === 2) {
-                        scoreEl.style.color = "#cd7f32"; // Bronse
-                        scoreEl.style.filter = "none";
-                    }
-                } else {
-                    scoreEl.style.color = "#ffffff";
-                    scoreEl.style.filter = "none";
+            // Farger basert på plassering
+            if (data.scores[p] > 0) {
+                if (placement === 0) {
+                    scoreEl.style.color = "#f1c40f";
+                    scoreEl.style.filter = "drop-shadow(0 0 8px rgba(241, 196, 15, 0.6))";
+                } else if (placement === 1) {
+                    scoreEl.style.color = "#bdc3c7";
+                } else if (placement === 2) {
+                    scoreEl.style.color = "#cd7f32";
                 }
-
-                // --- C: Småtall (NÅ, PERS, SISTE) ---
-                const bestVal = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
-                const lastVal = (data.lastSeries && data.lastSeries[p] !== undefined) ? data.lastSeries[p] : 0;
-                const nowVal = (curP === p) ? (data.scores[p] - data.scoreAtStart[p]) : 0;
-
-                const persValContainer = row.querySelector('.pers-val');
-                if (persValContainer) {
-                    persValContainer.innerHTML = `
-                        <span>${t.now} <b id="p${p}-now">${nowVal}</b></span>
-                        <span>${t.pers} <b id="best-${p}">${bestVal}</b></span>
-                        <span>${t.last} <b id="p${p}-last-shot">${lastVal}</b></span>
-                    `;
-                }
-
-                // --- D: Foul-prikker (med blinking) ---
-                let fHtml = '';
-                for (let d = 0; d < 3; d++) {
-                    let activeClass = d < fCount ? 'active' : '';
-                    // Blinker hvis man har nøyaktig 2 fouls
-                    let blinkClass = (fCount === 2 && d < fCount) ? 'blink' : '';
-                    
-                    fHtml += `<div class="dot ${activeClass} ${blinkClass}"></div>`;
-                }
-                document.getElementById(`p${p}-fouls`).innerHTML = fHtml;
+            } else {
+                scoreEl.style.color = "#ffffff";
+                scoreEl.style.filter = "none";
             }
+
+            // Oppdater småtall (NÅ, PERS, SISTE)
+            const bestVal = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
+            const lastVal = (data.lastSeries && data.lastSeries[p] !== undefined) ? data.lastSeries[p] : 0;
+            const nowVal = (curP === p) ? (data.scores[p] - data.scoreAtStart[p]) : 0;
+
+            const persValContainer = row.querySelector('.pers-val');
+            if (persValContainer) {
+                persValContainer.innerHTML = `
+                    <span>${t.now} <b id="p${p}-now">${nowVal}</b></span>
+                    <span>${t.pers} <b id="best-${p}">${bestVal}</b></span>
+                    <span>${t.last} <b id="p${p}-last-shot">${lastVal}</b></span>
+                `;
+            }
+
+            // Foul-prikker
+            let fHtml = '';
+            for (let d = 0; d < 3; d++) {
+                let activeClass = d < fCount ? 'active' : '';
+                let blinkClass = (fCount === 2 && d < fCount) ? 'blink' : '';
+                fHtml += `<div class="dot ${activeClass} ${blinkClass}"></div>`;
+            }
+            document.getElementById(`p${p}-fouls`).innerHTML = fHtml;
         }
 
         // --- 5. TOPPLINJE (HEADER) ---
