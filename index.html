@@ -217,6 +217,7 @@
         state.lastType = null;
         state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer];
         pushData();
+        gameData.foulCounts[gameData.currentPlayer] = 0;
     }
 
     function handleFoul() {
