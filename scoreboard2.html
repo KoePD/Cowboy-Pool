@@ -299,12 +299,10 @@
             for(let p=0; p < 3; p++) {
                 const row = document.getElementById(`p${p}-row`);
                 const fCount = data.foulCounts[p];
-                
-                // 1. HENT PLASSERINGEN HER (Viktig at denne står øverst!)
                 const placement = playerPlacement[p]; 
 
                 if (row) {
-                    // 2. Bestem hvordan raden skal flyttes (Pro/Standard)
+                    // 1. Bestem hvordan raden skal flyttes (Pro/Standard)
                     if (isProVersion) {
                         // PRO: Silkemyk F1-animasjon
                         const yPosition = placement * 75; 
@@ -316,7 +314,7 @@
                         row.style.order = placement; 
                     }
 
-                    // 3. Håndter eliminering (3 feil)
+                    // 2. Håndter eliminering (3 feil)
                     const isEliminated = p >= data.playerCount || fCount >= 3;
 
                     if (!isEliminated) {
@@ -335,13 +333,59 @@
                         }, 500);
                     }
 
-                    // 4. Marker hvem sin tur det er
+                    // 3. Marker hvem sin tur det er
                     row.classList.toggle('is-not-turn', curP !== p);
                 }
-                // --- SLUTT PÅ ERSTATNING ---
 
-                    row.classList.toggle('is-not-turn', curP !== p);
+                // --- VIKTIG: Her starter oppdatering av navn og poeng ---
+                if (p < data.playerCount) {
+                    const nameEl = document.getElementById(`p${p}-name`);
+                    const scoreEl = document.getElementById(`p${p}-score`);
+                    
+                    if (nameEl) nameEl.innerText = data.names[p] || "";
+                    if (scoreEl) scoreEl.innerText = data.scores[p];
+
+                    // Oppdater farge basert på rangering
+                    if (data.scores[p] > 0) { 
+                        if (placement === 0) {
+                            scoreEl.style.color = "#f1c40f"; // Gull
+                            scoreEl.style.filter = "drop-shadow(0 0 8px rgba(241, 196, 15, 0.6))";
+                        } else if (placement === 1) {
+                            scoreEl.style.color = "#bdc3c7"; // Sølv
+                            scoreEl.style.filter = "none";
+                        } else if (placement === 2) {
+                            scoreEl.style.color = "#cd7f32"; // Bronse
+                            scoreEl.style.filter = "none";
+                        }
+                    } else {
+                        scoreEl.style.color = "#ffffff";
+                        scoreEl.style.filter = "none";
+                    }
+
+                    // Oppdater småtall (NÅ, PERS, SISTE)
+                    const bestVal = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
+                    const lastVal = (data.lastSeries && data.lastSeries[p] !== undefined) ? data.lastSeries[p] : 0;
+                    const nowVal = (curP === p) ? (data.scores[p] - data.scoreAtStart[p]) : 0;
+
+                    const persValContainer = row.querySelector('.pers-val');
+                    if (persValContainer) {
+                        persValContainer.innerHTML = `
+                            <span>${t.now} <b id="p${p}-now">${nowVal}</b></span>
+                            <span>${t.pers} <b id="best-${p}">${bestVal}</b></span>
+                            <span>${t.last} <b id="p${p}-last-shot">${lastVal}</b></span>
+                        `;
+                    }
+                    
+                    // Foul-prikker
+                    let fHtml = '';
+                    for(let d=0; d<3; d++) {
+                        let activeClass = d < fCount ? 'active' : '';
+                        let blinkClass = (fCount === 2 && d < fCount) ? 'blink' : '';
+                        fHtml += `<div class="dot ${activeClass} ${blinkClass}"></div>`;
+                    }
+                    document.getElementById(`p${p}-fouls`).innerHTML = fHtml;
                 }
+            } // Slutt på for-løkken
 
 
                 if (p < data.playerCount) {
