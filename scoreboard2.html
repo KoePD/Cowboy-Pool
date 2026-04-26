@@ -5,101 +5,66 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
     <style>
-        /* OVERORDNET LAYOUT */
-        body { 
-            background-color: rgba(0, 0, 0, 0); /* Gjennomsiktig bakgrunn for OBS */
-            margin: 0; padding: 0; overflow: hidden; 
-            font-family: 'Segoe UI', sans-serif; 
-            height: 1080px; width: 1920px; /* Matcher standard Full HD strøm */
-            display: flex; flex-direction: column; 
-            justify-content: flex-end; /* Plasserer scoreboardet i bunnen av skjermen */
-            align-items: center; 
-        }
-
-        /* SCOREBOARD BREDDE: Endre max-width for å gjøre det smalere eller bredere */
-        .scoreline-wrapper { 
-            margin-bottom: 50px; /* Avstand fra bunnen av skjermen */
-            display: flex; flex-direction: column; 
-            align-items: center; width: 100%; 
-            max-width: 1000px; /* Dette styrer total bredde på scoreboardet */
-        }
+        /* Bakgrunnen for hele filen. 1920x1080 er standard skjermstørrelse i Full HD */
+        body { background-color: rgba(0, 0, 0, 0); margin: 0; padding: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; height: 1080px; width: 1920px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
         
-        /* HEADER (Den mørke stripen øverst) */
-        .scoreline-header { 
-            display: flex; align-items: center; 
-            background: #1a1a1a; /* Mørk grå bakgrunnsfarge */
-            border-radius: 20px 20px 0 0; /* Runder av de øverste hjørnene */
-            border: 3px solid #333; border-bottom: none; 
-            position: relative; 
-            height: 50px; /* Høyden på den øverste stripen */
-            width: 100%; box-sizing: border-box; z-index: 10; 
-        }
-
-        /* TEKSTSTØRRELSER I TOPPEN */
+        /* TOTAL BREDDE: Endre max-width (f.eks til 1200px) for å gjøre scoreboardet bredere eller smalere */
+        .scoreline-wrapper { margin-bottom: 50px; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 1000px; }
+        
+        /* HEADER: Den mørke stripen øverst. 'height' styrer tykkelsen på stripen */
+        .scoreline-header { display: flex; align-items: center; background: #1a1a1a; border-radius: 20px 20px 0 0; border: 3px solid #333; border-bottom: none; position: relative; height: 50px; width: 100%; box-sizing: border-box; z-index: 10; }
+        
+        /* TOPP-TEKST: Her endrer du størrelsen (font-size) og fargen på Inning-teksten */
+        .header-info { flex: 1; display: flex; align-items: center; padding-left: 25px; gap: 20px; }
         .inning-text { color: #f1c40f; font-weight: 900; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
         .status-msg { color: white; font-weight: 900; font-size: 13px; text-transform: uppercase; }
-
-        /* KULE-FELTET I TOPPEN: Bredden må matche .score-block (135px) for å stå rett over scoren */
+        
+        /* KULE-OMRÅDET I HEADER: 'width' her må være lik 'min-width' i .score-block (135px) for at de skal stå på linje */
         .header-balls { width: 135px; display: flex; justify-content: center; align-items: center; gap: 10px; }
         
-        /* HOVEDBOKS (Der spillerne står) */
-        .scoreline-body { 
-            display: flex; flex-direction: column; 
-            border-radius: 0 0 20px 20px; /* Runder av de nederste hjørnene */
-            background: #000; /* Svart bakgrunn */
-            border: 3px solid #333; border-top: none; 
-            width: 100%; box-sizing: border-box; position: relative; z-index: 5; 
-            overflow: hidden; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.7); /* Skygge under scoreboardet */
-        }
-
-        /* SPILLERRADEN: Endre height for å gjøre hver spiller høyere/lavere */
-        .player-row { 
-            display: none; align-items: center; width: 100%; 
-            height: 75px; /* Høyden på hver spillers felt */
-            color: white; transition: all 0.5s ease; position: relative; opacity: 1; 
-        }
+        /* HOVEDBOKSEN: 'background' her er fargen bak spillernavnene */
+        .scoreline-body { display: flex; flex-direction: column; border-radius: 0 0 20px 20px; background: #000; border: 3px solid #333; border-top: none; width: 100%; box-sizing: border-box; position: relative; z-index: 5; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.7); }
         
-        /* ELIMINERING: Effekt når en spiller får 3 fouls og forsvinner */
+        /* SPILLERRADEN: Endre 'height' for å gjøre hver spiller-rad høyere eller lavere */
+        .player-row { display: none; align-items: center; width: 100%; height: 75px; color: white; transition: all 0.5s ease; position: relative; opacity: 1; }
+        
+        /* ELIMINERING: Effekt når en spiller ryker (forsvinner til venstre) */
         .player-eliminated { opacity: 0; transform: translateX(-50px); pointer-events: none; }
 
-        /* NAVNEFELTET */
+        /* NAVNEOMRÅDET: Juster font-size for å endre størrelsen på spillernavnet */
         .player-name-area { display: flex; align-items: center; flex: 1; padding: 0 35px; }
         .name { font-size: 32px; font-weight: 800; text-transform: uppercase; white-space: nowrap; }
 
-        /* POENG-BOKSEN (Høyre side) */
-        .score-block { 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            min-width: 135px; /* Bredden på det svarte poengfeltet */
-            height: 100%; background: rgba(0,0,0,0.5); border-left: 3px solid #333; 
-        }
+        /* POENGBOKS (Til høyre): Juster 'min-width' for å gjøre poengfeltet bredere eller smalere */
+        .score-block { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 135px; height: 100%; background: rgba(0,0,0,0.5); border-left: 3px solid #333; }
         .score-val { font-size: 60px; font-weight: 900; color: #f1c40f; line-height: 0.85; }
         .pers-val { font-size: 10px; font-weight: 900; color: #aaa; text-transform: uppercase; margin-top: 3px; }
+        .pers-val b { color: #f1c40f; font-size: 13px; margin-left: 3px; }
 
-        /* FOUL-PRIKKER (De små røde prikkene til venstre for navnet) */
+        /* FOUL-PRIKKER: 'gap' styrer avstanden mellom prikkene. 'width/height' styrer størrelsen på prikken */
         .fouls { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; width: 12px; align-items: center; margin-right: 20px; }
         .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(0,0,0,0.2); }
         .dot.active { background: #ff0000; box-shadow: 0 0 8px #ff0000; }
         
-        /* BLINKING: Styres av 0.5s (farten på blinket) */
+        /* BLINKING: '0.5s' styrer hastigheten på blinkingen ved 2 fouls */
         .dot.blink { animation: foul-warning 0.5s infinite ease-in-out; }
         @keyframes foul-warning { 0% { opacity: 1; } 50% { opacity: 0.2; } 100% { opacity: 1; } }
 
-        /* 3D KULER (I headeren) */
+        /* 3D KULER I TOPPEN: 'width/height' her endrer størrelsen på kulene */
         .ball { width: 28px; height: 28px; border-radius: 50%; position: relative; background-color: #fff; display: flex; justify-content: center; align-items: center; overflow: hidden; transition: all 0.3s ease; }
         .ball-overlay-3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; z-index: 10; box-shadow: inset -2px -2px 4px rgba(0,0,0,0.4), inset 1.5px 1.5px 3px rgba(255,255,255,0.2); border: 1px solid rgba(0,0,0,0.1); }
         .ball-num { font-size: 10px; font-weight: 900; z-index: 5; color: black; background: white; width: 14px; height: 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #000; }
         
-        /* BALLFARGER (Radial gradient lager 3D-effekt) */
+        /* BALLFARGER: Juster fargekodene her for å endre kulefargene */
         .f-1 { background: radial-gradient(circle at 35% 35%, #f1c40f, #b38f00); }  /* Gul */
         .f-3 { background: radial-gradient(circle at 35% 35%, #e74c3c, #962d22); }  /* Rød */
         .f-5 { background: radial-gradient(circle at 35% 35%, #8e44ad, #4b0082); }  /* Lilla */
         
-        /* INAKTIVITET (Når det ikke er din tur, eller ballen ikke skal treffes) */
+        /* GJENNOMSIKTIGHET: 'is-not-turn' styrer hvor mye spillere som ikke har tur skal tones ned */
         .ball-dimmed { opacity: 0.15; filter: brightness(0.5) blur(0.5px); transform: scale(0.8); }
-        .is-not-turn { opacity: 0.40; } /* Gjør de som ikke har turen mer gjennomsiktig */
+        .is-not-turn { opacity: 0.40; }
 
-        /* PULSERING (Når Carom er påbudt) */
+        /* PULSERING: Brukes når det er krav om Carom */
         @keyframes pulse-glow { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.1); filter: brightness(1.4); } 100% { transform: scale(1); filter: brightness(1); } }
         .mode-carom { animation: pulse-glow 1.5s infinite ease-in-out; }
     </style>
@@ -154,18 +119,17 @@
     </div>
 
     <script>
-        // FIREBASE-OPPSETT
+        /* LOGIKK: Denne delen henter data fra databasen og oppdaterer alt det visuelle */
         const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('gameData');
 
-        // OVERSETTELSER
+        // Her kan du endre tekstene som vises ved de forskjellige bord-statusene
         const i18n = {
             no: { pers: "PERS", inn: "INNING", break: "STARTSTØT (3-BALL)", open: "VALG: CAROM / POCKET", rc: "KRAV: CAROM", rp: "KRAV: POCKET" },
             en: { pers: "BEST", inn: "INNING", break: "BREAKSHOT (3-BALL)", open: "CHOICE: CAROM / POCKET", rc: "REQ: CAROM", rp: "REQ: POCKET" }
         };
 
-        // LYTTER PÅ ENDRINGER I DATABASEN
         db.on('value', snap => {
             const data = snap.val();
             if (!data) return;
@@ -175,35 +139,31 @@
             const curP = data.currentPlayer;
             const curS = data.scores[curP];
 
-            // LOOP GJENNOM DE 3 SPILLERNE
             for(let p=0; p < 3; p++) {
                 const row = document.getElementById(`p${p}-row`);
                 const fCount = data.foulCounts[p];
 
                 if (row) {
-                    // LOGIKK FOR Å VISE/SKJULE RADER:
-                    // Vises hvis p er mindre enn valgt spillerantall OG fouls er under 3.
+                    // Sjekker om spilleren er med i gamet og om de ikke har røket på 3 fouls
                     if (p < data.playerCount && fCount < 3) {
                         row.style.display = "flex";
                         row.classList.remove('player-eliminated');
                     } else {
-                        // Kjører animasjon før raden skjules helt
                         row.classList.add('player-eliminated');
                         setTimeout(() => { 
                             if(row.classList.contains('player-eliminated')) row.style.display = "none"; 
                         }, 500);
                     }
-                    // Markerer hvem sin tur det er (gjør de andre litt blasse)
+                    // Legger på en klasse hvis det ikke er spillerens tur
                     row.classList.toggle('is-not-turn', curP !== p);
                 }
 
-                // OPPDATERER NAVN, SCORE OG PERS
                 if (p < data.playerCount) {
                     document.getElementById(`p${p}-name`).innerText = data.names[p] || "";
                     document.getElementById(`p${p}-score`).innerText = data.scores[p];
                     document.getElementById(`best-${p}`).innerText = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
                     
-                    // TEGNER FOUL-PRIKKER OG SJEKKER FOR BLINKING (VED 2 FOULS)
+                    // FOUL-LOGIKK: Tegner prikker og legger til blinking ved 2 fouls
                     let fHtml = '';
                     for(let d=0; d<3; d++) {
                         let activeClass = d < fCount ? 'active' : '';
@@ -214,34 +174,31 @@
                 }
             }
 
-            // OPPDATERER TEKST I HEADER (INNING OG STATUS)
             document.querySelectorAll('.l-pers').forEach(el => el.innerText = t.pers);
             document.getElementById('inning-text').innerText = t.inn + " " + (Math.floor(data.innings/data.playerCount) + 1);
             
+            // STATUSMELDING: Bestemmer hvilken tekst som vises i toppen
             let statusText = t.break;
             if (data.breakDone) {
-                // Sjekker om bordet er låst til Carom eller Pocket
                 statusText = (data.tableStatus === 'locked') ? (data.lastType === 'pocket' ? t.rc : t.rp) : t.open;
             }
             document.getElementById('status-msg').innerText = statusText;
 
-            // KULE-LOGIKK (HEADER)
             const b1 = document.getElementById('hdr-b1');
             const b3 = document.getElementById('hdr-b3');
             const b5 = document.getElementById('hdr-b5');
             const balls = [b1, b3, b5];
 
-            // Resetter kule-stiler før nye sjekker
+            // Reset kuler
             balls.forEach(b => { b.classList.remove('ball-dimmed'); b.classList.remove('mode-carom'); });
 
+            // Ball-lys logikk (Brekk, Sluttfase og Carom-krav)
             if (!data.breakDone) {
-                // Kun 3-ballen lyser ved brekk
                 b1.classList.add('ball-dimmed');
                 b5.classList.add('ball-dimmed');
             } else if (curS >= 90) {
-                // Ved over 90 poeng lyser alt konstant
+                // Alt lyser
             } else if (data.tableStatus === 'locked' && data.lastType === 'pocket') {
-                // Legger på pulsering hvis neste krav er Carom
                 balls.forEach(b => b.classList.add('mode-carom'));
             }
         });
