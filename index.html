@@ -354,9 +354,6 @@ function updateUI() {
 
     /* Oppdatering av spiller-boksene (Score, Serie, Pers, Fouls) */
     for(let i=0; i<state.playerCount; i++) {
-        document.getElementById(`p${i}-now-label`).innerText = t.now;
-        document.getElementById(`p${i}-last-label`).innerText = t.last;
-        document.getElementById(`p${i}-best-label`).innerText = t.best;
         document.getElementById(`p${i}-label`).innerText = state.names[i];
         document.getElementById(`p${i}-score`).innerText = state.scores[i];
         
