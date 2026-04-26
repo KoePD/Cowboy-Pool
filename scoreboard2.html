@@ -236,7 +236,20 @@
             const t = i18n[lang];
             const curP = data.currentPlayer;
             const curS = data.scores[curP];
+            
+            // --- NY RANGERINGSLOGIKK ---
+            let rankings = [];
+            for(let i=0; i < data.playerCount; i++) {
+                rankings.push({ index: i, score: data.scores[i] });
+            }
+            // Sorterer fra høyest til lavest score
+            rankings.sort((a, b) => b.score - a.score);
 
+            let playerPlacement = []; 
+            rankings.forEach((item, pos) => {
+                playerPlacement[item.index] = pos; 
+            });
+            // ----------------------------
             for(let p=0; p < 3; p++) {
                 const row = document.getElementById(`p${p}-row`);
                 const fCount = data.foulCounts[p];
@@ -258,8 +271,29 @@
 
                 if (p < data.playerCount) {
                     document.getElementById(`p${p}-name`).innerText = data.names[p] || "";
-                    document.getElementById(`p${p}-score`).innerText = data.scores[p];
+                    // Hent score-elementet og sett poengsummen
+                    const scoreEl = document.getElementById(`p${p}-score`);
+                    scoreEl.innerText = data.scores[p];
 
+                    // --- OPPDATER FARGE BASERT PÅ RANGERING ---
+                    const placement = playerPlacement[p];
+                    if (data.scores[p] > 0) { 
+                        if (placement === 0) {
+                            scoreEl.style.color = "#f1c40f"; // Gull
+                            scoreEl.style.filter = "drop-shadow(0 0 8px rgba(241, 196, 15, 0.6))";
+                        } else if (placement === 1) {
+                            scoreEl.style.color = "#bdc3c7"; // Sølv
+                            scoreEl.style.filter = "none";
+                        } else if (placement === 2) {
+                            scoreEl.style.color = "#cd7f32"; // Bronse
+                            scoreEl.style.filter = "none";
+                        }
+                    } else {
+                        // Standard hvit hvis man har 0 poeng
+                        scoreEl.style.color = "#ffffff";
+                        scoreEl.style.filter = "none";
+                    }
+                    // ------------------------------------------
                     // 1. Hent verdiene fra data
                     const bestVal = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
                     const lastVal = (data.lastSeries && data.lastSeries[p] !== undefined) ? data.lastSeries[p] : 0;
