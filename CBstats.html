@@ -83,6 +83,44 @@
 </div>
 
 <script>
+    const i18n = {
+        no: {
+            title: "Cowboy Pool Stats",
+            leaderboard: "🏆 ALL-TIME LEADERBOARD",
+            history: "Match Historikk",
+            player: "Spiller",
+            wins: "Seire",
+            best: "Beste Serie",
+            total: "Total Score",
+            innings: "Innings",
+            serie: "Serie",
+            snitt: "Snitt",
+            loading: "Laster statistikk...",
+            noMatches: "Ingen kamper lagret ennå."
+        },
+        en: {
+            title: "Cowboy Pool Stats",
+            leaderboard: "🏆 ALL-TIME LEADERBOARD",
+            history: "Match History",
+            player: "Player",
+            wins: "Wins",
+            best: "Best Series",
+            total: "Total Score",
+            innings: "Innings",
+            serie: "Series",
+            snitt: "Avg",
+            loading: "Loading statistics...",
+            noMatches: "No matches saved yet."
+    }
+};
+
+let currentLang = 'no'; // Standard språk
+
+/* 2. Legg til en funksjon for å bytte språk og oppdatere tekster */
+function toggleLang() {
+    currentLang = currentLang === 'no' ? 'en' : 'no';
+    renderStats(); // Vi lager en funksjon som tegner alt på nytt
+}
     const firebaseConfig = {
         databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app"
     };
