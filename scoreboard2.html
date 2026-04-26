@@ -24,10 +24,20 @@
         .pers-val { font-size: 10px; font-weight: 900; color: #aaa; text-transform: uppercase; margin-top: 3px; }
         .pers-val b { color: #f1c40f; font-size: 13px; margin-left: 3px; }
 
+        /* FOULS STYLING */
         .fouls { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; width: 12px; align-items: center; margin-right: 20px; }
         .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(0,0,0,0.2); }
         .dot.active { background: #ff0000; box-shadow: 0 0 8px #ff0000; }
 
+        /* BLINKENDE ANIMASJON FOR 2 FOULS */
+        @keyframes foul-blink {
+            0% { opacity: 1; filter: brightness(1); }
+            50% { opacity: 0.3; filter: brightness(2); }
+            100% { opacity: 1; filter: brightness(1); }
+        }
+        .dot.blink { animation: foul-blink 0.6s infinite ease-in-out; }
+
+        /* 3D KULER */
         .ball { width: 28px; height: 28px; border-radius: 50%; position: relative; background-color: #fff; display: flex; justify-content: center; align-items: center; overflow: hidden; transition: all 0.3s ease; }
         .ball-overlay-3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; z-index: 10; box-shadow: inset -2px -2px 4px rgba(0,0,0,0.4), inset 1.5px 1.5px 3px rgba(255,255,255,0.2); border: 1px solid rgba(0,0,0,0.1); }
         .ball-num { font-size: 10px; font-weight: 900; z-index: 5; color: black; background: white; width: 14px; height: 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #000; }
@@ -101,24 +111,9 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('gameData');
 
-        // OPPDATERTE TEKSTER SOM FØLGER KONTROLLEREN
         const i18n = {
-            no: { 
-                pers: "PERS", 
-                inn: "INNING", 
-                break: "STARTSTØT (3-BALL)", 
-                open: "VALG: CAROM / POCKET", 
-                rc: "KRAV: CAROM", 
-                rp: "KRAV: POCKET" 
-            },
-            en: { 
-                pers: "BEST", 
-                inn: "INNING", 
-                break: "BREAKSHOT (3-BALL)", 
-                open: "CHOICE: CAROM / POCKET", 
-                rc: "REQ: CAROM", 
-                rp: "REQ: POCKET" 
-            }
+            no: { pers: "PERS", inn: "INNING", break: "STARTSTØT (3-BALL)", open: "VALG: CAROM / POCKET", rc: "KRAV: CAROM", rp: "KRAV: POCKET" },
+            en: { pers: "BEST", inn: "INNING", break: "BREAKSHOT (3-BALL)", open: "CHOICE: CAROM / POCKET", rc: "REQ: CAROM", rp: "REQ: POCKET" }
         };
 
         db.on('value', snap => {
@@ -140,8 +135,16 @@
                     document.getElementById(`p${p}-name`).innerText = data.names[p] || "";
                     document.getElementById(`p${p}-score`).innerText = data.scores[p];
                     document.getElementById(`best-${p}`).innerText = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
+                    
+                    // FOUL LOGIKK MED BLINKING
                     let fHtml = '';
-                    for(let d=0; d<3; d++) fHtml += `<div class="dot ${d < data.foulCounts[p] ? 'active' : ''}"></div>`;
+                    const fCount = data.foulCounts[p];
+                    for(let d=0; d<3; d++) {
+                        let activeClass = d < fCount ? 'active' : '';
+                        // Hvis spilleren har nøyaktig 2 fouls, legg på 'blink' klassen på de aktive prikkene
+                        let blinkClass = (fCount === 2 && d < fCount) ? 'blink' : '';
+                        fHtml += `<div class="dot ${activeClass} ${blinkClass}"></div>`;
+                    }
                     document.getElementById(`p${p}-fouls`).innerHTML = fHtml;
                 }
             }
@@ -149,7 +152,6 @@
             document.querySelectorAll('.l-pers').forEach(el => el.innerText = t.pers);
             document.getElementById('inning-text').innerText = t.inn + " " + (Math.floor(data.innings/data.playerCount) + 1);
             
-            // LOGIKK FOR STATUSMELDING
             let statusText = t.break;
             if (data.breakDone) {
                 statusText = (data.tableStatus === 'locked') ? (data.lastType === 'pocket' ? t.rc : t.rp) : t.open;
@@ -167,7 +169,6 @@
                 b1.classList.add('ball-dimmed');
                 b5.classList.add('ball-dimmed');
             } else if (curS >= 90) {
-                // Alle aktive i sluttfase
             } else if (data.tableStatus === 'locked' && data.lastType === 'pocket') {
                 balls.forEach(b => b.classList.add('mode-carom'));
             }
