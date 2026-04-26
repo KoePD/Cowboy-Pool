@@ -54,7 +54,7 @@
             margin-top: 5px;
             display: flex;
             justify-content: center; 
-            flex: 0 0 65px;
+            flex: 0 0 75px;
             gap: 5px; /* Litt mindre gap for å få plass til faste bredder */
             width: 100%;
             padding: 0 10px;
@@ -73,11 +73,12 @@
         .pers-val b { 
             color: #f1c40f; 
             font-size: 13px; 
-            margin-left: 4px; 
-        /* Endret her: Gir tallet en fast plass å bo i */
+        /* Gir tallet en fast avstand fra starten av span-boksen */
+            margin-left: auto; 
+        /* Tvinger tallet til å ha en fast bredde slik at det ikke 'danser' */
             display: inline-block;
-            width: 18px; 
-            text-align: left;
+            width: 20px; 
+            text-align: right;
 }
 
         /* FOUL-PRIKKER: 'gap' styrer avstanden mellom prikkene. 'width/height' styrer størrelsen på prikken */
