@@ -383,9 +383,13 @@ function updateUI() {
     }
 
     /* LOGIKK FOR KRAV-TEKST: Viser hva spilleren MÅ gjøre */
-    let reqText = t.msgOpen;
-    if (!state.breakDone) reqText = t.msgBreak;
-    else if (state.tableStatus === 'locked') reqText = (state.lastType === 'pocket' ? t.msgReqCarom : t.msgReqPocket);
+        let reqText = t.msgOpen;
+        if (!state.breakDone) {
+            reqText = t.msgBreak;
+        }
+        else if (state.tableStatus === 'locked') {
+            reqText = (state.lastType === 'pocket' ? t.msgReqCarom : t.msgReqPocket);
+}
     document.getElementById('moveText').innerText = reqText;
 
     /* BALL-SYNLIGHET: Gjør baller grå/inaktive basert på om de er lovlige å putte */
