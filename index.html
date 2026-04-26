@@ -201,32 +201,46 @@
 
     function adjustScore(val) { saveHistory(); state.scores[state.currentPlayer] = Math.max(0, state.scores[state.currentPlayer] + val); pushData(); }
 
-    function nextTurn() {
-        saveHistory();
-        let currentSeries = state.scores[state.currentPlayer] - state.scoreAtStart[state.currentPlayer];
-        if (currentSeries > (state.bestSeries[state.currentPlayer] || 0)) {
-            state.bestSeries[state.currentPlayer] = currentSeries;
-        }
-        if (!state.breakDone) state.breakDone = true;
-        if (state.scores[state.currentPlayer] > state.scoreAtStart[state.currentPlayer]) {
-            state.foulCounts[state.currentPlayer] = 0;
-        }
-        state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
-        state.innings++;
-        state.tableStatus = 'open';
-        state.lastType = null;
-        state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer];
-        pushData();
-    }
+    /* --- Finn disse funksjonene nederst i script-delen din og bytt dem ut med disse --- */
 
-    function handleFoul() {
-        saveHistory();
-        if (!state.breakDone) state.breakDone = true;
-        state.foulCounts[state.currentPlayer]++;
-        state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer];
-        if (state.foulCounts[state.currentPlayer] >= 3) alert("3 FOULS!");
-        nextTurn(); 
+function nextTurn() {
+    saveHistory();
+    let currentSeries = state.scores[state.currentPlayer] - state.scoreAtStart[state.currentPlayer];
+    if (currentSeries > (state.bestSeries[state.currentPlayer] || 0)) {
+        state.bestSeries[state.currentPlayer] = currentSeries;
     }
+    if (!state.breakDone) state.breakDone = true;
+
+    // --- ENDRING HER: Nullstiller fouls hver gang man trykker Avslutt Tur/Bom ---
+    state.foulCounts[state.currentPlayer] = 0; 
+    // -------------------------------------------------------------------------
+
+    state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
+    state.innings++;
+    state.tableStatus = 'open';
+    state.lastType = null;
+    state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer];
+    pushData();
+}
+
+function handleFoul() {
+    saveHistory();
+    if (!state.breakDone) state.breakDone = true;
+    state.foulCounts[state.currentPlayer]++;
+    
+    // Spilleren mister poengene i serien
+    state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer];
+    
+    if (state.foulCounts[state.currentPlayer] >= 3) {
+        // Her kan du velge: Hvis du vil at de skal forsvinne fra scoreboardet, 
+        // må de beholde foulCount = 3 når turen går videre. 
+        // Men siden du vil resette ved tur-slutt, kjører vi vanlig nextTurn.
+        alert("3 FOULS!");
+    }
+    
+    // Ved foul avsluttes turen, og fouls nullstilles via nextTurn()
+    nextTurn(); 
+}
 
     function updateUI() {
         const t = i18n[state.lang || 'no'];
