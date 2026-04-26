@@ -236,239 +236,206 @@
 </div>
 
     <script>
-        // Denne variabelen styrer om man har tilgang til pro-funksjoner
-        let isProVersion = true; // Sett denne til false for å se standard-versjonen
-        
-        /* LOGIKK: Denne delen henter data fra databasen og oppdaterer alt det visuelle */
-        const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database().ref('gameData');
-
-        // Her kan du endre tekstene som vises ved de forskjellige bord-statusene
-        const i18n = {
-            no: { 
-                pers: "PERS", 
-                last: "SISTE",
-                now: "NÅ",
-                inn: "INNING", 
-                break: "STARTSTØT (3-BALL)", 
-                open: "VALG: CAROM / POCKET", 
-                rc: "KRAV: CAROM", 
-                rp: "KRAV: POCKET" 
-            },
-            en: { 
-                pers: "BEST", 
-                last: "LAST",
-                now: "NOW",
-                inn: "INNING", 
-                break: "BREAKSHOT (3-BALL)", 
-                open: "CHOICE: CAROM / POCKET", 
-                rc: "REQ: CAROM", 
-                rp: "REQ: POCKET" 
-            }
-        };
-
-        db.on('value', snap => {
-            const data = snap.val();
-            if (!data) return;
-
-            const lang = data.lang || 'no';
-            const t = i18n[lang];
-            const curP = data.currentPlayer;
-            const curS = data.scores[curP];
-            
-            // --- NY RANGERINGSLOGIKK ---
-            let rankings = [];
-            for(let i=0; i < data.playerCount; i++) {
-                // VIKTIG: Bare legg til spillere som har under 3 fouls i listen som skal sorteres
-                if (data.foulCounts[i] < 3) {
-                    rankings.push({ index: i, score: data.scores[i] });
-                }
-            }
+    // --- 1. KONFIGURASJON ---
     
-            
-            // Sorterer fra høyest til lavest score
-            rankings.sort((a, b) => b.score - a.score);
+    // Styrer om appen er i Pro-versjon eller ikke
+    let isProVersion = true; 
 
-            let playerPlacement = []; 
-            rankings.forEach((item, pos) => {
-            playerPlacement[item.index] = pos; 
-    });
-            
-           // ----------------------------
-            for(let p=0; p < 3; p++) {
-                const row = document.getElementById(`p${p}-row`);
-                const fCount = data.foulCounts[p];
-                const placement = playerPlacement[p]; 
+    // Kobling til Firebase-databasen din
+    const firebaseConfig = { 
+        databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" 
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database().ref('gameData');
 
-                if (row) {
-                    // 1. Bestem hvordan raden skal flyttes (Pro/Standard)
-                    if (isProVersion) {
-                        // PRO: Silkemyk F1-animasjon
-                        const yPosition = placement * 75; 
-                        row.style.transform = `translateY(${yPosition}px)`;
-                        row.style.order = "0"; 
-                    } else {
-                        // STANDARD: Enkel sortering
-                        row.style.transform = "none";
-                        row.style.order = placement; 
-                    }
+    // Ordbok for tekst på forskjellige språk
+    const i18n = {
+        no: { 
+            pers: "PERS", 
+            last: "SISTE", 
+            now: "NÅ", 
+            inn: "INNING", 
+            break: "STARTSTØT (3-BALL)", 
+            open: "VALG: CAROM / POCKET", 
+            rc: "KRAV: CAROM", 
+            rp: "KRAV: POCKET" 
+        },
+        en: { 
+            pers: "BEST", 
+            last: "LAST", 
+            now: "NOW", 
+            inn: "INNING", 
+            break: "BREAKSHOT (3-BALL)", 
+            open: "CHOICE: CAROM / POCKET", 
+            rc: "REQ: CAROM", 
+            rp: "REQ: POCKET" 
+        }
+    };
 
-                    // 2. Håndter eliminering (3 feil)
-                    const isEliminated = p >= data.playerCount || fCount >= 3;
+    // --- 2. HOVEDFUNKSJON (KJØRER VED HVER ENDRING) ---
+    
+    db.on('value', snap => {
+        const data = snap.val();
+        if (!data) return;
 
-                    if (!isEliminated) {
-                        row.style.display = "flex";
-                        row.style.opacity = "1";
-                        row.classList.remove('player-eliminated');
-                    } else {
-                        row.classList.add('player-eliminated');
-                        // Drar raden ut av syne og krymper den
-                        row.style.transform = "translateY(0px) scale(0)"; 
-                        
-                        setTimeout(() => { 
-                            if(row.classList.contains('player-eliminated')) {
-                                row.style.display = "none"; 
-                            }
-                        }, 500);
-                    }
+        // Henter innstillinger fra databasen
+        const lang = data.lang || 'no';
+        const t = i18n[lang];
+        const curP = data.currentPlayer;
+        const curS = data.scores[curP];
 
-                    // 3. Marker hvem sin tur det er
-                    row.classList.toggle('is-not-turn', curP !== p);
-                }
-
-                // --- VIKTIG: Her starter oppdatering av navn og poeng ---
-                if (p < data.playerCount) {
-                    const nameEl = document.getElementById(`p${p}-name`);
-                    const scoreEl = document.getElementById(`p${p}-score`);
-                    
-                    if (nameEl) nameEl.innerText = data.names[p] || "";
-                    if (scoreEl) scoreEl.innerText = data.scores[p];
-
-                    // Oppdater farge basert på rangering
-                    if (data.scores[p] > 0) { 
-                        if (placement === 0) {
-                            scoreEl.style.color = "#f1c40f"; // Gull
-                            scoreEl.style.filter = "drop-shadow(0 0 8px rgba(241, 196, 15, 0.6))";
-                        } else if (placement === 1) {
-                            scoreEl.style.color = "#bdc3c7"; // Sølv
-                            scoreEl.style.filter = "none";
-                        } else if (placement === 2) {
-                            scoreEl.style.color = "#cd7f32"; // Bronse
-                            scoreEl.style.filter = "none";
-                        }
-                    } else {
-                        scoreEl.style.color = "#ffffff";
-                        scoreEl.style.filter = "none";
-                    }
-
-                    // Oppdater småtall (NÅ, PERS, SISTE)
-                    const bestVal = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
-                    const lastVal = (data.lastSeries && data.lastSeries[p] !== undefined) ? data.lastSeries[p] : 0;
-                    const nowVal = (curP === p) ? (data.scores[p] - data.scoreAtStart[p]) : 0;
-
-                    const persValContainer = row.querySelector('.pers-val');
-                    if (persValContainer) {
-                        persValContainer.innerHTML = `
-                            <span>${t.now} <b id="p${p}-now">${nowVal}</b></span>
-                            <span>${t.pers} <b id="best-${p}">${bestVal}</b></span>
-                            <span>${t.last} <b id="p${p}-last-shot">${lastVal}</b></span>
-                        `;
-                    }
-                    
-                    // Foul-prikker
-                    let fHtml = '';
-                    for(let d=0; d<3; d++) {
-                        let activeClass = d < fCount ? 'active' : '';
-                        let blinkClass = (fCount === 2 && d < fCount) ? 'blink' : '';
-                        fHtml += `<div class="dot ${activeClass} ${blinkClass}"></div>`;
-                    }
-                    document.getElementById(`p${p}-fouls`).innerHTML = fHtml;
-                }
-            } // Slutt på for-løkken
-
-
-                if (p < data.playerCount) {
-                    document.getElementById(`p${p}-name`).innerText = data.names[p] || "";
-                    // Hent score-elementet og sett poengsummen
-                    const scoreEl = document.getElementById(`p${p}-score`);
-                    scoreEl.innerText = data.scores[p];
-
-                    // --- OPPDATER FARGE BASERT PÅ RANGERING ---
-                    const placement = playerPlacement[p];
-                    if (data.scores[p] > 0) { 
-                        if (placement === 0) {
-                            scoreEl.style.color = "#f1c40f"; // Gull
-                            scoreEl.style.filter = "drop-shadow(0 0 8px rgba(241, 196, 15, 0.6))";
-                        } else if (placement === 1) {
-                            scoreEl.style.color = "#bdc3c7"; // Sølv
-                            scoreEl.style.filter = "none";
-                        } else if (placement === 2) {
-                            scoreEl.style.color = "#cd7f32"; // Bronse
-                            scoreEl.style.filter = "none";
-                        }
-                    } else {
-                        // Standard hvit hvis man har 0 poeng
-                        scoreEl.style.color = "#ffffff";
-                        scoreEl.style.filter = "none";
-                    }
-                    // ------------------------------------------
-                    // 1. Hent verdiene fra data
-                    const bestVal = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
-                    const lastVal = (data.lastSeries && data.lastSeries[p] !== undefined) ? data.lastSeries[p] : 0;
-                    const nowVal = (curP === p) ? (data.scores[p] - data.scoreAtStart[p]) : 0;
-
-                    // 2. Finn containeren som holder disse tre verdiene
-                    const persValContainer = row.querySelector('.pers-val');
-                    
-                    if (persValContainer) {
-                        // 3. Skriv om hele innholdet med tekst fra ordboken (t) og verdiene
-                        persValContainer.innerHTML = `
-                            <span>${t.now || 'NÅ'} <b id="p${p}-now">${nowVal}</b></span>
-                            <span>${t.pers || 'PERS'} <b id="best-${p}">${bestVal}</b></span>
-                            <span>${t.last || 'SISTE'} <b id="p${p}-last-shot">${lastVal}</b></span>
-                        `;
-                    }
-                    
-                    // FOUL-LOGIKK: Tegner prikker og legger til blinking ved 2 fouls
-                    let fHtml = '';
-                    for(let d=0; d<3; d++) {
-                        let activeClass = d < fCount ? 'active' : '';
-                        let blinkClass = (fCount === 2 && d < fCount) ? 'blink' : '';
-                        fHtml += `<div class="dot ${activeClass} ${blinkClass}"></div>`;
-                    }
-                    document.getElementById(`p${p}-fouls`).innerHTML = fHtml;
-                }
+        // --- 3. RANGERING OG PLASSERING ---
+        
+        let rankings = [];
+        for (let i = 0; i < data.playerCount; i++) {
+            // Vi tar bare med spillere som har under 3 feil i rangeringen
+            if (data.foulCounts[i] < 3) {
+                rankings.push({ 
+                    index: i, 
+                    score: data.scores[i] 
+                });
             }
+        }
+        
+        // Sorterer listen: Høyest score kommer først (posisjon 0)
+        rankings.sort((a, b) => b.score - a.score);
 
-            document.querySelectorAll('.l-pers').forEach(el => el.innerText = t.pers);
-            document.getElementById('inning-text').innerText = t.inn + " " + (Math.floor(data.innings/data.playerCount) + 1);
-            
-            // STATUSMELDING: Bestemmer hvilken tekst som vises i toppen
-            let statusText = t.break;
-            if (data.breakDone) {
-                statusText = (data.tableStatus === 'locked') ? (data.lastType === 'pocket' ? t.rc : t.rp) : t.open;
-            }
-            document.getElementById('status-msg').innerText = statusText;
-
-            const b1 = document.getElementById('hdr-b1');
-            const b3 = document.getElementById('hdr-b3');
-            const b5 = document.getElementById('hdr-b5');
-            const balls = [b1, b3, b5];
-
-            // Reset kuler
-            balls.forEach(b => { b.classList.remove('ball-dimmed'); b.classList.remove('mode-carom'); });
-
-            // Ball-lys logikk (Brekk, Sluttfase og Carom-krav)
-            if (!data.breakDone) {
-                b1.classList.add('ball-dimmed');
-                b5.classList.add('ball-dimmed');
-            } else if (curS >= 90) {
-                // Alt lyser
-            } else if (data.tableStatus === 'locked' && data.lastType === 'pocket') {
-                balls.forEach(b => b.classList.add('mode-carom'));
-            }
+        // Lager en liste over hvor hver spiller skal stå (0, 1 eller 2)
+        let playerPlacement = [];
+        rankings.forEach((item, pos) => {
+            playerPlacement[item.index] = pos;
         });
-    </script>
+
+        // --- 4. OPPDATERING AV HVER SPILLER-RAD ---
+        
+        for (let p = 0; p < 3; p++) {
+            const row = document.getElementById(`p${p}-row`);
+            if (!row) continue;
+
+            const fCount = data.foulCounts[p];
+            const placement = playerPlacement[p];
+            
+            // Sjekker om spilleren skal være med eller er utslått
+            const isEliminated = p >= data.playerCount || fCount >= 3;
+
+            // --- A: Synlighet og Flytting ---
+            if (!isEliminated) {
+                if (isProVersion) {
+                    // Flytter raden vertikalt basert på plassering (75px per rad)
+                    const yPosition = placement * 75;
+                    row.style.transform = `translateY(${yPosition}px)`;
+                    row.style.order = "0";
+                } else {
+                    row.style.transform = "none";
+                    row.style.order = placement;
+                }
+                row.style.display = "flex";
+                row.style.opacity = "1";
+                row.classList.remove('player-eliminated');
+            } else {
+                // Ved 3 feil: Start ut-animasjon
+                row.classList.add('player-eliminated');
+                row.style.transform = "translateY(0px) scale(0)";
+                
+                // Fjerner raden helt fra skjermen etter 0.5 sekunder
+                setTimeout(() => {
+                    if (row.classList.contains('player-eliminated')) {
+                        row.style.display = "none";
+                    }
+                }, 500);
+            }
+
+            // Toner ned rader for spillere som ikke har tur
+            row.classList.toggle('is-not-turn', curP !== p);
+
+            // --- B: Tekst, Navn og Poeng ---
+            if (p < data.playerCount) {
+                // Oppdaterer navn
+                document.getElementById(`p${p}-name`).innerText = data.names[p] || "";
+                
+                // Oppdaterer hovedscore
+                const scoreEl = document.getElementById(`p${p}-score`);
+                scoreEl.innerText = data.scores[p];
+
+                // Fargelegger scoren basert på plassering (Gull, Sølv, Bronse)
+                if (data.scores[p] > 0) {
+                    if (placement === 0) {
+                        scoreEl.style.color = "#f1c40f"; // Gull
+                        scoreEl.style.filter = "drop-shadow(0 0 8px rgba(241, 196, 15, 0.6))";
+                    } else if (placement === 1) {
+                        scoreEl.style.color = "#bdc3c7"; // Sølv
+                        scoreEl.style.filter = "none";
+                    } else if (placement === 2) {
+                        scoreEl.style.color = "#cd7f32"; // Bronse
+                        scoreEl.style.filter = "none";
+                    }
+                } else {
+                    scoreEl.style.color = "#ffffff";
+                    scoreEl.style.filter = "none";
+                }
+
+                // --- C: Småtall (NÅ, PERS, SISTE) ---
+                const bestVal = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
+                const lastVal = (data.lastSeries && data.lastSeries[p] !== undefined) ? data.lastSeries[p] : 0;
+                const nowVal = (curP === p) ? (data.scores[p] - data.scoreAtStart[p]) : 0;
+
+                const persValContainer = row.querySelector('.pers-val');
+                if (persValContainer) {
+                    persValContainer.innerHTML = `
+                        <span>${t.now} <b id="p${p}-now">${nowVal}</b></span>
+                        <span>${t.pers} <b id="best-${p}">${bestVal}</b></span>
+                        <span>${t.last} <b id="p${p}-last-shot">${lastVal}</b></span>
+                    `;
+                }
+
+                // --- D: Foul-prikker (med blinking) ---
+                let fHtml = '';
+                for (let d = 0; d < 3; d++) {
+                    let activeClass = d < fCount ? 'active' : '';
+                    // Blinker hvis man har nøyaktig 2 fouls
+                    let blinkClass = (fCount === 2 && d < fCount) ? 'blink' : '';
+                    
+                    fHtml += `<div class="dot ${activeClass} ${blinkClass}"></div>`;
+                }
+                document.getElementById(`p${p}-fouls`).innerHTML = fHtml;
+            }
+        }
+
+        // --- 5. TOPPLINJE (HEADER) ---
+        
+        // Inning-nummer
+        const currentInning = Math.floor(data.innings / data.playerCount) + 1;
+        document.getElementById('inning-text').innerText = `${t.inn} ${currentInning}`;
+        
+        // Statusmelding (hva spilleren må gjøre)
+        let statusText = t.break;
+        if (data.breakDone) {
+            statusText = (data.tableStatus === 'locked') 
+                ? (data.lastType === 'pocket' ? t.rc : t.rp) 
+                : t.open;
+        }
+        document.getElementById('status-msg').innerText = statusText;
+
+        // --- 6. KULE-LYS LOGIKK ---
+        
+        const b1 = document.getElementById('hdr-b1');
+        const b3 = document.getElementById('hdr-b3');
+        const b5 = document.getElementById('hdr-b5');
+        
+        // Nullstiller alle kuler først
+        [b1, b3, b5].forEach(b => { 
+            b.classList.remove('ball-dimmed', 'mode-carom'); 
+        });
+        
+        if (!data.breakDone) {
+            // Kun 3-ballen lyser ved startstøt
+            b1.classList.add('ball-dimmed');
+            b5.classList.add('ball-dimmed');
+        } else if (data.tableStatus === 'locked' && data.lastType === 'pocket') {
+            // Alle kuler pulserer hvis man må treffe carom
+            [b1, b3, b5].forEach(b => b.classList.add('mode-carom'));
+        }
+    });
+</script>
 </body>
 </html>
