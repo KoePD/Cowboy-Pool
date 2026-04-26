@@ -357,6 +357,9 @@ function updateUI() {
     for(let i=0; i<state.playerCount; i++) {
         document.getElementById(`p${i}-label`).innerText = state.names[i];
         document.getElementById(`p${i}-score`).innerText = state.scores[i];
+        document.getElementById(`p${i}-now-label`).innerText = t.now;
+        document.getElementById(`p${i}-last-label`).innerText = t.last;
+        document.getElementById(`p${i}-best-label`).innerText = t.best;
         
         // 1. NÅ (Aktiv serie): Viser poeng tatt i denne runden. Blir 0 for de som venter.
         let currentRun = (state.currentPlayer === i) ? (state.scores[i] - state.scoreAtStart[i]) : 0;
