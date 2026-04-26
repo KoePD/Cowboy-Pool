@@ -314,19 +314,29 @@
                     row.style.display = "flex"; // Sikrer at raden er synlig
 
                 if (row) {
-                    // Sjekker om spilleren er med i gamet og om de ikke har røket på 3 fouls
-                    if (p < data.playerCount && fCount < 3) {
+                    // Sjekk om spilleren skal være med (er konfigurert og har under 3 feil)
+                    const isEliminated = p >= data.playerCount || fCount >= 3;
+
+                    if (!isEliminated) {
+                        // Spilleren er aktiv
                         row.style.display = "flex";
+                        row.style.opacity = "1";
                         row.classList.remove('player-eliminated');
                     } else {
+                        // Spilleren har 3 feil - start ut-animasjon
                         row.classList.add('player-eliminated');
+                        
+                        // Vi venter 0.5 sekunder (tiden det tar å fadet ut) 
+                        // før vi fjerner raden helt fra layouten
                         setTimeout(() => { 
-                            if(row.classList.contains('player-eliminated')) row.style.display = "none"; 
+                            if(row.classList.contains('player-eliminated')) {
+                                row.style.display = "none"; 
+                            }
                         }, 500);
                     }
-                    // Legger på en klasse hvis det ikke er spillerens tur
+
+                    // Gjør raden litt gjennomsiktig hvis det ikke er spillerens tur
                     row.classList.toggle('is-not-turn', curP !== p);
-                    
                 }
 
                 if (p < data.playerCount) {
