@@ -231,20 +231,23 @@
                 if (p < data.playerCount) {
                     document.getElementById(`p${p}-name`).innerText = data.names[p] || "";
                     document.getElementById(`p${p}-score`).innerText = data.scores[p];
-                    document.getElementById(`best-${p}`).innerText = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
 
-                // 1. BEST (Pers) - Denne har du fra før på linje 205
-                    document.getElementById(`best-${p}`).innerText = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
-
-                // 2. SISTE (Forrige serie)
+                    // 1. Hent verdiene fra data
+                    const bestVal = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
                     const lastVal = (data.lastSeries && data.lastSeries[p] !== undefined) ? data.lastSeries[p] : 0;
-                    const lastShotEl = document.getElementById(`p${p}-last-shot`);
-                    if (lastShotEl) lastShotEl.innerText = lastVal;
-
-                // 3. NÅ (Aktiv serie)
                     const nowVal = (curP === p) ? (data.scores[p] - data.scoreAtStart[p]) : 0;
-                    const nowEl = document.getElementById(`p${p}-now`);
-                    if (nowEl) nowEl.innerText = nowVal;
+
+                    // 2. Finn containeren som holder disse tre verdiene
+                    const persValContainer = row.querySelector('.pers-val');
+                    
+                    if (persValContainer) {
+                        // 3. Skriv om hele innholdet med tekst fra ordboken (t) og verdiene
+                        persValContainer.innerHTML = `
+                            <span>${t.now || 'NÅ'} <b id="p${p}-now">${nowVal}</b></span>
+                            <span>${t.pers || 'PERS'} <b id="best-${p}">${bestVal}</b></span>
+                            <span>${t.last || 'SISTE'} <b id="p${p}-last-shot">${lastVal}</b></span>
+                        `;
+                    }
                     
                     // FOUL-LOGIKK: Tegner prikker og legger til blinking ved 2 fouls
                     let fHtml = '';
