@@ -64,9 +64,16 @@
         /* BLINKING: '0.5s' styrer hastigheten på blinkingen ved 2 fouls */
         .dot.blink { animation: foul-warning 0.5s infinite ease-in-out; }
             @keyframes pulse-glow { 
-                0% { filter: brightness(1); } 
-                50% { filter: brightness(1.5) drop-shadow(0 0 5px rgba(255,255,255,0.5)); } 
-                100% { filter: brightness(1); } 
+    0% { 
+        box-shadow: inset -2px -2px 4px rgba(0,0,0,0.4), inset 1.5px 1.5px 3px rgba(255,255,255,0.2);
+    } 
+    50% { 
+        box-shadow: inset -2px -2px 4px rgba(0,0,0,0.4), inset 1.5px 1.5px 3px rgba(255,255,255,0.2), 0 0 15px rgba(255,255,255,0.8);
+        filter: brightness(1.2);
+    } 
+    100% { 
+        box-shadow: inset -2px -2px 4px rgba(0,0,0,0.4), inset 1.5px 1.5px 3px rgba(255,255,255,0.2);
+    } 
 }
 
         /* 3D KULER I TOPPEN: 'width/height' her endrer størrelsen på kulene */
