@@ -6,56 +6,49 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
     <style>
         body { background-color: rgba(0, 0, 0, 0); margin: 0; padding: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; height: 1080px; width: 1920px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
-        .scoreline-wrapper { margin-bottom: 50px; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 1000px; } /* Gjort litt smalere for å ligne bildet */
+        .scoreline-wrapper { margin-bottom: 50px; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 1000px; }
         
-        /* HEADER (Sort topp) - Basert på bildet ditt */
-        .scoreline-header { display: flex; align-items: center; justify-content: space-between; background: #1a1a1a; padding: 12px 25px; border-radius: 20px 20px 0 0; border: 3px solid #333; border-bottom: none; position: relative; height: 35px; width: 95%; box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 10; }
-        .inning-text { color: #f1c40f; font-weight: 900; font-size: 14px; text-transform: uppercase; }
+        /* HEADER (Sort topp) */
+        .scoreline-header { display: flex; align-items: center; justify-content: space-between; background: #1a1a1a; padding: 12px 25px; border-radius: 20px 20px 0 0; border: 3px solid #333; border-bottom: none; position: relative; height: 35px; width: 100%; box-sizing: border-box; box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 10; }
+        .inning-text { color: #f1c40f; font-weight: 900; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
         .status-msg { color: white; font-weight: 900; font-size: 14px; text-transform: uppercase; text-align: center; }
         .balls-row { display: flex; gap: 8px; align-items: center; }
 
-        /* HOVED Scoreboard - Basert på bildet ditt, speilet med våre farger */
-        .scoreline-body { display: flex; flex-direction: column; border-radius: 20px; background: #000; border: 3px solid #333; width: 100%; position: relative; z-index: 5; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.7); }
+        /* HOVED SCOREBOARD BODY - Nå flush med toppen */
+        .scoreline-body { display: flex; flex-direction: column; border-radius: 0 0 20px 20px; background: #000; border: 3px solid #333; border-top: none; width: 100%; box-sizing: border-box; position: relative; z-index: 5; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.7); }
         
-        /* SPILLER RAD - Enkel, flat linje med farge */
         .player-row { display: flex; align-items: center; width: 100%; height: 75px; color: white; transition: opacity 0.3s; position: relative; }
         
         /* NAVN OMRÅDE */
-        .player-name-area { display: flex; align-items: center; flex: 1; padding: 0 30px; }
-        .name { font-size: 30px; font-weight: 800; text-transform: uppercase; white-space: nowrap; }
+        .player-name-area { display: flex; align-items: center; flex: 1; padding: 0 35px; }
+        .name { font-size: 32px; font-weight: 800; text-transform: uppercase; white-space: nowrap; }
 
-        /* SCORE OMRÅDE (Mørk boks til høyre) - Basert på bildet */
-        .score-block { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 130px; height: 100%; background: rgba(0,0,0,0.5); border-left: 3px solid #333; }
+        /* SCORE OMRÅDE */
+        .score-block { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 135px; height: 100%; background: rgba(0,0,0,0.5); border-left: 3px solid #333; }
         .score-val { font-size: 60px; font-weight: 900; color: #f1c40f; line-height: 0.85; }
         .pers-val { font-size: 10px; font-weight: 900; color: #aaa; text-transform: uppercase; margin-top: 3px; }
         .pers-val b { color: #f1c40f; font-size: 13px; margin-left: 3px; }
 
-        /* FOULS (Vertikale prikker, nå flyttet foran navnet) */
-        .fouls { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; width: 12px; align-items: center; margin-right: 15px; }
-        .dot { width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(0,0,0,0.2); }
+        /* FOULS (Vertikale prikker) */
+        .fouls { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; width: 12px; align-items: center; margin-right: 20px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(0,0,0,0.2); }
         .dot.active { background: #ff0000; box-shadow: 0 0 8px #ff0000; }
 
-        /* 3D ELEMENTER (Høyere kvalitet) */
-        .ball { width: 30px; height: 30px; border-radius: 50%; position: relative; background-color: #fff; display: flex; justify-content: center; align-items: center; overflow: hidden; margin-right: 15px; flex-shrink: 0; }
+        /* BALLER I HEADER */
+        .ball { width: 28px; height: 28px; border-radius: 50%; position: relative; background-color: #fff; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         .ball-overlay-3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; z-index: 10; box-shadow: inset -2px -2px 4px rgba(0,0,0,0.4), inset 1.5px 1.5px 3px rgba(255,255,255,0.2); border: 1px solid rgba(0,0,0,0.1); }
-        .ball-num { font-size: 10px; font-weight: 900; z-index: 5; color: black; background: white; width: 15px; height: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #000; }
+        .ball-num { font-size: 10px; font-weight: 900; z-index: 5; color: black; background: white; width: 14px; height: 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #000; }
         .f-1 { background: #ffcc00; } .f-3 { background: #cc0000; } .f-5 { background: #663399; }
         .ball-dimmed { opacity: 0.15; filter: grayscale(1); }
 
-        /* TUR-MARKERING (Speilet fra bildet, nå ved scoren) */
-        .turn-marker-3d { display: none; background-color: #f1c40f; border-radius: 50%; width: 22px; height: 22px; position: absolute; right: -11px; z-index: 100; box-shadow: 0 0 15px rgba(241,196,15,0.7); }
-        
-        .is-not-turn { opacity: 0.45; }
-        .active-row { border-color: #f1c40f !important; }
-        
-        /* P3 Synlighet */
+        .is-not-turn { opacity: 0.40; }
         #p2-row { display: none; }
     </style>
 </head>
 <body>
     <div class="scoreline-wrapper">
         <div class="scoreline-header">
-            <div class="inning-text" id="inning-text">INN 1</div>
+            <div class="inning-text" id="inning-text">INNING 1</div>
             <div class="status-msg" id="status-msg">BREAK</div>
             <div class="balls-row">
                 <div id="b-1" class="ball f-1"><div class="ball-num">1</div><div class="ball-overlay-3d"></div></div>
@@ -65,43 +58,36 @@
         </div>
         
         <div class="scoreline-body">
-            
-            <div class="player-row" id="p0-row" style="background: rgba(204,0,0,0.6);">
+            <div class="player-row" id="p0-row" style="background: rgba(204,0,0,0.65);">
                 <div class="player-name-area">
                     <div class="fouls" id="p0-fouls"></div>
-                    <div class="ball f-1"><div class="ball-num">1</div><div class="ball-overlay-3d"></div></div>
                     <div class="name" id="p0-name">PLAYER 1</div>
                 </div>
                 <div class="score-block">
                     <div class="score-val" id="p0-score">0</div>
                     <div class="pers-val"><span class="l-pers">PERS</span> <b id="best-0">0</b></div>
-                    <div class="turn-marker-3d" id="p0-turn"></div>
                 </div>
             </div>
 
-            <div class="player-row" id="p1-row" style="background: rgba(0,0,102,0.6); border-top: 3px solid #333;">
+            <div class="player-row" id="p1-row" style="background: rgba(0,0,102,0.65); border-top: 2px solid #333;">
                 <div class="player-name-area">
                     <div class="fouls" id="p1-fouls"></div>
-                    <div class="ball f-3"><div class="ball-num">3</div><div class="ball-overlay-3d"></div></div>
                     <div class="name" id="p1-name">PLAYER 2</div>
                 </div>
                 <div class="score-block">
                     <div class="score-val" id="p1-score">0</div>
                     <div class="pers-val"><span class="l-pers">PERS</span> <b id="best-1">0</b></div>
-                    <div class="turn-marker-3d" id="p1-turn"></div>
                 </div>
             </div>
 
-            <div class="player-row" id="p2-row" style="background: rgba(241,196,15,0.3); border-top: 3px solid #333;">
+            <div class="player-row" id="p2-row" style="background: rgba(241,196,15,0.3); border-top: 2px solid #333;">
                 <div class="player-name-area">
                     <div class="fouls" id="p2-fouls"></div>
-                    <div class="ball f-5"><div class="ball-num">5</div><div class="ball-overlay-3d"></div></div>
-                    <div class="name" id="p2-name" style="font-size:24px;">PLAYER 3</div>
+                    <div class="name" id="p2-name">PLAYER 3</div>
                 </div>
                 <div class="score-block">
-                    <div class="score-val" id="p2-score" style="font-size: 48px;">0</div>
+                    <div class="score-val" id="p2-score">0</div>
                     <div class="pers-val"><span class="l-pers">PERS</span> <b id="best-2">0</b></div>
-                    <div class="turn-marker-3d" id="p2-turn"></div>
                 </div>
             </div>
         </div>
@@ -113,8 +99,8 @@
         const db = firebase.database().ref('gameData');
 
         const i18n = {
-            no: { pers: "PERS", inn: "INN", break: "BREAK", open: "ÅPEN", rc: "CAROM", rp: "POCKET" },
-            en: { pers: "BEST", inn: "INN", break: "BREAK", open: "OPEN", rc: "CAROM", rp: "POCKET" }
+            no: { pers: "PERS", inn: "INNING", break: "BREAK", open: "ÅPEN", rc: "CAROM", rp: "POCKET" },
+            en: { pers: "BEST", inn: "INNING", break: "BREAK", open: "OPEN", rc: "CAROM", rp: "POCKET" }
         };
 
         db.on('value', snap => {
@@ -124,7 +110,6 @@
             const lang = data.lang || 'no';
             const t = i18n[lang];
 
-            // 3-spiller synlighet (vises som block for å beholde flex i loopen)
             document.getElementById('p2-row').style.display = (data.playerCount >= 3) ? "flex" : "none";
             document.querySelectorAll('.l-pers').forEach(el => el.innerText = t.pers);
 
@@ -134,12 +119,8 @@
                 if (document.getElementById(`best-${p}`)) document.getElementById(`best-${p}`).innerText = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
 
                 const row = document.getElementById(`p${p}-row`);
-                const turnM = document.getElementById(`p${p}-turn`);
-
                 if(row) {
                     row.classList.toggle('is-not-turn', data.currentPlayer !== p);
-                    // Tur-markør som stikker ut fra poengboksen (speilet logikk fra bildet)
-                    if(turnM) turnM.style.display = (data.currentPlayer === p) ? "block" : "none";
                 }
 
                 let fHtml = '';
@@ -150,7 +131,6 @@
 
             document.getElementById('inning-text').innerText = t.inn + " " + (Math.floor(data.innings/data.playerCount) + 1);
             
-            // Status tekst (CAROM/POCKET)
             const curS = data.scores[data.currentPlayer];
             let statusText = t.break;
             if (data.breakDone) {
