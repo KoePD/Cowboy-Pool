@@ -255,18 +255,24 @@
             let rankings = [];
             for(let i=0; i < data.playerCount; i++) {
                 rankings.push({ index: i, score: data.scores[i] });
-            }
+    
+    }
+    
+            
             // Sorterer fra høyest til lavest score
             rankings.sort((a, b) => b.score - a.score);
 
             let playerPlacement = []; 
             rankings.forEach((item, pos) => {
-                playerPlacement[item.index] = pos; 
-            });
+            playerPlacement[item.index] = pos; 
+    });
+            
             // ----------------------------
             for(let p=0; p < 3; p++) {
                 const row = document.getElementById(`p${p}-row`);
                 const fCount = data.foulCounts[p];
+                const placement = playerPlacement[p];
+                row.style.order = placement;
 
                 if (row) {
                     // Sjekker om spilleren er med i gamet og om de ikke har røket på 3 fouls
@@ -281,7 +287,7 @@
                     }
                     // Legger på en klasse hvis det ikke er spillerens tur
                     row.classList.toggle('is-not-turn', curP !== p);
-                    row.style.order = placement;
+                    
                 }
 
                 if (p < data.playerCount) {
