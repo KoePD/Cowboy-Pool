@@ -30,8 +30,37 @@
         .score { font-size: 2.8em; font-weight: 900; display: block; line-height: 1; }
         
         /* SERIE-INFO: Viser "Nå" (gjeldende serie) og "Pers" */
-        .series-info { display: flex; justify-content: space-around; margin-top: 8px; border-top: 1px solid #444; padding-top: 5px; }
-        .series-val { font-size: 0.95em; color: #f1c40f; font-weight: 900; }
+        .series-info { 
+            display: flex; 
+            justify-content: space-around; 
+            margin-top: 8px; 
+            border-top: 1px solid #444; 
+            padding-top: 5px; 
+}
+
+        .series-box { 
+            flex: 1; 
+            min-width: 45px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+}
+        
+        .series-val { 
+            font-size: 0.95em; 
+            color: #f1c40f; 
+            font-weight: 900; 
+            width: 100%; 
+            text-align: center; 
+}
+        
+        .series-label { 
+            font-size: 0.65em; 
+            color: #888; 
+            text-transform: uppercase; 
+            white-space: nowrap; 
+            text-align: center;
+}
 
         /* FOUL-DOTS: De tre små prikkene som blir røde ved feil */
         .foul-dots { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
