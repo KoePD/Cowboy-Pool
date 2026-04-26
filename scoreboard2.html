@@ -70,13 +70,16 @@
 }
         
         /* NYTT: Dette låser bredden på hver tekst+tall-gruppe */
+        /* Containeren for hver gruppe (NÅ 0, PERS 0, SISTE 0) */
         .pers-val span {
-            display: block;
-            position: relative;     /* Gjør at vi kan plassere tallet nøyaktig inni her */
-            flex: 1;                /* Fordeler plassen likt mellom de tre gruppene */
-            height: 20px;
+            display: flex;             /* Bruker flex for å styre tekst og tall internt */
+            align-items: center;
+            justify-content: flex-start;
+            flex: 1;                   /* Fordeler de tre gruppene likt utover bredden */
             white-space: nowrap;
-            text-align: left;       /* Teksten (NOW/NÅ) starter alltid helt til venstre */
+            position: relative;        /* Viktig for at tallene skal stå stille */
+            min-width: 0;
+            font-size: 10px;
 }
 
         /* Selve tallet (scoren) */
@@ -84,9 +87,8 @@
             color: #f1c40f; 
             font-size: 13px; 
             position: absolute;
-            /* VIKTIG: Dette låser tallet til nøyaktig samme punkt horisontalt */
-            left: 38px;         /* Juster denne verdien for å flytte ALLE tallene samtidig */
-            top: -2px;          /* Justerer høyden så det flukter med teksten */
+        /* VIKTIG: Låser tallet til nøyaktig samme punkt fra venstre i hver span */
+            left: 35px;                /* Juster denne hvis tallet står for nærme eller langt unna teksten */
             width: 20px;
             text-align: left;
 }
