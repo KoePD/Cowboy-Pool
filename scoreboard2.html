@@ -264,31 +264,31 @@
         const t = i18n[lang];
         const curP = data.currentPlayer;
 
-        // --- 3. RANGERING ---
+        // --- 3. RANGERING OG POSISJONERING ---
         let activePlayers = [];
-        let eliminatedPlayers = [];
+        let eliminatedCount = 0;
 
-        // Finn body-elementet
-        const bodyEl = document.querySelector('.scoreline-body');
-        // Oppdater høyden basert på antall spillere (76px er høyden du har satt på radene)
-        if (bodyEl) {
-            bodyEl.style.height = (data.playerCount * 76) + "px";
-}
-
-        // Vi sjekker kun spillere opp til det antallet som faktisk spiller (playerCount)
+        // Finn ut hvem som er med og hvem som har røket
         for (let i = 0; i < data.playerCount; i++) {
             if (data.foulCounts[i] < 3) {
                 activePlayers.push({ index: i, score: data.scores[i] });
             } else {
-                eliminatedPlayers.push({ index: i, score: data.scores[i] });
+                eliminatedCount++;
             }
         }
 
+        // Sorter de aktive etter poeng (høyest øverst)
         activePlayers.sort((a, b) => b.score - a.score);
-        let totalRank = [...activePlayers, ...eliminatedPlayers];
 
+        // Dynamisk høyde: Krymper boksen når folk ryker
+        const bodyEl = document.querySelector('.scoreline-body');
+        if (bodyEl) {
+            bodyEl.style.height = ((data.playerCount - eliminatedCount) * 76) + "px";
+        }
+
+        // Lag et kart over hvor de aktive skal stå (0, 1, 2...)
         let playerPlacement = [];
-        totalRank.forEach((item, pos) => {
+        activePlayers.forEach((item, pos) => {
             playerPlacement[item.index] = pos;
         });
 
@@ -296,6 +296,74 @@
         for (let p = 0; p < 3; p++) {
             const row = document.getElementById(`p${p}-row`);
             if (!row) continue;
+
+            const isPlaying = p < data.playerCount;
+            const fCount = data.foulCounts[p];
+            const isEliminated = fCount >= 3;
+
+            // Hvis spilleren ikke er med i spillet, eller er eliminert
+            if (!isPlaying || isEliminated) {
+                row.style.opacity = "0";
+                row.style.transform = `translateY(${playerPlacement[p] * 76}px) translateX(-50px)`;
+                
+                // Vi bruker en timeout for å fjerne display helt etter at animasjonen er ferdig
+                setTimeout(() => {
+                    if (data.foulCounts[p] >= 3 || p >= data.playerCount) {
+                        row.style.display = "none";
+                    }
+                }, 600);
+                continue; 
+            }
+
+            // Raden er aktiv
+            row.style.display = "flex";
+            row.style.opacity = "1";
+
+            // Hent den nye "komprimerte" plasseringen
+            const placement = playerPlacement[p];
+            const yPosition = placement * 76;
+            row.style.transform = `translateY(${yPosition}px)`;
+
+            // Tone ned de som ikke har tur
+            row.classList.toggle('is-not-turn', curP !== p);
+
+            // Oppdater Navn og Score
+            document.getElementById(`p${p}-name`).innerText = data.names[p] || "";
+            const scoreEl = document.getElementById(`p${p}-score`);
+            scoreEl.innerText = data.scores[p];
+
+            // Farger basert på ranking blant de som er igjen
+            if (data.scores[p] > 0) {
+                if (placement === 0) scoreEl.style.color = "#f1c40f"; // Gull
+                else if (placement === 1) scoreEl.style.color = "#bdc3c7"; // Sølv
+                else scoreEl.style.color = "#cd7f32"; // Bronse
+            } else {
+                scoreEl.style.color = "#ffffff";
+            }
+
+            // Oppdater småtall (NÅ, PERS, SISTE)
+            const bestVal = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
+            const lastVal = (data.lastSeries && data.lastSeries[p] !== undefined) ? data.lastSeries[p] : 0;
+            const nowVal = (curP === p) ? (data.scores[p] - data.scoreAtStart[p]) : 0;
+
+            const persValContainer = row.querySelector('.pers-val');
+            if (persValContainer) {
+                persValContainer.innerHTML = `
+                    <span>${t.now} <b id="p${p}-now">${nowVal}</b></span>
+                    <span>${t.pers} <b id="best-${p}">${bestVal}</b></span>
+                    <span>${t.last} <b id="p${p}-last-shot">${lastVal}</b></span>
+                `;
+            }
+
+            // Oppdater Foul-prikker
+            let fHtml = '';
+            for (let d = 0; d < 3; d++) {
+                let activeClass = d < fCount ? 'active' : '';
+                let blinkClass = (fCount === 2 && d < fCount) ? 'blink' : '';
+                fHtml += `<div class="dot ${activeClass} ${blinkClass}"></div>`;
+            }
+            document.getElementById(`p${p}-fouls`).innerHTML = fHtml;
+        }
 
             // VIKTIG: Sjekk om denne raden i det hele tatt skal eksistere i dette spillet
             const isPlaying = p < data.playerCount;
