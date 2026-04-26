@@ -3,14 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cowboy Pool - Statistikk</title>
+    <title>Cowboy Pool - Statistikk & Leaderboard</title>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: white; margin: 0; padding: 20px; }
         .stats-container { max-width: 800px; margin: auto; }
-        h1 { text-align: center; color: #f1c40f; text-transform: uppercase; letter-spacing: 2px; }
+        h1 { text-align: center; color: #f1c40f; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px; }
         
+        /* LEADERBOARD STIL */
+        .leaderboard-section {
+            background: linear-gradient(145deg, #2c3e50, #1a252f);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 50px;
+            border: 2px solid #f1c40f;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .leaderboard-section h2 { margin-top: 0; color: #f1c40f; font-size: 1.2em; text-align: center; margin-bottom: 20px; }
+        
+        .leaderboard-table { width: 100%; border-collapse: collapse; }
+        .leaderboard-table th { text-align: left; color: #aaa; text-transform: uppercase; font-size: 0.75em; padding: 10px; border-bottom: 2px solid rgba(241, 196, 15, 0.2); }
+        .leaderboard-table td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        
+        .rank-badge { background: rgba(241, 196, 15, 0.2); padding: 2px 8px; border-radius: 5px; font-size: 0.8em; margin-right: 10px; font-weight: bold; color: #f1c40f; }
+        .rank-1 { color: #f1c40f; font-weight: bold; background: rgba(241, 196, 15, 0.05); }
+
+        /* MATCH HISTORIKK STIL */
         .match-card { 
             background: #2c3e50; 
             border-radius: 15px; 
@@ -19,7 +38,6 @@
             border-left: 8px solid #27ae60;
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
-        
         .match-header { 
             display: flex; 
             justify-content: space-between; 
@@ -29,20 +47,8 @@
             font-size: 0.9em;
             color: #bdc3c7;
         }
-
-        .player-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
-            gap: 15px; 
-        }
-
-        .player-stat {
-            background: rgba(0,0,0,0.2);
-            padding: 10px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
+        .player-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
+        .player-stat { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px; text-align: center; }
         .player-stat.winner { border: 2px solid #f1c40f; }
         .player-name { font-weight: 800; display: block; margin-bottom: 5px; }
         .player-score { font-size: 1.5em; color: #f1c40f; font-weight: 900; }
@@ -52,6 +58,26 @@
 <body>
 
 <div class="stats-container">
+    <h1>Cowboy Pool Stats</h1>
+
+    <div class="leaderboard-section">
+        <h2>🏆 ALL-TIME LEADERBOARD</h2>
+        <table class="leaderboard-table">
+            <thead>
+                <tr>
+                    <th>Spiller</th>
+                    <th style="text-align:center;">Seire</th>
+                    <th style="text-align:center;">Beste Serie</th>
+                    <th style="text-align:center;">Total Score</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+                </tbody>
+        </table>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #333; margin-bottom: 40px;">
+
     <h1>Match Historikk</h1>
     <div id="history-list">Laster statistikk...</div>
 </div>
@@ -66,21 +92,73 @@
     db.on('value', (snapshot) => {
         const history = snapshot.val();
         const listDiv = document.getElementById('history-list');
+        const lbBody = document.getElementById('leaderboard-body');
         
         if (!history) {
             listDiv.innerHTML = "<p style='text-align:center;'>Ingen kamper lagret ennå.</p>";
             return;
         }
 
-        let html = "";
-        // Vi gjør om objektet til en liste og snur den (nyeste først)
-        const matches = Object.values(history).reverse();
+        const matches = Object.values(history);
+        const reversedMatches = [...matches].reverse();
+
+        // --- BEREGN LEADERBOARD ---
+        let playerStats = {};
 
         matches.forEach(match => {
-            // Finn vinneren (den med høyest poengsum)
             const maxScore = Math.max(...match.poengsummer);
             
-            html += `
+            match.spillere.forEach((name, i) => {
+                if (!name) return;
+                
+                if (!playerStats[name]) {
+                    playerStats[name] = { wins: 0, highestSeries: 0, totalScore: 0 };
+                }
+
+                // Legg til score
+                playerStats[name].totalScore += (match.poengsummer[i] || 0);
+
+                // Sjekk om seier (må ha mer enn 0 poeng for å vinne)
+                if (match.poengsummer[i] === maxScore && maxScore > 0) {
+                    playerStats[name].wins += 1;
+                }
+
+                // Sjekk personlig beste serie
+                const matchBest = (match.bestSeries && match.bestSeries[i]) ? match.bestSeries[i] : 0;
+                if (matchBest > playerStats[name].highestSeries) {
+                    playerStats[name].highestSeries = matchBest;
+                }
+            });
+        });
+
+        // Sorter spillere: Seire først, så total score
+        const sortedPlayers = Object.keys(playerStats).map(name => ({
+            name: name,
+            ...playerStats[name]
+        })).sort((a, b) => b.wins - a.wins || b.totalScore - a.totalScore);
+
+        // Tegn Leaderboard
+        let lbHtml = "";
+        sortedPlayers.forEach((p, index) => {
+            const isTop = index === 0;
+            lbHtml += `
+                <tr class="${isTop ? 'rank-1' : ''}">
+                    <td><span class="rank-badge">#${index + 1}</span> ${p.name}</td>
+                    <td style="text-align:center;">${p.wins}</td>
+                    <td style="text-align:center;">${p.highestSeries}</td>
+                    <td style="text-align:center;">${p.totalScore}</td>
+                </tr>
+            `;
+        });
+        lbBody.innerHTML = lbHtml;
+
+
+        // --- TEGN MATCH HISTORIKK ---
+        let historyHtml = "";
+        reversedMatches.forEach(match => {
+            const maxScore = Math.max(...match.poengsummer);
+            
+            historyHtml += `
                 <div class="match-card">
                     <div class="match-header">
                         <span>📅 ${match.dato}</span>
@@ -89,13 +167,15 @@
                     </div>
                     <div class="player-grid">
                         ${match.spillere.map((name, i) => {
-                            const isWinner = match.poengsummer[i] === maxScore;
-                            const avg = (match.poengsummer[i] / match.innings).toFixed(2);
+                            const isWinner = match.poengsummer[i] === maxScore && maxScore > 0;
+                            const score = match.poengsummer[i] || 0;
+                            const bestS = (match.bestSeries && match.bestSeries[i]) ? match.bestSeries[i] : 0;
+                            const avg = (score / (match.innings || 1)).toFixed(2);
                             return `
                                 <div class="player-stat ${isWinner ? 'winner' : ''}">
                                     <span class="player-name">${isWinner ? '🏆 ' : ''}${name}</span>
-                                    <span class="player-score">${match.poengsummer[i]}</span>
-                                    <span class="sub-stat">Serie: ${match.bestSeries[i]} | Snitt: ${avg}</span>
+                                    <span class="player-score">${score}</span>
+                                    <span class="sub-stat">Serie: ${bestS} | Snitt: ${avg}</span>
                                 </div>
                             `;
                         }).join('')}
@@ -103,7 +183,7 @@
                 </div>
             `;
         });
-        listDiv.innerHTML = html;
+        listDiv.innerHTML = historyHtml;
     });
 </script>
 </body>
