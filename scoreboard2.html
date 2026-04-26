@@ -222,6 +222,9 @@
 </div>
 
     <script>
+        // Denne variabelen styrer om man har tilgang til pro-funksjoner
+        let isProVersion = true; // Sett denne til false for å se standard-versjonen
+        
         /* LOGIKK: Denne delen henter data fra databasen og oppdaterer alt det visuelle */
         const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" };
         firebase.initializeApp(firebaseConfig);
@@ -283,11 +286,17 @@
                 // 1. Hent plasseringen (0, 1 eller 2)
                     const placement = playerPlacement[p]; 
 
-                    // 2. Regn ut posisjonen i piksler (plassering * høyde på rad)
-                    const yPosition = placement * 75; 
-
-                    // 3. Flytt raden med en smooth animasjon
-                    row.style.transform = `translateY(${yPosition}px)`;
+                    // --- ERSTATT HERFRA ---
+                    if (isProVersion) {
+                        // PRO: Silkemyk F1-animasjon
+                        const yPosition = placement * 75; 
+                        row.style.transform = `translateY(${yPosition}px)`;
+                        row.style.order = "0"; // Reset order når vi bruker transform
+                    } else {
+                        // STANDARD: Enkel sortering uten animasjon
+                        row.style.transform = "none";
+                        row.style.order = placement; 
+                    }
                     row.style.display = "flex"; // Sikrer at raden er synlig
 
                 if (row) {
