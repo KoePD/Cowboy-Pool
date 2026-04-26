@@ -238,6 +238,7 @@
 </div>
 
    <script>
+    // --- 1. KONFIGURASJON ---
     let isProVersion = true; 
 
     const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" };
@@ -249,6 +250,7 @@
         en: { pers: "BEST", last: "LAST", now: "NOW", inn: "INNING", break: "BREAKSHOT (3-BALL)", open: "CHOICE: CAROM / POCKET", rc: "REQ: CAROM", rp: "REQ: POCKET" }
     };
 
+    // --- 2. HOVEDLOGIKK ---
     db.on('value', snap => {
         const data = snap.val();
         if (!data) return;
@@ -257,13 +259,15 @@
         const t = i18n[lang];
         const curP = data.currentPlayer;
 
-        // 1. Finn aktive spillere og sorter dem
+        // --- 3. RANGERING (Finn ut hvem som skal stå hvor) ---
         let rankings = [];
         for (let i = 0; i < data.playerCount; i++) {
+            // Kun spillere med under 3 fouls er med i kampen om plassene
             if (data.foulCounts[i] < 3) {
                 rankings.push({ index: i, score: data.scores[i] });
             }
         }
+        // Sorterer: Høyest score øverst
         rankings.sort((a, b) => b.score - a.score);
 
         let playerPlacement = [];
@@ -271,7 +275,7 @@
             playerPlacement[item.index] = pos;
         });
 
-        // 2. Oppdater hver spiller-rad
+        // --- 4. OPPDATERING AV SPILLER-RADER ---
         for (let p = 0; p < 3; p++) {
             const row = document.getElementById(`p${p}-row`);
             if (!row) continue;
@@ -281,36 +285,43 @@
             const isEliminated = p >= data.playerCount || fCount >= 3;
 
             if (isEliminated) {
-                // Spilleren er ute: Fjern dem helt fra layouten
+                // Spilleren er ute: Skjul raden helt
                 row.style.display = "none";
-                row.style.position = "absolute"; // Gjør at de ikke tar opp plass
+                row.style.transform = "scale(0)";
                 continue; 
             }
 
-            // Spilleren er aktiv: Still dem opp på nytt
+            // Spilleren er aktiv: Vis raden og flytt den til riktig plass
             row.style.display = "flex";
-            row.style.position = "relative";
             row.style.opacity = "1";
 
-            // Plassering (Pro-versjon bruker translateY)
-            const yPosition = placement * 75;
-            row.style.transform = `translateY(${yPosition}px)`;
+            // Beregn posisjon: Hver rad er 76px høy
+            const yPosition = placement * 76;
+            row.style.transform = `translateY(${yPosition}px) scale(1)`;
 
-            // Toner ned de som ikke har tur
+            // Marker hvem sin tur det er
             row.classList.toggle('is-not-turn', curP !== p);
 
-            // Oppdater navn og score
+            // Oppdater navn og hovedscore
             document.getElementById(`p${p}-name`).innerText = data.names[p] || "";
             const scoreEl = document.getElementById(`p${p}-score`);
             scoreEl.innerText = data.scores[p];
 
-            // Gull/Sølv/Bronse-farger
+            // Gull/Sølv/Bronse farger på tallene
             if (data.scores[p] > 0) {
-                if (placement === 0) scoreEl.style.color = "#f1c40f";
-                else if (placement === 1) scoreEl.style.color = "#bdc3c7";
-                else scoreEl.style.color = "#cd7f32";
+                if (placement === 0) {
+                    scoreEl.style.color = "#f1c40f"; // Gull
+                    scoreEl.style.filter = "drop-shadow(0 0 8px rgba(241, 196, 15, 0.4))";
+                } else if (placement === 1) {
+                    scoreEl.style.color = "#bdc3c7"; // Sølv
+                    scoreEl.style.filter = "none";
+                } else {
+                    scoreEl.style.color = "#cd7f32"; // Bronse
+                    scoreEl.style.filter = "none";
+                }
             } else {
                 scoreEl.style.color = "#ffffff";
+                scoreEl.style.filter = "none";
             }
 
             // Oppdater småtall (NÅ, PERS, SISTE)
@@ -337,7 +348,7 @@
             document.getElementById(`p${p}-fouls`).innerHTML = fHtml;
         }
 
-        // 3. Header info
+        // --- 5. HEADER (Inning og Status) ---
         const currentInning = Math.floor(data.innings / data.playerCount) + 1;
         document.getElementById('inning-text').innerText = `${t.inn} ${currentInning}`;
         
@@ -347,7 +358,7 @@
         }
         document.getElementById('status-msg').innerText = statusText;
 
-        // 4. Kuler
+        // --- 6. KULER ---
         const b1 = document.getElementById('hdr-b1'), b3 = document.getElementById('hdr-b3'), b5 = document.getElementById('hdr-b5');
         [b1, b3, b5].forEach(b => b.classList.remove('ball-dimmed', 'mode-carom'));
         if (!data.breakDone) { b1.classList.add('ball-dimmed'); b5.classList.add('ball-dimmed'); }
