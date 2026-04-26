@@ -8,41 +8,36 @@
         body { background-color: rgba(0, 0, 0, 0); margin: 0; padding: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; height: 1080px; width: 1920px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
         .scoreline-wrapper { margin-bottom: 50px; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 1000px; }
         
-        /* HEADER (Sort topp) */
-        .scoreline-header { display: flex; align-items: center; justify-content: space-between; background: #1a1a1a; padding: 12px 25px; border-radius: 20px 20px 0 0; border: 3px solid #333; border-bottom: none; position: relative; height: 35px; width: 100%; box-sizing: border-box; box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 10; }
+        .scoreline-header { display: flex; align-items: center; justify-content: space-between; background: #1a1a1a; padding: 10px 25px; border-radius: 20px 20px 0 0; border: 3px solid #333; border-bottom: none; position: relative; height: 40px; width: 100%; box-sizing: border-box; box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 10; }
         .inning-text { color: #f1c40f; font-weight: 900; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
         .status-msg { color: white; font-weight: 900; font-size: 14px; text-transform: uppercase; text-align: center; }
-        .balls-row { display: flex; gap: 8px; align-items: center; }
-
-        /* HOVED SCOREBOARD BODY - Nå flush med toppen */
+        
         .scoreline-body { display: flex; flex-direction: column; border-radius: 0 0 20px 20px; background: #000; border: 3px solid #333; border-top: none; width: 100%; box-sizing: border-box; position: relative; z-index: 5; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.7); }
         
-        .player-row { display: flex; align-items: center; width: 100%; height: 75px; color: white; transition: opacity 0.3s; position: relative; }
+        .player-row { display: none; align-items: center; width: 100%; height: 75px; color: white; transition: opacity 0.3s; position: relative; }
         
-        /* NAVN OMRÅDE */
         .player-name-area { display: flex; align-items: center; flex: 1; padding: 0 35px; }
         .name { font-size: 32px; font-weight: 800; text-transform: uppercase; white-space: nowrap; }
 
-        /* SCORE OMRÅDE */
         .score-block { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 135px; height: 100%; background: rgba(0,0,0,0.5); border-left: 3px solid #333; }
         .score-val { font-size: 60px; font-weight: 900; color: #f1c40f; line-height: 0.85; }
         .pers-val { font-size: 10px; font-weight: 900; color: #aaa; text-transform: uppercase; margin-top: 3px; }
         .pers-val b { color: #f1c40f; font-size: 13px; margin-left: 3px; }
 
-        /* FOULS (Vertikale prikker) */
         .fouls { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; width: 12px; align-items: center; margin-right: 20px; }
         .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(0,0,0,0.2); }
         .dot.active { background: #ff0000; box-shadow: 0 0 8px #ff0000; }
 
-        /* BALLER I HEADER */
-        .ball { width: 28px; height: 28px; border-radius: 50%; position: relative; background-color: #fff; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .ball { width: 30px; height: 30px; border-radius: 50%; position: relative; background-color: #fff; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         .ball-overlay-3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; z-index: 10; box-shadow: inset -2px -2px 4px rgba(0,0,0,0.4), inset 1.5px 1.5px 3px rgba(255,255,255,0.2); border: 1px solid rgba(0,0,0,0.1); }
-        .ball-num { font-size: 10px; font-weight: 900; z-index: 5; color: black; background: white; width: 14px; height: 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #000; }
-        .f-1 { background: #ffcc00; } .f-3 { background: #cc0000; } .f-5 { background: #663399; }
+        .ball-num { font-size: 10px; font-weight: 900; z-index: 5; color: black; background: white; width: 15px; height: 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #000; }
+        
+        .f-1 { background: #ffcc00; } 
+        .f-3 { background: #cc0000; } 
+        .f-5 { background: #663399; }
         .ball-dimmed { opacity: 0.15; filter: grayscale(1); }
 
         .is-not-turn { opacity: 0.40; }
-        #p2-row { display: none; }
     </style>
 </head>
 <body>
@@ -50,7 +45,7 @@
         <div class="scoreline-header">
             <div class="inning-text" id="inning-text">INNING 1</div>
             <div class="status-msg" id="status-msg">BREAK</div>
-            <div class="balls-row">
+            <div style="display:flex; gap:10px; align-items:center;">
                 <div id="b-1" class="ball f-1"><div class="ball-num">1</div><div class="ball-overlay-3d"></div></div>
                 <div id="b-3" class="ball f-3"><div class="ball-num">3</div><div class="ball-overlay-3d"></div></div>
                 <div id="b-5" class="ball f-5"><div class="ball-num">5</div><div class="ball-overlay-3d"></div></div>
@@ -61,7 +56,7 @@
             <div class="player-row" id="p0-row" style="background: rgba(204,0,0,0.65);">
                 <div class="player-name-area">
                     <div class="fouls" id="p0-fouls"></div>
-                    <div class="name" id="p0-name">PLAYER 1</div>
+                    <div class="name" id="p0-name">SPILLER 1</div>
                 </div>
                 <div class="score-block">
                     <div class="score-val" id="p0-score">0</div>
@@ -72,7 +67,7 @@
             <div class="player-row" id="p1-row" style="background: rgba(0,0,102,0.65); border-top: 2px solid #333;">
                 <div class="player-name-area">
                     <div class="fouls" id="p1-fouls"></div>
-                    <div class="name" id="p1-name">PLAYER 2</div>
+                    <div class="name" id="p1-name">SPILLER 2</div>
                 </div>
                 <div class="score-block">
                     <div class="score-val" id="p1-score">0</div>
@@ -83,7 +78,7 @@
             <div class="player-row" id="p2-row" style="background: rgba(241,196,15,0.3); border-top: 2px solid #333;">
                 <div class="player-name-area">
                     <div class="fouls" id="p2-fouls"></div>
-                    <div class="name" id="p2-name">PLAYER 3</div>
+                    <div class="name" id="p2-name">SPILLER 3</div>
                 </div>
                 <div class="score-block">
                     <div class="score-val" id="p2-score">0</div>
@@ -110,25 +105,30 @@
             const lang = data.lang || 'no';
             const t = i18n[lang];
 
-            document.getElementById('p2-row').style.display = (data.playerCount >= 3) ? "flex" : "none";
-            document.querySelectorAll('.l-pers').forEach(el => el.innerText = t.pers);
-
+            // LOGIKK FOR VISNING: Viser bare rader basert på playerCount
             for(let p=0; p < 3; p++) {
-                if (document.getElementById(`p${p}-name`)) document.getElementById(`p${p}-name`).innerText = data.names[p] || "";
-                if (document.getElementById(`p${p}-score`)) document.getElementById(`p${p}-score`).innerText = data.scores[p];
-                if (document.getElementById(`best-${p}`)) document.getElementById(`best-${p}`).innerText = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
-
                 const row = document.getElementById(`p${p}-row`);
-                if(row) {
-                    row.classList.toggle('is-not-turn', data.currentPlayer !== p);
+                if (row) {
+                    row.style.display = (p < data.playerCount) ? "flex" : "none";
                 }
 
-                let fHtml = '';
-                for(let d=0; d<3; d++) fHtml += `<div class="dot ${d < data.foulCounts[p] ? 'active' : ''}"></div>`;
-                const fDiv = document.getElementById(`p${p}-fouls`);
-                if(fDiv) fDiv.innerHTML = fHtml;
+                if (p < data.playerCount) {
+                    if (document.getElementById(`p${p}-name`)) document.getElementById(`p${p}-name`).innerText = data.names[p] || "";
+                    if (document.getElementById(`p${p}-score`)) document.getElementById(`p${p}-score`).innerText = data.scores[p];
+                    if (document.getElementById(`best-${p}`)) document.getElementById(`best-${p}`).innerText = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
+
+                    if(row) {
+                        row.classList.toggle('is-not-turn', data.currentPlayer !== p);
+                    }
+
+                    let fHtml = '';
+                    for(let d=0; d<3; d++) fHtml += `<div class="dot ${d < data.foulCounts[p] ? 'active' : ''}"></div>`;
+                    const fDiv = document.getElementById(`p${p}-fouls`);
+                    if(fDiv) fDiv.innerHTML = fHtml;
+                }
             }
 
+            document.querySelectorAll('.l-pers').forEach(el => el.innerText = t.pers);
             document.getElementById('inning-text').innerText = t.inn + " " + (Math.floor(data.innings/data.playerCount) + 1);
             
             const curS = data.scores[data.currentPlayer];
