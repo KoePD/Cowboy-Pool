@@ -176,7 +176,8 @@
         <button class="ctrl btn-foul" onclick="handleFoul()" id="foulBtn">FOUL (MISTER SERIE)</button>
         <button class="ctrl btn-turn" onclick="nextTurn()" id="turnBtn">AVSLUTT TUR / BOM</button>
         <button class="ctrl" style="background:#34495e; grid-column: span 3; margin-top:10px; font-size:0.7em;" onclick="resetGame()" id="resetBtn">HARD RESET</button>
-</div>
+        <button class="ctrl" style="background:#27ae60; grid-column: span 3; margin-top:10px; padding: 18px;" onclick="saveMatchToHistory()" id="saveMatchBtn">AVSLUTT OG LAGRE KAMP</button>
+    </div>
 </div>
 
 <script>
@@ -388,6 +389,34 @@ function nextTurn() {
         pushData();
     }
 
+function saveMatchToHistory() {
+    // 1. Definer banen til den nye mappen i Firebase
+    const historyRef = firebase.database().ref('matchHistory');
+
+    // 2. Samle dataene fra den nåværende "state"
+    const kampData = {
+        dato: new Date().toLocaleString('no-NO'), // Lagrer norsk dato og klokkeslett
+        timestamp: firebase.database.ServerValue.TIMESTAMP, // For sortering i databasen
+        spillere: state.names.slice(0, state.playerCount), // Lagrer kun navnene på de som spilte
+        poengsummer: state.scores.slice(0, state.playerCount),
+        innings: Math.floor(state.innings / state.playerCount) + 1,
+        varighet: document.getElementById('matchTimer').innerText, // Lagrer tiden slik den står i displayet
+        bestSeries: state.bestSeries.slice(0, state.playerCount)
+    };
+
+    // 3. Send til Firebase
+    if (confirm("Vil du avslutte og lagre denne kampen i historikken?")) {
+        historyRef.push(kampData)
+            .then(() => {
+                alert("Kampen er lagret!");
+                // Valgfritt: Kjør resetGame() her hvis du vil tømme brettet automatisk
+            })
+            .catch((error) => {
+                alert("Feil ved lagring: " + error.message);
+            });
+    }
+}
+    
     /* OPPDATER UI: Oppdaterer alle tekster, knapper og farger i kontrolleren */
 function updateUI() {
     const t = i18n[state.lang || 'no'];
