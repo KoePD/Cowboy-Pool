@@ -211,6 +211,7 @@
         inputCont.innerHTML = ''; scoreCont.innerHTML = '';
         const t = i18n[state.lang || 'no'];
         
+        
         for(let i=0; i<state.playerCount; i++) {
             inputCont.innerHTML += `<input id="p${i}-name-in" value="${state.names[i]}" oninput="saveName(${i}, this.value)">`;
             scoreCont.innerHTML += `
@@ -312,6 +313,7 @@
         document.getElementById('inningText').innerText = t.inning + ": " + (Math.floor(state.innings/state.playerCount) + 1);
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
         document.getElementById('turnBtn').innerText = t.turn;
+        document.getElementById('rulesBtn').innerText = t.rules;
 
         /* Klokke-knapp tekst */
         if(!isPaused) { document.getElementById('timerBtn').innerText = t.pause; } 
