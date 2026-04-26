@@ -24,20 +24,18 @@
         .pers-val { font-size: 10px; font-weight: 900; color: #aaa; text-transform: uppercase; margin-top: 3px; }
         .pers-val b { color: #f1c40f; font-size: 13px; margin-left: 3px; }
 
-        /* FOULS STYLING */
         .fouls { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; width: 12px; align-items: center; margin-right: 20px; }
-        .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(0,0,0,0.2); }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(0,0,0,0.2); transition: all 0.2s; }
         .dot.active { background: #ff0000; box-shadow: 0 0 8px #ff0000; }
 
-        /* BLINKENDE ANIMASJON FOR 2 FOULS */
-        @keyframes foul-blink {
-            0% { opacity: 1; filter: brightness(1); }
-            50% { opacity: 0.3; filter: brightness(2); }
-            100% { opacity: 1; filter: brightness(1); }
+        /* BLINKER KRAFTIG VED 2 FOULS */
+        @keyframes foul-warning {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.2; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
         }
-        .dot.blink { animation: foul-blink 0.6s infinite ease-in-out; }
+        .dot.blink { animation: foul-warning 0.5s infinite ease-in-out; }
 
-        /* 3D KULER */
         .ball { width: 28px; height: 28px; border-radius: 50%; position: relative; background-color: #fff; display: flex; justify-content: center; align-items: center; overflow: hidden; transition: all 0.3s ease; }
         .ball-overlay-3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; z-index: 10; box-shadow: inset -2px -2px 4px rgba(0,0,0,0.4), inset 1.5px 1.5px 3px rgba(255,255,255,0.2); border: 1px solid rgba(0,0,0,0.1); }
         .ball-num { font-size: 10px; font-weight: 900; z-index: 5; color: black; background: white; width: 14px; height: 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #000; }
@@ -68,7 +66,7 @@
             <div class="header-balls">
                 <div id="hdr-b1" class="ball f-1"><div class="ball-num">1</div><div class="ball-overlay-3d"></div></div>
                 <div id="hdr-b3" class="ball f-3"><div class="ball-num">3</div><div class="ball-overlay-3d"></div></div>
-                <div id="hdr-b5" class="ball f-5"><div class="ball-num">5</div><div class="ball-overlay-3d"></div></div>
+                <div id="hdr-b5" class="ball f-5"><div class="ball-num">5</div><div class="ball-num">5</div><div class="ball-overlay-3d"></div></div>
             </div>
         </div>
         
@@ -136,12 +134,10 @@
                     document.getElementById(`p${p}-score`).innerText = data.scores[p];
                     document.getElementById(`best-${p}`).innerText = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
                     
-                    // FOUL LOGIKK MED BLINKING
                     let fHtml = '';
                     const fCount = data.foulCounts[p];
                     for(let d=0; d<3; d++) {
                         let activeClass = d < fCount ? 'active' : '';
-                        // Hvis spilleren har nøyaktig 2 fouls, legg på 'blink' klassen på de aktive prikkene
                         let blinkClass = (fCount === 2 && d < fCount) ? 'blink' : '';
                         fHtml += `<div class="dot ${activeClass} ${blinkClass}"></div>`;
                     }
