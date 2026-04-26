@@ -349,6 +349,9 @@ function updateUI() {
     document.getElementById('rulesBtn').innerText = t.rules;
     document.getElementById('undoBtn').innerText = t.undo;
 
+    if (document.getElementById('foulBtn')) document.getElementById('foulBtn').innerText = t.foul;
+    if (document.getElementById('resetBtn')) document.getElementById('resetBtn').innerText = t.reset;
+    
     /* Klokke-knapp tekst */
     if(!isPaused) { document.getElementById('timerBtn').innerText = t.pause; } 
     else { document.getElementById('timerBtn').innerText = state.seconds > 0 ? t.resume : t.start; }
@@ -399,8 +402,19 @@ function updateUI() {
     document.getElementById('c2').className = (isLockedCarom) ? 'ctrl btn-carom waiting' : 'ctrl btn-carom';
     
     // Oppdaterer "Bytt startspiller"-knappen
-    const changeStartBtn = document.getElementById('changeStartBtn'); // Sjekk at ID-en stemmer med din HTML
-    if (changeStartBtn) changeStartBtn.innerText = t.changeStart;
+    const changeStartBtn = document.getElementById('changeBreakerBtn');
+    
+    if (changeStartBtn) {
+        // Oversetter teksten live (henter 'BYTT STARTSPILLER' eller 'CHANGE BREAKER')
+        changeStartBtn.innerText = t.breaker; 
+        
+        // SKJULER knappen helt hvis brekket er tatt (breakDone er true)
+        if (state.breakDone) {
+            changeStartBtn.style.display = 'none';
+        } else {
+            changeStartBtn.style.display = 'inline-block';
+        }
+    }
 
     // Oppdaterer "Fortsett"-knappen (hvis den er synlig)
     const resumeBtn = document.getElementById('resumeBtn'); // Sjekk ID
