@@ -233,6 +233,7 @@
         if(isPaused) toggleTimer();
         saveHistory();
         let s = state.scores[state.currentPlayer];
+        state.lastShotValue = val;
         
         /* POENG-SPERRE: Hindrer poeng over 90/100 hvis man må ha carom */
         if (s < 90 && s + val > 90) return;
