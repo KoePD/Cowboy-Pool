@@ -31,7 +31,21 @@
 }
         
         /* HOVEDBOKSEN: 'background' her er fargen bak spillernavnene */
-        .scoreline-body { display: flex; flex-direction: column; border-radius: 0 0 20px 20px; background: #000; border: 3px solid #333; border-top: none; width: 100%; box-sizing: border-box; position: relative; z-index: 5; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.7); }
+        .scoreline-body { 
+             display: flex; 
+             flex-direction: column; 
+             border-radius: 0 0 20px 20px; 
+             background: #000; 
+             border: 3px solid #333; 
+             border-top: none; 
+             width: 100%; 
+             box-sizing: border-box; 
+             position: relative; 
+             z-index: 5; 
+             overflow: hidden; 
+             box-shadow: 0 15px 35px rgba(0,0,0,0.7); 
+                    
+    }
         
         /* SPILLERRADEN: Endre 'height' for å gjøre hver spiller-rad høyere eller lavere */
         .player-row { display: none; align-items: center; width: 100%; height: 75px; color: white; transition: all 0.5s ease; position: relative; opacity: 1; }
@@ -267,6 +281,7 @@
                     }
                     // Legger på en klasse hvis det ikke er spillerens tur
                     row.classList.toggle('is-not-turn', curP !== p);
+                    row.style.order = placement;
                 }
 
                 if (p < data.playerCount) {
