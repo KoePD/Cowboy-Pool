@@ -71,21 +71,23 @@
         
         /* NYTT: Dette låser bredden på hver tekst+tall-gruppe */
         .pers-val span {
-            display: inline-block; /* Endret fra flex for å låse bredden bedre */
-            width: 42px;           /* Fast bredde på selve ordet (NÅ/NOW/BEST) */
+            display: block;
+            position: relative;     /* Gjør at vi kan plassere tallet nøyaktig inni her */
+            flex: 1;                /* Fordeler plassen likt mellom de tre gruppene */
+            height: 20px;
             white-space: nowrap;
-            text-align: left;
-            flex-shrink: 0;
+            text-align: left;       /* Teksten (NOW/NÅ) starter alltid helt til venstre */
 }
 
+        /* Selve tallet (scoren) */
         .pers-val b { 
             color: #f1c40f; 
             font-size: 13px; 
-        /* Gir tallet en fast avstand fra starten av span-boksen */
-            margin-left: 2px; 
-        /* Tvinger tallet til å ha en fast bredde slik at det ikke 'danser' */
-            display: inline-block;
-            width: 15px; 
+            position: absolute;
+            /* VIKTIG: Dette låser tallet til nøyaktig samme punkt horisontalt */
+            left: 38px;         /* Juster denne verdien for å flytte ALLE tallene samtidig */
+            top: -2px;          /* Justerer høyden så det flukter med teksten */
+            width: 20px;
             text-align: left;
 }
 
