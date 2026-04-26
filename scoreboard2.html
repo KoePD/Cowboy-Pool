@@ -51,7 +51,8 @@
             border-top: none; 
             border-radius: 0 0 20px 20px; 
             width: 100%;
-            height: 228px; /* Endret fra 225px for å få plass til 3 skillelinjer */
+            height: auto; /* Endret fra 225px for å få plass til 3 skillelinjer */
+            min-height: 50px;
             position: relative;
             overflow: hidden;
             box-sizing: border-box;
@@ -238,9 +239,12 @@
 </div>
 
    <script>
+    // --- 1. KONFIGURASJON ---
     let isProVersion = true; 
 
-    const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" };
+    const firebaseConfig = { 
+        databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" 
+    };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('gameData');
 
@@ -249,6 +253,7 @@
         en: { pers: "BEST", last: "LAST", now: "NOW", inn: "INNING", break: "BREAKSHOT (3-BALL)", open: "CHOICE: CAROM / POCKET", rc: "REQ: CAROM", rp: "REQ: POCKET" }
     };
 
+    // --- 2. HOVEDFUNKSJON ---
     db.on('value', snap => {
         const data = snap.val();
         if (!data) return;
@@ -257,10 +262,11 @@
         const t = i18n[lang];
         const curP = data.currentPlayer;
 
-        // --- 1. RANGERINGSLOGIKK ---
+        // --- 3. RANGERING ---
         let activePlayers = [];
         let eliminatedPlayers = [];
 
+        // Vi sjekker kun spillere opp til det antallet som faktisk spiller (playerCount)
         for (let i = 0; i < data.playerCount; i++) {
             if (data.foulCounts[i] < 3) {
                 activePlayers.push({ index: i, score: data.scores[i] });
@@ -269,10 +275,7 @@
             }
         }
 
-        // Sorter de aktive etter poeng
         activePlayers.sort((a, b) => b.score - a.score);
-        
-        // Kombiner listene (Aktive først, så de utslåtte nederst)
         let totalRank = [...activePlayers, ...eliminatedPlayers];
 
         let playerPlacement = [];
@@ -280,29 +283,32 @@
             playerPlacement[item.index] = pos;
         });
 
-        // --- 2. OPPDATERING AV SPILLER-RADER ---
+        // --- 4. OPPDATERING AV SPILLER-RADER ---
         for (let p = 0; p < 3; p++) {
             const row = document.getElementById(`p${p}-row`);
             if (!row) continue;
 
-            const fCount = data.foulCounts[p];
-            const placement = playerPlacement[p];
-            const isEliminated = fCount >= 3;
+            // VIKTIG: Sjekk om denne raden i det hele tatt skal eksistere i dette spillet
             const isPlaying = p < data.playerCount;
+            const fCount = data.foulCounts[p];
+            const isEliminated = fCount >= 3;
 
             if (!isPlaying) {
+                // Hvis vi bare spiller 2, fjerner vi rad p2 helt fra layouten
                 row.style.display = "none";
-                continue;
+                continue; 
             }
 
+            // Raden skal være med
             row.style.display = "flex";
             row.style.opacity = "1";
 
-            // Plassering (Flytter alle til sin plass i totalRank)
+            // Hent plasseringen basert på rangeringen over
+            const placement = playerPlacement[p];
             const yPosition = placement * 76;
             row.style.transform = `translateY(${yPosition}px)`;
 
-            // Håndter klasser for status
+            // Grå ut de som er eliminert, tone ned de som ikke har tur
             row.classList.toggle('player-eliminated', isEliminated);
             row.classList.toggle('is-not-turn', !isEliminated && curP !== p);
 
@@ -311,13 +317,13 @@
             const scoreEl = document.getElementById(`p${p}-score`);
             scoreEl.innerText = data.scores[p];
 
-            // Farger: Kun gull/sølv til de som faktisk er med
+            // Farger: Kun gull/sølv til de som er aktive
             if (data.scores[p] > 0 && !isEliminated) {
                 if (placement === 0) scoreEl.style.color = "#f1c40f";
                 else if (placement === 1) scoreEl.style.color = "#bdc3c7";
                 else scoreEl.style.color = "#cd7f32";
             } else {
-                scoreEl.style.color = "#ffffff"; // Hvit score for utslåtte
+                scoreEl.style.color = "#ffffff";
             }
 
             // Oppdater småtall
@@ -334,7 +340,7 @@
                 `;
             }
 
-            // Foul-prikker
+            // Oppdater Foul-prikker
             let fHtml = '';
             for (let d = 0; d < 3; d++) {
                 let activeClass = d < fCount ? 'active' : '';
@@ -344,7 +350,7 @@
             document.getElementById(`p${p}-fouls`).innerHTML = fHtml;
         }
 
-        // --- 3. HEADER & KULER (Standard logikk) ---
+        // --- 5. HEADER & KULER ---
         const currentInning = Math.floor(data.innings / data.playerCount) + 1;
         document.getElementById('inning-text').innerText = `${t.inn} ${currentInning}`;
         let statusText = t.break;
