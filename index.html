@@ -164,7 +164,7 @@
         no: {
             start: "START KLOKKE", resume: "FORTSETT", pause: "PAUSE", breaker: "BYTT STARTSPILLER",
             rules: "REGLER", foul: "FOUL (MISTER SERIE)", turn: "AVSLUTT TUR / BOM", reset: "HARD RESET",
-            undo: "Angre", inning: "Inning", now: "Nå", best: "Pers",
+            undo: "Angre", inning: "Inning", now: "Nå", best: "Pers", last: "SISTE",
             msgBreak: "BREAK SHOT (3-BALL)", msgOpen: "VALG: CAROM ELLER KULE", 
             msgReqCarom: "KRAV: CAROM", msgReqPocket: "KRAV: POCKET",
             confirmReset: "Er du sikker på at du vil starte spillet helt på nytt? Alle poeng og personlige rekorder blir slettet!"
@@ -172,7 +172,7 @@
         en: {
             start: "START CLOCK", resume: "RESUME", pause: "PAUSE", breaker: "CHANGE BREAKER",
             rules: "RULES", foul: "FOUL (LOSE SERIES)", turn: "END TURN / MISS", reset: "HARD RESET",
-            undo: "Undo", inning: "Inning", now: "Now", best: "Best",
+            undo: "Undo", inning: "Inning", now: "Now", best: "Best", last: "LAST",
             msgBreak: "BREAK SHOT (3-BALL)", msgOpen: "CHOICE: CAROM OR POCKET", 
             msgReqCarom: "REQ: CAROM", msgReqPocket: "REQ: POCKET",
             confirmReset: "Are you sure you want to reset the game? All scores and personal bests will be cleared!"
@@ -219,8 +219,18 @@
                     <span id="p${i}-label" class="player-label-display">${state.names[i]}</span>
                     <span id="p${i}-score" class="score">${state.scores[i]}</span>
                     <div class="series-info">
-                        <div class="series-box"><span class="series-label">${t.now}</span><div id="p${i}-turn-score" class="series-val">0</div></div>
-                        <div class="series-box"><span class="series-label">${t.best}</span><div id="p${i}-best-score" class="series-val">0</div></div>
+                        <div class="series-box">
+                            <span class="series-label">${t.now}</span>
+                            <div id="p${i}-turn-score" class="series-val">0</div>
+                        </div>
+                        <div class="series-box">
+                            <span class="series-label">${t.last || 'LAST'}</span>
+                            <div id="p${i}-last-series" class="series-val" style="color: #aaa;">0</div>
+                        </div>
+                        <div class="series-box">
+                            <span class="series-label">${t.best}</span>
+                            <div id="p${i}-best-score" class="series-val">0</div>
+                        </div>
                     </div>
                     <div class="foul-dots" id="p${i}-fouls"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
                 </div>`;
@@ -349,16 +359,15 @@ function updateUI() {
         document.getElementById(`p${i}-label`).innerText = state.names[i];
         document.getElementById(`p${i}-score`).innerText = state.scores[i];
         
-        // --- NY LOGIKK FOR SERIE/SISTE ---
-        let displaySeries;
-        if (state.currentPlayer === i) {
-            // Aktiv spiller: Vis poeng tatt i nåværende tur
-            displaySeries = state.scores[i] - state.scoreAtStart[i];
-        } else {
-            // Inaktiv spiller: Vis resultatet fra deres forrige fullførte serie
-            displaySeries = (state.lastSeries && state.lastSeries[i] !== undefined) ? state.lastSeries[i] : 0;
+        // 1. NÅ (Aktiv serie): Viser poeng tatt i denne runden. Blir 0 for de som venter.
+        let currentRun = (state.currentPlayer === i) ? (state.scores[i] - state.scoreAtStart[i]) : 0;
+        document.getElementById(`p${i}-turn-score`).innerText = currentRun;
+
+        // 2. SISTE (Forrige serie): Viser hva spilleren fikk totalt sist gang de var ved bordet.
+        let lastRun = (state.lastSeries && state.lastSeries[i] !== undefined) ? state.lastSeries[i] : 0;
+        if (document.getElementById(`p${i}-last-series`)) {
+            document.getElementById(`p${i}-last-series`).innerText = lastRun;
         }
-        document.getElementById(`p${i}-turn-score`).innerText = displaySeries;
         // ---------------------------------
 
         document.getElementById(`p${i}-best-score`).innerText = state.bestSeries ? (state.bestSeries[i] || 0) : 0;
