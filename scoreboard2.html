@@ -241,13 +241,10 @@
     </div>
 </div>
 
-    <script>
-    // --- 1. KONFIGURASJON ---
+   <script>
     let isProVersion = true; 
 
-    const firebaseConfig = { 
-        databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" 
-    };
+    const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('gameData');
 
@@ -256,7 +253,6 @@
         en: { pers: "BEST", last: "LAST", now: "NOW", inn: "INNING", break: "BREAKSHOT (3-BALL)", open: "CHOICE: CAROM / POCKET", rc: "REQ: CAROM", rp: "REQ: POCKET" }
     };
 
-    // --- 2. HOVEDFUNKSJON ---
     db.on('value', snap => {
         const data = snap.val();
         if (!data) return;
@@ -265,7 +261,7 @@
         const t = i18n[lang];
         const curP = data.currentPlayer;
 
-        // --- 3. RANGERING ---
+        // 1. Finn aktive spillere og sorter dem
         let rankings = [];
         for (let i = 0; i < data.playerCount; i++) {
             if (data.foulCounts[i] < 3) {
@@ -279,7 +275,7 @@
             playerPlacement[item.index] = pos;
         });
 
-        // --- 4. OPPDATERING AV SPILLER-RADER ---
+        // 2. Oppdater hver spiller-rad
         for (let p = 0; p < 3; p++) {
             const row = document.getElementById(`p${p}-row`);
             if (!row) continue;
@@ -288,56 +284,40 @@
             const placement = playerPlacement[p];
             const isEliminated = p >= data.playerCount || fCount >= 3;
 
-            // SJEKK OM SPILLEREN ER UTE
             if (isEliminated) {
-                row.style.opacity = "0";
-                row.style.transform = "scale(0.8) translateX(-50px)";
-                
-                setTimeout(() => {
-                    row.style.display = "none";
-                }, 500);
-
-                // VIKTIG: "continue" gjør at vi hopper over resten av koden for denne spilleren
+                // Spilleren er ute: Fjern dem helt fra layouten
+                row.style.display = "none";
+                row.style.position = "absolute"; // Gjør at de ikke tar opp plass
                 continue; 
             }
 
-            // SPILLEREN ER AKTIV
+            // Spilleren er aktiv: Still dem opp på nytt
             row.style.display = "flex";
+            row.style.position = "relative";
             row.style.opacity = "1";
 
-            if (isProVersion) {
-                const yPosition = placement * 75;
-                row.style.transform = `translateY(${yPosition}px) scale(1)`;
-            } else {
-                row.style.transform = "scale(1)";
-                row.style.order = placement;
-            }
+            // Plassering (Pro-versjon bruker translateY)
+            const yPosition = placement * 75;
+            row.style.transform = `translateY(${yPosition}px)`;
 
+            // Toner ned de som ikke har tur
             row.classList.toggle('is-not-turn', curP !== p);
 
-            // OPPDATER NAVN OG SCORE
+            // Oppdater navn og score
             document.getElementById(`p${p}-name`).innerText = data.names[p] || "";
             const scoreEl = document.getElementById(`p${p}-score`);
             scoreEl.innerText = data.scores[p];
 
-            // FARGE BASERT PÅ RANGERING
+            // Gull/Sølv/Bronse-farger
             if (data.scores[p] > 0) {
-                if (placement === 0) {
-                    scoreEl.style.color = "#f1c40f";
-                    scoreEl.style.filter = "drop-shadow(0 0 8px rgba(241, 196, 15, 0.6))";
-                } else if (placement === 1) {
-                    scoreEl.style.color = "#bdc3c7";
-                    scoreEl.style.filter = "none";
-                } else if (placement === 2) {
-                    scoreEl.style.color = "#cd7f32";
-                    scoreEl.style.filter = "none";
-                }
+                if (placement === 0) scoreEl.style.color = "#f1c40f";
+                else if (placement === 1) scoreEl.style.color = "#bdc3c7";
+                else scoreEl.style.color = "#cd7f32";
             } else {
                 scoreEl.style.color = "#ffffff";
-                scoreEl.style.filter = "none";
             }
 
-            // OPPDATER SMÅTALL
+            // Oppdater småtall (NÅ, PERS, SISTE)
             const bestVal = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
             const lastVal = (data.lastSeries && data.lastSeries[p] !== undefined) ? data.lastSeries[p] : 0;
             const nowVal = (curP === p) ? (data.scores[p] - data.scoreAtStart[p]) : 0;
@@ -351,7 +331,7 @@
                 `;
             }
 
-            // OPPDATER FOUL-PRIKKER
+            // Foul-prikker
             let fHtml = '';
             for (let d = 0; d < 3; d++) {
                 let activeClass = d < fCount ? 'active' : '';
@@ -361,7 +341,7 @@
             document.getElementById(`p${p}-fouls`).innerHTML = fHtml;
         }
 
-        // --- 5. HEADER ---
+        // 3. Header info
         const currentInning = Math.floor(data.innings / data.playerCount) + 1;
         document.getElementById('inning-text').innerText = `${t.inn} ${currentInning}`;
         
@@ -371,7 +351,7 @@
         }
         document.getElementById('status-msg').innerText = statusText;
 
-        // --- 6. KULER ---
+        // 4. Kuler
         const b1 = document.getElementById('hdr-b1'), b3 = document.getElementById('hdr-b3'), b5 = document.getElementById('hdr-b5');
         [b1, b3, b5].forEach(b => b.classList.remove('ball-dimmed', 'mode-carom'));
         if (!data.breakDone) { b1.classList.add('ball-dimmed'); b5.classList.add('ball-dimmed'); }
