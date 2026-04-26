@@ -302,30 +302,30 @@
                 // 1. Hent plasseringen (0, 1 eller 2)
                     const placement = playerPlacement[p]; 
 
-                    // --- ERSTATT HERFRA ---
+                    // --- ERSTATT FRA LINJE 306 ---
+                if (row) {
+                    // 1. Bestem hvordan raden skal flyttes (Pro/Standard)
                     if (isProVersion) {
                         // PRO: Silkemyk F1-animasjon
                         const yPosition = placement * 75; 
                         row.style.transform = `translateY(${yPosition}px)`;
-                        row.style.order = "0"; // Reset order når vi bruker transform
+                        row.style.order = "0"; 
                     } else {
-                        // STANDARD: Enkel sortering uten animasjon
+                        // STANDARD: Enkel sortering
                         row.style.transform = "none";
                         row.style.order = placement; 
                     }
-                    row.style.display = "flex"; // Sikrer at raden er synlig
 
-                if (row) {
+                    // 2. Håndter eliminering (3 feil)
                     const isEliminated = p >= data.playerCount || fCount >= 3;
 
                     if (!isEliminated) {
+                        row.style.display = "flex";
                         row.style.opacity = "1";
                         row.classList.remove('player-eliminated');
-                        // Vi må sikre at display er flex her
-                        row.style.display = "flex"; 
                     } else {
                         row.classList.add('player-eliminated');
-                        // Vi fjerner transform helt så den ikke blokkerer layouten
+                        // Drar raden ut av syne og krymper den
                         row.style.transform = "translateY(0px) scale(0)"; 
                         
                         setTimeout(() => { 
@@ -334,6 +334,11 @@
                             }
                         }, 500);
                     }
+
+                    // 3. Marker hvem sin tur det er
+                    row.classList.toggle('is-not-turn', curP !== p);
+                }
+                // --- SLUTT PÅ ERSTATNING ---
 
                     row.classList.toggle('is-not-turn', curP !== p);
                 }
