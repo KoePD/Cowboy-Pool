@@ -343,9 +343,6 @@
                     row.classList.toggle('is-not-turn', curP !== p);
                 }
 
-                    // Gjør raden litt gjennomsiktig hvis det ikke er spillerens tur
-                    row.classList.toggle('is-not-turn', curP !== p);
-                }
 
                 if (p < data.playerCount) {
                     document.getElementById(`p${p}-name`).innerText = data.names[p] || "";
