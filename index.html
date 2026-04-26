@@ -7,10 +7,11 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
     <style>
+        /* DESIGN: Her styres farger og utseende på kontrolleren */
         body { font-family: 'Segoe UI', sans-serif; background: #1a3c1a; color: white; text-align: center; margin: 0; padding: 10px; overflow-x: hidden; }
         .container { max-width: 600px; margin: auto; background: #222; padding: 15px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); position: relative; }
         
-        /* Layout for topp-rad med språkknapp */
+        /* MODUS-VELGER: Knappene for 1P, 2P, 3P øverst */
         .top-row { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; }
         .mode-selector { flex: 1; height: 50px; background: #333; padding: 0 10px; border-radius: 10px; display: flex; justify-content: center; gap: 10px; align-items: center; }
         .mode-selector button { background: #444; color: white; border: 1px solid #555; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 60px; }
@@ -18,40 +19,42 @@
         
         .lang-btn { background: #34495e; color: white; border: 2px solid #5d6d7e; padding: 0 15px; border-radius: 10px; cursor: pointer; font-weight: 800; height: 50px; font-size: 0.8em; }
 
+        /* NAVNE-FELT: Input-boksene der du skriver inn spillernavn */
         .names-row { height: 40px; display: flex; gap: 5px; margin-bottom: 10px; justify-content: center; }
         .names-row input { flex: 1; padding: 10px 5px; border-radius: 8px; border: none; background: #444; color: white; text-align: center; font-size: 0.85em; font-weight: bold; }
+        
+        /* SCOREBOARD-KORTENE: Boksene som viser score, fouls og serie */
         .scoreboard { display: flex; justify-content: center; margin-bottom: 15px; gap: 8px; align-items: stretch; }
         .player-box { flex: 1; min-width: 0; padding: 15px 5px; border-radius: 15px; background: #333; border: 4px solid transparent; position: relative; }
-        .active { border-color: #f1c40f; background: #3d3d3d; }
+        .active { border-color: #f1c40f; background: #3d3d3d; } /* Rammen rundt den aktive spilleren */
         .score { font-size: 2.8em; font-weight: 900; display: block; line-height: 1; }
-        .player-label-display { font-size: 0.75em; color: #aaa; text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 8px; }
         
+        /* SERIE-INFO: Viser "Nå" (gjeldende serie) og "Pers" */
         .series-info { display: flex; justify-content: space-around; margin-top: 8px; border-top: 1px solid #444; padding-top: 5px; }
-        .series-box { display: flex; flex-direction: column; }
-        .series-label { font-size: 0.55em; color: #aaa; text-transform: uppercase; font-weight: 800; }
         .series-val { font-size: 0.95em; color: #f1c40f; font-weight: 900; }
 
+        /* FOUL-DOTS: De tre små prikkene som blir røde ved feil */
         .foul-dots { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
         .dot { width: 12px; height: 12px; border-radius: 50%; background: #444; border: 1px solid #111; }
         .dot.active { background: #c0392b; box-shadow: 0 0 8px #ff0000; }
+
+        /* TIMER: Match-klokken i midten */
         .timer-row { display: flex; flex-direction: column; align-items: center; margin: 10px 0; padding: 10px 0; border-top: 1px solid #333; border-bottom: 1px solid #333; }
         .timer-display { font-family: monospace; font-size: 1.8em; color: #f1c40f; font-weight: bold; }
+        
+        /* STATUS-BOKS: Den store boksen som forteller hva neste krav er (KRAV: CAROM osv.) */
         .next-move-box { min-height: 60px; background: #2c3e50; padding: 12px; border-radius: 12px; margin: 10px 0; border-left: 6px solid #f1c40f; text-align: left; display: flex; flex-direction: column; justify-content: center; }
-        .move-text { font-weight: 900; font-size: 1.1em; color: #fff; text-transform: uppercase; }
+        
+        /* BALL-KNAPPER: Knappene for 1, 3 og 5 baller */
         .ball-row { display: flex; justify-content: space-around; margin: 20px 0; align-items: flex-start; min-height: 125px; }
-        .ball-group { display: flex; flex-direction: column; align-items: center; width: 85px; }
         .ball-btn { width: 75px; height: 75px; border-radius: 50%; border: 3px solid #000; display: flex; align-items: center; justify-content: center; box-shadow: inset -5px -5px 10px rgba(0,0,0,0.5); cursor: pointer; }
-        .ball-num-circle { width: 32px; height: 32px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; font-weight: 900; border: 1px solid #000; }
-        #b1 { background: radial-gradient(circle at 40% 40%, #f1c40f, #b38f00); }
-        #b3 { background: radial-gradient(circle at 40% 40%, #e74c3c, #962d22); }
-        #b5 { background: radial-gradient(circle at 40% 40%, #f39c12, #a36504); }
-        .btn-sub-carom { background: #3498db; color: white; border: none; padding: 6px 8px; border-radius: 5px; font-size: 0.65em; font-weight: bold; text-transform: uppercase; cursor: pointer; margin-top: 10px; width: 75px; }
-        .waiting { opacity: 0.15; filter: grayscale(0.8); pointer-events: none; }
+        .waiting { opacity: 0.15; filter: grayscale(0.8); pointer-events: none; } /* Gjør baller grå når de ikke er lov å putte */
+
+        /* KONTROLL-KNAPPER: Carom, Angre, Foul og Avslutt tur */
         .control-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        button.ctrl { padding: 14px 5px; font-size: 0.8em; border: none; border-radius: 10px; color: white; font-weight: bold; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px rgba(0,0,0,0.2); }
-        .btn-carom { background: #2980b9; }
-        .btn-foul { background: #c0392b; grid-column: span 3; font-size: 1em; padding: 18px; margin-top: 5px; }
-        .btn-turn { background: #27ae60; grid-column: span 3; font-size: 1.2em; padding: 18px; margin-top: 5px; }
+        button.ctrl { padding: 14px 5px; font-size: 0.8em; border: none; border-radius: 10px; color: white; font-weight: bold; text-transform: uppercase; cursor: pointer; }
+        .btn-foul { background: #c0392b; grid-column: span 3; font-size: 1em; padding: 18px; }
+        .btn-turn { background: #27ae60; grid-column: span 3; font-size: 1.2em; padding: 18px; }
     </style>
 </head>
 <body>
@@ -109,6 +112,7 @@
 </div>
 
 <script>
+    /* FIREBASE: Koblingen til databasen din */
     const firebaseConfig = {
         databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app"
     };
@@ -116,6 +120,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('gameData');
 
+    /* ORDBOK: Her styres alle tekstene for norsk og engelsk */
     const i18n = {
         no: {
             start: "START KLOKKE", resume: "FORTSETT", pause: "PAUSE", breaker: "BYTT STARTSPILLER",
@@ -135,6 +140,7 @@
         }
     };
 
+    /* START-TILSTAND: Standardverdiene når spillet starter */
     let state = {
         playerCount: 2, scores: [0, 0, 0], foulCounts: [0, 0, 0], scoreAtStart: [0, 0, 0],
         currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null,
@@ -144,18 +150,22 @@
 
     let timerInterval = null; let isPaused = true; let history = [];
 
+    /* DATABASE-LYTTER: Oppdaterer kontrolleren når noe endres i Firebase */
     db.on('value', (snapshot) => {
         const data = snapshot.val();
         if (data) { state = data; updateUI(); }
     });
 
+    /* SEND DATA: Funksjon for å dytte endringer til Firebase */
     function pushData() { db.set(state); }
 
+    /* SPRÅK: Bytter mellom norsk og engelsk */
     function toggleLang() {
         state.lang = state.lang === 'no' ? 'en' : 'no';
         pushData();
     }
 
+    /* INITIALISER: Lager boksene og input-feltene basert på spillerantall */
     function initUI() {
         const inputCont = document.getElementById('inputs-container');
         const scoreCont = document.getElementById('scoreboard-container');
@@ -179,15 +189,23 @@
 
     function saveName(i, val) { state.names[i] = val; pushData(); }
 
+    /* HANDLINGER: Håndterer poeng fra kuler og Carom, og styrer KRAV-logikken */
     function action(type, val) {
         if(isPaused) toggleTimer();
         saveHistory();
         let s = state.scores[state.currentPlayer];
+        
+        /* POENG-SPERRE: Hindrer poeng over 90/100 hvis man må ha carom */
         if (s < 90 && s + val > 90) return;
         if (s >= 90 && s < 100 && s + val > 100) return;
+        
         if(!state.breakDone) state.breakDone = true;
+        
+        /* GYLDIG STØT: Nullstiller fouls hvis man scorer poeng */
         state.foulCounts[state.currentPlayer] = 0;
+        
         if (type === 'pocket_carom') {
+            /* Veksel-logikk for kule + carom knapper */
             if (state.tableStatus === 'locked') state.lastType = (state.lastType === 'pocket') ? 'carom' : 'pocket';
             else state.tableStatus = 'open';
         } else { 
@@ -198,17 +216,20 @@
         pushData();
     }
 
+    /* JUSTER: Knappene for + og - poeng */
     function adjustScore(val) { saveHistory(); state.scores[state.currentPlayer] = Math.max(0, state.scores[state.currentPlayer] + val); pushData(); }
 
+    /* NESTE TUR: Kjører ved "Avslutt tur / Bom". Nullstiller fouls og bytter spiller. */
     function nextTurn() {
         saveHistory();
+        /* Oppdater pers hvis serien som nettopp ble ferdig er rekord */
         let currentSeries = state.scores[state.currentPlayer] - state.scoreAtStart[state.currentPlayer];
         if (currentSeries > (state.bestSeries[state.currentPlayer] || 0)) {
             state.bestSeries[state.currentPlayer] = currentSeries;
         }
         if (!state.breakDone) state.breakDone = true;
 
-        // --- NULLSTILL FOULS FOR SPILLEREN SOM GÅR FRA BORDET ---
+        /* NULLSTILLER FOULS FOR SPILLEREN SOM GÅR FRA BORDET */
         state.foulCounts[state.currentPlayer] = 0;
 
         state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
@@ -219,17 +240,16 @@
         pushData();
     }
 
+    /* FOUL: Håndterer feilstøt. Mister serien og bytter tur uten å resette fouls før ETTERpå. */
     function handleFoul() {
         saveHistory();
         if (!state.breakDone) state.breakDone = true;
         state.foulCounts[state.currentPlayer]++;
         state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer];
         
-        // Her avslutter vi turen manuelt ved foul - men vi fjerner IKKE foul-prikkene 
-        // før turen byttes, så de vises på scoreboardet.
         if (state.foulCounts[state.currentPlayer] >= 3) alert("3 FOULS!");
         
-        // Vi kaller IKKE nextTurn her lenger, vi bytter tur manuelt så fouls blir med over til Firebase før de nullstilles
+        /* Bytter tur manuelt slik at fouls blir synlig på scoreboardet før de nullstilles i nextTurn logikken */
         let nextPlayer = (state.currentPlayer + 1) % state.playerCount;
         state.currentPlayer = nextPlayer;
         state.innings++;
@@ -239,38 +259,43 @@
         pushData();
     }
 
+    /* OPPDATER UI: Oppdaterer alle tekster, knapper og farger i kontrolleren */
     function updateUI() {
         const t = i18n[state.lang || 'no'];
         if (document.getElementById('scoreboard-container').children.length !== state.playerCount) initUI();
+        
+        /* Aktiv modus-knapp (1P/2P/3P) */
         document.querySelectorAll('.mode-selector button').forEach(b => b.classList.remove('active'));
         document.getElementById(`btn-count-${state.playerCount}`).classList.add('active');
+        
+        /* Inning, Klokke og knapper */
         document.getElementById('inningText').innerText = t.inning + ": " + (Math.floor(state.innings/state.playerCount) + 1);
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
-        document.getElementById('changeBreakerBtn').innerText = t.breaker;
-        document.getElementById('changeBreakerBtn').style.display = state.breakDone ? 'none' : 'block';
-        document.getElementById('rulesBtn').innerText = t.rules;
-        document.getElementById('foulBtn').innerText = t.foul;
         document.getElementById('turnBtn').innerText = t.turn;
-        document.getElementById('undoBtn').innerText = t.undo;
-        document.getElementById('resetBtn').innerText = t.reset;
+
+        /* Klokke-knapp tekst */
         if(!isPaused) { document.getElementById('timerBtn').innerText = t.pause; } 
         else { document.getElementById('timerBtn').innerText = state.seconds > 0 ? t.resume : t.start; }
 
+        /* Oppdatering av spiller-boksene (Score, Serie, Pers, Fouls) */
         for(let i=0; i<state.playerCount; i++) {
             document.getElementById(`p${i}-label`).innerText = state.names[i];
             document.getElementById(`p${i}-score`).innerText = state.scores[i];
             document.getElementById(`p${i}-turn-score`).innerText = state.scores[i] - state.scoreAtStart[i];
             document.getElementById(`p${i}-best-score`).innerText = state.bestSeries ? (state.bestSeries[i] || 0) : 0;
             document.getElementById(`p${i}-box`).className = (state.currentPlayer === i) ? 'player-box active' : 'player-box';
+            
             const dots = document.getElementById(`p${i}-fouls`).children;
             for(let d=0; d<3; d++) dots[d].className = (d < state.foulCounts[i]) ? 'dot active' : 'dot';
-            const boxes = document.getElementById(`p${i}-box`).querySelectorAll('.series-label');
-            if(boxes.length === 2) { boxes[0].innerText = t.now; boxes[1].innerText = t.best; }
         }
+
+        /* LOGIKK FOR KRAV-TEKST: Viser hva spilleren MÅ gjøre */
         let reqText = t.msgOpen;
         if (!state.breakDone) reqText = t.msgBreak;
         else if (state.tableStatus === 'locked') reqText = (state.lastType === 'pocket' ? t.msgReqCarom : t.msgReqPocket);
         document.getElementById('moveText').innerText = reqText;
+
+        /* BALL-SYNLIGHET: Gjør baller grå/inaktive basert på om de er lovlige å putte */
         const isLockedPocket = (state.tableStatus === 'locked' && state.lastType === 'pocket');
         const isAtEnd = state.scores[state.currentPlayer] >= 90;
         document.getElementById('b1').className = (!state.breakDone || isLockedPocket || isAtEnd) ? 'ball-btn waiting' : 'ball-btn';
@@ -278,17 +303,26 @@
         document.getElementById('b5').className = (!state.breakDone || isLockedPocket || isAtEnd) ? 'ball-btn waiting' : 'ball-btn';
     }
 
+    /* REGLER: Viser en enkel popup med regler */
     function showRules() {
         const rules = { no: "REGLER:\n- Brekk må treffe 3-ball.\n- Etter pocket må du ta carom.\n- Etter carom må du ta pocket.\n- Ved 90 poeng er alt carom.", en: "RULES:\n- Break must hit the 3-ball.\n- After a pocket, you must score a carom.\n- After a carom, you must score a pocket.\n- At 90 points, everything is carom." };
         alert(rules[state.lang || 'no']);
     }
 
+    /* TIMER-LOGIKK: Teller sekunder og lagrer til Firebase hvert sekund */
     function toggleTimer() { if(!isPaused) { clearInterval(timerInterval); isPaused = true; } else { isPaused = false; timerInterval = setInterval(() => { state.seconds++; db.child('gameData/seconds').set(state.seconds); }, 1000); } updateUI(); }
+    
     function setPlayerCount(n) { state.playerCount = n; resetGame(); }
+
+    /* RESET: Nullstiller hele spillet til start-verdier */
     function resetGame() { const t = i18n[state.lang || 'no']; if (confirm(t.confirmReset)) { state.scores=[0,0,0]; state.foulCounts=[0,0,0]; state.scoreAtStart=[0,0,0]; state.bestSeries=[0,0,0]; state.breakDone=false; state.tableStatus='open'; state.innings=0; state.seconds=0; pushData(); } }
+    
     function rotateBreaker() { if(!state.breakDone) { state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; pushData(); } }
+    
+    /* ANGRE: Lagrer forrige tilstand så du kan hoppe ett steg tilbake */
     function saveHistory() { history.push(JSON.stringify(state)); }
     function undo() { if(history.length) { state = JSON.parse(history.pop()); pushData(); } }
+    
     window.onload = initUI;
 </script>
 </body>
