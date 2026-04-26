@@ -318,57 +318,70 @@
 
             const fCount = data.foulCounts[p];
             const placement = playerPlacement[p];
+            
+            // Definerer om spilleren skal være med eller er utslått (3 feil)
             const isEliminated = p >= data.playerCount || fCount >= 3;
 
-            // Hvis spilleren er ute, fjern dem helt og hopp over resten av denne spilleren
-            if (isEliminated) {
-                row.classList.remove('is-not-turn'); 
-                row.style.transform = "scale(0)";
-                row.style.opacity = "0";
+            // --- A: Synlighet og Flytting ---
+            if (!isEliminated) {
+                // Spilleren er med - sørg for at raden vises
+                row.style.display = "flex";
+                row.style.opacity = "1";
+                row.classList.remove('player-eliminated');
+
+                if (isProVersion) {
+                    // Flytter raden vertikalt basert på plassering (75px per rad)
+                    const yPosition = placement * 75;
+                    row.style.transform = `translateY(${yPosition}px) scale(1)`;
+                } else {
+                    row.style.transform = "scale(1)";
+                    row.style.order = placement;
+                }
+            } else {
+                // Spilleren har 3 feil - start ut-animasjon
+                row.classList.add('player-eliminated');
                 
+                // Vi drar raden til scale 0 for å fjerne den fysisk fra listen
+                row.style.transform = "translateY(0px) scale(0)";
+                
+                // Fjerner raden helt fra skjermen etter 0.5 sekunder
                 setTimeout(() => {
-                    row.style.display = "none";
+                    if (row.classList.contains('player-eliminated')) {
+                        row.style.display = "none";
+                    }
                 }, 500);
                 
-                continue; // Går rett til neste spiller i løkka
-            } 
-
-            // Hvis vi er her, betyr det at spilleren er aktiv
-            row.style.display = "flex";
-            row.style.opacity = "1";
-            
-            if (isProVersion) {
-                const yPosition = placement * 75;
-                row.style.transform = `translateY(${yPosition}px) scale(1)`;
-            } else {
-                row.style.transform = "scale(1)";
-                row.style.order = placement;
+                // Vi hopper over resten av oppdateringen for denne spilleren
+                continue; 
             }
 
-            // Marker hvem sin tur det er
+            // Toner ned rader for spillere som ikke har tur
             row.classList.toggle('is-not-turn', curP !== p);
 
-            // Oppdater navn og hovedscore
+            // --- B: Tekst, Navn og Poeng ---
+            // Oppdaterer navn og hovedscore
             document.getElementById(`p${p}-name`).innerText = data.names[p] || "";
             const scoreEl = document.getElementById(`p${p}-score`);
             scoreEl.innerText = data.scores[p];
 
-            // Farger basert på plassering
+            // Fargelegger scoren basert på plassering (Gull, Sølv, Bronse)
             if (data.scores[p] > 0) {
                 if (placement === 0) {
-                    scoreEl.style.color = "#f1c40f";
+                    scoreEl.style.color = "#f1c40f"; // Gull
                     scoreEl.style.filter = "drop-shadow(0 0 8px rgba(241, 196, 15, 0.6))";
                 } else if (placement === 1) {
-                    scoreEl.style.color = "#bdc3c7";
+                    scoreEl.style.color = "#bdc3c7"; // Sølv
+                    scoreEl.style.filter = "none";
                 } else if (placement === 2) {
-                    scoreEl.style.color = "#cd7f32";
+                    scoreEl.style.color = "#cd7f32"; // Bronse
+                    scoreEl.style.filter = "none";
                 }
             } else {
                 scoreEl.style.color = "#ffffff";
                 scoreEl.style.filter = "none";
             }
 
-            // Oppdater småtall (NÅ, PERS, SISTE)
+            // --- C: Småtall (NÅ, PERS, SISTE) ---
             const bestVal = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
             const lastVal = (data.lastSeries && data.lastSeries[p] !== undefined) ? data.lastSeries[p] : 0;
             const nowVal = (curP === p) ? (data.scores[p] - data.scoreAtStart[p]) : 0;
@@ -382,7 +395,7 @@
                 `;
             }
 
-            // Foul-prikker
+            // --- D: Foul-prikker ---
             let fHtml = '';
             for (let d = 0; d < 3; d++) {
                 let activeClass = d < fCount ? 'active' : '';
