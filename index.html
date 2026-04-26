@@ -166,7 +166,7 @@
             rules: "REGLER", foul: "FOUL (MISTER SERIE)", turn: "AVSLUTT TUR / BOM", reset: "HARD RESET",
             undo: "Angre", inning: "Inning", now: "Nå", best: "Pers", last: "Siste",
             msgBreak: "BREAK SHOT (3-BALL)", msgOpen: "VALG: CAROM ELLER KULE", 
-            msgReqCarom: "KRAV: CAROM", msgReqPocket: "KRAV: POCKET",
+            msgReqCarom: "KRAV: CAROM", msgReqPocket: "KRAV: POCKET", changeStart: "BYTT STARTSPILLER",
             confirmReset: "Er du sikker på at du vil starte spillet helt på nytt? Alle poeng og personlige rekorder blir slettet!"
         },
         en: {
@@ -174,7 +174,7 @@
             rules: "RULES", foul: "FOUL (LOSE SERIES)", turn: "END TURN / MISS", reset: "HARD RESET",
             undo: "Undo", inning: "Inning", now: "Now", best: "Best", last: "Last",
             msgBreak: "BREAK SHOT (3-BALL)", msgOpen: "CHOICE: CAROM OR POCKET", 
-            msgReqCarom: "REQ: CAROM", msgReqPocket: "REQ: POCKET",
+            msgReqCarom: "REQ: CAROM", msgReqPocket: "REQ: POCKET", changeStart: "CHANGE STARTER",
             confirmReset: "Are you sure you want to reset the game? All scores and personal bests will be cleared!"
         }
     };
@@ -218,24 +218,22 @@
                 <div id="p${i}-box" class="player-box">
                     <span id="p${i}-label" class="player-label-display">${state.names[i]}</span>
                     <span id="p${i}-score" class="score">${state.scores[i]}</span>
-                    <div class="series-info">
-                        <div class="series-box">
-                            <span class="series-label">${t.now}</span>
-                            <div id="p${i}-turn-score" class="series-val">0</div>
-                        </div>
-                        <div class="series-box">
-                            <span class="series-label">${t.last || 'LAST'}</span>
-                            <div id="p${i}-last-series" class="series-val">0</div>
-                        </div>
-                        <div class="series-box">
-                            <span class="series-label">${t.best}</span>
-                            <div id="p${i}-best-score" class="series-val">0</div>
-                        </div>
-                    </div>
-                    <div class="foul-dots" id="p${i}-fouls"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-                </div>`;
-        }
-    }
+                <div class="series-info">
+                <div class="series-box">
+                    <span class="series-label" id="p${i}-now-label">${t.now}</span>
+                <div id="p${i}-turn-score" class="series-val">0</div>
+            </div>
+                <div class="series-box">
+                    <span class="series-label" id="p${i}-last-label">${t.last || 'LAST'}</span>
+                <div id="p${i}-last-series" class="series-val">0</div>
+            </div>
+                <div class="series-box">
+                    <span class="series-label" id="p${i}-best-label">${t.best}</span>
+                <div id="p${i}-best-score" class="series-val">0</div>
+            </div>
+        </div>
+            <div class="foul-dots" id="p${i}-fouls"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    </div>`;
 
     function saveName(i, val) { state.names[i] = val; pushData(); }
 
@@ -356,6 +354,9 @@ function updateUI() {
 
     /* Oppdatering av spiller-boksene (Score, Serie, Pers, Fouls) */
     for(let i=0; i<state.playerCount; i++) {
+        document.getElementById(`p${i}-now-label`).innerText = t.now;
+        document.getElementById(`p${i}-last-label`).innerText = t.last;
+        document.getElementById(`p${i}-best-label`).innerText = t.best;
         document.getElementById(`p${i}-label`).innerText = state.names[i];
         document.getElementById(`p${i}-score`).innerText = state.scores[i];
         
@@ -395,6 +396,14 @@ function updateUI() {
     
     document.getElementById('c1').className = (isLockedCarom) ? 'ctrl btn-carom waiting' : 'ctrl btn-carom';
     document.getElementById('c2').className = (isLockedCarom) ? 'ctrl btn-carom waiting' : 'ctrl btn-carom';
+    
+    // Oppdaterer "Bytt startspiller"-knappen
+    const changeStartBtn = document.getElementById('changeStartBtn'); // Sjekk at ID-en stemmer med din HTML
+    if (changeStartBtn) changeStartBtn.innerText = t.changeStart;
+
+    // Oppdaterer "Fortsett"-knappen (hvis den er synlig)
+    const resumeBtn = document.getElementById('resumeBtn'); // Sjekk ID
+    if (resumeBtn) resumeBtn.innerText = t.resume;
 }
         
     /* REGLER: Viser en enkel popup med regler */
