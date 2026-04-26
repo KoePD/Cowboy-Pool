@@ -54,6 +54,7 @@
             margin-top: 5px;
             display: flex;
             justify-content: center; 
+            flex: 0 0 65px;
             gap: 5px; /* Litt mindre gap for å få plass til faste bredder */
             width: 100%;
             padding: 0 10px;
@@ -73,9 +74,11 @@
             color: #f1c40f; 
             font-size: 13px; 
             margin-left: 4px; 
-            min-width: 15px; /* Låser bredden på selve tallet */
+        /* Endret her: Gir tallet en fast plass å bo i */
+            display: inline-block;
+            width: 18px; 
             text-align: left;
-        }
+}
 
         /* FOUL-PRIKKER: 'gap' styrer avstanden mellom prikkene. 'width/height' styrer størrelsen på prikken */
         .fouls { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; width: 12px; align-items: center; margin-right: 20px; }
