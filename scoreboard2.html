@@ -203,6 +203,19 @@
                     document.getElementById(`p${p}-name`).innerText = data.names[p] || "";
                     document.getElementById(`p${p}-score`).innerText = data.scores[p];
                     document.getElementById(`best-${p}`).innerText = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
+
+                // 1. BEST (Pers) - Denne har du fra før på linje 205
+                    document.getElementById(`best-${p}`).innerText = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
+
+                // 2. SISTE (Forrige serie)
+                    const lastVal = (data.lastSeries && data.lastSeries[p] !== undefined) ? data.lastSeries[p] : 0;
+                    const lastShotEl = document.getElementById(`p${p}-last-shot`);
+                    if (lastShotEl) lastShotEl.innerText = lastVal;
+
+                // 3. NÅ (Aktiv serie)
+                    const nowVal = (curP === p) ? (data.scores[p] - data.scoreAtStart[p]) : 0;
+                    const nowEl = document.getElementById(`p${p}-now`);
+                    if (nowEl) nowEl.innerText = nowVal;
                     
                     // FOUL-LOGIKK: Tegner prikker og legger til blinking ved 2 fouls
                     let fHtml = '';
