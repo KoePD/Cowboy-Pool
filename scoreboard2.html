@@ -45,21 +45,29 @@
 
         /* POENGBOKS (Til høyre): Juster 'min-width' for å gjøre poengfeltet bredere eller smalere */
         .score-block { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 135px; height: 100%; background: rgba(0,0,0,0.5); border-left: 3px solid #333; }
-        .score-val { font-size: 60px; font-weight: 900; color: #f1c40f; line-height: 0.85; }
+        .score-val { 
+            font-size: 60px; 
+            font-weight: 900; 
+            color: #f1c40f; 
+            line-height: 0.85; 
+        /* NYTT: Dytter tallet nedover for å sentrere det */
+            margin-top: 5px; 
+}
         .pers-val { 
             font-size: 10px; 
             font-weight: 900; 
             color: #aaa; 
             text-transform: uppercase; 
-            margin-top: 5px;
+            margin-top: 2px;
             display: flex;
-            justify-content: center; 
-            flex: 0 0 65px;
-            gap: 5px; /* Litt mindre gap for å få plass til faste bredder */
+        /* ENDRET: Flytter alt til venstre side av boksen */
+            justify-content: flex-start; 
+        /* NYTT: Gir litt luft fra venstreveggen (juster denne til det passer) */
+            padding-left: 15px; 
+            gap: 8px; 
             width: 100%;
-            padding: 0 10px;
             box-sizing: border-box;
-        }
+}
         
         /* NYTT: Dette låser bredden på hver tekst+tall-gruppe */
         .pers-val span {
