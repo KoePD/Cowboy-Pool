@@ -211,8 +211,6 @@
         if (state.scores[state.currentPlayer] > state.scoreAtStart[state.currentPlayer]) {
             state.foulCounts[state.currentPlayer] = 0;
         }
-        // 1. Nullstill fouls for nåværende spiller før vi bytter tur
-        gameData.foulCounts[gameData.currentPlayer] = 0;
         state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
         state.innings++;
         state.tableStatus = 'open';
