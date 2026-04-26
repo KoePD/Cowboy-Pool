@@ -46,16 +46,19 @@
         .scoreline-body { 
             display: flex; 
             flex-direction: column; 
+            border-radius: 0 0 20px 20px; 
             background: #000; 
             border: 3px solid #333; 
             border-top: none; 
-            border-radius: 0 0 20px 20px; 
             width: 100%;
-            height: auto !important; /* Denne må være auto for å krympe */
-            min-height: 75px; 
-            position: relative;
-            overflow: hidden;
-            box-sizing: border-box;
+            height: auto; 
+            /* Dette sikrer at boksen alltid er stor nok for 3 spillere (3 * 75px) */
+            min-height: 225px; 
+            box-sizing: border-box; 
+            position: relative; 
+            z-index: 5; 
+            overflow: hidden; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7); 
 }
         
         /* SPILLERRADEN: Endre 'height' for å gjøre hver spiller-rad høyere eller lavere */
