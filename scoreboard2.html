@@ -38,8 +38,23 @@
         /* POENGBOKS (Til høyre): Juster 'min-width' for å gjøre poengfeltet bredere eller smalere */
         .score-block { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 135px; height: 100%; background: rgba(0,0,0,0.5); border-left: 3px solid #333; }
         .score-val { font-size: 60px; font-weight: 900; color: #f1c40f; line-height: 0.85; }
-        .pers-val { font-size: 10px; font-weight: 900; color: #aaa; text-transform: uppercase; margin-top: 3px; }
-        .pers-val b { color: #f1c40f; font-size: 13px; margin-left: 3px; }
+       .pers-val { 
+            font-size: 10px; 
+            font-weight: 900; 
+            color: #aaa; 
+            text-transform: uppercase; 
+            margin-top: 3px;
+            display: flex;         /* Aktiverer rad-visning */
+            justify-content: center; /* Sentrerer begge under hovedscoren */
+            gap: 15px;             /* Lager luft mellom PERS og SISTE */
+            width: 100%;
+        }
+        
+        .pers-val b { 
+            color: #f1c40f; 
+            font-size: 13px; 
+            margin-left: 3px; 
+        }
 
         /* FOUL-PRIKKER: 'gap' styrer avstanden mellom prikkene. 'width/height' styrer størrelsen på prikken */
         .fouls { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; width: 12px; align-items: center; margin-right: 20px; }
