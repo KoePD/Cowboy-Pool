@@ -63,7 +63,11 @@
         
         /* BLINKING: '0.5s' styrer hastigheten på blinkingen ved 2 fouls */
         .dot.blink { animation: foul-warning 0.5s infinite ease-in-out; }
-        @keyframes foul-warning { 0% { opacity: 1; } 50% { opacity: 0.2; } 100% { opacity: 1; } }
+            @keyframes pulse-glow { 
+                0% { filter: brightness(1); } 
+                50% { filter: brightness(1.5) drop-shadow(0 0 5px rgba(255,255,255,0.5)); } 
+                100% { filter: brightness(1); } 
+}
 
         /* 3D KULER I TOPPEN: 'width/height' her endrer størrelsen på kulene */
         .ball { width: 28px; height: 28px; border-radius: 50%; position: relative; background-color: #fff; display: flex; justify-content: center; align-items: center; overflow: hidden; transition: all 0.3s ease; }
