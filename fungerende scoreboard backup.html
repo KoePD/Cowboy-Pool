@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
+
+    <style>
+
+
+
+        /* Denne får prikkene til å blinke rødt når man har 2 fouls */
+
+        @keyframes foul-warning {
+
+            0% { background: #ff0000; box-shadow: 0 0 10px #ff0000; }
+
+            50% { background: rgba(255, 0, 0, 0.2); box-shadow: none; }
+
+            100% { background: #ff0000; box-shadow: 0 0 10px #ff0000; }
+
+}
+
+
+
+        /* Bytting av blinkhastighet på feil prikkene */
+
+        .dot.active.blink {
+
+            animation: foul-warning 2.0s infinite ease-in-out;
+
+}
+
+        /* Bakgrunnen for hele filen. 1920x1080 er standard skjermstørrelse i Full HD */
+
+        body { background-color: rgba(0, 0, 0, 0); margin: 0; padding: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; height: 1080px; width: 1920px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
+
+        
+
+        /* TOTAL BREDDE: Endre max-width (f.eks til 1200px) for å gjøre scoreboardet bredere eller smalere */
+
+        .scoreline-wrapper { margin-bottom: 50px; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 1000px; }
+
+        
+
+        /* HEADER: Den mørke stripen øverst. 'height' styrer tykkelsen på stripen */
+
+        .scoreline-header { display: flex; align-items: center; background: #1a1a1a; border-radius: 20px 20px 0 0; border: 3px solid #333; border-bottom: none; position: relative; height: 50px; width: 100%; box-sizing: border-box; z-index: 10; }
+
+        
+
+        /* TOPP-TEKST: Her endrer du størrelsen (font-size) og fargen på Inning-teksten */
+
+        .header-info { flex: 1; display: flex; align-items: center; padding-left: 25px; gap: 20px; }
+
+        .inning-text { color: #f1c40f; font-weight: 900; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+
+        .status-msg { color: white; font-weight: 900; font-size: 13px; text-transform: uppercase; }
+
+        
+
+        /* KULE-OMRÅDET I HEADER: 'width' her må være lik 'min-width' i .score-block (135px) for at de skal stå på linje */
+
+        .header-balls { 
+
+            width: 200px;            /* Holder seg på linje med score-block */
+
+            display: flex; 
+
+            justify-content: center; /* Holder kulegruppen sentrert som en enhet */
+
+            align-items: center; 
+
+            gap: 25px;               /* Økt fra 10px for mer luft mellom kulene */
+
+            height: 100%;
+
+            box-sizing: border-box;
+
+}
+
+        
+
+        /* HOVEDBOKSEN: 'background' her er fargen bak spillernavnene */
+
+        .scoreline-body { 
+
+            display: flex; 
+
+            flex-direction: column; 
+
+            border-radius: 0 0 20px 20px; 
+
+            background: #000; 
+
+            border: 3px solid #333; 
+
+            border-top: none; 
+
+            width: 100%;
+
+            height: auto; 
+
+            box-sizing: border-box; 
+
+            position: relative; 
+
+            z-index: 5; 
+
+            overflow: hidden; 
+
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7); 
+
+            transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+}
+
+        
+
+        /* SPILLERRADEN: Endre 'height' for å gjøre hver spiller-rad høyere eller lavere */
+
+        .player-row {
+
+            display: none; 
+
+            align-items: center; 
+
+            width: 100%; 
+
+            height: 76px; /* Justert litt for perfekt passform */
+
+            color: white;
+
+            border-bottom: 1px solid rgba(0,0,0,0.3); /* Tynnere skillelinje */
+
+            box-sizing: border-box;
+
+            position: absolute; 
+
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+
+}
+
+        
+
+        /* ELIMINERING: Effekt når en spiller ryker (forsvinner til venstre) */
+
+        .player-eliminated { opacity: 0.30; filter: brightness(0.3) grayscale(1); pointer-events: none; }
+
+
+
+        /* NAVNEOMRÅDET: Juster font-size for å endre størrelsen på spillernavnet */
+
+        .player-name-area { display: flex; align-items: center; flex: 1; padding: 0 35px; }
+
+        .name { font-size: 32px; font-weight: 800; text-transform: uppercase; white-space: nowrap; }
+
+
+
+        /* POENGBOKS (Til høyre): Juster 'min-width' for å gjøre poengfeltet bredere eller smalere */
+
+        .score-block { 
+
+            display: flex; 
+
+            flex-direction: column; 
+
+            align-items: center; 
+
+            justify-content: center; 
+
+            min-width: 200px; height: 100%; 
+
+            background: rgba(0,0,0,0.5); 
+
+            border-left: 3px solid #333; 
+
+        
+
+        }
+
+
+
+        /*Main Scoreboard*/
+
+        .score-val { 
+
+            font-size: 60px; 
+
+            font-weight: 900; 
+
+            color: #f1c40f; 
+
+            line-height: 0.85; 
+
+        /* NYTT: Dytter tallet nedover for å sentrere det */
+
+            margin-top: -4px; 
+
+}
+
+        /*Best, Now & Last scoreboard*/
+
+        .pers-val { 
+
+            font-size: 10px; 
+
+            font-weight: 900; 
+
+            color: #aaa; 
+
+            text-transform: uppercase; 
+
+            margin-top: 2px;
+
+            display: flex;
+
+        /* ENDRET: Flytter alt til venstre side av boksen */
+
+            justify-content: flex-start; 
+
+        /* NYTT: Gir litt luft fra venstreveggen (juster denne til det passer) */
+
+            padding-left: 10px; 
+
+            gap: 8px; 
+
+            width: 100%;
+
+            box-sizing: border-box;
+
+}
+
+        
+
+        /* NYTT: Dette låser bredden på hver tekst+tall-gruppe */
+
+        /* Containeren for hver gruppe (NÅ 0, PERS 0, SISTE 0) */
+
+        .pers-val span {
+
+            display: flex;             /* Bruker flex for å styre tekst og tall internt */
+
+            align-items: center;
+
+            justify-content: flex-start;
+
+            flex: 1;                   /* Fordeler de tre gruppene likt utover bredden */
+
+            white-space: nowrap;
+
+            position: relative;        /* Viktig for at tallene skal stå stille */
+
+            min-width: 0;
+
+            font-size: 10px;
+
+}
+
+
+
+        /* Selve tallet (scoren) */
+
+        .pers-val b { 
+
+            color: #f1c40f; 
+
+            font-size: 13px; 
+
+            position: absolute;
+
+        /* VIKTIG: Låser tallet til nøyaktig samme punkt fra venstre i hver span */
+
+            left: 35px;                /* Juster denne hvis tallet står for nærme eller langt unna teksten */
+
+            width: 20px;
+
+            text-align: left;
+
+}
+
+
+
+        /* FOUL-PRIKKER: 'gap' styrer avstanden mellom prikkene. 'width/height' styrer størrelsen på prikken */
+
+        .fouls { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; width: 12px; align-items: center; margin-right: 20px; }
+
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(0,0,0,0.2); }
+
+        .dot.active { background: #ff0000; box-shadow: 0 0 8px #ff0000; }
+
+        
+
+        /* BLINKING: '0.5s' styrer hastigheten på blinkingen ved 2 fouls */
+
+        .dot.blink { animation: foul-warning 0.5s infinite ease-in-out; }
+
+        
+
+        /* PULSERING: Endret for å fjerne skalering (så tallene ikke endrer tykkelse) */
+
+        @keyframes pulse-glow { 
+
+            0% { filter: brightness(1); } 
+
+            50% { filter: brightness(1.5) drop-shadow(0 0 5px rgba(255,255,255,0.5)); } 
+
+            100% { filter: brightness(1); } 
+
+}
+
+
+
+        /* 3D KULER I TOPPEN: 'width/height' her endrer størrelsen på kulene */
+
+        .ball { width: 28px; height: 28px; border-radius: 50%; position: relative; background-color: #fff; display: flex; justify-content: center; align-items: center; overflow: hidden; transition: all 0.3s ease; }
+
+        .ball-overlay-3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; z-index: 10; box-shadow: inset -2px -2px 4px rgba(0,0,0,0.4), inset 1.5px 1.5px 3px rgba(255,255,255,0.2); border: 1px solid rgba(0,0,0,0.1); }
+
+        .ball-num { font-size: 10px; font-weight: 900; z-index: 5; color: black; background: white; width: 14px; height: 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #000; }
+
+        
+
+        /* BALLFARGER: Juster fargekodene her for å endre kulefargene */
+
+        .f-1 { background: radial-gradient(circle at 35% 35%, #f1c40f, #b38f00); }  /* Gul */
+
+        .f-5 { background: radial-gradient(circle at 35% 35%, #8e44ad, #4b0082); }  /* Lilla */
+
+        .f-3 { background: radial-gradient(circle at 35% 35%, #e74c3c, #962d22); }  /* Rød */
+
+        
+
+        /* GJENNOMSIKTIGHET: 'is-not-turn' styrer hvor mye spillere som ikke har tur skal tones ned */
+
+        .ball-dimmed { opacity: 0.15; filter: brightness(0.5) blur(0.5px); transform: scale(0.8); }
+
+        .is-not-turn { 
+
+            opacity: 0.30 !important; 
+
+            filter: brightness(1.5) grayscale(0.1); /* Gjør dem mørkere og litt mer grå */
+
+}
+
+
+
+        
+
+        .mode-carom { animation: pulse-glow 1.5s infinite ease-in-out; }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="scoreline-wrapper">
+
+        <div class="scoreline-header">
+
+            <div class="header-info">
+
+                <div class="inning-text" id="inning-text">INNING 1</div>
+
+                <div style="color: #444; font-weight: bold;">|</div>
+
+                <div class="status-msg" id="status-msg">STARTSTØT (3-BALL)</div>
+
+            </div>
+
+            <div class="header-balls">
+
+                <div id="hdr-b1" class="ball f-1"><div class="ball-num">1</div><div class="ball-overlay-3d"></div></div>
+
+                <div id="hdr-b5" class="ball f-5"><div class="ball-num">5</div><div class="ball-overlay-3d"></div></div>
+
+                <div id="hdr-b3" class="ball f-3"><div class="ball-num">3</div><div class="ball-overlay-3d"></div></div>                
+
+          </div>
+
+    </div>
+
+        
+
+        <div class="scoreline-body">
+
+            <div class="player-row" id="p0-row" style="background: linear-gradient(90deg, #083c2c 50%, #00af79);">
+
+    <div class="player-name-area">
+
+        <div class="fouls" id="p0-fouls"></div>
+
+        <div class="name" id="p0-name">PLAYER 1</div>
+
+    </div>
+
+    <div class="score-block">
+
+        <div class="score-val" id="p0-score">0</div> 
+
+        <div class="pers-val">
+
+            <span>NÅ <b id="p0-now">0</b></span>
+
+            <span>PERS <b id="best-0">0</b></span>
+
+            <span>SISTE <b id="p0-last-shot">0</b></span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<div class="player-row" id="p1-row" style="background: linear-gradient(90deg, #083c2c 50%, #00af79);">
+
+    <div class="player-name-area">
+
+        <div class="fouls" id="p1-fouls"></div>
+
+        <div class="name" id="p1-name">PLAYER 2</div>
+
+    </div>
+
+    <div class="score-block">
+
+        <div class="score-val" id="p1-score">0</div> 
+
+        <div class="pers-val">
+
+            <span>NÅ <b id="p1-now">0</b></span>
+
+            <span>PERS <b id="best-1">0</b></span>
+
+            <span>SISTE <b id="p1-last-shot">0</b></span>
+
+        </div>
+
+    </div>
+
+</div>
+
+            
+
+
+
+<div class="player-row" id="p2-row" style="background: linear-gradient(90deg, #083c2c 50%, #00af79);">
+
+    <div class="player-name-area">
+
+        <div class="fouls" id="p2-fouls"></div>
+
+        <div class="name" id="p2-name">PLAYER 3</div>
+
+    </div>
+
+    <div class="score-block">
+
+        <div class="score-val" id="p2-score">0</div> 
+
+        <div class="pers-val">
+
+            <span>NÅ <b id="p2-now">0</b></span>
+
+            <span>PERS <b id="best-2">0</b></span>
+
+            <span>SISTE <b id="p2-last-shot">0</b></span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+   <script>
+
+    // --- 1. KONFIGURASJON ---
+
+    let isProVersion = true; 
+
+
+
+    const firebaseConfig = { 
+
+        databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" 
+
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+    const db = firebase.database().ref('gameData');
+
+
+
+    const i18n = {
+
+        no: { pers: "PERS", last: "SISTE", now: "NÅ", inn: "INNING", break: "STARTSTØT (3-BALL)", open: "VALG: CAROM / POCKET", rc: "KRAV: CAROM", rp: "KRAV: POCKET" },
+
+        en: { pers: "BEST", last: "LAST", now: "NOW", inn: "INNING", break: "BREAKSHOT (3-BALL)", open: "CHOICE: CAROM / POCKET", rc: "REQ: CAROM", rp: "REQ: POCKET" }
+
+    };
+
+
+
+    // --- 2. HOVEDFUNKSJON ---
+
+    db.on('value', snap => {
+
+        const data = snap.val();
+
+        if (!data) return;
+
+
+
+        const lang = data.lang || 'no';
+
+        const t = i18n[lang];
+
+        const curP = data.currentPlayer;
+
+
+
+        // --- 3. RANGERING ---
+
+        let activePlayers = [];
+
+        let eliminatedPlayers = [];
+
+
+
+        // Finn body-elementet
+
+        const bodyEl = document.querySelector('.scoreline-body');
+
+        // Oppdater høyden basert på antall spillere (76px er høyden du har satt på radene)
+
+        if (bodyEl) {
+
+            bodyEl.style.height = (data.playerCount * 76) + "px";
+
+}
+
+
+
+        // Vi sjekker kun spillere opp til det antallet som faktisk spiller (playerCount)
+
+        for (let i = 0; i < data.playerCount; i++) {
+
+            if (data.foulCounts[i] < 3) {
+
+                activePlayers.push({ index: i, score: data.scores[i] });
+
+            } else {
+
+                eliminatedPlayers.push({ index: i, score: data.scores[i] });
+
+            }
+
+        }
+
+
+
+        activePlayers.sort((a, b) => b.score - a.score);
+
+        let totalRank = [...activePlayers, ...eliminatedPlayers];
+
+
+
+        let playerPlacement = [];
+
+        totalRank.forEach((item, pos) => {
+
+            playerPlacement[item.index] = pos;
+
+        });
+
+
+
+        // --- 4. OPPDATERING AV SPILLER-RADER ---
+
+        for (let p = 0; p < 3; p++) {
+
+            const row = document.getElementById(`p${p}-row`);
+
+            if (!row) continue;
+
+
+
+            // VIKTIG: Sjekk om denne raden i det hele tatt skal eksistere i dette spillet
+
+            const isPlaying = p < data.playerCount;
+
+            const fCount = data.foulCounts[p];
+
+            const isEliminated = fCount >= 3;
+
+
+
+            if (!isPlaying) {
+
+                // Hvis vi bare spiller 2, fjerner vi rad p2 helt fra layouten
+
+                row.style.display = "none";
+
+                continue; 
+
+            }
+
+
+
+            // Raden skal være med
+
+            row.style.display = "flex";
+
+            row.style.opacity = "1";
+
+
+
+            // Hent plasseringen basert på rangeringen over
+
+            const placement = playerPlacement[p];
+
+            const yPosition = placement * 76;
+
+            row.style.transform = `translateY(${yPosition}px)`;
+
+
+
+            // Grå ut de som er eliminert, tone ned de som ikke har tur
+
+            row.classList.toggle('player-eliminated', isEliminated);
+
+            row.classList.toggle('is-not-turn', !isEliminated && curP !== p);
+
+
+
+            // Oppdater Navn og Score
+
+            document.getElementById(`p${p}-name`).innerText = data.names[p] || "";
+
+            const scoreEl = document.getElementById(`p${p}-score`);
+
+            scoreEl.innerText = data.scores[p];
+
+
+
+            // Farger: Kun gull/sølv til de som er aktive
+
+            if (data.scores[p] > 0 && !isEliminated) {
+
+                if (placement === 0) scoreEl.style.color = "#f1c40f";
+
+                else if (placement === 1) scoreEl.style.color = "#bdc3c7";
+
+                else scoreEl.style.color = "#cd7f32";
+
+            } else {
+
+                scoreEl.style.color = "#ffffff";
+
+            }
+
+
+
+            // Oppdater småtall
+
+            const bestVal = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
+
+            const lastVal = (data.lastSeries && data.lastSeries[p] !== undefined) ? data.lastSeries[p] : 0;
+
+            const nowVal = (curP === p && !isEliminated) ? (data.scores[p] - data.scoreAtStart[p]) : 0;
+
+
+
+            const persValContainer = row.querySelector('.pers-val');
+
+            if (persValContainer) {
+
+                persValContainer.innerHTML = `
+
+                    <span>${t.now} <b id="p${p}-now">${nowVal}</b></span>
+
+                    <span>${t.pers} <b id="best-${p}">${bestVal}</b></span>
+
+                    <span>${t.last} <b id="p${p}-last-shot">${lastVal}</b></span>
+
+                `;
+
+            }
+
+
+
+            // Oppdater Foul-prikker
+
+            let fHtml = '';
+
+            for (let d = 0; d < 3; d++) {
+
+                let activeClass = d < fCount ? 'active' : '';
+
+                let blinkClass = (fCount === 2 && d < fCount) ? 'blink' : '';
+
+                fHtml += `<div class="dot ${activeClass} ${blinkClass}"></div>`;
+
+            }
+
+            document.getElementById(`p${p}-fouls`).innerHTML = fHtml;
+
+        }
+
+
+
+        // --- 5. HEADER & KULER ---
+
+        const currentInning = Math.floor(data.innings / data.playerCount) + 1;
+
+        document.getElementById('inning-text').innerText = `${t.inn} ${currentInning}`;
+
+        let statusText = t.break;
+
+        if (data.breakDone) {
+
+            statusText = (data.tableStatus === 'locked') ? (data.lastType === 'pocket' ? t.rc : t.rp) : t.open;
+
+        }
+
+        document.getElementById('status-msg').innerText = statusText;
+
+        const b1 = document.getElementById('hdr-b1'), b3 = document.getElementById('hdr-b3'), b5 = document.getElementById('hdr-b5');
+
+        [b1, b3, b5].forEach(b => b.classList.remove('ball-dimmed', 'mode-carom'));
+
+        if (!data.breakDone) { b1.classList.add('ball-dimmed'); b5.classList.add('ball-dimmed'); }
+
+        else if (data.tableStatus === 'locked' && data.lastType === 'pocket') { [b1, b3, b5].forEach(b => b.classList.add('mode-carom')); }
+
+    });
+
+</script>
+
+</body>
+
+</html>
