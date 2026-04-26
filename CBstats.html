@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cowboy Pool - Statistikk</title>
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #1a1a1a; color: white; margin: 0; padding: 20px; }
+        .stats-container { max-width: 800px; margin: auto; }
+        h1 { text-align: center; color: #f1c40f; text-transform: uppercase; letter-spacing: 2px; }
+        
+        .match-card { 
+            background: #2c3e50; 
+            border-radius: 15px; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            border-left: 8px solid #27ae60;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .match-header { 
+            display: flex; 
+            justify-content: space-between; 
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            color: #bdc3c7;
+        }
+
+        .player-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+            gap: 15px; 
+        }
+
+        .player-stat {
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .player-stat.winner { border: 2px solid #f1c40f; }
+        .player-name { font-weight: 800; display: block; margin-bottom: 5px; }
+        .player-score { font-size: 1.5em; color: #f1c40f; font-weight: 900; }
+        .sub-stat { font-size: 0.7em; color: #aaa; display: block; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="stats-container">
+    <h1>Match Historikk</h1>
+    <div id="history-list">Laster statistikk...</div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database().ref('matchHistory');
+
+    db.on('value', (snapshot) => {
+        const history = snapshot.val();
+        const listDiv = document.getElementById('history-list');
+        
+        if (!history) {
+            listDiv.innerHTML = "<p style='text-align:center;'>Ingen kamper lagret ennå.</p>";
+            return;
+        }
+
+        let html = "";
+        // Vi gjør om objektet til en liste og snur den (nyeste først)
+        const matches = Object.values(history).reverse();
+
+        matches.forEach(match => {
+            // Finn vinneren (den med høyest poengsum)
+            const maxScore = Math.max(...match.poengsummer);
+            
+            html += `
+                <div class="match-card">
+                    <div class="match-header">
+                        <span>📅 ${match.dato}</span>
+                        <span>⏱️ ${match.varighet}</span>
+                        <span>🔢 ${match.innings} Innings</span>
+                    </div>
+                    <div class="player-grid">
+                        ${match.spillere.map((name, i) => {
+                            const isWinner = match.poengsummer[i] === maxScore;
+                            const avg = (match.poengsummer[i] / match.innings).toFixed(2);
+                            return `
+                                <div class="player-stat ${isWinner ? 'winner' : ''}">
+                                    <span class="player-name">${isWinner ? '🏆 ' : ''}${name}</span>
+                                    <span class="player-score">${match.poengsummer[i]}</span>
+                                    <span class="sub-stat">Serie: ${match.bestSeries[i]} | Snitt: ${avg}</span>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        });
+        listDiv.innerHTML = html;
+    });
+</script>
+</body>
+</html>
