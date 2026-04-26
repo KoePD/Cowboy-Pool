@@ -5,6 +5,18 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
     <style>
+
+        /* Denne får prikkene til å blinke rødt når man har 2 fouls */
+        @keyframes foul-warning {
+            0% { background: #ff0000; box-shadow: 0 0 10px #ff0000; }
+            50% { background: rgba(255, 0, 0, 0.2); box-shadow: none; }
+            100% { background: #ff0000; box-shadow: 0 0 10px #ff0000; }
+}
+
+        /* Kobler animasjonen til riktig klasse */
+        .dot.active.blink {
+            animation: foul-warning 0.5s infinite ease-in-out;
+}
         /* Bakgrunnen for hele filen. 1920x1080 er standard skjermstørrelse i Full HD */
         body { background-color: rgba(0, 0, 0, 0); margin: 0; padding: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; height: 1080px; width: 1920px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
         
