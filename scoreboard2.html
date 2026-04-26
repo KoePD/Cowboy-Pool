@@ -20,7 +20,16 @@
         .status-msg { color: white; font-weight: 900; font-size: 13px; text-transform: uppercase; }
         
         /* KULE-OMRÅDET I HEADER: 'width' her må være lik 'min-width' i .score-block (135px) for at de skal stå på linje */
-        .header-balls { width: 135px; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .header-balls { 
+            width: 180px;         /* Match denne med min-width i .score-block */
+            display: flex; 
+            justify-content: center; /* Dette sentrerer kulene horisontalt i de 180 pikslene */
+            align-items: center; 
+            gap: 10px; 
+            border-left: 3px solid #333; /* Valgfritt: Legg til denne hvis du vil at skillelinjen skal gå helt opp i headeren */
+            height: 100%;
+            box-sizing: border-box;
+}
         
         /* HOVEDBOKSEN: 'background' her er fargen bak spillernavnene */
         .scoreline-body { display: flex; flex-direction: column; border-radius: 0 0 20px 20px; background: #000; border: 3px solid #333; border-top: none; width: 100%; box-sizing: border-box; position: relative; z-index: 5; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.7); }
