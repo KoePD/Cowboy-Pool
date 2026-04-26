@@ -9,15 +9,12 @@
         .scoreline-wrapper { margin-bottom: 50px; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 1000px; }
         
         .scoreline-header { display: flex; align-items: center; background: #1a1a1a; border-radius: 20px 20px 0 0; border: 3px solid #333; border-bottom: none; position: relative; height: 50px; width: 100%; box-sizing: border-box; z-index: 10; }
-        
         .header-info { flex: 1; display: flex; align-items: center; padding-left: 25px; gap: 20px; }
         .inning-text { color: #f1c40f; font-weight: 900; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
         .status-msg { color: white; font-weight: 900; font-size: 13px; text-transform: uppercase; }
-
-        .header-balls { width: 135px; display: flex; justify-content: center; align-items: center; gap: 10px; border-left: 3px solid transparent; }
+        .header-balls { width: 135px; display: flex; justify-content: center; align-items: center; gap: 10px; }
         
         .scoreline-body { display: flex; flex-direction: column; border-radius: 0 0 20px 20px; background: #000; border: 3px solid #333; border-top: none; width: 100%; box-sizing: border-box; position: relative; z-index: 5; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.7); }
-        
         .player-row { display: none; align-items: center; width: 100%; height: 75px; color: white; transition: opacity 0.3s; position: relative; }
         .player-name-area { display: flex; align-items: center; flex: 1; padding: 0 35px; }
         .name { font-size: 32px; font-weight: 800; text-transform: uppercase; white-space: nowrap; }
@@ -31,16 +28,18 @@
         .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(0,0,0,0.2); }
         .dot.active { background: #ff0000; box-shadow: 0 0 8px #ff0000; }
 
+        /* 3D KULER */
         .ball { width: 28px; height: 28px; border-radius: 50%; position: relative; background-color: #fff; display: flex; justify-content: center; align-items: center; overflow: hidden; transition: all 0.3s ease; }
         .ball-overlay-3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; z-index: 10; box-shadow: inset -2px -2px 4px rgba(0,0,0,0.4), inset 1.5px 1.5px 3px rgba(255,255,255,0.2); border: 1px solid rgba(0,0,0,0.1); }
         .ball-num { font-size: 10px; font-weight: 900; z-index: 5; color: black; background: white; width: 14px; height: 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #000; }
         
         .f-1 { background: radial-gradient(circle at 35% 35%, #f1c40f, #b38f00); } 
         .f-3 { background: radial-gradient(circle at 35% 35%, #e74c3c, #962d22); } 
-        /* 5-BALLEN ER NÅ LILLA IGJEN */
-        .f-5 { background: radial-gradient(circle at 35% 35%, #663399, #4d2673); }
+        .f-5 { background: radial-gradient(circle at 35% 35%, #8e44ad, #4b0082); } /* DEFINITIVT LILLA */
         
-        .ball-dimmed { opacity: 0.15; filter: grayscale(0.9) blur(1px); transform: scale(0.8); }
+        /* ENDRET: Nå fjerner vi grayscale for å bevare fargen, men gjør den mørkere og mer gjennomsiktig */
+        .ball-dimmed { opacity: 0.15; filter: brightness(0.5) blur(0.5px); transform: scale(0.8); }
+        
         .is-not-turn { opacity: 0.40; }
 
         @keyframes pulse-glow {
@@ -59,7 +58,6 @@
                 <div style="color: #444; font-weight: bold;">|</div>
                 <div class="status-msg" id="status-msg">BREAK</div>
             </div>
-            
             <div class="header-balls">
                 <div id="hdr-b1" class="ball f-1"><div class="ball-num">1</div><div class="ball-overlay-3d"></div></div>
                 <div id="hdr-b3" class="ball f-3"><div class="ball-num">3</div><div class="ball-overlay-3d"></div></div>
@@ -78,7 +76,6 @@
                     <div class="pers-val"><span class="l-pers">PERS</span> <b id="best-0">0</b></div>
                 </div>
             </div>
-
             <div class="player-row" id="p1-row" style="background: rgba(0,0,102,0.65); border-top: 2px solid #333;">
                 <div class="player-name-area">
                     <div class="fouls" id="p1-fouls"></div>
@@ -89,7 +86,6 @@
                     <div class="pers-val"><span class="l-pers">PERS</span> <b id="best-1">0</b></div>
                 </div>
             </div>
-
             <div class="player-row" id="p2-row" style="background: rgba(241,196,15,0.3); border-top: 2px solid #333;">
                 <div class="player-name-area">
                     <div class="fouls" id="p2-fouls"></div>
@@ -158,7 +154,7 @@
                 b1.classList.add('ball-dimmed');
                 b5.classList.add('ball-dimmed');
             } else if (curS >= 90) {
-                // All active
+                // Alle lyser
             } else if (data.tableStatus === 'locked' && data.lastType === 'pocket') {
                 balls.forEach(b => b.classList.add('mode-carom'));
             }
