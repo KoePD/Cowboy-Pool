@@ -341,8 +341,14 @@
         document.getElementById('b1').className = (!state.breakDone || isLockedPocket || isAtEnd) ? 'ball-btn waiting' : 'ball-btn';
         document.getElementById('b3').className = (isLockedPocket || isAtEnd) ? 'ball-btn waiting' : 'ball-btn';
         document.getElementById('b5').className = (!state.breakDone || isLockedPocket || isAtEnd) ? 'ball-btn waiting' : 'ball-btn';
+    
+        /* CAROM-SYNLIGHET: Gjør carom-knapper grå hvis man må ta kule */
+        const isLockedCarom = (state.tableStatus === 'locked' && state.lastType === 'carom');
+        
+        document.getElementById('c1').className = (isLockedCarom) ? 'ctrl btn-carom waiting' : 'ctrl btn-carom';
+        document.getElementById('c2').className = (isLockedCarom) ? 'ctrl btn-carom waiting' : 'ctrl btn-carom';
     }
-
+        
     /* REGLER: Viser en enkel popup med regler */
     function showRules() {
         const rules = { no: "REGLER:\n- Brekk må treffe 3-ball.\n- Etter pocket må du ta carom.\n- Etter carom må du ta pocket.\n- Ved 90 poeng er alt carom.", en: "RULES:\n- Break must hit the 3-ball.\n- After a pocket, you must score a carom.\n- After a carom, you must score a pocket.\n- At 90 points, everything is carom." };
