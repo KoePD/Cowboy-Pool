@@ -273,6 +273,9 @@
         /* NULLSTILLER FOULS FOR SPILLEREN SOM GÅR FRA BORDET */
         state.foulCounts[state.currentPlayer] = 0;
 
+        if (!state.lastSeries) state.lastSeries = [0, 0, 0];
+        state.lastSeries[state.currentPlayer] = currentSeries;
+
         state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
         state.innings++;
         state.tableStatus = 'open';
@@ -301,56 +304,68 @@
     }
 
     /* OPPDATER UI: Oppdaterer alle tekster, knapper og farger i kontrolleren */
-    function updateUI() {
-        const t = i18n[state.lang || 'no'];
-        if (document.getElementById('scoreboard-container').children.length !== state.playerCount) initUI();
-        
-        /* Aktiv modus-knapp (1P/2P/3P) */
-        document.querySelectorAll('.mode-selector button').forEach(b => b.classList.remove('active'));
-        document.getElementById(`btn-count-${state.playerCount}`).classList.add('active');
-        
-        /* Inning, Klokke og knapper */
-        document.getElementById('inningText').innerText = t.inning + ": " + (Math.floor(state.innings/state.playerCount) + 1);
-        document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
-        document.getElementById('turnBtn').innerText = t.turn;
-        document.getElementById('rulesBtn').innerText = t.rules;
-        document.getElementById('undoBtn').innerText = t.undo;
-
-        /* Klokke-knapp tekst */
-        if(!isPaused) { document.getElementById('timerBtn').innerText = t.pause; } 
-        else { document.getElementById('timerBtn').innerText = state.seconds > 0 ? t.resume : t.start; }
-
-        /* Oppdatering av spiller-boksene (Score, Serie, Pers, Fouls) */
-        for(let i=0; i<state.playerCount; i++) {
-            document.getElementById(`p${i}-label`).innerText = state.names[i];
-            document.getElementById(`p${i}-score`).innerText = state.scores[i];
-            document.getElementById(`p${i}-turn-score`).innerText = state.scores[i] - state.scoreAtStart[i];
-            document.getElementById(`p${i}-best-score`).innerText = state.bestSeries ? (state.bestSeries[i] || 0) : 0;
-            document.getElementById(`p${i}-box`).className = (state.currentPlayer === i) ? 'player-box active' : 'player-box';
-            
-            const dots = document.getElementById(`p${i}-fouls`).children;
-            for(let d=0; d<3; d++) dots[d].className = (d < state.foulCounts[i]) ? 'dot active' : 'dot';
-        }
-
-        /* LOGIKK FOR KRAV-TEKST: Viser hva spilleren MÅ gjøre */
-        let reqText = t.msgOpen;
-        if (!state.breakDone) reqText = t.msgBreak;
-        else if (state.tableStatus === 'locked') reqText = (state.lastType === 'pocket' ? t.msgReqCarom : t.msgReqPocket);
-        document.getElementById('moveText').innerText = reqText;
-
-        /* BALL-SYNLIGHET: Gjør baller grå/inaktive basert på om de er lovlige å putte */
-        const isLockedPocket = (state.tableStatus === 'locked' && state.lastType === 'pocket');
-        const isAtEnd = state.scores[state.currentPlayer] >= 90;
-        document.getElementById('b1').className = (!state.breakDone || isLockedPocket || isAtEnd) ? 'ball-btn waiting' : 'ball-btn';
-        document.getElementById('b3').className = (isLockedPocket || isAtEnd) ? 'ball-btn waiting' : 'ball-btn';
-        document.getElementById('b5').className = (!state.breakDone || isLockedPocket || isAtEnd) ? 'ball-btn waiting' : 'ball-btn';
+function updateUI() {
+    const t = i18n[state.lang || 'no'];
+    if (document.getElementById('scoreboard-container').children.length !== state.playerCount) initUI();
     
-        /* CAROM-SYNLIGHET: Gjør carom-knapper grå hvis man må ta kule */
-        const isLockedCarom = (state.tableStatus === 'locked' && state.lastType === 'carom');
+    /* Aktiv modus-knapp (1P/2P/3P) */
+    document.querySelectorAll('.mode-selector button').forEach(b => b.classList.remove('active'));
+    document.getElementById(`btn-count-${state.playerCount}`).classList.add('active');
+    
+    /* Inning, Klokke og knapper */
+    document.getElementById('inningText').innerText = t.inning + ": " + (Math.floor(state.innings/state.playerCount) + 1);
+    document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
+    document.getElementById('turnBtn').innerText = t.turn;
+    document.getElementById('rulesBtn').innerText = t.rules;
+    document.getElementById('undoBtn').innerText = t.undo;
+
+    /* Klokke-knapp tekst */
+    if(!isPaused) { document.getElementById('timerBtn').innerText = t.pause; } 
+    else { document.getElementById('timerBtn').innerText = state.seconds > 0 ? t.resume : t.start; }
+
+    /* Oppdatering av spiller-boksene (Score, Serie, Pers, Fouls) */
+    for(let i=0; i<state.playerCount; i++) {
+        document.getElementById(`p${i}-label`).innerText = state.names[i];
+        document.getElementById(`p${i}-score`).innerText = state.scores[i];
         
-        document.getElementById('c1').className = (isLockedCarom) ? 'ctrl btn-carom waiting' : 'ctrl btn-carom';
-        document.getElementById('c2').className = (isLockedCarom) ? 'ctrl btn-carom waiting' : 'ctrl btn-carom';
+        // --- NY LOGIKK FOR SERIE/SISTE ---
+        let displaySeries;
+        if (state.currentPlayer === i) {
+            // Aktiv spiller: Vis poeng tatt i nåværende tur
+            displaySeries = state.scores[i] - state.scoreAtStart[i];
+        } else {
+            // Inaktiv spiller: Vis resultatet fra deres forrige fullførte serie
+            displaySeries = (state.lastSeries && state.lastSeries[i] !== undefined) ? state.lastSeries[i] : 0;
+        }
+        document.getElementById(`p${i}-turn-score`).innerText = displaySeries;
+        // ---------------------------------
+
+        document.getElementById(`p${i}-best-score`).innerText = state.bestSeries ? (state.bestSeries[i] || 0) : 0;
+        document.getElementById(`p${i}-box`).className = (state.currentPlayer === i) ? 'player-box active' : 'player-box';
+        
+        const dots = document.getElementById(`p${i}-fouls`).children;
+        for(let d=0; d<3; d++) dots[d].className = (d < state.foulCounts[i]) ? 'dot active' : 'dot';
     }
+
+    /* LOGIKK FOR KRAV-TEKST: Viser hva spilleren MÅ gjøre */
+    let reqText = t.msgOpen;
+    if (!state.breakDone) reqText = t.msgBreak;
+    else if (state.tableStatus === 'locked') reqText = (state.lastType === 'pocket' ? t.msgReqCarom : t.msgReqPocket);
+    document.getElementById('moveText').innerText = reqText;
+
+    /* BALL-SYNLIGHET: Gjør baller grå/inaktive basert på om de er lovlige å putte */
+    const isLockedPocket = (state.tableStatus === 'locked' && state.lastType === 'pocket');
+    const isAtEnd = state.scores[state.currentPlayer] >= 90;
+    document.getElementById('b1').className = (!state.breakDone || isLockedPocket || isAtEnd) ? 'ball-btn waiting' : 'ball-btn';
+    document.getElementById('b3').className = (isLockedPocket || isAtEnd) ? 'ball-btn waiting' : 'ball-btn';
+    document.getElementById('b5').className = (!state.breakDone || isLockedPocket || isAtEnd) ? 'ball-btn waiting' : 'ball-btn';
+
+    /* CAROM-SYNLIGHET: Gjør carom-knapper grå hvis man må ta kule */
+    const isLockedCarom = (state.tableStatus === 'locked' && state.lastType === 'carom');
+    
+    document.getElementById('c1').className = (isLockedCarom) ? 'ctrl btn-carom waiting' : 'ctrl btn-carom';
+    document.getElementById('c2').className = (isLockedCarom) ? 'ctrl btn-carom waiting' : 'ctrl btn-carom';
+}
         
     /* REGLER: Viser en enkel popup med regler */
     function showRules() {
