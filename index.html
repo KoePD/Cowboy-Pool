@@ -116,7 +116,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('gameData');
 
-    // Ordbok for oversettelse
     const i18n = {
         no: {
             start: "START KLOKKE", resume: "FORTSETT", pause: "PAUSE", breaker: "BYTT STARTSPILLER",
@@ -208,10 +207,9 @@
             state.bestSeries[state.currentPlayer] = currentSeries;
         }
         if (!state.breakDone) state.breakDone = true;
-        
-        // --- HER ER ENDRINGEN: Nullstiller fouls for spilleren som nettopp avsluttet ---
+
+        // --- NULLSTILL FOULS FOR SPILLEREN SOM GÅR FRA BORDET ---
         state.foulCounts[state.currentPlayer] = 0;
-        // -------------------------------------------------------------------------------
 
         state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
         state.innings++;
@@ -226,18 +224,26 @@
         if (!state.breakDone) state.breakDone = true;
         state.foulCounts[state.currentPlayer]++;
         state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer];
+        
+        // Her avslutter vi turen manuelt ved foul - men vi fjerner IKKE foul-prikkene 
+        // før turen byttes, så de vises på scoreboardet.
         if (state.foulCounts[state.currentPlayer] >= 3) alert("3 FOULS!");
-        nextTurn(); 
+        
+        // Vi kaller IKKE nextTurn her lenger, vi bytter tur manuelt så fouls blir med over til Firebase før de nullstilles
+        let nextPlayer = (state.currentPlayer + 1) % state.playerCount;
+        state.currentPlayer = nextPlayer;
+        state.innings++;
+        state.tableStatus = 'open';
+        state.lastType = null;
+        state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer];
+        pushData();
     }
 
     function updateUI() {
         const t = i18n[state.lang || 'no'];
         if (document.getElementById('scoreboard-container').children.length !== state.playerCount) initUI();
-        
         document.querySelectorAll('.mode-selector button').forEach(b => b.classList.remove('active'));
         document.getElementById(`btn-count-${state.playerCount}`).classList.add('active');
-        
-        // Tekst-oppdateringer
         document.getElementById('inningText').innerText = t.inning + ": " + (Math.floor(state.innings/state.playerCount) + 1);
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
         document.getElementById('changeBreakerBtn').innerText = t.breaker;
@@ -247,12 +253,8 @@
         document.getElementById('turnBtn').innerText = t.turn;
         document.getElementById('undoBtn').innerText = t.undo;
         document.getElementById('resetBtn').innerText = t.reset;
-
-        if(!isPaused) {
-            document.getElementById('timerBtn').innerText = t.pause;
-        } else {
-            document.getElementById('timerBtn').innerText = state.seconds > 0 ? t.resume : t.start;
-        }
+        if(!isPaused) { document.getElementById('timerBtn').innerText = t.pause; } 
+        else { document.getElementById('timerBtn').innerText = state.seconds > 0 ? t.resume : t.start; }
 
         for(let i=0; i<state.playerCount; i++) {
             document.getElementById(`p${i}-label`).innerText = state.names[i];
@@ -262,20 +264,13 @@
             document.getElementById(`p${i}-box`).className = (state.currentPlayer === i) ? 'player-box active' : 'player-box';
             const dots = document.getElementById(`p${i}-fouls`).children;
             for(let d=0; d<3; d++) dots[d].className = (d < state.foulCounts[i]) ? 'dot active' : 'dot';
-            
-            // Oppdater labels i boksene hvis de finnes
             const boxes = document.getElementById(`p${i}-box`).querySelectorAll('.series-label');
-            if(boxes.length === 2) {
-                boxes[0].innerText = t.now;
-                boxes[1].innerText = t.best;
-            }
+            if(boxes.length === 2) { boxes[0].innerText = t.now; boxes[1].innerText = t.best; }
         }
-
         let reqText = t.msgOpen;
         if (!state.breakDone) reqText = t.msgBreak;
         else if (state.tableStatus === 'locked') reqText = (state.lastType === 'pocket' ? t.msgReqCarom : t.msgReqPocket);
         document.getElementById('moveText').innerText = reqText;
-
         const isLockedPocket = (state.tableStatus === 'locked' && state.lastType === 'pocket');
         const isAtEnd = state.scores[state.currentPlayer] >= 90;
         document.getElementById('b1').className = (!state.breakDone || isLockedPocket || isAtEnd) ? 'ball-btn waiting' : 'ball-btn';
@@ -284,36 +279,13 @@
     }
 
     function showRules() {
-        const rules = {
-            no: "REGLER:\n- Brekk må treffe 3-ball.\n- Etter pocket må du ta carom.\n- Etter carom må du ta pocket.\n- Ved 90 poeng er alt carom.",
-            en: "RULES:\n- Break must hit the 3-ball.\n- After a pocket, you must score a carom.\n- After a carom, you must score a pocket.\n- At 90 points, everything is carom."
-        };
+        const rules = { no: "REGLER:\n- Brekk må treffe 3-ball.\n- Etter pocket må du ta carom.\n- Etter carom må du ta pocket.\n- Ved 90 poeng er alt carom.", en: "RULES:\n- Break must hit the 3-ball.\n- After a pocket, you must score a carom.\n- After a carom, you must score a pocket.\n- At 90 points, everything is carom." };
         alert(rules[state.lang || 'no']);
     }
 
-    function toggleTimer() {
-        if(!isPaused) { clearInterval(timerInterval); isPaused = true; }
-        else { isPaused = false; timerInterval = setInterval(() => { state.seconds++; db.child('gameData/seconds').set(state.seconds); }, 1000); }
-        updateUI();
-    }
-
+    function toggleTimer() { if(!isPaused) { clearInterval(timerInterval); isPaused = true; } else { isPaused = false; timerInterval = setInterval(() => { state.seconds++; db.child('gameData/seconds').set(state.seconds); }, 1000); } updateUI(); }
     function setPlayerCount(n) { state.playerCount = n; resetGame(); }
-
-    function resetGame() { 
-        const t = i18n[state.lang || 'no'];
-        if (confirm(t.confirmReset)) {
-            state.scores=[0,0,0]; 
-            state.foulCounts=[0,0,0]; 
-            state.scoreAtStart=[0,0,0]; 
-            state.bestSeries=[0,0,0]; 
-            state.breakDone=false; 
-            state.tableStatus='open'; 
-            state.innings=0; 
-            state.seconds=0; 
-            pushData(); 
-        }
-    }
-
+    function resetGame() { const t = i18n[state.lang || 'no']; if (confirm(t.confirmReset)) { state.scores=[0,0,0]; state.foulCounts=[0,0,0]; state.scoreAtStart=[0,0,0]; state.bestSeries=[0,0,0]; state.breakDone=false; state.tableStatus='open'; state.innings=0; state.seconds=0; pushData(); } }
     function rotateBreaker() { if(!state.breakDone) { state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; pushData(); } }
     function saveHistory() { history.push(JSON.stringify(state)); }
     function undo() { if(history.length) { state = JSON.parse(history.pop()); pushData(); } }
