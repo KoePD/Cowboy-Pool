@@ -314,6 +314,7 @@
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
         document.getElementById('turnBtn').innerText = t.turn;
         document.getElementById('rulesBtn').innerText = t.rules;
+        document.getElementById('undoBtn').innerText = t.undo;
 
         /* Klokke-knapp tekst */
         if(!isPaused) { document.getElementById('timerBtn').innerText = t.pause; } 
