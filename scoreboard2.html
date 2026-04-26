@@ -91,7 +91,18 @@
         .is-not-turn { opacity: 0.40; }
 
         /* PULSERING: Brukes når det er krav om Carom */
-        @keyframes pulse-glow { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.1); filter: brightness(1.4); } 100% { transform: scale(1); filter: brightness(1); } }
+        @keyframes pulse-glow { 
+    0% { 
+        box-shadow: 0 0 0px rgba(255,255,255,0);
+    } 
+    50% { 
+        /* Her legger vi kun glød på utsiden av kula */
+        box-shadow: 0 0 0px 5px rgba(255,255,255,0.6);
+    } 
+    100% { 
+        box-shadow: 0 0 0px rgba(255,255,255,0);
+    } 
+}
         .mode-carom { animation: pulse-glow 1.5s infinite ease-in-out; }
     </style>
 </head>
