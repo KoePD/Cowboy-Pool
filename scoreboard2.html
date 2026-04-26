@@ -28,18 +28,15 @@
         .dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(0,0,0,0.2); }
         .dot.active { background: #ff0000; box-shadow: 0 0 8px #ff0000; }
 
-        /* 3D KULER */
         .ball { width: 28px; height: 28px; border-radius: 50%; position: relative; background-color: #fff; display: flex; justify-content: center; align-items: center; overflow: hidden; transition: all 0.3s ease; }
         .ball-overlay-3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; z-index: 10; box-shadow: inset -2px -2px 4px rgba(0,0,0,0.4), inset 1.5px 1.5px 3px rgba(255,255,255,0.2); border: 1px solid rgba(0,0,0,0.1); }
         .ball-num { font-size: 10px; font-weight: 900; z-index: 5; color: black; background: white; width: 14px; height: 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid #000; }
         
         .f-1 { background: radial-gradient(circle at 35% 35%, #f1c40f, #b38f00); } 
         .f-3 { background: radial-gradient(circle at 35% 35%, #e74c3c, #962d22); } 
-        .f-5 { background: radial-gradient(circle at 35% 35%, #8e44ad, #4b0082); } /* DEFINITIVT LILLA */
+        .f-5 { background: radial-gradient(circle at 35% 35%, #8e44ad, #4b0082); } 
         
-        /* ENDRET: Nå fjerner vi grayscale for å bevare fargen, men gjør den mørkere og mer gjennomsiktig */
         .ball-dimmed { opacity: 0.15; filter: brightness(0.5) blur(0.5px); transform: scale(0.8); }
-        
         .is-not-turn { opacity: 0.40; }
 
         @keyframes pulse-glow {
@@ -56,7 +53,7 @@
             <div class="header-info">
                 <div class="inning-text" id="inning-text">INNING 1</div>
                 <div style="color: #444; font-weight: bold;">|</div>
-                <div class="status-msg" id="status-msg">BREAK</div>
+                <div class="status-msg" id="status-msg">STARTSTØT (3-BALL)</div>
             </div>
             <div class="header-balls">
                 <div id="hdr-b1" class="ball f-1"><div class="ball-num">1</div><div class="ball-overlay-3d"></div></div>
@@ -104,9 +101,24 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref('gameData');
 
+        // OPPDATERTE TEKSTER SOM FØLGER KONTROLLEREN
         const i18n = {
-            no: { pers: "PERS", inn: "INNING", break: "BREAK", open: "ÅPEN", rc: "CAROM", rp: "POCKET" },
-            en: { pers: "BEST", inn: "INNING", break: "BREAK", open: "OPEN", rc: "CAROM", rp: "POCKET" }
+            no: { 
+                pers: "PERS", 
+                inn: "INNING", 
+                break: "STARTSTØT (3-BALL)", 
+                open: "VALG: CAROM / POCKET", 
+                rc: "KRAV: CAROM", 
+                rp: "KRAV: POCKET" 
+            },
+            en: { 
+                pers: "BEST", 
+                inn: "INNING", 
+                break: "BREAKSHOT (3-BALL)", 
+                open: "CHOICE: CAROM / POCKET", 
+                rc: "REQ: CAROM", 
+                rp: "REQ: POCKET" 
+            }
         };
 
         db.on('value', snap => {
@@ -137,6 +149,7 @@
             document.querySelectorAll('.l-pers').forEach(el => el.innerText = t.pers);
             document.getElementById('inning-text').innerText = t.inn + " " + (Math.floor(data.innings/data.playerCount) + 1);
             
+            // LOGIKK FOR STATUSMELDING
             let statusText = t.break;
             if (data.breakDone) {
                 statusText = (data.tableStatus === 'locked') ? (data.lastType === 'pocket' ? t.rc : t.rp) : t.open;
@@ -154,7 +167,7 @@
                 b1.classList.add('ball-dimmed');
                 b5.classList.add('ball-dimmed');
             } else if (curS >= 90) {
-                // Alle lyser
+                // Alle aktive i sluttfase
             } else if (data.tableStatus === 'locked' && data.lastType === 'pocket') {
                 balls.forEach(b => b.classList.add('mode-carom'));
             }
