@@ -67,14 +67,14 @@
         /* PULSERING: Brukes når det er krav om Carom */
         @keyframes pulse-glow { 
     0% { 
-        box-shadow: 0 0 0px rgba(255,255,255,0);
+        box-shadow: inset -2px -2px 4px rgba(0,0,0,0.4), inset 1.5px 1.5px 3px rgba(255,255,255,0.2);
     } 
     50% { 
-        /* Her legger vi kun glød på utsiden av kula */
-        box-shadow: 0 0 15px 5px rgba(255,255,255,0.6);
+        box-shadow: inset -2px -2px 4px rgba(0,0,0,0.4), inset 1.5px 1.5px 3px rgba(255,255,255,0.2), 0 0 15px rgba(255,255,255,0.8);
+        filter: brightness(1.2);
     } 
     100% { 
-        box-shadow: 0 0 0px rgba(255,255,255,0);
+        box-shadow: inset -2px -2px 4px rgba(0,0,0,0.4), inset 1.5px 1.5px 3px rgba(255,255,255,0.2);
     } 
 }
 
