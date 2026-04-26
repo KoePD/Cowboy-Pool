@@ -141,13 +141,13 @@
         <button class="ctrl btn-carom" onclick="action('carom', 1)" id="c1">Carom 1p</button>
         <button class="ctrl btn-carom" onclick="action('carom', 2)" id="c2">Carom 2p</button>
         <button class="ctrl" style="background:#8e44ad" onclick="undo()" id="undoBtn">Angre</button>
-        <button class="ctrl" style="background:#7f8c8d" onclick="adjustScore(1)">+</button>
-        <button class="ctrl" style="background:#7f8c8d" onclick="adjustScore(-1)">−</button>
-        <button class="ctrl" style="background:#444" onclick="showRules()" id="rulesBtn">REGLER</button>
+        <button class="ctrl" style="background:#7f8c8d; display: none;" onclick="adjustScore(1)">+</button>
+        <button class="ctrl" style="background:#7f8c8d; display: none;" onclick="adjustScore(-1)">−</button>
+        <button class="ctrl" style="background:#444; grid-column: span 3;" onclick="showRules()" id="rulesBtn">REGLER</button>
         <button class="ctrl btn-foul" onclick="handleFoul()" id="foulBtn">FOUL (MISTER SERIE)</button>
         <button class="ctrl btn-turn" onclick="nextTurn()" id="turnBtn">AVSLUTT TUR / BOM</button>
         <button class="ctrl" style="background:#34495e; grid-column: span 3; margin-top:10px; font-size:0.7em;" onclick="resetGame()" id="resetBtn">HARD RESET</button>
-    </div>
+</div>
 </div>
 
 <script>
