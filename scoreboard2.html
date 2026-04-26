@@ -295,16 +295,16 @@
             playerPlacement[item.index] = pos; 
     });
             
-            // ----------------------------
+           // ----------------------------
             for(let p=0; p < 3; p++) {
                 const row = document.getElementById(`p${p}-row`);
                 const fCount = data.foulCounts[p];
-                // 1. Hent plasseringen (0, 1 eller 2)
-                    const placement = playerPlacement[p]; 
+                
+                // 1. HENT PLASSERINGEN HER (Viktig at denne står øverst!)
+                const placement = playerPlacement[p]; 
 
-                    // --- ERSTATT FRA LINJE 306 ---
                 if (row) {
-                    // 1. Bestem hvordan raden skal flyttes (Pro/Standard)
+                    // 2. Bestem hvordan raden skal flyttes (Pro/Standard)
                     if (isProVersion) {
                         // PRO: Silkemyk F1-animasjon
                         const yPosition = placement * 75; 
@@ -316,7 +316,7 @@
                         row.style.order = placement; 
                     }
 
-                    // 2. Håndter eliminering (3 feil)
+                    // 3. Håndter eliminering (3 feil)
                     const isEliminated = p >= data.playerCount || fCount >= 3;
 
                     if (!isEliminated) {
@@ -335,7 +335,7 @@
                         }, 500);
                     }
 
-                    // 3. Marker hvem sin tur det er
+                    // 4. Marker hvem sin tur det er
                     row.classList.toggle('is-not-turn', curP !== p);
                 }
                 // --- SLUTT PÅ ERSTATNING ---
