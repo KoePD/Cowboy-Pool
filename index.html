@@ -262,27 +262,40 @@
 
     /* NESTE TUR: Kjører ved "Avslutt tur / Bom". Nullstiller fouls og bytter spiller. */
     function nextTurn() {
-        saveHistory();
-        /* Oppdater pers hvis serien som nettopp ble ferdig er rekord */
-        let currentSeries = state.scores[state.currentPlayer] - state.scoreAtStart[state.currentPlayer];
-        if (currentSeries > (state.bestSeries[state.currentPlayer] || 0)) {
-            state.bestSeries[state.currentPlayer] = currentSeries;
-        }
-        if (!state.breakDone) state.breakDone = true;
+    saveHistory();
+    
+    // 1. Regn ut poengene for runden som akkurat ble ferdig
+    const p = state.currentPlayer;
+    const roundScore = state.scores[p] - state.scoreAtStart[p];
+    
+    // 2. Oppdater personlig rekord (Pers)
+    if (roundScore > (state.bestSeries[p] || 0)) {
+        state.bestSeries[p] = roundScore;
+    }
+    
+    // 3. Lagre runden i historikken (SISTE)
+    if (!state.lastSeries) state.lastSeries = [0, 0, 0];
+        state.lastSeries[p] = roundScore;
 
-        /* NULLSTILLER FOULS FOR SPILLEREN SOM GÅR FRA BORDET */
-        state.foulCounts[state.currentPlayer] = 0;
+    if (!state.breakDone) state.breakDone = true;
 
-        if (!state.lastSeries) state.lastSeries = [0, 0, 0];
-        state.lastSeries[state.currentPlayer] = currentSeries;
+    // 4. Nullstill fouls for spilleren som går fra bordet
+        state.foulCounts[p] = 0;
 
+    // 5. Finn neste spiller som ikke har 3 fouls (hopp over eliminerte)
+    do {
         state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
+    } while (state.foulCounts[state.currentPlayer] >= 3);
+
+    // 6. Klargjør for neste spiller
         state.innings++;
         state.tableStatus = 'open';
         state.lastType = null;
+        state.lastShotValue = 0; // Nullstiller den lille indikatoren på scoreboardet
         state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer];
-        pushData();
-    }
+    
+    saveState();
+}
 
     /* FOUL: Håndterer feilstøt. Mister serien og bytter tur uten å resette fouls før ETTERpå. */
     function handleFoul() {
