@@ -52,13 +52,12 @@
             border-top: none; 
             width: 100%;
             height: auto; 
-            /* Dette sikrer at boksen alltid er stor nok for 3 spillere (3 * 75px) */
-            min-height: 225px; 
             box-sizing: border-box; 
             position: relative; 
             z-index: 5; 
             overflow: hidden; 
             box-shadow: 0 15px 35px rgba(0,0,0,0.7); 
+            transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
         
         /* SPILLERRADEN: Endre 'height' for å gjøre hver spiller-rad høyere eller lavere */
@@ -268,6 +267,13 @@
         // --- 3. RANGERING ---
         let activePlayers = [];
         let eliminatedPlayers = [];
+
+        // Finn body-elementet
+        const bodyEl = document.querySelector('.scoreline-body');
+        // Oppdater høyden basert på antall spillere (76px er høyden du har satt på radene)
+        if (bodyEl) {
+            bodyEl.style.height = (data.playerCount * 76) + "px";
+}
 
         // Vi sjekker kun spillere opp til det antallet som faktisk spiller (playerCount)
         for (let i = 0; i < data.playerCount; i++) {
