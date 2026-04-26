@@ -21,12 +21,11 @@
         
         /* KULE-OMRÅDET I HEADER: 'width' her må være lik 'min-width' i .score-block (135px) for at de skal stå på linje */
         .header-balls { 
-            width: 180px;         /* Match denne med min-width i .score-block */
+            width: 180px;            /* Holder seg på linje med score-block */
             display: flex; 
-            justify-content: center; /* Dette sentrerer kulene horisontalt i de 180 pikslene */
+            justify-content: center; /* Holder kulegruppen sentrert som en enhet */
             align-items: center; 
-            gap: 10px; 
-            border-left: 3px solid #333; /* Valgfritt: Legg til denne hvis du vil at skillelinjen skal gå helt opp i headeren */
+            gap: 25px;               /* Økt fra 10px for mer luft mellom kulene */
             height: 100%;
             box-sizing: border-box;
 }
