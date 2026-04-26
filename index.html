@@ -275,12 +275,12 @@
     
     // 3. Lagre runden i historikken (SISTE)
     if (!state.lastSeries) state.lastSeries = [0, 0, 0];
-        state.lastSeries[p] = roundScore;
+    state.lastSeries[p] = roundScore;
 
     if (!state.breakDone) state.breakDone = true;
 
     // 4. Nullstill fouls for spilleren som går fra bordet
-        state.foulCounts[p] = 0;
+    state.foulCounts[p] = 0;
 
     // 5. Finn neste spiller som ikke har 3 fouls (hopp over eliminerte)
     do {
@@ -288,11 +288,11 @@
     } while (state.foulCounts[state.currentPlayer] >= 3);
 
     // 6. Klargjør for neste spiller
-        state.innings++;
-        state.tableStatus = 'open';
-        state.lastType = null;
-        state.lastShotValue = 0; // Nullstiller den lille indikatoren på scoreboardet
-        state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer];
+    state.innings++;
+    state.tableStatus = 'open';
+    state.lastType = null;
+    state.lastShotValue = 0; // Nullstiller den lille indikatoren på scoreboardet
+    state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer];
     
     saveState();
 }
