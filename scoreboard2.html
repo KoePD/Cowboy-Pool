@@ -63,7 +63,7 @@
         /* ENDRET: Flytter alt til venstre side av boksen */
             justify-content: flex-start; 
         /* NYTT: Gir litt luft fra venstreveggen (juster denne til det passer) */
-            padding-left: 15px; 
+            padding-left: 10px; 
             gap: 8px; 
             width: 100%;
             box-sizing: border-box;
@@ -72,9 +72,10 @@
         /* NYTT: Dette låser bredden på hver tekst+tall-gruppe */
         .pers-val span {
             display: inline-block; /* Endret fra flex for å låse bredden bedre */
-            width: 45px;           /* Fast bredde på selve ordet (NÅ/NOW/BEST) */
+            width: 42px;           /* Fast bredde på selve ordet (NÅ/NOW/BEST) */
             white-space: nowrap;
             text-align: left;
+            flex-shrink: 0;
 }
 
         .pers-val b { 
@@ -84,7 +85,7 @@
             margin-left: 2px; 
         /* Tvinger tallet til å ha en fast bredde slik at det ikke 'danser' */
             display: inline-block;
-            width: 18px; 
+            width: 15px; 
             text-align: left;
 }
 
