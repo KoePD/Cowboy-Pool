@@ -6,40 +6,77 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Cowboy Pool Pro</title>
+    
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
+    
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: radial-gradient(circle at top, #1e4d2b 0%, #0a1a0f 100%); background-attachment: fixed; color: white; margin: 0; padding: 0; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: radial-gradient(circle at top, #1e4d2b 0%, #0a1a0f 100%);
+            background-attachment: fixed;
+            color: white; margin: 0; padding: 0; 
+            display: flex; justify-content: center;
+            min-height: 100vh; overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
         .app-container { width: 100%; max-width: 430px; padding: 20px; padding-bottom: 120px; display: flex; flex-direction: column; }
+        
+        /* SIDE-HÅNDTERING */
         .page { display: none; width: 100%; flex-direction: column; }
         .page.active { display: flex; }
+
         .header-actions { display: flex; justify-content: center; margin-bottom: 20px; min-height: 45px; }
-        .btn-gold { background: rgba(0,0,0,0.6); color: #f1c40f; border: 1px solid rgba(241, 196, 15, 0.5); padding: 10px 30px; border-radius: 50px; font-weight: 800; font-size: 0.75em; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; }
-        .card { background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%); backdrop-filter: blur(10px); border-radius: 24px; padding: 20px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; }
+        .btn-gold { 
+            background: rgba(0,0,0,0.6); color: #f1c40f; border: 1px solid rgba(241, 196, 15, 0.5); 
+            padding: 10px 30px; border-radius: 50px; font-weight: 800; font-size: 0.75em; 
+            letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
+        }
+
+        .card { 
+            background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%); 
+            backdrop-filter: blur(10px); border-radius: 24px; padding: 20px; margin-bottom: 12px; 
+            border: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center;
+        }
         .player-card.active-turn { border: 2px solid #f1c40f; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9); transform: scale(1.02); }
-        .info-label { font-size: 0.8em; color: #666; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
-        .info-value { font-size: 1.2em; font-weight: bold; color: #f1c40f; }
-        .profile-header { text-align: center; margin-bottom: 30px; }
-        .profile-avatar { width: 80px; height: 80px; background: #f1c40f; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; color: black; font-size: 2.5em; font-weight: 900; }
-        .profile-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .stat-box { background: rgba(0,0,0,0.5); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); text-align: center; }
+        
         .score-display { font-size: 3.5em; font-weight: 900; color: #333; }
         .active-turn .score-display { color: #f1c40f; }
-        .game-status-zone { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(15px); padding: 15px; border-radius: 20px 20px 0 0; text-align: center; border: 1px solid rgba(255,255,255,0.05); border-bottom: none; margin-top: 20px; }
-        .ball-control-zone { display: flex; justify-content: space-around; background: rgba(0,0,0,0.5); padding: 20px 10px; border-radius: 0 0 35px 35px; border: 1px solid rgba(255,255,255,0.03); margin-bottom: 15px; }
-        .ball { width: 75px; height: 75px; border-radius: 50%; border: none; box-shadow: inset -6px -6px 15px rgba(0,0,0,0.7), 6px 12px 20px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; }
+
+        .game-status-zone { background: rgba(0, 0, 0, 0.6); padding: 15px; border-radius: 20px 20px 0 0; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .ball-control-zone { display: flex; justify-content: space-around; background: rgba(0,0,0,0.5); padding: 20px 10px; border-radius: 0 0 35px 35px; margin-bottom: 15px; }
+        
+        .ball { width: 75px; height: 75px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+        .ball-inner { width: 28px; height: 28px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #000; }
+        
         .action-area { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .btn-action { padding: 16px; border-radius: 16px; border: none; font-weight: 800; text-transform: uppercase; cursor: pointer; color: white; }
+        
+        .btn-win { 
+            background: linear-gradient(45deg, #f1c40f, #d4ac0d); color: black; 
+            grid-column: span 2; padding: 20px; font-weight: 900; border-radius: 16px; 
+            border: none; margin-bottom: 10px; cursor: pointer; animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(241, 196, 15, 0.7); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 15px rgba(241, 196, 15, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(241, 196, 15, 0); }
+        }
+
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: flex; justify-content: space-around; padding: 10px 0 35px 0; border-top: 1px solid #111; z-index: 1000; }
         .nav-item { color: #333; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.55em; font-weight: bold; cursor: pointer; }
         .nav-item.active { color: #f1c40f; }
         .nav-item i { font-size: 2.2em; margin-bottom: 4px; }
-        .setup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,20,5,0.98); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(10px); }
-        .setup-card { background: #000; border: 1px solid #f1c40f; padding: 30px; border-radius: 30px; width: 100%; max-width: 350px; text-align: center; }
-        .waiting-ball { opacity: 0.15; filter: grayscale(1); pointer-events: none; }
-        .foul-dot { width: 12px; height: 12px; border-radius: 50%; background: #1a1a1a; border: 1px solid #222; }
+
+        .waiting-ball { opacity: 0.1; filter: grayscale(1); pointer-events: none; }
+        .foul-dot { width: 12px; height: 12px; border-radius: 50%; background: #1a1a1a; margin-right: 4px; }
         .foul-dot.active { background: #e74c3c; box-shadow: 0 0 10px #ff4757; }
+
+        .setup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,20,5,0.98); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(10px); }
+        .setup-card { background: #000; border: 1px solid #f1c40f; padding: 30px; border-radius: 30px; width: 100%; max-width: 350px; text-align: center; }
+        .name-field { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #111; color: white; margin-bottom: 10px; text-align: center; }
     </style>
 </head>
 <body>
@@ -48,13 +85,13 @@
     <div class="setup-card">
         <h2 id="overlayHeader" style="color:#f1c40f; margin-bottom: 20px;">NY MATCH</h2>
         <div id="step-confirm" style="display: none;">
-            <p id="confirmText" style="color:#888; margin-bottom: 20px;">En kamp pågår allerede.</p>
+            <p style="color:#888; margin-bottom: 20px;">En kamp pågår allerede.</p>
             <button class="btn-gold" style="width:100%; margin-bottom:10px;" onclick="handleFinishAndSave()">LAGRE & START NY</button>
             <button class="btn-gold" style="width:100%; border-color:#e74c3c; color:#e74c3c;" onclick="goToStep1()">SLETT & START NY</button>
             <button style="background:none; border:none; color:#555; margin-top:15px;" onclick="closeSetup()">Fortsett kampen</button>
         </div>
         <div id="step1" style="display: none;">
-            <p id="playersText" style="color:#888; margin-bottom: 15px;">Antall spillere?</p>
+            <p style="color:#888; margin-bottom: 15px;">Antall spillere?</p>
             <div style="display:flex; gap:10px; margin-bottom:20px;">
                 <button class="btn-gold" style="flex:1" onclick="selectPlayers(1)">1</button>
                 <button class="btn-gold" style="flex:1" onclick="selectPlayers(2)">2</button>
@@ -63,9 +100,8 @@
             <button style="background:none; border:none; color:#555;" onclick="closeSetup()">Avbryt</button>
         </div>
         <div id="step2" style="display: none;">
-            <p id="namesText" style="color:#888; margin-bottom: 15px;">Navn på spillere:</p>
             <div id="nameInputs"></div>
-            <button class="btn-gold" style="width:100%;" onclick="finalizeSetup()">START KAMP</button>
+            <button class="btn-gold" style="width:100%; margin-top:10px;" onclick="finalizeSetup()">START KAMP</button>
             <button style="background:none; border:none; color:#555; margin-top:15px;" onclick="goToStep1()">← Tilbake</button>
         </div>
     </div>
@@ -73,63 +109,56 @@
 
 <div class="app-container">
     <div id="profilePage" class="page">
-        <div class="profile-header">
-            <div class="profile-avatar" id="profInitial">O</div>
-            <h2 id="profName" style="margin:5px 0">Ole Andreas</h2>
-            <p id="profTitle" style="color:#666; font-size:0.8em; text-transform:uppercase">Pool Pro Player</p>
+        <div style="text-align:center; margin-bottom:20px;">
+            <div style="width:80px; height:80px; background:#f1c40f; border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center; color:black; font-size:2em; font-weight:900;" id="profInitial">O</div>
+            <h2 id="profName" style="margin:0;">Spiller 1</h2>
         </div>
         <div class="card">
             <div style="text-align:left">
-                <p class="info-label">All-time High Run</p>
-                <p class="info-value" id="profBest">0 Poeng</p>
+                <p style="font-size: 0.8em; color: #666; text-transform: uppercase;">All-time High Run</p>
+                <p style="font-size: 1.2em; font-weight: bold; color: #f1c40f;" id="profBest">0</p>
             </div>
             <i class="material-icons" style="color:#f1c40f; font-size:2em">emoji_events</i>
         </div>
-        <div class="profile-stats-grid">
-            <div class="stat-box"><p class="info-label">Kamper</p><p class="info-value" id="profMatches">0</p></div>
-            <div class="stat-box"><p class="info-label">Seire</p><p class="info-value" id="profWins">0</p></div>
+        <p style="text-align:center; color:#666; font-size:0.8em; text-transform:uppercase; margin:15px 0;">Trofé-skap</p>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;">
+            <div class="card" style="flex-direction:column; padding:10px; opacity:0.3;" id="trophy101"><i class="material-icons">workspace_premium</i><small style="font-size:0.6em;">101 Club</small></div>
+            <div class="card" style="flex-direction:column; padding:10px; opacity:0.3;"><i class="material-icons">military_tech</i><small style="font-size:0.6em;">Sniper</small></div>
+            <div class="card" style="flex-direction:column; padding:10px; opacity:0.3;"><i class="material-icons">stars</i><small style="font-size:0.6em;">Carom King</small></div>
         </div>
-        <button class="btn-gold" style="margin-top:30px; width:100%; border-color:#555; color:#888">Rediger Profil</button>
     </div>
 
     <div id="playPage" class="page active">
-        <div class="header-actions">
-            <button class="btn-gold" id="newMatchTopBtn" onclick="checkActiveGame()">New Match</button>
-        </div>
+        <div class="header-actions"><button class="btn-gold" onclick="checkActiveGame()">New Match</button></div>
         <div id="scoreboard-container"></div>
+
         <div class="game-status-zone">
-            <span id="moveText" style="font-size:0.8em; letter-spacing:2px; color:#2ecc71; font-weight:800; text-transform:uppercase">BREKK-STØT</span>
-            <span id="matchTimer" style="font-family:monospace; font-size:1.2em; color:#f1c40f; display:block; margin-top:3px">00:00:00</span>
-            <div id="rotate-container"><button style="background:rgba(241,196,15,0.1); border:1px solid #f1c40f; color:#f1c40f; padding:6px 15px; border-radius:8px; font-size:0.65em; font-weight:bold; cursor:pointer; margin-top:10px;" onclick="rotateBreaker()">BYTT STARTSPILLER</button></div>
+            <span id="moveText" style="font-size:0.8em; color:#2ecc71; font-weight:800; text-transform:uppercase">BREKK-STØT</span>
+            <span id="matchTimer" style="font-family:monospace; font-size:1.2em; color:#f1c40f; display:block;">00:00:00</span>
+            <div id="rotate-container"><button style="background:none; border:1px solid #f1c40f; color:#f1c40f; padding:5px 10px; border-radius:8px; font-size:0.6em; margin-top:10px;" onclick="rotateBreaker()">BYTT STARTSPILLER</button></div>
         </div>
+        
         <div class="ball-control-zone">
-            <div style="display:flex; flex-direction:column; align-items:center; gap:10px">
-                <button class="ball" id="ball1" style="background:radial-gradient(circle at 35% 35%, #f1c40f, #b38f00);" onclick="action('pocket', 1)"><div style="width:28px; height:28px; background:white; border-radius:50%; color:black; font-weight:900; display:flex; align-items:center; justify-content:center; border:2px solid #000">1</div></button>
-                <button style="background:rgba(52,152,219,0.1); color:#3498db; border:1px solid #3498db; border-radius:8px; padding:6px; font-size:0.6em; font-weight:800;" onclick="action('pocket_carom', 2)">+ CAROM</button>
-            </div>
-            <div style="display:flex; flex-direction:column; align-items:center; gap:10px">
-                <button class="ball" id="ball5" style="background:radial-gradient(circle at 35% 35%, #8e44ad, #4b0082);" onclick="action('pocket', 5)"><div style="width:28px; height:28px; background:white; border-radius:50%; color:black; font-weight:900; display:flex; align-items:center; justify-content:center; border:2px solid #000">5</div></button>
-                <button style="background:rgba(52,152,219,0.1); color:#3498db; border:1px solid #3498db; border-radius:8px; padding:6px; font-size:0.6em; font-weight:800;" onclick="action('pocket_carom', 6)">+ CAROM</button>
-            </div>
-            <div style="display:flex; flex-direction:column; align-items:center; gap:10px">
-                <button class="ball" id="ball3" style="background:radial-gradient(circle at 35% 35%, #e74c3c, #962d22);" onclick="action('pocket', 3)"><div style="width:28px; height:28px; background:white; border-radius:50%; color:black; font-weight:900; display:flex; align-items:center; justify-content:center; border:2px solid #000">3</div></button>
-                <button style="background:rgba(52,152,219,0.1); color:#3498db; border:1px solid #3498db; border-radius:8px; padding:6px; font-size:0.6em; font-weight:800;" onclick="action('pocket_carom', 4)">+ CAROM</button>
-            </div>
+            <div style="text-align:center"><button class="ball" id="ball1" style="background:radial-gradient(circle at 35% 35%, #f1c40f, #b38f00);" onclick="action('pocket', 1)"><div class="ball-inner">1</div></button><button id="pc1" style="background:none; color:#3498db; border:1px solid #3498db; font-size:0.5em; margin-top:8px; padding:4px; border-radius:4px;" onclick="action('pocket_carom', 2)">+CAROM</button></div>
+            <div style="text-align:center"><button class="ball" id="ball5" style="background:radial-gradient(circle at 35% 35%, #8e44ad, #4b0082);" onclick="action('pocket', 5)"><div class="ball-inner">5</div></button><button id="pc5" style="background:none; color:#3498db; border:1px solid #3498db; font-size:0.5em; margin-top:8px; padding:4px; border-radius:4px;" onclick="action('pocket_carom', 6)">+CAROM</button></div>
+            <div style="text-align:center"><button class="ball" id="ball3" style="background:radial-gradient(circle at 35% 35%, #e74c3c, #962d22);" onclick="action('pocket', 3)"><div class="ball-inner">3</div></button><button id="pc3" style="background:none; color:#3498db; border:1px solid #3498db; font-size:0.5em; margin-top:8px; padding:4px; border-radius:4px;" onclick="action('pocket_carom', 4)">+CAROM</button></div>
         </div>
+
         <div class="action-area">
-            <button class="btn-action" style="background:#2980b9; border-bottom:4px solid #1c5982" onclick="action('carom', 1)">Carom 1P</button>
-            <button class="btn-action" style="background:#2980b9; border-bottom:4px solid #1c5982" onclick="action('carom', 2)">Carom 2P</button>
-            <button class="btn-action" style="background:#c0392b; border-bottom:4px solid #7b241c" onclick="handleFoul()">FOUL</button>
-            <button class="btn-action" style="background:#2980b9; border-bottom:4px solid #1c5982" onclick="undo()">ANGRE</button>
-            <button class="btn-action" style="background:#27ae60; border-bottom:4px solid #1e8449; grid-column:span 2; padding:20px; font-size:1.1em" onclick="nextTurn()">AVSLUTT TUR</button>
+            <button id="winButton" class="btn-win" style="display:none;" onclick="action('winning_shot', 1)">WINNING SHOT (CUE VIA 1)</button>
+            <button class="btn-action" id="c1" style="background:#2980b9" onclick="action('carom', 1)">Carom 1P</button>
+            <button class="btn-action" id="c2" style="background:#2980b9" onclick="action('carom', 2)">Carom 2P</button>
+            <button class="btn-action" style="background:#c0392b" onclick="handleFoul()">FOUL</button>
+            <button class="btn-action" style="background:#2980b9" onclick="undo()">ANGRE</button>
+            <button class="btn-action" style="background:#27ae60; grid-column:span 2; padding:20px; font-size:1.1em;" onclick="nextTurn()">AVSLUTT TUR</button>
         </div>
     </div>
 </div>
 
 <nav class="bottom-nav">
-    <a class="nav-item" id="nav-profile" onclick="switchPage('profilePage')"><i class="material-icons">person</i><span id="txt-nav-prof">PROFIL</span></a>
-    <a class="nav-item active" id="nav-play" onclick="switchPage('playPage')"><i class="material-icons">home</i><span id="txt-nav-home">HJEM</span></a>
-    <a class="nav-item" onclick="window.location.href='stats.html'"><i class="material-icons">leaderboard</i><span id="txt-nav-stats">STATS</span></a>
+    <a class="nav-item" onclick="switchPage('profilePage')"><i class="material-icons">person</i>PROFIL</a>
+    <a class="nav-item active" onclick="switchPage('playPage')"><i class="material-icons">home</i>HJEM</a>
+    <a class="nav-item" onclick="window.location.href='stats.html'"><i class="material-icons">leaderboard</i>STATS</a>
     <a class="nav-item" onclick="toggleLanguage()"><i class="material-icons">language</i>EN/NO</a>
 </nav>
 
@@ -142,103 +171,117 @@
     let state = { playerCount: 2, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null, seconds: 0, names: ["P1","P2","P3"], bestSeries: [0,0,0], lastSeries: [0,0,0], lang: 'no' };
     let history = [];
 
-    const dictionary = {
-        no: { newMatch: "NY MATCH", confirm: "En kamp pågår. Hva vil du gjøre?", saveStart: "LAGRE & START NY", discardStart: "SLETT & START NY", resume: "Fortsett", players: "Antall spillere?", abort: "Avbryt", names: "Navn på spillere:", start: "START KAMP", back: "← Tilbake", now: "NÅ", best: "PERS", last: "SISTE", break: "BREKK-STØT", req_carom: "KRAV: CAROM", req_pocket: "KRAV: POCKET", any: "VELG: CAROM / KULE", rotate: "BYTT STARTSPILLER", foul: "FOUL", undo: "ANGRE", turn: "AVSLUTT TUR", home: "HJEM", stats: "STATS", prof: "PROFIL" },
-        en: { newMatch: "NEW MATCH", confirm: "A match is in progress. Action?", saveStart: "SAVE & START NEW", discardStart: "DISCARD & START NEW", resume: "Resume", players: "Players?", abort: "Cancel", names: "Player names:", start: "START MATCH", back: "← Back", now: "NOW", best: "BEST", last: "LAST", break: "BREAK SHOT", req_carom: "REQ: CAROM", req_pocket: "REQ: POCKET", any: "CHOOSE: CAROM / POCKET", rotate: "SWITCH STARTER", foul: "FOUL", undo: "UNDO", turn: "END TURN", home: "HOME", stats: "STATS", prof: "PROFILE" }
-    };
-
     db.on('value', (s) => { if(s.val()) { state = s.val(); updateUI(); } });
 
     function switchPage(pageId) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById(pageId).classList.add('active');
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        if(pageId === 'profilePage') document.getElementById('nav-profile').classList.add('active');
-        if(pageId === 'playPage') document.getElementById('nav-play').classList.add('active');
+        document.querySelectorAll('.nav-item').forEach((i, idx) => {
+            i.classList.remove('active');
+            if((pageId === 'profilePage' && idx === 0) || (pageId === 'playPage' && idx === 1)) i.classList.add('active');
+        });
     }
-
-    function checkActiveGame() {
-        document.getElementById('setupOverlay').style.display = 'flex';
-        const totalPoints = state.scores.reduce((a, b) => a + b, 0);
-        if (totalPoints > 0) { document.getElementById('step-confirm').style.display = 'block'; document.getElementById('step1').style.display = 'none'; }
-        else { goToStep1(); }
-    }
-    function goToStep1() { document.getElementById('step-confirm').style.display = 'none'; document.getElementById('step1').style.display = 'block'; document.getElementById('step2').style.display = 'none'; }
-    function selectPlayers(n) { setupCount = n; document.getElementById('step1').style.display = 'none'; document.getElementById('step2').style.display = 'block'; const container = document.getElementById('nameInputs'); container.innerHTML = ''; for(let i=0; i<n; i++) container.innerHTML += `<input type="text" class="name-field" id="n${i}" placeholder="${state.lang === 'no' ? 'Navn' : 'Name'} ${i+1}">`; }
-    function finalizeSetup() { const namesArr = []; for(let i=0; i<setupCount; i++) namesArr.push(document.getElementById(`n${i}`).value || (state.lang === 'no' ? `P${i+1}` : `Player ${i+1}`)); db.set({ ...state, playerCount: setupCount, names: namesArr, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, seconds: 0, tableStatus: 'open', lastType: null }).then(closeSetup); }
-    function closeSetup() { document.getElementById('setupOverlay').style.display = 'none'; }
-    function handleFinishAndSave() { firebase.database().ref('matchHistory').push({ date: new Date().toISOString(), players: state.names.slice(0, state.playerCount), scores: state.scores.slice(0, state.playerCount), duration: document.getElementById('matchTimer').innerText }).then(goToStep1); }
 
     function action(type, val) {
         saveHistory();
         let p = state.currentPlayer;
         let cur = state.scores[p];
-        if (cur < 90 && cur + val > 90) return;
-        if (cur >= 90 && cur < 100 && cur + val > 100) return;
-        state.breakDone = true; state.foulCounts[p] = 0;
-        
+
+        // 101 REGLER OG OVERSTØT
+        if ((cur < 90 && (cur + val) > 90) || (cur >= 90 && (cur + val) > 101)) {
+            handleFoul(); return;
+        }
+
+        // Fase-restriksjoner
+        if (cur >= 90 && cur < 100 && type.includes('pocket') && type !== 'pocket_carom') return;
+        if (cur === 100 && type !== 'winning_shot') return;
+
+        state.breakDone = true;
+        state.foulCounts[p] = 0;
+
         if (type === 'pocket_carom') {
-            if (state.tableStatus === 'open') {
-                state.tableStatus = 'open';
-                state.lastType = null;
-            } else {
-                state.tableStatus = 'locked';
-                state.lastType = 'pocket';
-            }
+            state.tableStatus = state.tableStatus === 'open' ? 'open' : 'locked';
+            state.lastType = 'pocket';
         } else {
             state.tableStatus = 'locked';
             state.lastType = type;
         }
-        state.scores[p] += val; db.set(state);
+
+        state.scores[p] += val;
+        if (state.scores[p] === 101) alert(state.names[p] + " VANT KAMPEN!");
+        db.set(state);
     }
 
-    function nextTurn() { saveHistory(); let p = state.currentPlayer; let round = state.scores[p] - state.scoreAtStart[p]; if (round > state.bestSeries[p]) state.bestSeries[p] = round; state.lastSeries[p] = round; state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; state.tableStatus = 'open'; state.lastType = null; state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; db.set(state); }
-    function handleFoul() { saveHistory(); state.foulCounts[state.currentPlayer]++; if(state.foulCounts[state.currentPlayer] >= 3) { state.scores[state.currentPlayer] = 0; state.foulCounts[state.currentPlayer] = 0; } else { state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; } nextTurn(); }
+    function handleFoul() {
+        saveHistory();
+        state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer];
+        state.foulCounts[state.currentPlayer]++;
+        if(state.foulCounts[state.currentPlayer] >= 3) {
+            state.scores[state.currentPlayer] = 0;
+            state.foulCounts[state.currentPlayer] = 0;
+        }
+        nextTurn();
+    }
+
+    function nextTurn() {
+        saveHistory();
+        let p = state.currentPlayer;
+        let series = state.scores[p] - state.scoreAtStart[p];
+        if(series > state.bestSeries[p]) state.bestSeries[p] = series;
+        state.lastSeries[p] = series;
+        state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
+        state.tableStatus = 'open';
+        state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer];
+        db.set(state);
+    }
+
+    function updateUI() {
+        const l = state.lang === 'no' ? {break:"BREKK-STØT",caroms:"KUN CAROMS",win:"WINNING SHOT",any:"ÅPEN",now:"NÅ",best:"BEST"} : {break:"BREAK SHOT",caroms:"ONLY CAROMS",win:"WINNING SHOT",any:"OPEN",now:"NOW",best:"BEST"};
+        
+        // Oppdater Profil
+        document.getElementById('profName').innerText = state.names[0];
+        document.getElementById('profInitial').innerText = state.names[0].charAt(0).toUpperCase();
+        document.getElementById('profBest').innerText = state.bestSeries[0];
+
+        const cont = document.getElementById('scoreboard-container');
+        cont.innerHTML = '';
+        for(let i=0; i<state.playerCount; i++){
+            const active = state.currentPlayer === i;
+            cont.innerHTML += `<div class="card player-card ${active?'active-turn':''}">
+                <div style="text-align:left"><h2 style="margin:0; color:${active?'#f1c40f':'#666'}">${state.names[i]}</h2>
+                <div style="display:flex; margin-top:8px;">${Array(3).fill(0).map((_,f)=>`<div class="foul-dot ${state.foulCounts[i]>f?'active':''}"></div>`).join('')}</div>
+                <div style="font-size:0.5em; color:#555; margin-top:5px;">${l.now}: ${active?state.scores[i]-state.scoreAtStart[i]:0} | ${l.best}: ${state.bestSeries[i]}</div></div>
+                <div class="score-display">${state.scores[i]}</div></div>`;
+        }
+
+        const cur = state.scores[state.currentPlayer];
+        const winPhase = cur === 100;
+        const caromPhase = cur >= 90 && cur < 100;
+        const lockPocket = state.tableStatus === 'locked' && state.lastType === 'pocket';
+
+        document.getElementById('winButton').style.display = winPhase ? 'block' : 'none';
+        document.getElementById('c1').style.display = winPhase ? 'none' : 'block';
+        document.getElementById('c2').style.display = winPhase ? 'none' : 'block';
+
+        document.getElementById('ball1').className = (!state.breakDone || caromPhase || winPhase || lockPocket) ? 'ball waiting-ball' : 'ball';
+        document.getElementById('ball5').className = (!state.breakDone || caromPhase || winPhase || lockPocket) ? 'ball waiting-ball' : 'ball';
+        document.getElementById('ball3').className = (caromPhase || winPhase || lockPocket) ? 'ball waiting-ball' : 'ball';
+        
+        document.getElementById('moveText').innerText = winPhase ? l.win : (caromPhase ? l.caroms : (!state.breakDone ? l.break : (lockPocket ? "KRAV: CAROM" : "KRAV: POCKET")));
+        document.getElementById('rotate-container').style.display = state.breakDone ? 'none' : 'block';
+        document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
+    }
+
+    function checkActiveGame() { document.getElementById('setupOverlay').style.display = 'flex'; document.getElementById('step-confirm').style.display = state.scores.some(s=>s>0)?'block':'none'; document.getElementById('step1').style.display = state.scores.some(s=>s>0)?'none':'block'; }
+    function goToStep1() { document.getElementById('step-confirm').style.display = 'none'; document.getElementById('step1').style.display = 'block'; }
+    function selectPlayers(n) { setupCount = n; document.getElementById('step1').style.display = 'none'; document.getElementById('step2').style.display = 'block'; const c = document.getElementById('nameInputs'); c.innerHTML = ''; for(let i=0; i<n; i++) c.innerHTML += `<input type="text" id="n${i}" class="name-field" placeholder="Navn ${i+1}">`; }
+    function finalizeSetup() { const ns = []; for(let i=0; i<setupCount; i++) ns.push(document.getElementById(`n${i}`).value || `P${i+1}`); db.set({...state, playerCount: setupCount, names: ns, scores: [0,0,0], foulCounts:[0,0,0], breakDone:false, seconds:0, currentPlayer:0, tableStatus:'open'}); closeSetup(); }
+    function closeSetup() { document.getElementById('setupOverlay').style.display = 'none'; }
+    function handleFinishAndSave() { firebase.database().ref('matchHistory').push({ date: new Date().toISOString(), players: state.names.slice(0, state.playerCount), scores: state.scores.slice(0, state.playerCount) }).then(goToStep1); }
     function saveHistory() { history.push(JSON.stringify(state)); if(history.length > 10) history.shift(); }
     function undo() { if(history.length) { state = JSON.parse(history.pop()); db.set(state); } }
     function toggleLanguage() { state.lang = state.lang==='no'?'en':'no'; db.set(state); }
     function rotateBreaker() { if(!state.breakDone) { state.currentPlayer = (state.currentPlayer+1)%state.playerCount; db.set(state); } }
-
-    function updateUI() {
-        const l = dictionary[state.lang || 'no'];
-        document.getElementById('newMatchTopBtn').innerText = l.newMatch;
-        document.getElementById('txt-nav-prof').innerText = l.prof;
-        document.getElementById('txt-nav-home').innerText = l.home;
-        document.getElementById('txt-nav-stats').innerText = l.stats;
-        document.getElementById('profName').innerText = state.names[0] || "Ole Andreas";
-        document.getElementById('profInitial').innerText = (state.names[0] || "O").charAt(0).toUpperCase();
-        document.getElementById('profBest').innerText = (state.bestSeries[0] || 0) + " Poeng";
-        const cont = document.getElementById('scoreboard-container');
-        cont.innerHTML = '';
-        for(let i=0; i<state.playerCount; i++) {
-            const active = state.currentPlayer === i;
-            cont.innerHTML += `<div class="card player-card ${active?'active-turn':''}">
-                <div style="text-align:left">
-                    <h2 style="margin:0; font-size:1.2em; text-transform:uppercase; color:${active?'#f1c40f':'#666'}">${state.names[i]}</h2>
-                    <div style="display:flex; gap:10px; margin-top:5px; font-size:0.55em; color:#444">
-                        <div>${l.now} <span style="color:#eee; font-weight:900">${active ? state.scores[i]-state.scoreAtStart[i] : 0}</span></div>
-                        <div>${l.best} <span style="color:#eee; font-weight:900">${state.bestSeries[i]}</span></div>
-                        <div>${l.last} <span style="color:#eee; font-weight:900">${state.lastSeries[i]}</span></div>
-                    </div>
-                    <div style="display:flex; gap:5px; margin-top:10px;">
-                        <div class="foul-dot ${state.foulCounts[i]>=1?'active':''}"></div>
-                        <div class="foul-dot ${state.foulCounts[i]>=2?'active':''}"></div>
-                        <div class="foul-dot ${state.foulCounts[i]>=3?'active':''}"></div>
-                    </div>
-                </div>
-                <div class="score-display">${state.scores[i]}</div>
-            </div>`;
-        }
-        document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
-        document.getElementById('rotate-container').style.display = state.breakDone ? 'none' : 'block';
-        document.getElementById('moveText').innerText = !state.breakDone ? l.break : (state.tableStatus === 'locked' ? (state.lastType === 'pocket' ? l.req_carom : l.req_pocket) : l.any);
-        const lockPocket = state.tableStatus === 'locked' && state.lastType === 'pocket';
-        const lockCarom = state.tableStatus === 'locked' && state.lastType === 'carom';
-        const at90 = state.scores[state.currentPlayer] >= 90;
-        document.getElementById('ball1').className = (!state.breakDone || lockPocket || at90) ? 'ball waiting-ball' : 'ball';
-        document.getElementById('ball5').className = (!state.breakDone || lockPocket || at90) ? 'ball waiting-ball' : 'ball';
-        document.getElementById('ball3').className = (lockPocket || at90) ? 'ball waiting-ball' : 'ball';
-    }
     setInterval(() => { if(state.breakDone) { state.seconds++; db.child('seconds').set(state.seconds); } }, 1000);
 </script>
 </body>
