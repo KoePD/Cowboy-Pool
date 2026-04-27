@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cowboy Pool Pro - Full Width Unified</title>
+    <title>Cowboy Pool Pro - Framed Range</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
@@ -27,28 +27,45 @@
         .felt-base { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--felt-green); z-index: 1; }
         .felt-texture { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: url("https://www.transparenttextures.com/patterns/felt.png"); opacity: 0.12; z-index: 2; pointer-events: none; }
 
-        /* LÆR PANELER */
+        /* LÆR PANELER (RAMMEN) */
         .header { 
             background: var(--leather); background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png"); 
             padding: 50px 30px 70px; z-index: 10; 
             border-bottom-left-radius: 50% 30px; border-bottom-right-radius: 50% 30px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8); transition: all 0.4s ease;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8); transition: all 0.5s ease;
         }
         .bottom-panel { 
             background: var(--leather); background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png"); 
             padding: 70px 30px 15px; z-index: 10; 
             border-top-left-radius: 50% 30px; border-top-right-radius: 50% 30px; 
-            box-shadow: 0 -20px 40px rgba(0,0,0,0.8); transition: all 0.4s ease;
+            box-shadow: 0 -20px 40px rgba(0,0,0,0.8); transition: all 0.5s ease;
         }
 
-        .slim-mode .header { padding: 5px 30px 10px; border-bottom-left-radius: 50% 15px; border-bottom-right-radius: 50% 15px; }
-        .slim-mode .bottom-panel { padding: 15px 30px 5px; border-top-left-radius: 50% 15px; border-top-right-radius: 50% 15px; }
+        /* MINSKET RAMME I RANGE */
+        .slim-mode .header { 
+            padding: 10px 30px 15px; 
+            border-bottom-left-radius: 50% 15px; 
+            border-bottom-right-radius: 50% 15px; 
+        }
+        .slim-mode .bottom-panel { 
+            padding: 20px 30px 5px; 
+            border-top-left-radius: 50% 15px; 
+            border-top-right-radius: 50% 15px; 
+        }
 
         .hide-on-slim { transition: opacity 0.3s ease; }
         .slim-mode .hide-on-slim { opacity: 0; display: none; }
 
-        .main-content { position: relative; z-index: 5; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; padding: 10px; scrollbar-width: none; width: 100%; box-sizing: border-box; }
+        /* MIDTPARTIET */
+        .main-content { 
+            position: relative; z-index: 5; flex-grow: 1; 
+            overflow-y: auto; display: flex; flex-direction: column; 
+            padding: 10px; scrollbar-width: none; width: 100%; box-sizing: border-box;
+        }
         .main-content::-webkit-scrollbar { display: none; }
+
+        /* SENTRERING AV KONTROLLER I RANGE */
+        .slim-mode .main-content { justify-content: center; padding: 5px 15px; }
 
         /* HJEM-SKJERM */
         .home-cards { display: flex; flex-direction: column; gap: 12px; align-items: center; justify-content: center; height: 100%; }
@@ -56,60 +73,55 @@
             width: 260px; padding: 18px 25px; background: rgba(0,0,0,0.7); 
             border: 2px solid var(--gold); border-radius: 20px; 
             display: flex; align-items: center; cursor: pointer;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
-        .action-card i { font-size: 24px; margin-right: 20px; width: 30px; text-align: center; }
-        .action-card span { font-size: 14px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; }
+        .action-card i { font-size: 24px; margin-right: 20px; width: 30px; text-align: center; color: var(--gold); }
         .slim-mode .home-cards { display: none; }
 
         /* RANGE-INNHOLD */
         .range-content { display: none; width: 100%; }
         .slim-mode .range-content { display: flex; flex-direction: column; }
 
-        /* SPILLERKORTENE DU VIL HA TILBAKE */
+        /* SPILLERKORT */
         .player-card { 
-            background: linear-gradient(180deg, #0a0a0a 0%, #000 100%); border-radius: 24px; padding: 20px; 
-            margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); 
-            display: flex; justify-content: space-between; align-items: center; transition: 0.3s;
+            background: linear-gradient(180deg, #0a0a0a 0%, #000 100%); border-radius: 24px; padding: 15px 20px; 
+            margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.08); 
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .player-card.active { border: 2px solid var(--gold); box-shadow: 0 15px 35px rgba(0,0,0,0.9); transform: scale(1.02); }
-        .score-display { font-size: 3.5em; font-weight: 900; line-height: 1; color: #333; min-width: 60px; text-align: right; }
+        .player-card.active { border: 2px solid var(--gold); box-shadow: 0 10px 25px rgba(0,0,0,0.8); }
+        .score-display { font-size: 3.2em; font-weight: 900; line-height: 1; color: #333; }
         .active .score-display { color: var(--gold); }
-        .player-info h2 { margin: 0; font-size: 1.2em; text-transform: uppercase; letter-spacing: 1px; color: #666; }
+        .player-info h2 { margin: 0; font-size: 1.1em; text-transform: uppercase; color: #666; }
         .active .player-info h2 { color: var(--gold); }
         
-        .sub-stats { font-size: 0.55em; color: #444; margin-top: 12px; display: flex; justify-content: flex-start; text-transform: uppercase; }
+        .sub-stats { font-size: 0.55em; color: #444; margin-top: 10px; display: flex; gap: 15px; text-transform: uppercase; }
         .active .sub-stats { color: #888; }
-        .stat-item { width: 55px; display: flex; flex-direction: column; }
         .stat-val { color: #eee; font-weight: 900; font-size: 1.1em; }
-        .foul-dot { width: 12px; height: 12px; border-radius: 50%; background: #1a1a1a; border: 1px solid #222; display: inline-block; margin-right: 5px; }
+        .foul-dot { width: 11px; height: 11px; border-radius: 50%; background: #1a1a1a; border: 1px solid #222; display: inline-block; margin-right: 4px; }
         .foul-dot.active { background: #e74c3c; box-shadow: 0 0 10px #ff4757; }
 
-        /* STATUS & KONTROLLER FRA index.html */
-        .game-status-zone { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(15px); padding: 15px; border-radius: 20px 20px 0 0; text-align: center; border: 1px solid rgba(255,255,255,0.05); border-bottom: none; margin-top: 10px; }
+        /* STATUS & BALLER */
+        .game-status-zone { background: rgba(0, 0, 0, 0.6); padding: 12px; border-radius: 20px 20px 0 0; text-align: center; border: 1px solid rgba(255,255,255,0.05); border-bottom: none; }
         .req-text { font-size: 0.8em; letter-spacing: 2px; color: #2ecc71; font-weight: 800; text-transform: uppercase; }
         .timer-text { font-family: monospace; font-size: 1.2em; color: var(--gold); margin-top: 3px; display: block; }
 
-        .ball-control-zone { display: flex; justify-content: space-around; background: rgba(0,0,0,0.5); padding: 20px 10px; border-radius: 0 0 35px 35px; border: 1px solid rgba(255,255,255,0.03); border-top: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px; }
-        .ball-group { display: flex; flex-direction: column; align-items: center; gap: 12px; }
-        .ball { width: 75px; height: 75px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: inset -6px -6px 15px rgba(0,0,0,0.7), 6px 12px 20px rgba(0,0,0,0.6); }
-        .ball-inner { width: 28px; height: 28px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #000; font-size: 13px; }
-        .btn-sub-carom { background: rgba(52, 152, 219, 0.12); color: #3498db; border: 1px solid #3498db; border-radius: 8px; padding: 6px 12px; font-size: 0.6em; font-weight: 800; cursor: pointer; margin-top: 5px; }
+        .ball-control-zone { display: flex; justify-content: space-around; background: rgba(0,0,0,0.5); padding: 15px 10px; border-radius: 0 0 35px 35px; border: 1px solid rgba(255,255,255,0.03); border-top: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px; }
+        .ball-group { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .ball { width: 70px; height: 70px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: inset -6px -6px 15px rgba(0,0,0,0.7), 6px 12px 20px rgba(0,0,0,0.6); }
+        .ball-inner { width: 26px; height: 26px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #000; font-size: 12px; }
+        .btn-sub-carom { background: rgba(52, 152, 219, 0.12); color: #3498db; border: 1px solid #3498db; border-radius: 8px; padding: 5px 10px; font-size: 0.6em; font-weight: 800; cursor: pointer; margin-top: 4px; }
 
-        .action-area { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn { padding: 16px; border-radius: 16px; border: none; font-weight: 800; text-transform: uppercase; cursor: pointer; font-size: 0.75em; color: white; }
+        .action-area { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .btn { padding: 14px; border-radius: 14px; border: none; font-weight: 800; text-transform: uppercase; cursor: pointer; font-size: 0.75em; color: white; }
         .btn-blue { background: #2980b9; border-bottom: 4px solid #1c5982; }
         .btn-foul { background: #c0392b; border-bottom: 4px solid #7b241c; }
-        .btn-turn { background: #27ae60; border-bottom: 4px solid #1e8449; grid-column: span 2; padding: 20px; font-size: 1.1em; }
-        .btn-win { background: linear-gradient(45deg, #f1c40f, #d4ac0d); color: black; grid-column: span 2; padding: 20px; font-weight: 900; border-radius: 16px; border: none; margin-bottom: 10px; display: none; }
-
+        .btn-turn { background: #27ae60; border-bottom: 4px solid #1e8449; grid-column: span 2; padding: 18px; font-size: 1.1em; }
+        
         /* NAVBAR */
         .navbar { background: #000; height: 85px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #111; z-index: 20; padding-bottom: 20px; }
         .nav-item { color: #333; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 10px; font-weight: bold; }
         .nav-item.active { color: var(--gold); }
         .nav-item i { font-size: 24px; margin-bottom: 4px; }
 
-        .setup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,20,5,0.98); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(10px); }
         .waiting-ball { opacity: 0.15; filter: grayscale(1); pointer-events: none; }
     </style>
 </head>
@@ -131,7 +143,7 @@
 
     <main class="main-content">
         <div class="home-cards">
-            <div class="action-card" onclick="checkActiveGame()"><i class="fa-solid fa-circle-plus" style="color:#2ecc71;"></i><span>Ny Kamp</span></div>
+            <div class="action-card" onclick="startNewMatch()"><i class="fa-solid fa-circle-plus"></i><span>Ny Kamp</span></div>
             <div class="action-card"><i class="fa-solid fa-trophy"></i><span>Toppliste</span></div>
             <div class="action-card"><i class="fa-solid fa-book-open"></i><span>Regler</span></div>
         </div>
@@ -140,35 +152,34 @@
             <div id="scoreboard-container"></div>
             
             <div class="game-status-zone">
-                <div id="modeLabel" style="font-size:0.6em; color:var(--gold); opacity:0.6; margin-bottom:5px; text-transform:uppercase;">MODUS: STANDARD</div>
+                <div id="modeLabel" style="font-size:0.5em; color:var(--gold); opacity:0.6; text-transform:uppercase; margin-bottom:4px;">MODUS: STANDARD</div>
                 <span class="req-text" id="moveText">BREKK-STØT</span>
                 <span class="timer-text" id="matchTimer">00:00:00</span>
-                <div id="inningDisplay" style="font-size:0.7em; color:#888; font-weight:bold; margin-top:5px; text-transform:uppercase;">INNING: 1</div>
-                <div id="rotate-container"><button onclick="rotateBreaker()" style="background:rgba(241,196,15,0.1); border:1px solid var(--gold); color:var(--gold); padding:6px 15px; border-radius:8px; font-size:0.65em; font-weight:bold; cursor:pointer; margin-top:10px;">BYTT STARTSPILLER</button></div>
+                <div id="inningDisplay" style="font-size:0.6em; color:#888; font-weight:bold; margin-top:4px; text-transform:uppercase;">INNING: 1</div>
             </div>
 
             <div class="ball-control-zone">
                 <div class="ball-group">
                     <button class="ball" id="ball1" onclick="action('pocket', 1)" style="background: radial-gradient(circle at 35% 35%, #f1c40f, #b38f00);"><div class="ball-inner">1</div></button>
-                    <button class="btn-sub-carom" id="pc1" onclick="action('pocket_carom', 2)">+ CAROM</button>
+                    <button class="btn-sub-carom" onclick="action('pocket_carom', 2)">+ CAROM</button>
                 </div>
                 <div class="ball-group">
                     <button class="ball" id="ball5" onclick="action('pocket', 5)" style="background: radial-gradient(circle at 35% 35%, #8e44ad, #4b0082);"><div class="ball-inner">5</div></button>
-                    <button class="btn-sub-carom" id="pc5" onclick="action('pocket_carom', 6)">+ CAROM</button>
+                    <button class="btn-sub-carom" onclick="action('pocket_carom', 6)">+ CAROM</button>
                 </div>
                 <div class="ball-group">
                     <button class="ball" id="ball3" onclick="action('pocket', 3)" style="background: radial-gradient(circle at 35% 35%, #e74c3c, #962d22);"><div class="ball-inner">3</div></button>
-                    <button class="btn-sub-carom" id="pc3" onclick="action('pocket_carom', 4)">+ CAROM</button>
+                    <button class="btn-sub-carom" onclick="action('pocket_carom', 4)">+ CAROM</button>
                 </div>
             </div>
 
             <div class="action-area">
-                <button id="winButton" class="btn-win" onclick="action('winning_shot', 1)">WINNING SHOT (CUE VIA 1)</button>
                 <button class="btn btn-blue" id="carom1PBtn" onclick="action('carom', 1)">Carom 1P</button>
                 <button class="btn btn-blue" id="carom2PBtn" onclick="action('carom', 2)">Carom 2P</button>
-                <button class="btn btn-foul" id="foulActionBtn" onclick="handleFoul()">FOUL</button>
-                <button class="btn btn-blue" id="undoActionBtn" onclick="undo()">ANGRE</button>
-                <button class="btn btn-turn" id="endTurnBtn" onclick="nextTurn()">AVSLUTT TUR</button>
+                <button class="btn btn-foul" onclick="handleFoul()">FOUL</button>
+                <button class="btn btn-blue" onclick="undo()">ANGRE</button>
+                <button class="btn btn-turn" onclick="nextTurn()">AVSLUTT TUR</button>
+                <button onclick="rotateBreaker()" id="rotBtn" style="grid-column: span 2; background:none; border:1px solid var(--gold); color:var(--gold); font-size:10px; padding:8px; border-radius:10px; margin-top:5px; cursor:pointer; text-transform:uppercase; font-weight:bold;">Bytt Startspiller</button>
             </div>
         </div>
     </main>
@@ -188,17 +199,12 @@
     </nav>
 </div>
 
-<div id="setupOverlay" class="setup-overlay">
-    <div style="background:#000; border:1px solid var(--gold); padding:30px; border-radius:30px; width:80%; text-align:center;" id="setupCard">
-        </div>
-</div>
-
 <script>
     const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('gameData');
 
-    let state = { gameMode: 'standard', playerCount: 2, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null, seconds: 0, names: ["P1","P2","P3"], bestSeries: [0,0,0], lastSeries: [0,0,0], innings: 1 };
+    let state = { gameMode: 'standard', playerCount: 3, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, seconds: 0, names: ["Player 1","Player 2","Player 3"], bestSeries: [0,0,0], lastSeries: [0,0,0], innings: 1 };
     let history = [];
 
     db.on('value', (s) => { if(s.val()) { state = s.val(); updateUI(); } });
@@ -211,27 +217,9 @@
         else app.classList.remove('slim-mode');
     }
 
-    function action(type, val) {
-        saveHistory(); let p = state.currentPlayer; let cur = state.scores[p];
-        if ((cur < 90 && (cur + val) > 90) || (cur >= 90 && (cur + val) > 101)) { handleFoul(); return; }
-        if (cur >= 90 && cur < 100 && type.includes('pocket') && type !== 'pocket_carom') return;
-        state.breakDone = true; state.foulCounts[p] = 0;
-        
-        if (state.gameMode === 'alternate') {
-            if (state.tableStatus === 'open') {
-                if (type === 'pocket_carom') state.tableStatus = 'open';
-                else { state.tableStatus = 'locked'; state.lastType = type; }
-            } else {
-                if (type === 'pocket_carom') state.lastType = (state.lastType === 'pocket') ? 'carom' : 'pocket';
-                else state.lastType = type;
-            }
-        }
-        state.scores[p] += val;
-        db.set(state);
-    }
-
     function updateUI() {
         const cont = document.getElementById('scoreboard-container');
+        if(!cont) return;
         cont.innerHTML = '';
         for(let i=0; i<state.playerCount; i++) {
             const active = state.currentPlayer === i;
@@ -248,30 +236,13 @@
                     </div>
                 </div><div class="score-display" style="color: ${active ? '#f1c40f' : '#eee'}">${state.scores[i]}</div></div>`;
         }
-
-        const cur = state.scores[state.currentPlayer];
-        const winPhase = cur === 100; const caromPhase = cur >= 90 && cur < 100;
-        const isAlt = state.gameMode === 'alternate';
-        const lockPocket = isAlt && state.tableStatus === 'locked' && state.lastType === 'pocket';
-        const lockCarom = isAlt && state.tableStatus === 'locked' && state.lastType === 'carom';
-
-        document.getElementById('winButton').style.display = winPhase ? 'block' : 'none';
-        document.getElementById('rotate-container').style.display = state.breakDone ? 'none' : 'block';
-        document.getElementById('carom1PBtn').className = (winPhase || (lockCarom && !caromPhase)) ? 'btn btn-blue waiting-ball' : 'btn btn-blue';
-        document.getElementById('ball1').className = (!state.breakDone || caromPhase || winPhase || lockPocket) ? 'ball waiting-ball' : 'ball';
-        
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
-        document.getElementById('inningDisplay').innerText = "INNING: " + state.innings;
-        document.getElementById('moveText').innerText = winPhase ? "VINNER STØTET" : (!state.breakDone ? "BREKK-STØT" : "VELG: CAROM / POCKET");
+        document.getElementById('rotBtn').style.display = state.breakDone ? 'none' : 'block';
     }
 
-    function checkActiveGame() {
-        document.getElementById('setupOverlay').style.display = 'flex';
-        document.getElementById('setupCard').innerHTML = `<h2 style="color:var(--gold);">START NY KAMP?</h2><button class="btn btn-turn" onclick="finalizeSetupSimple()">START KAMP</button><button onclick="closeSetup()" style="color:#555; background:none; border:none; margin-top:15px;">Avbryt</button>`;
-    }
-    function closeSetup() { document.getElementById('setupOverlay').style.display = 'none'; }
-    function finalizeSetupSimple() { db.set({...state, scores:[0,0,0], seconds:0, innings:1, breakDone:false}); closeSetup(); navTo('range', document.querySelectorAll('.nav-item')[1]); }
-    function nextTurn() { saveHistory(); let p = state.currentPlayer; let s = state.scores[p] - state.scoreAtStart[p]; if(s > state.bestSeries[p]) state.bestSeries[p] = s; state.lastSeries[p] = s; if(p === state.playerCount-1) state.innings++; state.currentPlayer = (state.currentPlayer+1)%state.playerCount; state.tableStatus = 'open'; state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; db.set(state); }
+    function startNewMatch() { navTo('range', document.querySelectorAll('.nav-item')[1]); }
+    function action(t, v) { saveHistory(); state.breakDone = true; state.scores[state.currentPlayer]+=v; db.set(state); }
+    function nextTurn() { saveHistory(); let p = state.currentPlayer; state.lastSeries[p] = state.scores[p] - state.scoreAtStart[p]; if(state.lastSeries[p] > state.bestSeries[p]) state.bestSeries[p] = state.lastSeries[p]; if(p === state.playerCount - 1) state.innings++; state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; db.set(state); }
     function handleFoul() { saveHistory(); state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; state.foulCounts[state.currentPlayer]++; nextTurn(); }
     function undo() { if(history.length) { state = JSON.parse(history.pop()); db.set(state); } }
     function saveHistory() { history.push(JSON.stringify(state)); if(history.length > 10) history.shift(); }
