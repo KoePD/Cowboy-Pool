@@ -191,9 +191,26 @@
     let state = { gameMode: 'standard', playerCount: 2, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null, seconds: 0, names: ["P1","P2","P3"], bestSeries: [0,0,0], lastSeries: [0,0,0], lang: 'no', innings: 1 };
     let history = [];
 
+    // KOMPLETT OPPDATERT ORDBOK
     const dictionary = {
-        no: { now: "NÅ", best: "PERS", last: "SISTE", break: "BREKK-STØT", req_carom: "KRAV: CAROM", req_pocket: "KRAV: POCKET", any: "VELG: CAROM / KULE", caroms_only: "KUN CAROMS", win: "WINNING SHOT (CUE VIA 1)", inn: "INNING", winner: "VINNER!", save: "LAGRE & NY", rematch: "REMATCH", discard: "SLETT & NY" },
-        en: { now: "NOW", best: "BEST", last: "LAST", break: "BREAK SHOT", req_carom: "REQ: CAROM", req_pocket: "REQ: POCKET", any: "ANY POINT", caroms_only: "CAROMS ONLY", win: "WINNING SHOT (CUE VIA 1)", inn: "INNING", winner: "WINNER!", save: "SAVE & NEW", rematch: "REMATCH", discard: "DELETE & NEW" }
+        no: { 
+            now: "NÅ", best: "PERS", last: "SISTE", break: "BREKK-STØT", 
+            req_carom: "KRAV: CAROM", req_pocket: "KRAV: POCKET", any: "VELG: CAROM / KULE", 
+            caroms_only: "KUN CAROMS", win: "WINNING SHOT (CUE VIA 1)", inn: "INNING", 
+            winner: "VINNER!", save: "LAGRE & NY", rematch: "REMATCH", discard: "SLETT & NY",
+            confirm_msg: "En kamp pågår allerede. Hva vil du gjøre?", resume: "FORTSETT",
+            new_match: "NY MATCH", game_mode: "SPILLMODUS", players_count: "ANTALL SPILLERE?",
+            player_names: "NAVN PÅ SPILLERE:", start_btn: "START KAMP", back_btn: "TILBAKE"
+        },
+        en: { 
+            now: "NOW", best: "BEST", last: "LAST", break: "BREAK SHOT", 
+            req_carom: "REQ: CAROM", req_pocket: "REQ: POCKET", any: "ANY POINT", 
+            caroms_only: "CAROMS ONLY", win: "WINNING SHOT (CUE VIA 1)", inn: "INNING", 
+            winner: "WINNER!", save: "SAVE & NEW", rematch: "REMATCH", discard: "DELETE & NEW",
+            confirm_msg: "A match is in progress. What do you want to do?", resume: "RESUME",
+            new_match: "NEW MATCH", game_mode: "GAME MODE", players_count: "NUMBER OF PLAYERS?",
+            player_names: "PLAYER NAMES:", start_btn: "START MATCH", back_btn: "BACK"
+        }
     };
 
     db.on('value', (s) => { 
@@ -203,15 +220,6 @@
             updateUI(); 
         } 
     });
-
-    function switchPage(pageId) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
-        document.querySelectorAll('.nav-item').forEach((item, idx) => {
-            item.classList.remove('active');
-            if((pageId === 'profilePage' && idx === 0) || (pageId === 'playPage' && idx === 1)) item.classList.add('active');
-        });
-    }
 
     function action(type, val) {
         saveHistory(); let p = state.currentPlayer; let cur = state.scores[p];
@@ -259,15 +267,29 @@
     }
 
     function handleRematch() {
-        db.set({...state, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], breakDone: false, seconds: 0, currentPlayer: 0, tableStatus: 'open', innings: 1, lastSeries: [0,0,0]}).then(() => { location.reload(); });
+        db.set({...state, scores:[0,0,0], foulCounts:[0,0,0], scoreAtStart:[0,0,0], breakDone:false, seconds:0, currentPlayer:0, tableStatus:'open', innings:1, lastSeries:[0,0,0]}).then(() => { location.reload(); });
     }
 
     function handleDiscard() {
-        db.set({...state, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], breakDone: false, seconds: 0, currentPlayer: 0, tableStatus: 'open', innings: 1, lastSeries: [0,0,0]}).then(() => { location.reload(); });
+        db.set({...state, scores:[0,0,0], foulCounts:[0,0,0], scoreAtStart:[0,0,0], breakDone:false, seconds:0, currentPlayer:0, tableStatus:'open', innings:1, lastSeries:[0,0,0]}).then(() => { location.reload(); });
     }
 
     function updateUI() {
         const l = dictionary[state.lang || 'no'];
+        
+        // Oppdater faste tekster i HTML
+        document.getElementById('overlayHeader').innerText = l.new_match;
+        document.getElementById('confirmText').innerText = l.confirm_msg;
+        document.getElementById('playersText').innerText = l.players_count;
+        document.getElementById('namesText').innerText = l.player_names;
+        
+        // Bruker querySelector for knapper uten ID
+        const resumeBtn = document.querySelector('#step-confirm .btn-back');
+        if(resumeBtn) resumeBtn.innerText = l.resume;
+        
+        const abortBtn = document.querySelector('#step1 .btn-back');
+        if(abortBtn) abortBtn.innerText = l.back_btn;
+
         document.getElementById('modeLabel').innerText = "MODUS: " + state.gameMode.toUpperCase();
         const innElem = document.getElementById('inningDisplay');
         if (innElem) innElem.innerText = (l.inn || "INNING") + ": " + (state.innings || 1);
@@ -312,38 +334,21 @@
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
     }
 
-    function checkActiveGame() { 
-        document.getElementById('setupOverlay').style.display = 'flex'; 
-        if (state.scores.some(s => s > 0)) { 
-            document.getElementById('step-confirm').style.display = 'block'; 
-            document.getElementById('step1').style.display = 'none'; 
-            document.getElementById('step2').style.display = 'none'; 
-        } else { goToStep1(); } 
+    function switchPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach((item, idx) => {
+            item.classList.remove('active');
+            if((pageId === 'profilePage' && idx === 0) || (pageId === 'playPage' && idx === 1)) item.classList.add('active');
+        });
     }
-    
+    function checkActiveGame() { document.getElementById('setupOverlay').style.display = 'flex'; if (state.scores.some(s => s > 0)) { document.getElementById('step-confirm').style.display = 'block'; document.getElementById('step1').style.display = 'none'; document.getElementById('step2').style.display = 'none'; } else { goToStep1(); } }
     function setMode(m) { tempMode = m; document.getElementById('modeStd').classList.toggle('selected', m === 'standard'); document.getElementById('modeAlt').classList.toggle('selected', m === 'alternate'); }
-    function goToStep1() { 
-        document.getElementById('step-confirm').style.display = 'none'; 
-        document.getElementById('step1').style.display = 'block'; 
-        document.getElementById('step2').style.display = 'none'; 
-        setMode(tempMode); 
-    }
+    function goToStep1() { document.getElementById('step-confirm').style.display = 'none'; document.getElementById('step1').style.display = 'block'; document.getElementById('step2').style.display = 'none'; setMode(tempMode); }
     function selectPlayers(n) { setupCount = n; document.getElementById('step1').style.display = 'none'; document.getElementById('step2').style.display = 'block'; const c = document.getElementById('nameInputs'); c.innerHTML = ''; for(let i=0; i<n; i++) c.innerHTML += `<input type="text" id="n${i}" class="name-field" placeholder="Navn ${i+1}">`; }
-    function finalizeSetup() { 
-        const ns = []; for(let i=0; i<setupCount; i++) ns.push(document.getElementById(`n${i}`).value || `P${i+1}`); 
-        db.set({...state, gameMode: tempMode, playerCount: setupCount, names: ns, scores: [0,0,0], foulCounts:[0,0,0], scoreAtStart:[0,0,0], bestSeries:[0,0,0], lastSeries:[0,0,0], breakDone:false, seconds:0, currentPlayer:0, tableStatus:'open', innings: 1}); 
-        closeSetup(); 
-    }
+    function finalizeSetup() { const ns = []; for(let i=0; i<setupCount; i++) ns.push(document.getElementById(`n${i}`).value || `P${i+1}`); db.set({...state, gameMode: tempMode, playerCount: setupCount, names: ns, scores: [0,0,0], foulCounts:[0,0,0], scoreAtStart:[0,0,0], bestSeries:[0,0,0], lastSeries:[0,0,0], breakDone:false, seconds:0, currentPlayer:0, tableStatus:'open', innings: 1}); closeSetup(); }
     function handleFoul() { saveHistory(); state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; state.foulCounts[state.currentPlayer]++; if(state.foulCounts[state.currentPlayer] >= 3) { state.scores[state.currentPlayer] = 0; state.foulCounts[state.currentPlayer] = 0; } nextTurn(); }
-    function nextTurn() { 
-        saveHistory(); let p = state.currentPlayer; let s = state.scores[p] - state.scoreAtStart[p]; 
-        if(s > state.bestSeries[p]) state.bestSeries[p] = s; 
-        state.lastSeries[p] = s; 
-        if(state.currentPlayer === state.playerCount - 1) { state.innings = (state.innings || 1) + 1; }
-        state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; 
-        state.tableStatus = 'open'; state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; 
-        db.set(state); 
-    }
+    function nextTurn() { saveHistory(); let p = state.currentPlayer; let s = state.scores[p] - state.scoreAtStart[p]; if(s > state.bestSeries[p]) state.bestSeries[p] = s; state.lastSeries[p] = s; if(state.currentPlayer === state.playerCount - 1) { state.innings = (state.innings || 1) + 1; } state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; state.tableStatus = 'open'; state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; db.set(state); }
     function undo() { if(history.length) { state = JSON.parse(history.pop()); db.set(state); } }
     function saveHistory() { history.push(JSON.stringify(state)); if(history.length > 10) history.shift(); }
     function closeSetup() { document.getElementById('setupOverlay').style.display = 'none'; }
