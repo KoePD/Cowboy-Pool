@@ -196,7 +196,8 @@
         no: { 
             now: "NÅ", best: "PERS", last: "SISTE", break: "BREKK-STØT", 
             req_carom: "KRAV: CAROM", req_pocket: "KRAV: POCKET", any: "VELG: CAROM / POCKET", 
-            caroms_only: "KUN CAROMS", undo: "ANGRE", foul: "FEIL", turn: "AVSLUTT TUR", win: "VINNER STØTET (PUTTE HVIT VIA 1)", inn: "INNING", 
+            caroms_only: "KUN CAROMS", undo: "ANGRE", foul: "FEIL", turn: "AVSLUTT TUR", 
+            rotate: "BYTT STARTSPILLER", win: "VINNER STØTET (PUTTE HVIT VIA 1)", inn: "INNING", 
             winner: "VINNER!", save: "LAGRE & NY", rematch: "REMATCH", discard: "SLETT & NY",
             confirm_msg: "En kamp pågår allerede. Hva vil du gjøre?", resume: "FORTSETT",
             new_match: "NY MATCH", game_mode: "SPILLMODUS", players_count: "ANTALL SPILLERE?",
@@ -205,7 +206,8 @@
         en: { 
             now: "NOW", best: "BEST", last: "LAST", break: "BREAK SHOT", 
             req_carom: "REQ: CAROM", req_pocket: "REQ: POCKET", any: "ANY POINT", 
-            caroms_only: "CAROMS ONLY", undo: "UNDO", foul: "FOUL", turn: "END TURN", win: "WINNING SHOT (POCKET CUE VIA 1)", inn: "INNING", 
+            caroms_only: "CAROMS ONLY", undo: "UNDO", foul: "FOUL", turn: "END TURN", 
+            rotate: "ROTATE BREAKER", win: "WINNING SHOT (POCKET CUE VIA 1)", inn: "INNING", 
             winner: "WINNER!", save: "SAVE & NEW", rematch: "REMATCH", discard: "DELETE & NEW",
             confirm_msg: "A match is in progress. What do you want to do?", resume: "RESUME",
             new_match: "NEW MATCH", game_mode: "GAME MODE", players_count: "NUMBER OF PLAYERS?",
@@ -281,13 +283,16 @@
         document.getElementById('foulActionBtn').innerText = l.foul;
         document.getElementById('endTurnBtn').innerText = l.turn;
         
+        // Oppdaterer "Bytt startspiller"-knappen (den har ingen ID, så vi bruker querySelector)
+        const rotBtn = document.querySelector('.btn-rotate');
+        if (rotBtn) rotBtn.innerText = l.rotate;
+        
         // Oppdater faste tekster i HTML
         document.getElementById('overlayHeader').innerText = l.new_match;
         document.getElementById('confirmText').innerText = l.confirm_msg;
         document.getElementById('playersText').innerText = l.players_count;
         document.getElementById('namesText').innerText = l.player_names;
         
-        // Bruker querySelector for knapper uten ID
         const resumeBtn = document.querySelector('#step-confirm .btn-back');
         if(resumeBtn) resumeBtn.innerText = l.resume;
         
