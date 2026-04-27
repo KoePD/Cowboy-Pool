@@ -30,7 +30,7 @@
         .player-info h2 { margin: 0; font-size: 1.2em; text-transform: uppercase; letter-spacing: 1px; color: #666; }
         .active .player-info h2 { color: #f1c40f; }
         .score-display { font-size: 3.5em; font-weight: 900; line-height: 1; margin: 0; color: #333; min-width: 60px; text-align: right; }
-        .active .score-display { color: #f1c40f; text-shadow: 0 0 15px rgba(241, 196, 15, 0.3); }
+        .active .score-display { color: #f1c40f; }
 
         .sub-stats { font-size: 0.55em; color: #444; margin-top: 12px; display: flex; justify-content: flex-start; text-transform: uppercase; }
         .active .sub-stats { color: #888; }
@@ -61,14 +61,11 @@
         .btn-turn { background: #27ae60; color: white; border-bottom: 4px solid #1e8449; grid-column: span 2; padding: 20px; font-size: 1.1em; }
         .btn-finish { background: #000; color: white; border: 1px solid #333; grid-column: span 2; margin-top: 5px; padding: 12px; font-size: 0.7em; letter-spacing: 1px; opacity: 0.8; }
         
-        /* SETUP OVERLAY STYLES */
         .setup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,20,5,0.98); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(10px); }
         .setup-card { background: #000; border: 1px solid #f1c40f; padding: 30px; border-radius: 30px; width: 100%; max-width: 350px; text-align: center; }
         .btn-choice { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid #333; background: #111; color: white; font-weight: bold; cursor: pointer; }
         .name-field { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #111; color: white; margin-bottom: 10px; box-sizing: border-box; text-align: center; font-size: 1em; }
         .btn-start { width: 100%; padding: 18px; border-radius: 15px; background: #27ae60; color: white; border: none; font-weight: 900; text-transform: uppercase; margin-top: 10px; cursor: pointer; }
-        
-        /* BACK BUTTON STYLE */
         .btn-back { background: none; border: none; color: #888; margin-top: 20px; cursor: pointer; font-size: 0.8em; text-decoration: underline; }
 
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: flex; justify-content: space-around; padding: 10px 0 35px 0; border-top: 1px solid #111; z-index: 1000; }
@@ -83,7 +80,6 @@
 <div id="setupOverlay" class="setup-overlay">
     <div class="setup-card">
         <h2 style="color:#f1c40f; margin-bottom: 20px;">NEW MATCH</h2>
-        
         <div id="step1">
             <p style="color:#888; margin-bottom: 15px;">Antall spillere?</p>
             <div style="display:flex; gap:10px; margin-bottom:20px;">
@@ -93,7 +89,6 @@
             </div>
             <button class="btn-back" onclick="closeSetup()">Avbryt</button>
         </div>
-
         <div id="step2" style="display: none;">
             <p style="color:#888; margin-bottom: 15px;">Navn på spillere:</p>
             <div id="nameInputs"></div>
@@ -108,17 +103,12 @@
     <div class="header-actions">
         <button class="btn-new-game-top" onclick="openSetup()">New Match</button>
     </div>
-
     <div id="scoreboard-container"></div>
-
     <div class="game-status-zone">
         <span class="req-text" id="moveText">BREKK-STØT</span>
         <span class="timer-text" id="matchTimer">00:00:00</span>
-        <div id="rotate-container">
-            <button class="btn-rotate" onclick="rotateBreaker()">BYTT STARTSPILLER</button>
-        </div>
+        <div id="rotate-container"><button class="btn-rotate" onclick="rotateBreaker()">BYTT STARTSPILLER</button></div>
     </div>
-
     <div class="ball-control-zone">
         <div class="ball-group">
             <button class="ball" id="ball1" onclick="action('pocket', 1)"><div class="ball-inner">1</div></button>
@@ -133,7 +123,6 @@
             <button class="btn-sub-carom" onclick="action('pocket_carom', 4)">+ CAROM</button>
         </div>
     </div>
-
     <div class="action-area">
         <button class="btn btn-blue" onclick="action('carom', 1)">Carom 1P</button>
         <button class="btn btn-blue" onclick="action('carom', 2)">Carom 2P</button>
@@ -142,7 +131,6 @@
         <button class="btn btn-turn" onclick="nextTurn()">AVSLUTT TUR</button>
         <button class="btn btn-finish" onclick="saveMatchToHistory()">FINISH & SAVE</button>
     </div>
-
     <nav class="bottom-nav">
         <a href="#" class="nav-item active"><i class="material-icons">home</i>HJEM</a>
         <a href="#" class="nav-item"><i class="material-icons">leaderboard</i>STATS</a>
@@ -155,6 +143,9 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('gameData');
 
+    // Variabel for å holde styr på valg i overlay midlertidig
+    let setupCount = 2;
+
     let state = { playerCount: 2, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null, innings: 0, seconds: 0, names: ["P1","P2","P3"], bestSeries: [0,0,0], lastSeries: [0,0,0], lang: 'no' };
     let history = [];
 
@@ -164,18 +155,14 @@
         document.getElementById('setupOverlay').style.display = 'flex'; 
         goBackToStep1();
     }
-
-    function closeSetup() {
-        document.getElementById('setupOverlay').style.display = 'none';
-    }
-
+    function closeSetup() { document.getElementById('setupOverlay').style.display = 'none'; }
     function goBackToStep1() {
         document.getElementById('step1').style.display = 'block';
         document.getElementById('step2').style.display = 'none';
     }
 
     function selectPlayers(n) { 
-        state.playerCount = n; 
+        setupCount = n; // Lagre valget lokalt
         document.getElementById('step1').style.display = 'none'; 
         document.getElementById('step2').style.display = 'block';
         const container = document.getElementById('nameInputs');
@@ -187,13 +174,14 @@
 
     function finalizeSetup() {
         const namesArr = [];
-        for(let i=0; i<state.playerCount; i++) {
+        for(let i=0; i<setupCount; i++) {
             const val = document.getElementById(`n${i}`).value;
             namesArr.push(val || `Spiller ${i+1}`);
         }
         
         const newState = {
             ...state,
+            playerCount: setupCount,
             names: namesArr,
             scores: [0,0,0],
             foulCounts: [0,0,0],
@@ -208,17 +196,14 @@
             innings: 0
         };
 
-        db.set(newState).then(() => {
-            closeSetup();
-        });
+        db.set(newState).then(() => { closeSetup(); });
     }
 
     function action(type, val) {
         saveHistory();
         let p = state.currentPlayer;
-        let cur = state.scores[p];
-        if (cur < 90 && cur + val > 90) return;
-        if (cur >= 90 && cur < 100 && cur + val > 100) return;
+        if (state.scores[p] < 90 && state.scores[p] + val > 90) return;
+        if (state.scores[p] >= 90 && state.scores[p] < 100 && state.scores[p] + val > 100) return;
         state.breakDone = true; state.foulCounts[p] = 0;
         if(type === 'pocket_carom') { state.tableStatus = 'open'; state.lastType = null; }
         else { state.tableStatus = 'locked'; state.lastType = type; }
@@ -263,7 +248,6 @@
                 <div class="score-display">${state.scores[i]}</div>
             </div>`;
         }
-        
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
         const rotateCont = document.getElementById('rotate-container');
         if (!state.breakDone) {
@@ -273,7 +257,6 @@
             rotateCont.style.display = 'none';
             document.getElementById('moveText').innerText = state.tableStatus === 'locked' ? (state.lastType === 'pocket' ? l.req_carom : l.req_pocket) : l.any;
         }
-
         const lock = state.tableStatus === 'locked';
         const at90 = state.scores[state.currentPlayer] >= 90;
         document.getElementById('ball1').className = (!state.breakDone || (lock && state.lastType==='pocket') || at90) ? 'ball waiting-ball' : 'ball';
@@ -282,11 +265,11 @@
     }
 
     function handleFoul() { saveHistory(); state.foulCounts[state.currentPlayer]++; if(state.foulCounts[state.currentPlayer] >= 3) { state.scores[state.currentPlayer] = 0; state.foulCounts[state.currentPlayer] = 0; } else { state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; } nextTurn(); }
-    function saveHistory() { history.push(JSON.stringify(state)); }
+    function saveHistory() { history.push(JSON.stringify(state)); if(history.length > 20) history.shift(); }
     function undo() { if(history.length) { state = JSON.parse(history.pop()); db.set(state); } }
     function toggleLanguage() { state.lang = state.lang==='no'?'en':'no'; db.set(state); }
     function rotateBreaker() { if(!state.breakDone) { state.currentPlayer = (state.currentPlayer+1)%state.playerCount; db.set(state); } }
-    function saveMatchToHistory() { if(confirm("Lagre?")) db.child('history').push({names:state.names, scores:state.scores, date: new Date().toISOString()}).then(finalizeSetup); }
+    function saveMatchToHistory() { if(confirm("Lagre?")) db.child('history').push({names:state.names, scores:state.scores, date: new Date().toISOString()}).then(() => { state.breakDone = false; state.scores = [0,0,0]; db.set(state); }); }
     setInterval(() => { if(state.breakDone) { state.seconds++; db.child('seconds').set(state.seconds); } }, 1000);
 </script>
 </body>
