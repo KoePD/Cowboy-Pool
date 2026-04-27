@@ -270,7 +270,8 @@
         document.getElementById('ball5').className = pocketDisabled ? 'ball waiting-ball' : 'ball';
         document.getElementById('ball3').className = (caromPhase || winPhase || lockPocket) ? 'ball waiting-ball' : 'ball';
         
-        const subCaromDisabled = winPhase || (lockCarom && !caromPhase);
+        // CAROM+ (Pocket Carom) gråes ut hvis man er i caromPhase (90-100) eller winPhase (100)
+        const subCaromDisabled = caromPhase || winPhase;
         document.getElementById('pc1').className = subCaromDisabled ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
         document.getElementById('pc5').className = subCaromDisabled ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
         document.getElementById('pc3').className = subCaromDisabled ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
