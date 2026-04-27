@@ -208,6 +208,8 @@
 
     function action(type, val) {
         saveHistory(); let p = state.currentPlayer; let cur = state.scores[p];
+        
+        // Regelsjekk for 90-101 fasen
         if ((cur < 90 && (cur + val) > 90) || (cur >= 90 && (cur + val) > 101)) { handleFoul(); return; }
         if (cur >= 90 && cur < 100 && type.includes('pocket') && type !== 'pocket_carom') return;
         if (cur === 100 && type !== 'winning_shot') return;
@@ -215,12 +217,24 @@
         state.breakDone = true; state.foulCounts[p] = 0;
         
         if (state.gameMode === 'alternate') {
-            if (type === 'pocket_carom') { 
-                state.tableStatus = 'open'; 
-                state.lastType = null; 
-            } else { 
-                state.tableStatus = 'locked'; 
-                state.lastType = type; 
+            if (state.tableStatus === 'open') {
+                // Hvis bordet er åpent:
+                if (type === 'pocket_carom') {
+                    state.tableStatus = 'open'; // Forblir åpent ved Carom+
+                    state.lastType = null;
+                } else {
+                    state.tableStatus = 'locked'; // Låses til det du nettopp gjorde
+                    state.lastType = type;
+                }
+            } else {
+                // Hvis bordet allerede er låst (Alternate-fasen):
+                if (type === 'pocket_carom') {
+                    // Hvis du gjør Carom+ når bordet er låst, teller det som en "Pocket" (kravet utført)
+                    // og neste krav blir Carom. Bordet forblir låst.
+                    state.lastType = 'pocket'; 
+                } else {
+                    state.lastType = type;
+                }
             }
         } else { 
             state.tableStatus = 'open'; 
@@ -232,9 +246,13 @@
     function updateUI() {
         const l = dictionary[state.lang || 'no'];
         document.getElementById('modeLabel').innerText = "MODUS: " + state.gameMode.toUpperCase();
-        document.getElementById('profName').innerText = state.names[0];
-        document.getElementById('profInitial').innerText = state.names[0].charAt(0).toUpperCase();
-        document.getElementById('profBest').innerText = (state.bestSeries ? state.bestSeries[0] : 0) + " Poeng";
+        
+        // Profil-oppdateringer (forberedt for utskilling)
+        if(document.getElementById('profName')) {
+            document.getElementById('profName').innerText = state.names[0];
+            document.getElementById('profInitial').innerText = state.names[0].charAt(0).toUpperCase();
+            document.getElementById('profBest').innerText = (state.bestSeries ? state.bestSeries[0] : 0) + " Poeng";
+        }
 
         const cont = document.getElementById('scoreboard-container'); cont.innerHTML = '';
         for(let i=0; i<state.playerCount; i++) {
@@ -270,8 +288,7 @@
         document.getElementById('ball5').className = pocketDisabled ? 'ball waiting-ball' : 'ball';
         document.getElementById('ball3').className = (caromPhase || winPhase || lockPocket) ? 'ball waiting-ball' : 'ball';
         
-        // CAROM+ (Pocket Carom) gråes ut hvis man er i caromPhase (90-100) eller winPhase (100)
-        const subCaromDisabled = caromPhase || winPhase;
+        const subCaromDisabled = caromPhase || winPhase || (lockCarom && !caromPhase);
         document.getElementById('pc1').className = subCaromDisabled ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
         document.getElementById('pc5').className = subCaromDisabled ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
         document.getElementById('pc3').className = subCaromDisabled ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
