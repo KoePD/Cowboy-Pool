@@ -147,6 +147,7 @@
             <div id="modeLabel" style="font-size:0.6em; color:#f1c40f; opacity:0.6; margin-bottom:5px; text-transform:uppercase;">MODUS: STANDARD</div>
             <span class="req-text" id="moveText">BREKK-STØT</span>
             <span class="timer-text" id="matchTimer">00:00:00</span>
+            <div id="inningDisplay" style="font-size:0.7em; color:#888; font-weight:bold; margin-top:5px; text-transform:uppercase;">INNING: 1</div>
             <div id="rotate-container"><button class="btn-rotate" onclick="rotateBreaker()">BYTT STARTSPILLER</button></div>
         </div>
         <div class="ball-control-zone">
@@ -187,12 +188,12 @@
     const db = firebase.database().ref('gameData');
 
     let setupCount = 2; let tempMode = 'standard';
-    let state = { gameMode: 'standard', playerCount: 2, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null, seconds: 0, names: ["P1","P2","P3"], bestSeries: [0,0,0], lastSeries: [0,0,0], lang: 'no' };
+    let state = { gameMode: 'standard', playerCount: 2, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null, seconds: 0, names: ["P1","P2","P3"], bestSeries: [0,0,0], lastSeries: [0,0,0], lang: 'no', innings: 1 };
     let history = [];
 
     const dictionary = {
-        no: { now: "NÅ", best: "PERS", last: "SISTE", break: "BREKK-STØT", req_carom: "KRAV: CAROM", req_pocket: "KRAV: POCKET", any: "VELG: CAROM / KULE", caroms_only: "KUN CAROMS", win: "WINNING SHOT (CUE VIA 1)" },
-        en: { now: "NOW", best: "BEST", last: "LAST", break: "BREAK SHOT", req_carom: "REQ: CAROM", req_pocket: "REQ: POCKET", any: "ANY POINT", caroms_only: "CAROMS ONLY", win: "WINNING SHOT (CUE VIA 1)" }
+        no: { now: "NÅ", best: "PERS", last: "SISTE", break: "BREKK-STØT", req_carom: "KRAV: CAROM", req_pocket: "KRAV: POCKET", any: "VELG: CAROM / KULE", caroms_only: "KUN CAROMS", win: "WINNING SHOT (CUE VIA 1)", inn: "INNING" },
+        en: { now: "NOW", best: "BEST", last: "LAST", break: "BREAK SHOT", req_carom: "REQ: CAROM", req_pocket: "REQ: POCKET", any: "ANY POINT", caroms_only: "CAROMS ONLY", win: "WINNING SHOT (CUE VIA 1)", inn: "INNING" }
     };
 
     db.on('value', (s) => { if(s.val()) { state = s.val(); updateUI(); } });
@@ -218,20 +219,14 @@
         if (state.gameMode === 'alternate') {
             if (state.tableStatus === 'open') {
                 if (type === 'pocket_carom') {
-                    state.tableStatus = 'open'; // Forblir åpent
+                    state.tableStatus = 'open';
                     state.lastType = null;
                 } else {
-                    state.tableStatus = 'locked'; // Låses til det som ble gjort
+                    state.tableStatus = 'locked';
                     state.lastType = type;
                 }
             } else {
-                // HVIS LÅST:
                 if (type === 'pocket_carom') {
-                    // Hvis du gjør Carom+ (Pocket+Carom), betyr det at du har gjort BEGGE.
-                    // Logikken må da sette "lastType" til det motsatte av det som var KRAVET,
-                    // slik at neste støt blir det man IKKE gjorde sist som hovedkrav.
-                    // Hvis kravet var Carom (lastType var pocket), så har du nå gjort Carom. Neste er Pocket.
-                    // Altså: lastType blir carom.
                     state.lastType = (state.lastType === 'pocket') ? 'carom' : 'pocket';
                 } else {
                     state.lastType = type;
@@ -247,6 +242,7 @@
     function updateUI() {
         const l = dictionary[state.lang || 'no'];
         document.getElementById('modeLabel').innerText = "MODUS: " + state.gameMode.toUpperCase();
+        document.getElementById('inningDisplay').innerText = (l.inn || "INNING") + ": " + (state.innings || 1);
         
         if(document.getElementById('profName')) {
             document.getElementById('profName').innerText = state.names[0];
@@ -302,9 +298,34 @@
     function setMode(m) { tempMode = m; document.getElementById('modeStd').classList.toggle('selected', m === 'standard'); document.getElementById('modeAlt').classList.toggle('selected', m === 'alternate'); }
     function goToStep1() { document.getElementById('step-confirm').style.display = 'none'; document.getElementById('step1').style.display = 'block'; document.getElementById('step2').style.display = 'none'; setMode(tempMode); }
     function selectPlayers(n) { setupCount = n; document.getElementById('step1').style.display = 'none'; document.getElementById('step2').style.display = 'block'; const c = document.getElementById('nameInputs'); c.innerHTML = ''; for(let i=0; i<n; i++) c.innerHTML += `<input type="text" id="n${i}" class="name-field" placeholder="Navn ${i+1}">`; }
-    function finalizeSetup() { const ns = []; for(let i=0; i<setupCount; i++) ns.push(document.getElementById(`n${i}`).value || `P${i+1}`); db.set({...state, gameMode: tempMode, playerCount: setupCount, names: ns, scores: [0,0,0], foulCounts:[0,0,0], scoreAtStart:[0,0,0], breakDone:false, seconds:0, currentPlayer:0, tableStatus:'open'}); closeSetup(); }
+    
+    function finalizeSetup() { 
+        const ns = []; 
+        for(let i=0; i<setupCount; i++) ns.push(document.getElementById(`n${i}`).value || `P${i+1}`); 
+        db.set({...state, gameMode: tempMode, playerCount: setupCount, names: ns, scores: [0,0,0], foulCounts:[0,0,0], scoreAtStart:[0,0,0], breakDone:false, seconds:0, currentPlayer:0, tableStatus:'open', innings: 1}); 
+        closeSetup(); 
+    }
+
     function handleFoul() { saveHistory(); state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; state.foulCounts[state.currentPlayer]++; if(state.foulCounts[state.currentPlayer] >= 3) { state.scores[state.currentPlayer] = 0; state.foulCounts[state.currentPlayer] = 0; } nextTurn(); }
-    function nextTurn() { saveHistory(); let p = state.currentPlayer; let s = state.scores[p] - state.scoreAtStart[p]; if(s > state.bestSeries[p]) state.bestSeries[p] = s; state.lastSeries[p] = s; state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; state.tableStatus = 'open'; state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; db.set(state); }
+    
+    function nextTurn() { 
+        saveHistory(); 
+        let p = state.currentPlayer; 
+        let s = state.scores[p] - state.scoreAtStart[p]; 
+        if(s > state.bestSeries[p]) state.bestSeries[p] = s; 
+        state.lastSeries[p] = s; 
+        
+        // Øk inning når runden går tilbake til spiller 0
+        if(state.currentPlayer === state.playerCount - 1) {
+            state.innings = (state.innings || 1) + 1;
+        }
+        
+        state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; 
+        state.tableStatus = 'open'; 
+        state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; 
+        db.set(state); 
+    }
+
     function undo() { if(history.length) { state = JSON.parse(history.pop()); db.set(state); } }
     function saveHistory() { history.push(JSON.stringify(state)); if(history.length > 10) history.shift(); }
     function closeSetup() { document.getElementById('setupOverlay').style.display = 'none'; }
