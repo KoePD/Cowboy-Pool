@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biljard App - 100% Fasit</title>
+    <title>Biljard App - Final Fix</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
             --gold: #d4af37;
-            --felt-green: radial-gradient(circle, #247339 0%, #103a1d 100%);
+            --felt: radial-gradient(circle at center, #247339 0%, #103a1d 100%);
             --leather: #121212;
         }
 
@@ -18,127 +18,121 @@
             justify-content: center;
             margin: 0;
             padding: 20px;
-            font-family: 'Segoe UI', Roboto, sans-serif;
         }
 
         .phone {
             width: 360px;
             height: 760px;
-            background: var(--felt-green); /* Hele telefonen har grønn duk som base */
+            background: #0d2b15; /* Base farge for duk */
             border-radius: 45px;
-            border: 10px solid #282828;
+            border: 8px solid #282828;
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 0 50px rgba(0,0,0,0.7);
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
         }
 
-        /* LÆR-PANEL TOPP */
-        .leather-top {
+        /* DUKEN (Bakgrunnslaget) */
+        .felt-bg {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--felt);
+            background-image: url("https://www.transparenttextures.com/patterns/felt.png");
+            z-index: 1;
+        }
+
+        /* LÆR TOPP - Buer NEDOVER ut i duken */
+        .header {
             background: var(--leather);
             background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png");
-            padding: 45px 25px 60px;
-            position: relative;
+            padding: 45px 25px 80px;
             z-index: 10;
-            /* Denne lager den "smilende" buen nederst */
-            clip-path: ellipse(120% 80% at 50% 20%);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            /* Denne lager den konvekse buen (utover) */
+            border-bottom-left-radius: 50% 40px;
+            border-bottom-right-radius: 50% 40px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.7);
+            position: relative;
         }
 
-        /* Sømmen (den stiplede linjen langs buen) */
-        .stitch-top {
+        /* Søm-detalj */
+        .header::after {
+            content: "";
             position: absolute;
-            bottom: 25px;
-            left: -10%;
-            width: 120%;
-            height: 80px;
-            border-bottom: 2px dashed rgba(212, 175, 55, 0.4);
+            bottom: 10px; left: 5%; width: 90%; height: 40px;
+            border-bottom: 1.5px dashed rgba(212, 175, 55, 0.3);
             border-radius: 50%;
-            pointer-events: none;
         }
 
-        .header-content h1 { color: #fff; margin: 0; font-size: 26px; font-weight: 700; }
-        .rank { color: var(--gold); font-size: 14px; margin: 6px 0; font-weight: 500; }
+        .header h1 { color: #fff; margin: 0; font-size: 26px; }
+        .rank { color: var(--gold); font-size: 14px; margin: 5px 0; }
         
         .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #222;
-            border-radius: 4px;
-            margin-top: 15px;
+            width: 100%; height: 8px; background: #222;
+            border-radius: 4px; margin-top: 15px;
         }
         .progress-fill {
-            width: 65%;
-            height: 100%;
+            width: 65%; height: 100%;
             background: linear-gradient(90deg, #b38f36, var(--gold));
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
         }
 
-        /* MIDTRE SEKSJON (GRØNN DUK) */
-        .main-felt {
+        /* MIDTPARTI (Her ligger kortene på duken) */
+        .main-content {
+            position: relative;
+            z-index: 5;
             flex-grow: 1;
             display: flex;
             justify-content: space-evenly;
             align-items: center;
-            padding: 0 10px;
-            background-image: url("https://www.transparenttextures.com/patterns/felt.png"); /* Tekstur på duken */
-            position: relative;
-            z-index: 1;
         }
 
-        .action-card {
-            width: 95px;
-            height: 110px;
-            background: rgba(0,0,0,0.45);
-            border: 1.5px solid var(--gold);
+        .card {
+            width: 95px; height: 110px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--gold);
             border-radius: 14px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             color: #fff;
-            backdrop-filter: blur(2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
         }
 
-        .action-card i { font-size: 32px; margin-bottom: 12px; color: var(--gold); }
-        .action-card.plus i { color: #2ecc71; }
-        .action-card span { font-size: 10px; font-weight: 800; letter-spacing: 0.5px; }
+        .card i { font-size: 30px; margin-bottom: 10px; color: var(--gold); }
+        .card.plus i { color: #2ecc71; }
+        .card span { font-size: 10px; font-weight: bold; }
 
-        /* LÆR-PANEL BUNN */
-        .leather-bottom {
+        /* LÆR BUNN - Buer OPPOVER ut i duken */
+        .bottom-panel {
             background: var(--leather);
             background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png");
-            padding: 60px 20px 20px;
-            position: relative;
+            padding: 80px 20px 20px;
             z-index: 10;
-            /* Denne lager buen som peker oppover */
-            clip-path: ellipse(120% 80% at 50% 80%);
-            margin-top: -10px;
+            /* Denne lager buen som peker oppover i midten */
+            border-top-left-radius: 50% 40px;
+            border-top-right-radius: 50% 40px;
+            box-shadow: 0 -15px 30px rgba(0,0,0,0.7);
+            position: relative;
         }
 
-        .stitch-bottom {
+        .bottom-panel::before {
+            content: "";
             position: absolute;
-            top: 25px;
-            left: -10%;
-            width: 120%;
-            height: 80px;
-            border-top: 2px dashed rgba(212, 175, 55, 0.4);
+            top: 10px; left: 5%; width: 90%; height: 40px;
+            border-top: 1.5px dashed rgba(212, 175, 55, 0.3);
             border-radius: 50%;
-            pointer-events: none;
         }
 
         .match-card {
-            background: rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.05);
             border: 1px solid #333;
-            border-radius: 20px;
-            padding: 18px;
-            margin-bottom: 10px;
+            border-radius: 18px;
+            padding: 15px;
         }
 
         /* NAVIGASJON */
-        .navbar {
+        .nav {
             background: #0d0d0d;
             height: 75px;
             display: flex;
@@ -148,67 +142,59 @@
             z-index: 20;
         }
 
-        .nav-link { color: #555; text-align: center; font-size: 11px; text-decoration: none; }
-        .nav-link.active { color: var(--gold); }
-        .nav-link i { display: block; font-size: 22px; margin-bottom: 5px; }
+        .nav-item { color: #555; text-align: center; font-size: 11px; text-decoration: none; }
+        .nav-item.active { color: var(--gold); }
+        .nav-item i { display: block; font-size: 22px; margin-bottom: 5px; }
 
     </style>
 </head>
 <body>
 
 <div class="phone">
-    <div class="leather-top">
-        <div class="header-content">
-            <h1>Hei, Marius!</h1>
-            <div class="rank">Cowboy Rank: Level 12 - Gunslinger</div>
-            <div class="progress-bar"><div class="progress-fill"></div></div>
-        </div>
-        <div class="stitch-top"></div>
+    <div class="felt-bg"></div>
+
+    <div class="header">
+        <h1>Hei, Marius!</h1>
+        <div class="rank">Cowboy Rank: Level 12 - Gunslinger</div>
+        <div class="progress-bar"><div class="progress-fill"></div></div>
     </div>
 
-    <div class="main-felt">
-        <div class="action-card plus">
+    <div class="main-content">
+        <div class="card plus">
             <i class="fa-solid fa-plus"></i>
             <span>NY KAMP</span>
         </div>
-        <div class="action-card">
+        <div class="card">
             <i class="fa-solid fa-trophy"></i>
             <span>TOPPLISTE</span>
         </div>
-        <div class="action-card">
+        <div class="card">
             <i class="fa-solid fa-book-open"></i>
             <span>REGLER</span>
         </div>
     </div>
 
-    <div class="leather-bottom">
-        <div class="stitch-bottom"></div>
+    <div class="bottom-panel">
         <div class="match-card">
-            <div style="color:#aaa; font-size:13px; margin-bottom:12px; font-weight:600;">Min Siste Kamp</div>
+            <div style="color:#aaa; font-size:13px; margin-bottom:10px;">Min Siste Kamp</div>
             <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="width:50px; height:50px; border-radius:50%; background:#333; border:2px solid var(--gold);"></div>
                 <div style="text-align:center;">
-                    <div style="width:52px; height:52px; border-radius:50%; background:#333; border:2.5px solid var(--gold); margin-bottom:5px;"></div>
-                    <div style="color:#fff; font-size:12px;">Mav</div>
-                </div>
-                <div style="text-align:center;">
-                    <div style="font-size:28px; font-weight:800; color:#fff; letter-spacing:1px;">
+                    <div style="font-size:26px; font-weight:bold; color:#fff;">
                         <span style="color:#2ecc71">100</span> - <span style="color:var(--gold)">82</span>
                     </div>
-                    <div style="color:#2ecc71; font-size:11px; font-weight:bold; margin-top:4px;">WIN</div>
+                    <div style="color:#2ecc71; font-size:10px; font-weight:bold;">WIN</div>
                 </div>
-                <div style="text-align:center;">
-                    <div style="width:52px; height:52px; border-radius:50%; background:#333; border:2px solid #444; margin-bottom:5px;"></div>
-                    <div style="color:#fff; font-size:12px;">Per</div>
-                </div>
+                <div style="width:50px; height:50px; border-radius:50%; background:#333; border:2px solid #444;"></div>
             </div>
         </div>
     </div>
 
-    <nav class="navbar">
-        <a href="#" class="nav-link active"><i class="fa-solid fa-house"></i>Hjem</a>
-        <a href="#" class="nav-link"><i class="fa-solid fa-trophy"></i>Toppliste</a>
-        <a href="#" class="nav-item nav-link"><i class="fa-solid fa-book"></i>Regler</a>
-    </nav>
+    <div class="nav">
+        <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i>Hjem</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-trophy"></i>Toppliste</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-book"></i>Regler</a>
+    </div>
 </div>
 
 </body>
