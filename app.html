@@ -26,7 +26,7 @@
 
         /* 2. MODUS VELGER */
         .mode-row {
-            display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;
+            display: flex; justify-content: center; gap: 10px; margin-bottom: 15px;
         }
         .btn-mode {
             background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
@@ -34,7 +34,24 @@
         }
         .btn-mode.active { background: #f1c40f; color: black; border-color: #f1c40f; }
 
-        /* 3. STATUS & HEADER */
+        /* 3. NAVNE-INPUTS (NYTT) */
+        .name-inputs-row {
+            display: flex; gap: 8px; margin-bottom: 20px;
+        }
+        .name-input {
+            flex: 1;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: white;
+            padding: 8px;
+            text-align: center;
+            font-size: 0.75em;
+            font-weight: bold;
+        }
+        .name-input:focus { border-color: #f1c40f; outline: none; }
+
+        /* 4. STATUS & HEADER */
         .status-header {
             background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(15px);
             padding: 12px; border-radius: 18px; text-align: center;
@@ -43,44 +60,30 @@
         .req-text { font-size: 0.75em; letter-spacing: 2px; color: #2ecc71; font-weight: 800; text-transform: uppercase; }
         .timer-text { font-family: monospace; font-size: 1.3em; color: #f1c40f; margin-top: 5px; display: block; }
 
-        /* 4. SPILLERKORT (NÅ MØRKERE / SORTE) */
+        /* 5. SPILLERKORT (SORTE) */
         .player-card {
-            /* Her er endringen: Fra grå til dyp sort-gradient */
             background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%);
-            backdrop-filter: blur(10px); 
-            border-radius: 22px;
-            padding: 18px 22px; 
-            margin-bottom: 12px;
-            border: 1px solid rgba(255,255,255,0.08); /* Tynn lys kant for definisjon */
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
+            backdrop-filter: blur(10px); border-radius: 22px;
+            padding: 18px 22px; margin-bottom: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            display: flex; justify-content: space-between; align-items: center;
             transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .player-card.active {
-            border: 2px solid #f1c40f; 
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(241, 196, 15, 0.2);
-            transform: scale(1.03); 
-            /* Den aktive boksen får en ørliten touch av gull-glød i bunnen */
-            background: linear-gradient(180deg, #0f0f0f 0%, #000000 100%);
+            border: 2px solid #f1c40f; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(241, 196, 15, 0.2);
+            transform: scale(1.03); background: linear-gradient(180deg, #0f0f0f 0%, #000000 100%);
         }
         .player-info h2 { margin: 0; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; color: #777; }
         .active .player-info h2 { color: #f1c40f; }
-        
         .score-display { font-size: 3.2em; font-weight: 900; line-height: 1; margin: 0; color: #444; }
-        .active .score-display { color: #f1c40f; text-shadow: 0 0 15px rgba(241, 196, 15, 0.4); }
+        .active .score-display { color: #f1c40f; }
 
-        /* STATS INNI BOKSENE */
-        .sub-stats { 
-            font-size: 0.6em; color: #555; margin-top: 10px; 
-            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; text-transform: uppercase; 
-        }
+        /* STATS & FOULS */
+        .sub-stats { font-size: 0.6em; color: #555; margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; text-transform: uppercase; }
         .active .sub-stats { color: #888; }
-        .stat-item { display: flex; flex-direction: column; }
         .stat-val { color: #fff; font-weight: 900; font-size: 1.2em; }
         .active .stat-val { color: #f1c40f; }
 
-        /* FOUL MARKERING */
         .foul-container { display: flex; gap: 6px; margin-top: 10px; }
         .foul-dot { width: 11px; height: 11px; border-radius: 50%; background: #222; border: 1px solid #333; transition: 0.3s; }
         .foul-dot.active { background: #e74c3c; box-shadow: 0 0 10px #ff4757; }
@@ -97,13 +100,10 @@
             box-shadow: inset -6px -6px 15px rgba(0,0,0,0.7), 6px 10px 20px rgba(0,0,0,0.6);
             display: flex; align-items: center; justify-content: center; transition: 0.1s;
         }
-        .ball:active { transform: scale(0.92); }
-        .ball-inner { width: 28px; height: 28px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #000; font-size: 0.9em; }
-
         #ball1 { background: radial-gradient(circle at 35% 35%, #f1c40f, #b38f00); }
         #ball5 { background: radial-gradient(circle at 35% 35%, #8e44ad, #4b0082); }
         #ball3 { background: radial-gradient(circle at 35% 35%, #e74c3c, #962d22); }
-
+        .ball-inner { width: 28px; height: 28px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #000; font-size: 0.9em; }
         .btn-sub-carom { background: rgba(52, 152, 219, 0.1); color: #3498db; border: 1px solid #3498db; border-radius: 6px; padding: 5px 10px; font-size: 0.6em; font-weight: 800; cursor: pointer; }
 
         /* HANDLINGER BUNN */
@@ -112,7 +112,7 @@
             padding: 0 20px; max-width: 430px; margin: auto;
             display: grid; grid-template-columns: 1fr 1fr; gap: 10px; z-index: 900;
         }
-        .btn { padding: 16px; border-radius: 15px; border: none; font-weight: 800; text-transform: uppercase; cursor: pointer; font-size: 0.75em; box-shadow: 0 6px 15px rgba(0,0,0,0.4); }
+        .btn { padding: 16px; border-radius: 15px; border: none; font-weight: 800; text-transform: uppercase; cursor: pointer; font-size: 0.75em; }
         .btn-blue { background: #2980b9; color: white; border-bottom: 4px solid #1c5982; }
         .btn-foul { background: #c0392b; color: white; border-bottom: 4px solid #7b241c; }
         .btn-turn { background: #27ae60; color: white; border-bottom: 4px solid #1e8449; grid-column: span 2; padding: 18px; font-size: 1em; }
@@ -138,6 +138,8 @@
         <button class="btn-mode" id="m2" onclick="setPlayerCount(2)">2P</button>
         <button class="btn-mode" id="m3" onclick="setPlayerCount(3)">3P</button>
     </div>
+
+    <div class="name-inputs-row" id="name-inputs-container"></div>
 
     <div class="status-header">
         <span class="req-text" id="moveText">BREKK-STØT (3-BALL)</span>
@@ -184,7 +186,7 @@
     let state = {
         playerCount: 2, scores: [0, 0, 0], foulCounts: [0, 0, 0], scoreAtStart: [0, 0, 0],
         currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null,
-        innings: 0, seconds: 0, names: ["Simen Jøndal", "Lasse Kåring", "Ole Andreas Sandvik"],
+        innings: 0, seconds: 0, names: ["Spiller 1", "Spiller 2", "Spiller 3"],
         bestSeries: [0, 0, 0], lastSeries: [0, 0, 0]
     };
 
@@ -196,9 +198,19 @@
     });
 
     function updateUI() {
+        // Oppdater modus-knapper
         for(let i=1; i<=3; i++) {
             const btn = document.getElementById(`m${i}`);
             if(btn) btn.className = (state.playerCount === i) ? 'btn-mode active' : 'btn-mode';
+        }
+
+        // Oppdater navne-inputs (kun hvis antallet endres)
+        const nameInputCont = document.getElementById('name-inputs-container');
+        if (nameInputCont.children.length !== state.playerCount) {
+            nameInputCont.innerHTML = '';
+            for (let i = 0; i < state.playerCount; i++) {
+                nameInputCont.innerHTML += `<input class="name-input" id="p${i}-name-in" value="${state.names[i]}" oninput="saveName(${i}, this.value)">`;
+            }
         }
 
         const container = document.getElementById('scoreboard-container');
@@ -222,7 +234,7 @@
                         <h2>${state.names[i]}</h2>
                         <div class="sub-stats">
                             <div class="stat-item">NÅ <span class="stat-val">${currentRun}</span></div>
-                            <div class="stat-item">BEST <span class="stat-val">${state.bestSeries[i] || 0}</span></div>
+                            <div class="stat-item">PERS <span class="stat-val">${state.bestSeries[i] || 0}</span></div>
                             <div class="stat-item">SISTE <span class="stat-val">${lastRun}</span></div>
                         </div>
                         ${foulHtml}
@@ -248,8 +260,13 @@
         document.getElementById('ball3').parentElement.className = (isLockedPocket || isAtEnd) ? 'ball-group waiting' : 'ball-group';
     }
 
+    function saveName(i, val) {
+        state.names[i] = val;
+        db.child('names').set(state.names);
+    }
+
     function setPlayerCount(n) {
-        if(confirm(`Bytte til ${n} spillere? Dette vil resette nåværende kamp.`)) {
+        if(confirm(`Bytte til ${n} spillere? Kampen resettes.`)) {
             state.playerCount = n;
             state.scores = [0,0,0];
             state.foulCounts = [0,0,0];
