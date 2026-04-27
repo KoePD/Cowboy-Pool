@@ -37,7 +37,8 @@
         .foul-dot.active { background: #e74c3c; }
         .setup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,20,5,0.98); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(10px); }
         .setup-card { background: #000; border: 1px solid #f1c40f; padding: 30px; border-radius: 30px; width: 100%; max-width: 350px; text-align: center; }
-        .name-field { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #111; color: white; margin-bottom: 10px; text-align: center; box-sizing: border-box; }
+        .name-field { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #111; color: white; margin-bottom: 10px; text-align: center; box-sizing: border-box; font-size: 1em; }
+        .btn-back-text { background: none; border: none; color: #666; margin-top: 15px; cursor: pointer; text-decoration: underline; font-size: 0.8em; }
     </style>
 </head>
 <body>
@@ -45,27 +46,35 @@
 <div id="setupOverlay" class="setup-overlay">
     <div class="setup-card">
         <h2 style="color:#f1c40f">NY MATCH</h2>
+        
         <div id="step-confirm" style="display: none;">
-            <button class="btn-gold" style="width:100%; margin-bottom:10px;" onclick="handleFinishAndSave()">LAGRE & NY</button>
-            <button class="btn-gold" style="width:100%; border-color:#e74c3c; color:#e74c3c;" onclick="goToStep1()">SLETT & NY</button>
-            <button style="background:none; border:none; color:#555; margin-top:15px;" onclick="closeSetup()">Avbryt</button>
+            <p style="color:#888; margin-bottom: 20px;">En kamp pågår allerede.</p>
+            <button class="btn-gold" style="width:100%; margin-bottom:10px;" onclick="handleFinishAndSave()">LAGRE & START NY</button>
+            <button class="btn-gold" style="width:100%; border-color:#e74c3c; color:#e74c3c;" onclick="goToStep1()">SLETT & START NY</button>
+            <button class="btn-back-text" onclick="closeSetup()">Fortsett kampen</button>
         </div>
+
         <div id="step1" style="display: none;">
-            <p style="color:#888">Velg Spillmodus:</p>
+            <p style="color:#888; margin-bottom: 10px;">Spillmodus:</p>
             <div style="display:flex; gap:10px; margin-bottom:20px;">
                 <button class="btn-gold" id="modeStd" style="flex:1" onclick="setMode('standard')">Standard</button>
                 <button class="btn-gold" id="modeAlt" style="flex:1" onclick="setMode('alternate')">Alternate</button>
             </div>
-            <p style="color:#888">Antall spillere:</p>
+            <p style="color:#888; margin-bottom: 10px;">Antall spillere:</p>
             <div style="display:flex; gap:10px; margin-bottom:20px;">
                 <button class="btn-gold" style="flex:1" onclick="setPlayers(1)">1</button>
                 <button class="btn-gold" style="flex:1" onclick="setPlayers(2)">2</button>
                 <button class="btn-gold" style="flex:1" onclick="setPlayers(3)">3</button>
             </div>
+            <button class="btn-back-text" onclick="closeSetup()">Avbryt</button>
         </div>
+
         <div id="step2" style="display: none;">
+            <p style="color:#888; margin-bottom: 15px;">Navn på spillere:</p>
             <div id="nameInputs"></div>
             <button class="btn-gold" style="width:100%; margin-top:10px;" onclick="finalizeSetup()">START KAMP</button>
+            <br>
+            <button class="btn-back-text" onclick="goToStep1()">← Gå tilbake</button>
         </div>
     </div>
 </div>
@@ -108,7 +117,6 @@
 
     let tempPlayers = 2;
     let tempMode = 'standard';
-
     let state = { gameMode: 'standard', playerCount: 2, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null, seconds: 0, names: ["P1","P2","P3"], bestSeries: [0,0,0] };
     let history = [];
 
@@ -118,26 +126,17 @@
         saveHistory();
         let p = state.currentPlayer;
         let cur = state.scores[p];
-
         if ((cur < 90 && (cur + val) > 90) || (cur >= 90 && (cur + val) > 101)) { handleFoul(); return; }
         if (cur >= 90 && cur < 100 && type.includes('pocket') && type !== 'pocket_carom') return;
         if (cur === 100 && type !== 'winning_shot') return;
-
         state.breakDone = true;
         state.foulCounts[p] = 0;
-
         if (state.gameMode === 'alternate') {
             if (type === 'pocket_carom') {
                 state.tableStatus = state.tableStatus === 'open' ? 'open' : 'locked';
                 state.lastType = 'pocket';
-            } else {
-                state.tableStatus = 'locked';
-                state.lastType = type;
-            }
-        } else {
-            state.tableStatus = 'open'; // Standard-modus: alltid åpen
-        }
-
+            } else { state.tableStatus = 'locked'; state.lastType = type; }
+        } else { state.tableStatus = 'open'; }
         state.scores[p] += val;
         if (state.scores[p] === 101) alert(state.names[p] + " VANT!");
         db.set(state);
@@ -153,21 +152,17 @@
                 <div style="display:flex; margin-top:8px;">${Array(3).fill(0).map((_,f)=>`<div class="foul-dot ${state.foulCounts[i]>f?'active':''}"></div>`).join('')}</div></div>
                 <div class="score-display">${s}</div></div>`;
         });
-
         const cur = state.scores[state.currentPlayer];
         const winPhase = cur === 100;
         const caromPhase = cur >= 90 && cur < 100;
         const lockPocket = state.gameMode === 'alternate' && state.tableStatus === 'locked' && state.lastType === 'pocket';
         const lockCarom = state.gameMode === 'alternate' && state.tableStatus === 'locked' && state.lastType === 'carom';
-
         document.getElementById('winButton').style.display = winPhase ? 'block' : 'none';
         document.getElementById('c1').style.display = winPhase ? 'none' : (lockCarom ? 'none' : 'block');
         document.getElementById('c2').style.display = winPhase ? 'none' : (lockCarom ? 'none' : 'block');
-
         document.getElementById('ball1').className = (!state.breakDone || caromPhase || winPhase || lockPocket) ? 'ball waiting-ball' : 'ball';
         document.getElementById('ball5').className = (!state.breakDone || caromPhase || winPhase || lockPocket) ? 'ball waiting-ball' : 'ball';
         document.getElementById('ball3').className = (caromPhase || winPhase || lockPocket) ? 'ball waiting-ball' : 'ball';
-        
         document.getElementById('moveText').innerText = winPhase ? "WINNING SHOT" : (caromPhase ? "KUN CAROMS" : (!state.breakDone ? "BREKK-STØT" : (lockPocket ? "KRAV: CAROM" : (lockCarom ? "KRAV: POCKET" : "VELG FRITT"))));
         document.getElementById('rotate-container').style.display = state.breakDone ? 'none' : 'block';
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
@@ -175,11 +170,12 @@
 
     function checkActiveGame() { 
         document.getElementById('setupOverlay').style.display = 'flex'; 
-        document.getElementById('step-confirm').style.display = state.scores.some(s=>s>0)?'block':'none';
-        document.getElementById('step1').style.display = state.scores.some(s=>s>0)?'none':'block';
-        setMode('standard');
+        const inProgress = state.scores.some(s=>s>0);
+        if (inProgress) { document.getElementById('step-confirm').style.display = 'block'; document.getElementById('step1').style.display = 'none'; document.getElementById('step2').style.display = 'none'; }
+        else { goToStep1(); }
     }
     function setMode(m) { tempMode = m; document.getElementById('modeStd').className = m === 'standard' ? 'btn-gold selected' : 'btn-gold'; document.getElementById('modeAlt').className = m === 'alternate' ? 'btn-gold selected' : 'btn-gold'; }
+    function goToStep1() { document.getElementById('step-confirm').style.display = 'none'; document.getElementById('step1').style.display = 'block'; document.getElementById('step2').style.display = 'none'; setMode(tempMode); }
     function setPlayers(n) { tempPlayers = n; document.getElementById('step1').style.display = 'none'; document.getElementById('step2').style.display = 'block'; const c = document.getElementById('nameInputs'); c.innerHTML = ''; for(let i=0; i<n; i++) c.innerHTML += `<input type="text" id="n${i}" class="name-field" placeholder="Navn ${i+1}">`; }
     function finalizeSetup() { 
         const ns = []; for(let i=0; i<tempPlayers; i++) ns.push(document.getElementById(`n${i}`).value || `P${i+1}`); 
@@ -191,8 +187,8 @@
     function undo() { if(history.length) { state = JSON.parse(history.pop()); db.set(state); } }
     function saveHistory() { history.push(JSON.stringify(state)); if(history.length > 10) history.shift(); }
     function closeSetup() { document.getElementById('setupOverlay').style.display = 'none'; }
-    function goToStep1() { document.getElementById('step-confirm').style.display = 'none'; document.getElementById('step1').style.display = 'block'; }
     function rotateBreaker() { if(!state.breakDone) { state.currentPlayer = (state.currentPlayer+1)%state.playerCount; db.set(state); } }
+    function handleFinishAndSave() { firebase.database().ref('matchHistory').push({ date: new Date().toISOString(), players: state.names.slice(0, state.playerCount), scores: state.scores.slice(0, state.playerCount) }).then(goToStep1); }
     setInterval(() => { if(state.breakDone) { state.seconds++; db.child('seconds').set(state.seconds); } }, 1000);
 </script>
 </body>
