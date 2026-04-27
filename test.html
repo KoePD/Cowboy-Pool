@@ -7,14 +7,12 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            /* Den nøyaktige, dype grønnfargen fra originalbildet */
             --felt-green: radial-gradient(circle at center, #2fa34b 0%, #155e2d 60%, #082411 100%);
             --gold: #d4af37;
             --leather: #121212;
-            --card-bg: rgba(0, 0, 0, 0.65);
+            --card-bg: rgba(0, 0, 0, 0.7);
         }
 
-        /* Fullskjerm reset */
         html, body {
             height: 100%;
             margin: 0;
@@ -32,7 +30,6 @@
             position: relative;
         }
 
-        /* GRØNN DUK - Ren farge i bunn */
         .felt-base {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -40,42 +37,41 @@
             z-index: 1;
         }
 
-        /* Tekstur-lag - Ligger over fargen med lav synlighet for å hindre gråskjær */
         .felt-texture {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             background-image: url("https://www.transparenttextures.com/patterns/felt.png");
-            opacity: 0.15;
+            opacity: 0.12;
             z-index: 2;
             pointer-events: none;
         }
 
-        /* TOPP-PANEL - 50% Større */
+        /* TOPP-PANEL - Gjort betydelig lenger */
         .header {
             background: var(--leather);
             background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png");
-            padding: 70px 30px 110px; /* Massiv padding for å matche originalen */
+            padding: 80px 30px 140px; /* Ekstremt lenger ned */
             z-index: 10;
-            border-bottom-left-radius: 50% 45px;
-            border-bottom-right-radius: 50% 45px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.9);
+            border-bottom-left-radius: 50% 50px;
+            border-bottom-right-radius: 50% 50px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.9);
             position: relative;
         }
 
         .header::after {
             content: "";
             position: absolute;
-            bottom: 15px; left: 5%; width: 90%; height: 45px;
-            border-bottom: 1.5px dashed rgba(212, 175, 55, 0.4);
+            bottom: 18px; left: 5%; width: 90%; height: 50px;
+            border-bottom: 2px dashed rgba(212, 175, 55, 0.3);
             border-radius: 50%;
         }
 
-        .header h1 { color: #fff; margin: 0; font-size: 32px; font-weight: 700; }
+        .header h1 { color: #fff; margin: 0; font-size: 34px; font-weight: 800; }
         .rank { color: var(--gold); font-size: 16px; margin: 8px 0; font-weight: 500; }
         
         .progress-bar {
             width: 100%; height: 10px; background: #222;
-            border-radius: 5px; margin-top: 25px;
+            border-radius: 5px; margin-top: 30px;
         }
         .progress-fill {
             width: 65%; height: 100%;
@@ -84,7 +80,7 @@
             border-radius: 5px;
         }
 
-        /* MIDTPARTI - Større knapper */
+        /* MIDTPARTI - Knappene fyller nå nesten hele høyden som er igjen */
         .main-felt {
             position: relative;
             z-index: 5;
@@ -92,70 +88,70 @@
             display: flex;
             justify-content: space-evenly;
             align-items: center;
-            padding: 20px 10px;
+            padding: 10px;
         }
 
         .action-card {
-            width: 130px; /* Blåst opp størrelse */
-            height: 140px; 
+            width: 140px; /* Bredere */
+            height: 155px; /* Mye høyere */
             background: var(--card-bg);
             border: 2px solid var(--gold);
-            border-radius: 20px;
+            border-radius: 22px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             color: #fff;
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 10px 25px rgba(0,0,0,0.5);
-            backdrop-filter: blur(4px);
+            box-shadow: inset 0 0 35px rgba(0,0,0,0.8), 0 15px 30px rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
         }
 
-        .action-card i { font-size: 45px; margin-bottom: 15px; color: var(--gold); }
+        .action-card i { font-size: 50px; margin-bottom: 15px; color: var(--gold); }
         .action-card.green-icon i { color: #2ecc71; }
-        .action-card span { font-size: 13px; font-weight: 900; letter-spacing: 1px; }
+        .action-card span { font-size: 14px; font-weight: 900; letter-spacing: 1.2px; }
 
-        /* BUNN-PANEL - 50% Større */
+        /* BUNN-PANEL - Gjort betydelig lenger */
         .bottom-panel {
             background: var(--leather);
             background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png");
-            padding: 100px 30px 30px; /* Massiv padding i topp for buen */
+            padding: 130px 30px 40px; /* Ekstremt lenger opp */
             z-index: 10;
-            border-top-left-radius: 50% 45px;
-            border-top-right-radius: 50% 45px;
-            box-shadow: 0 -20px 40px rgba(0,0,0,0.9);
+            border-top-left-radius: 50% 50px;
+            border-top-right-radius: 50% 50px;
+            box-shadow: 0 -25px 45px rgba(0,0,0,0.9);
             position: relative;
         }
 
         .bottom-panel::before {
             content: "";
             position: absolute;
-            top: 15px; left: 5%; width: 90%; height: 45px;
-            border-top: 1.5px dashed rgba(212, 175, 55, 0.4);
+            top: 18px; left: 5%; width: 90%; height: 50px;
+            border-top: 2px dashed rgba(212, 175, 55, 0.3);
             border-radius: 50%;
         }
 
         .match-card {
-            background: rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.04);
             border: 1px solid #333;
-            border-radius: 22px;
+            border-radius: 24px;
             padding: 25px;
         }
 
         /* NAVBAR */
         .navbar {
-            background: #0d0d0d;
-            height: 85px;
+            background: #080808;
+            height: 90px;
             display: flex;
             justify-content: space-around;
             align-items: center;
-            border-top: 1px solid #222;
+            border-top: 1px solid #1a1a1a;
             z-index: 20;
-            padding-bottom: 10px; /* Plass for hjem-bar på iPhone */
+            padding-bottom: 15px;
         }
 
-        .nav-item { color: #555; text-align: center; font-size: 13px; text-decoration: none; font-weight: 600; }
+        .nav-item { color: #444; text-align: center; font-size: 13px; text-decoration: none; font-weight: 700; }
         .nav-item.active { color: var(--gold); }
-        .nav-item i { display: block; font-size: 28px; margin-bottom: 6px; }
+        .nav-item i { display: block; font-size: 30px; margin-bottom: 6px; }
 
     </style>
 </head>
@@ -166,14 +162,14 @@
     <div class="felt-texture"></div>
 
     <header class="header">
-        <h1>Hei, Marius!</h1>
+        <h1>Hei, Lasse!</h1>
         <div class="rank">Cowboy Rank: Level 12 - Gunslinger</div>
         <div class="progress-bar"><div class="progress-fill"></div></div>
     </header>
 
     <main class="main-felt">
         <div class="action-card green-icon">
-            <i class="fa-solid fa-plus"></i>
+            <i class="fa-solid fa-circle-plus"></i>
             <span>NY KAMP</span>
         </div>
         <div class="action-card">
@@ -188,30 +184,30 @@
 
     <section class="bottom-panel">
         <div class="match-card">
-            <div style="color:#aaa; font-size:14px; margin-bottom:18px; font-weight:700; text-transform: uppercase; letter-spacing: 1px;">Min Siste Kamp</div>
+            <div style="color:#666; font-size:14px; margin-bottom:20px; font-weight:800; text-transform: uppercase; letter-spacing: 1.5px;">Min Siste Kamp</div>
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div style="text-align:center;">
-                    <div style="width:60px; height:60px; border-radius:50%; background:#222; border:3px solid var(--gold); margin-bottom:8px;"></div>
-                    <div style="color:#fff; font-size:14px; font-weight: 600;">Mav</div>
+                    <div style="width:65px; height:65px; border-radius:50%; background:#1a1a1a; border:3px solid var(--gold); margin-bottom:10px;"></div>
+                    <div style="color:#fff; font-size:14px; font-weight: 700;">Lasse</div>
                 </div>
                 <div style="text-align:center;">
-                    <div style="font-size:36px; font-weight:900; color:#fff; letter-spacing:2px;">
-                        <span style="color:#2ecc71">100</span> - <span style="color:var(--gold)">82</span>
+                    <div style="font-size:42px; font-weight:950; color:#fff; letter-spacing:2px;">
+                        <span style="color:#2ecc71">0</span> - <span style="color:#444">0</span>
                     </div>
-                    <div style="color:#2ecc71; font-size:12px; font-weight:900; margin-top:5px; letter-spacing: 1px;">WIN</div>
+                    <div style="color:#666; font-size:12px; font-weight:900; margin-top:5px;">LASTER...</div>
                 </div>
                 <div style="text-align:center;">
-                    <div style="width:60px; height:60px; border-radius:50%; background:#222; border:3px solid #333; margin-bottom:8px;"></div>
-                    <div style="color:#fff; font-size:14px; font-weight: 600;">Per</div>
+                    <div style="width:65px; height:65px; border-radius:50%; background:#1a1a1a; border:3px solid #333; margin-bottom:10px;"></div>
+                    <div style="color:#fff; font-size:14px; font-weight: 700;">?</div>
                 </div>
             </div>
         </div>
     </section>
 
     <nav class="navbar">
-        <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i>Hjem</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-trophy"></i>Toppliste</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-book"></i>Regler</a>
+        <a href="#" class="nav-item active"><i class="fa-solid fa-house-chimney"></i>HJEM</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-infinity"></i>RANGE</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-user"></i>PROFIL</a>
     </nav>
 </div>
 
