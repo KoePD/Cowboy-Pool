@@ -6,55 +6,24 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Cowboy Pool Pro</title>
-    
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
-    
     <style>
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background: radial-gradient(circle at top, #1e4d2b 0%, #0a1a0f 100%);
-            background-attachment: fixed;
-            color: white; margin: 0; padding: 0; 
-            display: flex; justify-content: center;
-            min-height: 100vh; overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
-        }
+        body { font-family: 'Segoe UI', sans-serif; background: radial-gradient(circle at top, #1e4d2b 0%, #0a1a0f 100%); background-attachment: fixed; color: white; margin: 0; padding: 0; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
         .app-container { width: 100%; max-width: 430px; padding: 20px; padding-bottom: 120px; display: flex; flex-direction: column; }
-        
-        /* SIDE-HÅNDTERING */
         .page { display: none; width: 100%; flex-direction: column; }
         .page.active { display: flex; }
-
-        /* HEADER & KNAPPER */
         .header-actions { display: flex; justify-content: center; margin-bottom: 20px; min-height: 45px; }
-        .btn-gold { 
-            background: rgba(0,0,0,0.6); color: #f1c40f; border: 1px solid rgba(241, 196, 15, 0.5); 
-            padding: 10px 30px; border-radius: 50px; font-weight: 800; font-size: 0.75em; 
-            letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
-        }
-
-        /* SPILLERKORT & PROFILKORT */
-        .card { 
-            background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%); 
-            backdrop-filter: blur(10px); border-radius: 24px; 
-            padding: 20px; margin-bottom: 12px; 
-            border: 1px solid rgba(255,255,255,0.08); 
-            display: flex; justify-content: space-between; align-items: center;
-        }
+        .btn-gold { background: rgba(0,0,0,0.6); color: #f1c40f; border: 1px solid rgba(241, 196, 15, 0.5); padding: 10px 30px; border-radius: 50px; font-weight: 800; font-size: 0.75em; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; }
+        .card { background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%); backdrop-filter: blur(10px); border-radius: 24px; padding: 20px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; }
         .player-card.active-turn { border: 2px solid #f1c40f; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9); transform: scale(1.02); }
-        
         .info-label { font-size: 0.8em; color: #666; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
         .info-value { font-size: 1.2em; font-weight: bold; color: #f1c40f; }
-
-        /* PROFIL SPESIFIKT */
         .profile-header { text-align: center; margin-bottom: 30px; }
         .profile-avatar { width: 80px; height: 80px; background: #f1c40f; border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; color: black; font-size: 2.5em; font-weight: 900; }
         .profile-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
         .stat-box { background: rgba(0,0,0,0.5); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); text-align: center; }
-
-        /* SPILL-ELEMENTER (SAMME SOM FØR) */
         .score-display { font-size: 3.5em; font-weight: 900; color: #333; }
         .active-turn .score-display { color: #f1c40f; }
         .game-status-zone { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(15px); padding: 15px; border-radius: 20px 20px 0 0; text-align: center; border: 1px solid rgba(255,255,255,0.05); border-bottom: none; margin-top: 20px; }
@@ -62,17 +31,15 @@
         .ball { width: 75px; height: 75px; border-radius: 50%; border: none; box-shadow: inset -6px -6px 15px rgba(0,0,0,0.7), 6px 12px 20px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; }
         .action-area { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .btn-action { padding: 16px; border-radius: 16px; border: none; font-weight: 800; text-transform: uppercase; cursor: pointer; color: white; }
-        
-        /* NAVIGASJON */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: flex; justify-content: space-around; padding: 10px 0 35px 0; border-top: 1px solid #111; z-index: 1000; }
         .nav-item { color: #333; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.55em; font-weight: bold; cursor: pointer; }
         .nav-item.active { color: #f1c40f; }
         .nav-item i { font-size: 2.2em; margin-bottom: 4px; }
-
-        /* OVERLAY */
         .setup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,20,5,0.98); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(10px); }
         .setup-card { background: #000; border: 1px solid #f1c40f; padding: 30px; border-radius: 30px; width: 100%; max-width: 350px; text-align: center; }
         .waiting-ball { opacity: 0.15; filter: grayscale(1); pointer-events: none; }
+        .foul-dot { width: 12px; height: 12px; border-radius: 50%; background: #1a1a1a; border: 1px solid #222; }
+        .foul-dot.active { background: #e74c3c; box-shadow: 0 0 10px #ff4757; }
     </style>
 </head>
 <body>
@@ -105,14 +72,12 @@
 </div>
 
 <div class="app-container">
-    
     <div id="profilePage" class="page">
         <div class="profile-header">
             <div class="profile-avatar" id="profInitial">O</div>
             <h2 id="profName" style="margin:5px 0">Ole Andreas</h2>
             <p id="profTitle" style="color:#666; font-size:0.8em; text-transform:uppercase">Pool Pro Player</p>
         </div>
-
         <div class="card">
             <div style="text-align:left">
                 <p class="info-label">All-time High Run</p>
@@ -120,18 +85,10 @@
             </div>
             <i class="material-icons" style="color:#f1c40f; font-size:2em">emoji_events</i>
         </div>
-
         <div class="profile-stats-grid">
-            <div class="stat-box">
-                <p class="info-label">Kamper</p>
-                <p class="info-value" id="profMatches">0</p>
-            </div>
-            <div class="stat-box">
-                <p class="info-label">Seire</p>
-                <p class="info-value" id="profWins">0</p>
-            </div>
+            <div class="stat-box"><p class="info-label">Kamper</p><p class="info-value" id="profMatches">0</p></div>
+            <div class="stat-box"><p class="info-label">Seire</p><p class="info-value" id="profWins">0</p></div>
         </div>
-        
         <button class="btn-gold" style="margin-top:30px; width:100%; border-color:#555; color:#888">Rediger Profil</button>
     </div>
 
@@ -139,15 +96,12 @@
         <div class="header-actions">
             <button class="btn-gold" id="newMatchTopBtn" onclick="checkActiveGame()">New Match</button>
         </div>
-
         <div id="scoreboard-container"></div>
-
         <div class="game-status-zone">
             <span id="moveText" style="font-size:0.8em; letter-spacing:2px; color:#2ecc71; font-weight:800; text-transform:uppercase">BREKK-STØT</span>
             <span id="matchTimer" style="font-family:monospace; font-size:1.2em; color:#f1c40f; display:block; margin-top:3px">00:00:00</span>
             <div id="rotate-container"><button style="background:rgba(241,196,15,0.1); border:1px solid #f1c40f; color:#f1c40f; padding:6px 15px; border-radius:8px; font-size:0.65em; font-weight:bold; cursor:pointer; margin-top:10px;" onclick="rotateBreaker()">BYTT STARTSPILLER</button></div>
         </div>
-
         <div class="ball-control-zone">
             <div style="display:flex; flex-direction:column; align-items:center; gap:10px">
                 <button class="ball" id="ball1" style="background:radial-gradient(circle at 35% 35%, #f1c40f, #b38f00);" onclick="action('pocket', 1)"><div style="width:28px; height:28px; background:white; border-radius:50%; color:black; font-weight:900; display:flex; align-items:center; justify-content:center; border:2px solid #000">1</div></button>
@@ -162,13 +116,12 @@
                 <button style="background:rgba(52,152,219,0.1); color:#3498db; border:1px solid #3498db; border-radius:8px; padding:6px; font-size:0.6em; font-weight:800;" onclick="action('pocket_carom', 4)">+ CAROM</button>
             </div>
         </div>
-
         <div class="action-area">
-            <button class="btn-action" style="background:#2980b9; border-bottom:4px solid #1c5982" id="carom1PBtn" onclick="action('carom', 1)">Carom 1P</button>
-            <button class="btn-action" style="background:#2980b9; border-bottom:4px solid #1c5982" id="carom2PBtn" onclick="action('carom', 2)">Carom 2P</button>
-            <button class="btn-action" style="background:#c0392b; border-bottom:4px solid #7b241c" id="foulActionBtn" onclick="handleFoul()">FOUL</button>
-            <button class="btn-action" style="background:#2980b9; border-bottom:4px solid #1c5982" id="undoActionBtn" onclick="undo()">ANGRE</button>
-            <button class="btn-action" style="background:#27ae60; border-bottom:4px solid #1e8449; grid-column:span 2; padding:20px; font-size:1.1em" id="endTurnBtn" onclick="nextTurn()">AVSLUTT TUR</button>
+            <button class="btn-action" style="background:#2980b9; border-bottom:4px solid #1c5982" onclick="action('carom', 1)">Carom 1P</button>
+            <button class="btn-action" style="background:#2980b9; border-bottom:4px solid #1c5982" onclick="action('carom', 2)">Carom 2P</button>
+            <button class="btn-action" style="background:#c0392b; border-bottom:4px solid #7b241c" onclick="handleFoul()">FOUL</button>
+            <button class="btn-action" style="background:#2980b9; border-bottom:4px solid #1c5982" onclick="undo()">ANGRE</button>
+            <button class="btn-action" style="background:#27ae60; border-bottom:4px solid #1e8449; grid-column:span 2; padding:20px; font-size:1.1em" onclick="nextTurn()">AVSLUTT TUR</button>
         </div>
     </div>
 </div>
@@ -176,7 +129,7 @@
 <nav class="bottom-nav">
     <a class="nav-item" id="nav-profile" onclick="switchPage('profilePage')"><i class="material-icons">person</i><span id="txt-nav-prof">PROFIL</span></a>
     <a class="nav-item active" id="nav-play" onclick="switchPage('playPage')"><i class="material-icons">home</i><span id="txt-nav-home">HJEM</span></a>
-    <a class="nav-item" id="nav-stats" onclick="window.location.href='stats.html'"><i class="material-icons">leaderboard</i><span id="txt-nav-stats">STATS</span></a>
+    <a class="nav-item" onclick="window.location.href='stats.html'"><i class="material-icons">leaderboard</i><span id="txt-nav-stats">STATS</span></a>
     <a class="nav-item" onclick="toggleLanguage()"><i class="material-icons">language</i>EN/NO</a>
 </nav>
 
@@ -196,7 +149,6 @@
 
     db.on('value', (s) => { if(s.val()) { state = s.val(); updateUI(); } });
 
-    // PAGE SWITCHER
     function switchPage(pageId) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById(pageId).classList.add('active');
@@ -205,7 +157,6 @@
         if(pageId === 'playPage') document.getElementById('nav-play').classList.add('active');
     }
 
-    // SETUP LOGIKK
     function checkActiveGame() {
         document.getElementById('setupOverlay').style.display = 'flex';
         const totalPoints = state.scores.reduce((a, b) => a + b, 0);
@@ -218,8 +169,29 @@
     function closeSetup() { document.getElementById('setupOverlay').style.display = 'none'; }
     function handleFinishAndSave() { firebase.database().ref('matchHistory').push({ date: new Date().toISOString(), players: state.names.slice(0, state.playerCount), scores: state.scores.slice(0, state.playerCount), duration: document.getElementById('matchTimer').innerText }).then(goToStep1); }
 
-    // SPILL LOGIKK
-    function action(type, val) { saveHistory(); let p = state.currentPlayer; if (state.scores[p] < 90 && state.scores[p] + val > 90) return; if (state.scores[p] >= 90 && state.scores[p] < 100 && state.scores[p] + val > 100) return; state.breakDone = true; state.foulCounts[p] = 0; if(type === 'pocket_carom') { state.tableStatus = 'open'; state.lastType = null; } else { state.tableStatus = 'locked'; state.lastType = type; } state.scores[p] += val; db.set(state); }
+    function action(type, val) {
+        saveHistory();
+        let p = state.currentPlayer;
+        let cur = state.scores[p];
+        if (cur < 90 && cur + val > 90) return;
+        if (cur >= 90 && cur < 100 && cur + val > 100) return;
+        state.breakDone = true; state.foulCounts[p] = 0;
+        
+        if (type === 'pocket_carom') {
+            if (state.tableStatus === 'open') {
+                state.tableStatus = 'open';
+                state.lastType = null;
+            } else {
+                state.tableStatus = 'locked';
+                state.lastType = 'pocket';
+            }
+        } else {
+            state.tableStatus = 'locked';
+            state.lastType = type;
+        }
+        state.scores[p] += val; db.set(state);
+    }
+
     function nextTurn() { saveHistory(); let p = state.currentPlayer; let round = state.scores[p] - state.scoreAtStart[p]; if (round > state.bestSeries[p]) state.bestSeries[p] = round; state.lastSeries[p] = round; state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; state.tableStatus = 'open'; state.lastType = null; state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; db.set(state); }
     function handleFoul() { saveHistory(); state.foulCounts[state.currentPlayer]++; if(state.foulCounts[state.currentPlayer] >= 3) { state.scores[state.currentPlayer] = 0; state.foulCounts[state.currentPlayer] = 0; } else { state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; } nextTurn(); }
     function saveHistory() { history.push(JSON.stringify(state)); if(history.length > 10) history.shift(); }
@@ -233,12 +205,9 @@
         document.getElementById('txt-nav-prof').innerText = l.prof;
         document.getElementById('txt-nav-home').innerText = l.home;
         document.getElementById('txt-nav-stats').innerText = l.stats;
-
-        // Oppdater Profil-siden
         document.getElementById('profName').innerText = state.names[0] || "Ole Andreas";
         document.getElementById('profInitial').innerText = (state.names[0] || "O").charAt(0).toUpperCase();
         document.getElementById('profBest').innerText = (state.bestSeries[0] || 0) + " Poeng";
-
         const cont = document.getElementById('scoreboard-container');
         cont.innerHTML = '';
         for(let i=0; i<state.playerCount; i++) {
@@ -249,6 +218,7 @@
                     <div style="display:flex; gap:10px; margin-top:5px; font-size:0.55em; color:#444">
                         <div>${l.now} <span style="color:#eee; font-weight:900">${active ? state.scores[i]-state.scoreAtStart[i] : 0}</span></div>
                         <div>${l.best} <span style="color:#eee; font-weight:900">${state.bestSeries[i]}</span></div>
+                        <div>${l.last} <span style="color:#eee; font-weight:900">${state.lastSeries[i]}</span></div>
                     </div>
                     <div style="display:flex; gap:5px; margin-top:10px;">
                         <div class="foul-dot ${state.foulCounts[i]>=1?'active':''}"></div>
@@ -262,15 +232,13 @@
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
         document.getElementById('rotate-container').style.display = state.breakDone ? 'none' : 'block';
         document.getElementById('moveText').innerText = !state.breakDone ? l.break : (state.tableStatus === 'locked' ? (state.lastType === 'pocket' ? l.req_carom : l.req_pocket) : l.any);
-        
-        const lock = state.tableStatus === 'locked' && state.lastType === 'pocket';
+        const lockPocket = state.tableStatus === 'locked' && state.lastType === 'pocket';
+        const lockCarom = state.tableStatus === 'locked' && state.lastType === 'carom';
         const at90 = state.scores[state.currentPlayer] >= 90;
-        const waiting = !state.breakDone || lock || at90;
-        document.getElementById('ball1').className = waiting ? 'ball waiting-ball' : 'ball';
-        document.getElementById('ball5').className = waiting ? 'ball waiting-ball' : 'ball';
-        document.getElementById('ball3').className = (lock || at90) ? 'ball waiting-ball' : 'ball';
+        document.getElementById('ball1').className = (!state.breakDone || lockPocket || at90) ? 'ball waiting-ball' : 'ball';
+        document.getElementById('ball5').className = (!state.breakDone || lockPocket || at90) ? 'ball waiting-ball' : 'ball';
+        document.getElementById('ball3').className = (lockPocket || at90) ? 'ball waiting-ball' : 'ball';
     }
-
     setInterval(() => { if(state.breakDone) { state.seconds++; db.child('seconds').set(state.seconds); } }, 1000);
 </script>
 </body>
