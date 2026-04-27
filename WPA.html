@@ -10,34 +10,45 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: radial-gradient(circle at top, #1e4d2b 0%, #0a1a0f 100%); background-attachment: fixed; color: white; margin: 0; padding: 0; display: flex; justify-content: center; min-height: 100vh; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', sans-serif; background: radial-gradient(circle at top, #1e4d2b 0%, #0a1a0f 100%); background-attachment: fixed; color: white; margin: 0; padding: 0; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
         .app-container { width: 100%; max-width: 430px; padding: 20px; padding-bottom: 120px; display: flex; flex-direction: column; }
+        
         .page { display: none; width: 100%; flex-direction: column; }
         .page.active { display: flex; }
+
         .btn-gold { background: rgba(0,0,0,0.6); color: #f1c40f; border: 1px solid rgba(241, 196, 15, 0.5); padding: 10px 25px; border-radius: 50px; font-weight: 800; font-size: 0.75em; text-transform: uppercase; cursor: pointer; }
         .btn-gold.selected { background: #f1c40f; color: black; }
-        .card { background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%); border-radius: 24px; padding: 20px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; }
+        
+        .card { background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%); backdrop-filter: blur(10px); border-radius: 24px; padding: 20px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; }
         .player-card.active-turn { border: 2px solid #f1c40f; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
         .score-display { font-size: 3.5em; font-weight: 900; color: #333; }
         .active-turn .score-display { color: #f1c40f; }
-        .game-status-zone { background: rgba(0,0,0,0.6); padding: 15px; border-radius: 20px 20px 0 0; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+
+        .game-status-zone { background: rgba(0, 0, 0, 0.6); padding: 15px; border-radius: 20px 20px 0 0; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
         .ball-control-zone { display: flex; justify-content: space-around; background: rgba(0,0,0,0.5); padding: 20px 10px; border-radius: 0 0 35px 35px; margin-bottom: 15px; }
+        
         .ball { width: 70px; height: 70px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .ball-inner { width: 25px; height: 25px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #000; }
+        
         .action-area { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn-action { padding: 16px; border-radius: 16px; border: none; font-weight: 800; text-transform: uppercase; color: white; cursor: pointer; }
+        .btn-action { padding: 16px; border-radius: 16px; border: none; font-weight: 800; text-transform: uppercase; cursor: pointer; color: white; }
+        
         .btn-win { background: linear-gradient(45deg, #f1c40f, #d4ac0d); color: black; grid-column: span 2; padding: 20px; font-weight: 900; border-radius: 16px; border: none; margin-bottom: 10px; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: flex; justify-content: space-around; padding: 10px 0 30px 0; border-top: 1px solid #111; }
-        .nav-item { color: #333; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.6em; cursor: pointer; }
+
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: flex; justify-content: space-around; padding: 10px 0 30px 0; border-top: 1px solid #111; z-index: 1000; }
+        .nav-item { color: #333; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.6em; font-weight: bold; cursor: pointer; }
         .nav-item.active { color: #f1c40f; }
-        .nav-item i { font-size: 2em; }
+        .nav-item i { font-size: 2.2em; margin-bottom: 4px; }
+
         .waiting-ball { opacity: 0.1; filter: grayscale(1); pointer-events: none; }
         .foul-dot { width: 10px; height: 10px; border-radius: 50%; background: #1a1a1a; margin-right: 4px; }
         .foul-dot.active { background: #e74c3c; }
+
         .setup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,20,5,0.98); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(10px); }
         .setup-card { background: #000; border: 1px solid #f1c40f; padding: 30px; border-radius: 30px; width: 100%; max-width: 350px; text-align: center; }
-        .name-field { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #111; color: white; margin-bottom: 10px; text-align: center; box-sizing: border-box; font-size: 1em; }
+        .name-field { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #111; color: white; margin-bottom: 10px; text-align: center; box-sizing: border-box; }
         .btn-back-text { background: none; border: none; color: #666; margin-top: 15px; cursor: pointer; text-decoration: underline; font-size: 0.8em; }
     </style>
 </head>
@@ -46,21 +57,19 @@
 <div id="setupOverlay" class="setup-overlay">
     <div class="setup-card">
         <h2 style="color:#f1c40f">NY MATCH</h2>
-        
         <div id="step-confirm" style="display: none;">
             <p style="color:#888; margin-bottom: 20px;">En kamp pågår allerede.</p>
             <button class="btn-gold" style="width:100%; margin-bottom:10px;" onclick="handleFinishAndSave()">LAGRE & START NY</button>
             <button class="btn-gold" style="width:100%; border-color:#e74c3c; color:#e74c3c;" onclick="goToStep1()">SLETT & START NY</button>
             <button class="btn-back-text" onclick="closeSetup()">Fortsett kampen</button>
         </div>
-
         <div id="step1" style="display: none;">
-            <p style="color:#888; margin-bottom: 10px;">Spillmodus:</p>
+            <p style="color:#888">Velg Spillmodus:</p>
             <div style="display:flex; gap:10px; margin-bottom:20px;">
                 <button class="btn-gold" id="modeStd" style="flex:1" onclick="setMode('standard')">Standard</button>
                 <button class="btn-gold" id="modeAlt" style="flex:1" onclick="setMode('alternate')">Alternate</button>
             </div>
-            <p style="color:#888; margin-bottom: 10px;">Antall spillere:</p>
+            <p style="color:#888">Antall spillere:</p>
             <div style="display:flex; gap:10px; margin-bottom:20px;">
                 <button class="btn-gold" style="flex:1" onclick="setPlayers(1)">1</button>
                 <button class="btn-gold" style="flex:1" onclick="setPlayers(2)">2</button>
@@ -68,23 +77,41 @@
             </div>
             <button class="btn-back-text" onclick="closeSetup()">Avbryt</button>
         </div>
-
         <div id="step2" style="display: none;">
-            <p style="color:#888; margin-bottom: 15px;">Navn på spillere:</p>
+            <p style="color:#888">Navn på spillere:</p>
             <div id="nameInputs"></div>
             <button class="btn-gold" style="width:100%; margin-top:10px;" onclick="finalizeSetup()">START KAMP</button>
-            <br>
             <button class="btn-back-text" onclick="goToStep1()">← Gå tilbake</button>
         </div>
     </div>
 </div>
 
 <div class="app-container">
+    <div id="profilePage" class="page">
+        <div style="text-align:center; margin-bottom:20px;">
+            <div style="width:80px; height:80px; background:#f1c40f; border-radius:50%; margin:0 auto 10px; display:flex; align-items:center; justify-content:center; color:black; font-size:2em; font-weight:900;" id="profInitial">O</div>
+            <h2 id="profName" style="margin:0;">Spiller 1</h2>
+        </div>
+        <div class="card">
+            <div style="text-align:left">
+                <p style="font-size: 0.8em; color: #666; text-transform: uppercase;">All-time High Run</p>
+                <p style="font-size: 1.2em; font-weight: bold; color: #f1c40f;" id="profBest">0</p>
+            </div>
+            <i class="material-icons" style="color:#f1c40f; font-size:2em">emoji_events</i>
+        </div>
+        <p style="text-align:center; color:#666; font-size:0.8em; text-transform:uppercase; margin:15px 0;">Trofé-skap</p>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;">
+            <div class="card" style="flex-direction:column; padding:10px; opacity:0.3;" id="trophy101"><i class="material-icons">workspace_premium</i><small style="font-size:0.6em;">101 Club</small></div>
+            <div class="card" style="flex-direction:column; padding:10px; opacity:0.3;"><i class="material-icons">military_tech</i><small style="font-size:0.6em;">Sniper</small></div>
+            <div class="card" style="flex-direction:column; padding:10px; opacity:0.3;"><i class="material-icons">stars</i><small style="font-size:0.6em;">Carom King</small></div>
+        </div>
+    </div>
+
     <div id="playPage" class="page active">
         <div class="header-actions"><button class="btn-gold" onclick="checkActiveGame()">New Match</button></div>
         <div id="scoreboard-container"></div>
         <div class="game-status-zone">
-            <div id="modeLabel" style="font-size:0.6em; color:#f1c40f; opacity:0.6; margin-bottom:5px;">MODUS: -</div>
+            <div id="modeLabel" style="font-size:0.6em; color:#f1c40f; opacity:0.6; margin-bottom:5px;">MODUS: STANDARD</div>
             <span id="moveText" style="font-size:0.8em; color:#2ecc71; font-weight:800; text-transform:uppercase">BREKK-STØT</span>
             <span id="matchTimer" style="font-family:monospace; font-size:1.1em; color:#f1c40f; display:block; margin-top:5px;">00:00:00</span>
             <div id="rotate-container"><button style="background:none; border:1px solid #f1c40f; color:#f1c40f; padding:5px 10px; border-radius:8px; font-size:0.6em; margin-top:10px;" onclick="rotateBreaker()">BYTT STARTSPILLER</button></div>
@@ -106,8 +133,10 @@
 </div>
 
 <nav class="bottom-nav">
-    <a class="nav-item active"><i class="material-icons">home</i>HOME</a>
+    <a class="nav-item" onclick="switchPage('profilePage')"><i class="material-icons">person</i>PROFIL</a>
+    <a class="nav-item active" onclick="switchPage('playPage')"><i class="material-icons">home</i>HJEM</a>
     <a class="nav-item" onclick="window.location.href='stats.html'"><i class="material-icons">leaderboard</i>STATS</a>
+    <a class="nav-item" onclick="toggleLanguage()"><i class="material-icons">language</i>EN/NO</a>
 </nav>
 
 <script>
@@ -117,26 +146,39 @@
 
     let tempPlayers = 2;
     let tempMode = 'standard';
-    let state = { gameMode: 'standard', playerCount: 2, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null, seconds: 0, names: ["P1","P2","P3"], bestSeries: [0,0,0] };
+    let state = { gameMode: 'standard', playerCount: 2, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null, seconds: 0, names: ["P1","P2","P3"], bestSeries: [0,0,0], lang: 'no' };
     let history = [];
 
     db.on('value', (s) => { if(s.val()) { state = s.val(); updateUI(); } });
+
+    function switchPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach((item, idx) => {
+            item.classList.remove('active');
+            if((pageId === 'profilePage' && idx === 0) || (pageId === 'playPage' && idx === 1)) item.classList.add('active');
+        });
+    }
 
     function action(type, val) {
         saveHistory();
         let p = state.currentPlayer;
         let cur = state.scores[p];
+
         if ((cur < 90 && (cur + val) > 90) || (cur >= 90 && (cur + val) > 101)) { handleFoul(); return; }
         if (cur >= 90 && cur < 100 && type.includes('pocket') && type !== 'pocket_carom') return;
         if (cur === 100 && type !== 'winning_shot') return;
+
         state.breakDone = true;
         state.foulCounts[p] = 0;
+
         if (state.gameMode === 'alternate') {
             if (type === 'pocket_carom') {
                 state.tableStatus = state.tableStatus === 'open' ? 'open' : 'locked';
                 state.lastType = 'pocket';
             } else { state.tableStatus = 'locked'; state.lastType = type; }
         } else { state.tableStatus = 'open'; }
+
         state.scores[p] += val;
         if (state.scores[p] === 101) alert(state.names[p] + " VANT!");
         db.set(state);
@@ -144,6 +186,10 @@
 
     function updateUI() {
         document.getElementById('modeLabel').innerText = "MODUS: " + state.gameMode.toUpperCase();
+        document.getElementById('profName').innerText = state.names[0];
+        document.getElementById('profInitial').innerText = state.names[0].charAt(0).toUpperCase();
+        document.getElementById('profBest').innerText = state.bestSeries[0];
+
         const cont = document.getElementById('scoreboard-container'); cont.innerHTML = '';
         state.scores.slice(0, state.playerCount).forEach((s, i) => {
             const active = state.currentPlayer === i;
@@ -152,17 +198,20 @@
                 <div style="display:flex; margin-top:8px;">${Array(3).fill(0).map((_,f)=>`<div class="foul-dot ${state.foulCounts[i]>f?'active':''}"></div>`).join('')}</div></div>
                 <div class="score-display">${s}</div></div>`;
         });
+
         const cur = state.scores[state.currentPlayer];
         const winPhase = cur === 100;
         const caromPhase = cur >= 90 && cur < 100;
         const lockPocket = state.gameMode === 'alternate' && state.tableStatus === 'locked' && state.lastType === 'pocket';
         const lockCarom = state.gameMode === 'alternate' && state.tableStatus === 'locked' && state.lastType === 'carom';
+
         document.getElementById('winButton').style.display = winPhase ? 'block' : 'none';
         document.getElementById('c1').style.display = winPhase ? 'none' : (lockCarom ? 'none' : 'block');
         document.getElementById('c2').style.display = winPhase ? 'none' : (lockCarom ? 'none' : 'block');
         document.getElementById('ball1').className = (!state.breakDone || caromPhase || winPhase || lockPocket) ? 'ball waiting-ball' : 'ball';
         document.getElementById('ball5').className = (!state.breakDone || caromPhase || winPhase || lockPocket) ? 'ball waiting-ball' : 'ball';
         document.getElementById('ball3').className = (caromPhase || winPhase || lockPocket) ? 'ball waiting-ball' : 'ball';
+        
         document.getElementById('moveText').innerText = winPhase ? "WINNING SHOT" : (caromPhase ? "KUN CAROMS" : (!state.breakDone ? "BREKK-STØT" : (lockPocket ? "KRAV: CAROM" : (lockCarom ? "KRAV: POCKET" : "VELG FRITT"))));
         document.getElementById('rotate-container').style.display = state.breakDone ? 'none' : 'block';
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
@@ -189,6 +238,7 @@
     function closeSetup() { document.getElementById('setupOverlay').style.display = 'none'; }
     function rotateBreaker() { if(!state.breakDone) { state.currentPlayer = (state.currentPlayer+1)%state.playerCount; db.set(state); } }
     function handleFinishAndSave() { firebase.database().ref('matchHistory').push({ date: new Date().toISOString(), players: state.names.slice(0, state.playerCount), scores: state.scores.slice(0, state.playerCount) }).then(goToStep1); }
+    function toggleLanguage() { state.lang = state.lang==='no'?'en':'no'; db.set(state); }
     setInterval(() => { if(state.breakDone) { state.seconds++; db.child('seconds').set(state.seconds); } }, 1000);
 </script>
 </body>
