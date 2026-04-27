@@ -16,7 +16,7 @@
             display: flex; justify-content: center;
             min-height: 100vh; overflow-x: hidden;
         }
-        .app-container { width: 100%; max-width: 430px; padding: 20px; padding-bottom: 120px; display: flex; flex-direction: column; }
+        .app-container { width: 100%; max-width: 430px; padding: 20px; padding-bottom: 120px; display: flex; flex-direction: column; margin: 0 auto; }
         
         .page { display: none; width: 100%; flex-direction: column; }
         .page.active { display: flex; }
@@ -90,7 +90,7 @@
         <div id="step-confirm" style="display: none;">
             <p id="confirmText" style="color:#888; margin-bottom: 20px;">En kamp pågår allerede. Hva vil du gjøre?</p>
             <button class="btn-save-option" onclick="handleFinishAndSave()">LAGRE & START NY</button>
-            <button class="btn-discard-option" onclick="goToStep1()">SLETT & START NY</button>
+            <button class="btn-discard-option" onclick="handleDiscard()">SLETT & START NY</button>
             <button class="btn-back" onclick="closeSetup()">Fortsett kampen</button>
         </div>
         <div id="step1" style="display: none;">
@@ -118,21 +118,6 @@
 </div>
 
 <div class="app-container">
-        <div class="player-card">
-            <div style="text-align:left">
-                <p style="font-size: 0.6em; color: #666; text-transform: uppercase;">All-time High Run</p>
-                <p style="font-size: 1.2em; font-weight: bold; color: #f1c40f;" id="profBest">0</p>
-            </div>
-            <i class="material-icons" style="color:#f1c40f; font-size:2.5em">emoji_events</i>
-        </div>
-        <p style="text-align:center; color:#666; font-size:0.8em; text-transform:uppercase; margin:15px 0;">Dine Trofeer</p>
-        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;">
-            <div class="player-card" style="flex-direction:column; padding:15px; opacity:0.3; justify-content:center; text-align:center;"><i class="material-icons">workspace_premium</i><small style="font-size:0.6em; margin-top:5px;">101 Club</small></div>
-            <div class="player-card" style="flex-direction:column; padding:15px; opacity:0.3; justify-content:center; text-align:center;"><i class="material-icons">military_tech</i><small style="font-size:0.6em; margin-top:5px;">Sniper</small></div>
-            <div class="player-card" style="flex-direction:column; padding:15px; opacity:0.3; justify-content:center; text-align:center;"><i class="material-icons">stars</i><small style="font-size:0.6em; margin-top:5px;">Carom King</small></div>
-        </div>
-    </div>
-
     <div id="playPage" class="page active">
         <div class="header-actions">
             <button class="btn-new-game-top" id="newMatchTopBtn" onclick="checkActiveGame()">New Match</button>
@@ -170,23 +155,23 @@
     </div>
 
     <nav class="bottom-nav">
-    <a href="profile.html" class="nav-item">
-        <i class="material-icons">person</i>
-        <span>PROFIL</span>
-    </a>
-    <a href="index.html" class="nav-item active">
-        <i class="material-icons">home</i>
-        <span>HJEM</span>
-    </a>
-    <a href="CBstats.html" class="nav-item">
-        <i class="material-icons">leaderboard</i>
-        <span>STATS</span>
-    </a>
-    <a href="javascript:void(0)" class="nav-item" onclick="toggleLanguage()">
-        <i class="material-icons">language</i>
-        <span>EN/NO</span>
-    </a>
-</nav>
+        <a href="profile.html" class="nav-item">
+            <i class="material-icons">person</i>
+            <span>PROFIL</span>
+        </a>
+        <a href="index.html" class="nav-item active">
+            <i class="material-icons">home</i>
+            <span>HJEM</span>
+        </a>
+        <a href="CBstats.html" class="nav-item">
+            <i class="material-icons">leaderboard</i>
+            <span>STATS</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item" onclick="toggleLanguage()">
+            <i class="material-icons">language</i>
+            <span>EN/NO</span>
+        </a>
+    </nav>
 </div>
 
 <script>
@@ -198,7 +183,6 @@
     let state = { gameMode: 'standard', playerCount: 2, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null, seconds: 0, names: ["P1","P2","P3"], bestSeries: [0,0,0], lastSeries: [0,0,0], lang: 'no', innings: 1 };
     let history = [];
 
-    // KOMPLETT OPPDATERT ORDBOK
     const dictionary = {
         no: { 
             now: "NÅ", best: "PERS", last: "SISTE", break: "BREKK-STØT", 
@@ -290,11 +274,9 @@
         document.getElementById('foulActionBtn').innerText = l.foul;
         document.getElementById('endTurnBtn').innerText = l.turn;
         
-        // Oppdaterer "Bytt startspiller"-knappen (den har ingen ID, så vi bruker querySelector)
         const rotBtn = document.querySelector('.btn-rotate');
         if (rotBtn) rotBtn.innerText = l.rotate;
         
-        // Oppdater faste tekster i HTML
         document.getElementById('overlayHeader').innerText = l.new_match;
         document.getElementById('confirmText').innerText = l.confirm_msg;
         document.getElementById('playersText').innerText = l.players_count;
@@ -350,14 +332,6 @@
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
     }
 
-    function switchPage(pageId) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
-        document.querySelectorAll('.nav-item').forEach((item, idx) => {
-            item.classList.remove('active');
-            if((pageId === 'profilePage' && idx === 0) || (pageId === 'playPage' && idx === 1)) item.classList.add('active');
-        });
-    }
     function checkActiveGame() { document.getElementById('setupOverlay').style.display = 'flex'; if (state.scores.some(s => s > 0)) { document.getElementById('step-confirm').style.display = 'block'; document.getElementById('step1').style.display = 'none'; document.getElementById('step2').style.display = 'none'; } else { goToStep1(); } }
     function setMode(m) { tempMode = m; document.getElementById('modeStd').classList.toggle('selected', m === 'standard'); document.getElementById('modeAlt').classList.toggle('selected', m === 'alternate'); }
     function goToStep1() { document.getElementById('step-confirm').style.display = 'none'; document.getElementById('step1').style.display = 'block'; document.getElementById('step2').style.display = 'none'; setMode(tempMode); }
