@@ -21,7 +21,7 @@
         .header-actions { display: flex; justify-content: center; margin-bottom: 20px; }
         .btn-new-game-top { 
             background: rgba(0,0,0,0.6); color: #f1c40f; border: 1px solid rgba(241, 196, 15, 0.5); 
-            padding: 10px 30px; border-radius: 50px; font-weight: 800; font-size: 0.7em; 
+            padding: 10px 30px; border-radius: 50px; font-weight: 800; font-size: 0.75em; 
             letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
         }
 
@@ -59,14 +59,17 @@
         .btn-blue { background: #2980b9; color: white; border-bottom: 4px solid #1c5982; }
         .btn-foul { background: #c0392b; color: white; border-bottom: 4px solid #7b241c; }
         .btn-turn { background: #27ae60; color: white; border-bottom: 4px solid #1e8449; grid-column: span 2; padding: 20px; font-size: 1.1em; }
-        .btn-finish { background: #000; color: white; border: 1px solid #333; grid-column: span 2; margin-top: 5px; padding: 12px; font-size: 0.7em; letter-spacing: 1px; opacity: 0.8; }
-        
+
         .setup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,20,5,0.98); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(10px); }
         .setup-card { background: #000; border: 1px solid #f1c40f; padding: 30px; border-radius: 30px; width: 100%; max-width: 350px; text-align: center; }
         .btn-choice { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid #333; background: #111; color: white; font-weight: bold; cursor: pointer; }
         .name-field { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #111; color: white; margin-bottom: 10px; box-sizing: border-box; text-align: center; font-size: 1em; }
         .btn-start { width: 100%; padding: 18px; border-radius: 15px; background: #27ae60; color: white; border: none; font-weight: 900; text-transform: uppercase; margin-top: 10px; cursor: pointer; }
         .btn-back { background: none; border: none; color: #888; margin-top: 20px; cursor: pointer; font-size: 0.8em; text-decoration: underline; }
+
+        /* SPESIELLE VALG FOR AVLEUTT KAMP */
+        .btn-save-option { background: #2980b9; color: white; margin-bottom: 10px; width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-discard-option { background: #c0392b; color: white; width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; }
 
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: flex; justify-content: space-around; padding: 10px 0 35px 0; border-top: 1px solid #111; z-index: 1000; }
         .nav-item { color: #333; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.55em; font-weight: bold; }
@@ -79,7 +82,15 @@
 
 <div id="setupOverlay" class="setup-overlay">
     <div class="setup-card">
-        <h2 style="color:#f1c40f; margin-bottom: 20px;">NEW MATCH</h2>
+        <h2 style="color:#f1c40f; margin-bottom: 20px;">NY KAMP</h2>
+        
+        <div id="step-confirm" style="display: none;">
+            <p style="color:#888; margin-bottom: 20px;">En kamp pågår allerede. Hva vil du gjøre?</p>
+            <button class="btn-save-option" onclick="handleFinishAndSave()">LAGRE & START NY</button>
+            <button class="btn-discard-option" onclick="goToStep1()">SLETT & START NY</button>
+            <button class="btn-back" onclick="closeSetup()">Avbryt</button>
+        </div>
+
         <div id="step1">
             <p style="color:#888; margin-bottom: 15px;">Antall spillere?</p>
             <div style="display:flex; gap:10px; margin-bottom:20px;">
@@ -87,28 +98,34 @@
                 <button class="btn-choice" onclick="selectPlayers(2)">2</button>
                 <button class="btn-choice" onclick="selectPlayers(3)">3</button>
             </div>
-            <button class="btn-back" onclick="closeSetup()">Avbryt</button>
+            <button class="btn-back" onclick="closeSetup()">Fortsett kampen</button>
         </div>
+
         <div id="step2" style="display: none;">
             <p style="color:#888; margin-bottom: 15px;">Navn på spillere:</p>
             <div id="nameInputs"></div>
-            <button class="btn-start" onclick="finalizeSetup()">Start Match</button>
+            <button class="btn-start" onclick="finalizeSetup()">START KAMP</button>
             <br>
-            <button class="btn-back" onclick="goBackToStep1()">← Gå tilbake</button>
+            <button class="btn-back" onclick="goToStep1()">← Tilbake</button>
         </div>
     </div>
 </div>
 
 <div class="app-container">
     <div class="header-actions">
-        <button class="btn-new-game-top" onclick="openSetup()">New Match</button>
+        <button class="btn-new-game-top" onclick="checkActiveGame()">New Match</button>
     </div>
+
     <div id="scoreboard-container"></div>
+
     <div class="game-status-zone">
         <span class="req-text" id="moveText">BREKK-STØT</span>
         <span class="timer-text" id="matchTimer">00:00:00</span>
-        <div id="rotate-container"><button class="btn-rotate" onclick="rotateBreaker()">BYTT STARTSPILLER</button></div>
+        <div id="rotate-container">
+            <button class="btn-rotate" onclick="rotateBreaker()">BYTT STARTSPILLER</button>
+        </div>
     </div>
+
     <div class="ball-control-zone">
         <div class="ball-group">
             <button class="ball" id="ball1" onclick="action('pocket', 1)"><div class="ball-inner">1</div></button>
@@ -123,17 +140,18 @@
             <button class="btn-sub-carom" onclick="action('pocket_carom', 4)">+ CAROM</button>
         </div>
     </div>
+
     <div class="action-area">
         <button class="btn btn-blue" onclick="action('carom', 1)">Carom 1P</button>
         <button class="btn btn-blue" onclick="action('carom', 2)">Carom 2P</button>
         <button class="btn btn-foul" onclick="handleFoul()">FOUL</button>
         <button class="btn btn-blue" onclick="undo()">ANGRE</button>
         <button class="btn btn-turn" onclick="nextTurn()">AVSLUTT TUR</button>
-        <button class="btn btn-finish" onclick="saveMatchToHistory()">FINISH & SAVE</button>
     </div>
+
     <nav class="bottom-nav">
         <a href="#" class="nav-item active"><i class="material-icons">home</i>HJEM</a>
-        <a href="#" class="nav-item"><i class="material-icons">leaderboard</i>STATS</a>
+        <a href="stats.html" class="nav-item"><i class="material-icons">leaderboard</i>STATS</a>
         <a href="#" class="nav-item" onclick="toggleLanguage()"><i class="material-icons">language</i>EN/NO</a>
     </nav>
 </div>
@@ -143,62 +161,64 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('gameData');
 
-    // Variabel for å holde styr på valg i overlay midlertidig
     let setupCount = 2;
-
     let state = { playerCount: 2, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null, innings: 0, seconds: 0, names: ["P1","P2","P3"], bestSeries: [0,0,0], lastSeries: [0,0,0], lang: 'no' };
     let history = [];
 
     db.on('value', (s) => { if(s.val()) { state = s.val(); updateUI(); } });
 
-    function openSetup() { 
-        document.getElementById('setupOverlay').style.display = 'flex'; 
-        goBackToStep1();
+    // --- NY NEW GAME LOGIKK ---
+    function checkActiveGame() {
+        document.getElementById('setupOverlay').style.display = 'flex';
+        // Hvis noen har mer enn 0 poeng, spør vi om de vil lagre
+        const gameInProgress = state.scores.some(s => s > 0);
+        if (gameInProgress) {
+            document.getElementById('step-confirm').style.display = 'block';
+            document.getElementById('step1').style.display = 'none';
+        } else {
+            goToStep1();
+        }
     }
-    function closeSetup() { document.getElementById('setupOverlay').style.display = 'none'; }
-    function goBackToStep1() {
+
+    function handleFinishAndSave() {
+        const historyRef = firebase.database().ref('matchHistory'); 
+        const kampData = { 
+            dato: new Date().toLocaleString('no-NO'), 
+            spillere: state.names.slice(0, state.playerCount), 
+            resultat: state.scores.slice(0, state.playerCount), 
+            varighet: document.getElementById('matchTimer').innerText, 
+            innings: Math.floor(state.innings / state.playerCount) + 1 
+        }; 
+        historyRef.push(kampData).then(() => {
+            goToStep1();
+        });
+    }
+
+    function goToStep1() {
+        document.getElementById('step-confirm').style.display = 'none';
         document.getElementById('step1').style.display = 'block';
         document.getElementById('step2').style.display = 'none';
     }
 
     function selectPlayers(n) { 
-        setupCount = n; // Lagre valget lokalt
+        setupCount = n; 
         document.getElementById('step1').style.display = 'none'; 
         document.getElementById('step2').style.display = 'block';
         const container = document.getElementById('nameInputs');
         container.innerHTML = '';
-        for(let i=0; i<n; i++) {
-            container.innerHTML += `<input type="text" class="name-field" id="n${i}" placeholder="Spiller ${i+1} navn">`;
-        }
+        for(let i=0; i<n; i++) container.innerHTML += `<input type="text" class="name-field" id="n${i}" placeholder="Navn ${i+1}">`;
     }
 
     function finalizeSetup() {
         const namesArr = [];
-        for(let i=0; i<setupCount; i++) {
-            const val = document.getElementById(`n${i}`).value;
-            namesArr.push(val || `Spiller ${i+1}`);
-        }
-        
-        const newState = {
-            ...state,
-            playerCount: setupCount,
-            names: namesArr,
-            scores: [0,0,0],
-            foulCounts: [0,0,0],
-            scoreAtStart: [0,0,0],
-            bestSeries: [0,0,0],
-            lastSeries: [0,0,0],
-            currentPlayer: 0,
-            breakDone: false,
-            seconds: 0,
-            tableStatus: 'open',
-            lastType: null,
-            innings: 0
-        };
-
+        for(let i=0; i<setupCount; i++) namesArr.push(document.getElementById(`n${i}`).value || `Spiller ${i+1}`);
+        const newState = { ...state, playerCount: setupCount, names: namesArr, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], bestSeries: [0,0,0], lastSeries: [0,0,0], currentPlayer: 0, breakDone: false, seconds: 0, tableStatus: 'open', lastType: null, innings: 0 };
         db.set(newState).then(() => { closeSetup(); });
     }
 
+    function closeSetup() { document.getElementById('setupOverlay').style.display = 'none'; }
+
+    // --- SPILL LOGIKK ---
     function action(type, val) {
         saveHistory();
         let p = state.currentPlayer;
@@ -269,7 +289,6 @@
     function undo() { if(history.length) { state = JSON.parse(history.pop()); db.set(state); } }
     function toggleLanguage() { state.lang = state.lang==='no'?'en':'no'; db.set(state); }
     function rotateBreaker() { if(!state.breakDone) { state.currentPlayer = (state.currentPlayer+1)%state.playerCount; db.set(state); } }
-    function saveMatchToHistory() { if(confirm("Lagre?")) db.child('history').push({names:state.names, scores:state.scores, date: new Date().toISOString()}).then(() => { state.breakDone = false; state.scores = [0,0,0]; db.set(state); }); }
     setInterval(() => { if(state.breakDone) { state.seconds++; db.child('seconds').set(state.seconds); } }, 1000);
 </script>
 </body>
