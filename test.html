@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Biljard App - Master Template</title>
+    <title>Biljard App - Dynamic Range</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -11,11 +11,11 @@
             --gold: #d4af37;
             --leather: #121212;
             --card-bg: rgba(0, 0, 0, 0.75);
-            /* Standard høyder for "Hjem" */
-            --header-padding: 80px 30px 140px;
-            --bottom-padding: 130px 30px 40px;
-            --stitch-pos-top: 18px;
-            --stitch-pos-bottom: 18px;
+            
+            /* Standard Hjem-verdier */
+            --header-p: 80px 30px 140px;
+            --bottom-p: 130px 30px 40px;
+            --stitch-opacity: 0.3;
         }
 
         html, body {
@@ -33,15 +33,20 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            transition: all 0.4s ease; /* Myk overgang mellom sider */
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* DYNAMISK JUSTERING FOR RANGE / ANDRE SIDER */
+        /* SLIM MODE - For Range/Kontroller */
         .app-container.slim-mode {
-            --header-padding: 40px 30px 60px; /* Mye lavere */
-            --bottom-padding: 60px 30px 30px;  /* Mye lavere */
-            --stitch-pos-top: 8px;
-            --stitch-pos-bottom: 8px;
+            --header-p: 20px 30px 40px; /* Minimalistisk topp */
+            --bottom-p: 40px 30px 10px; /* Minimalistisk bunn */
+            --stitch-opacity: 0;        /* Skjuler sømmen for en renere look */
+        }
+
+        /* Skjuler alt innhold i panelene når vi er i slim-mode */
+        .app-container.slim-mode .hide-on-slim {
+            opacity: 0;
+            display: none;
         }
 
         .felt-base {
@@ -64,38 +69,25 @@
         .header {
             background: var(--leather);
             background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png");
-            padding: var(--header-padding);
+            padding: var(--header-p);
             z-index: 10;
             border-bottom-left-radius: 50% 50px;
             border-bottom-right-radius: 50% 50px;
             box-shadow: 0 25px 45px rgba(0,0,0,0.9);
             position: relative;
-            transition: padding 0.4s ease;
+            transition: inherit;
         }
 
         .header::after {
             content: "";
             position: absolute;
-            bottom: var(--stitch-pos-top); left: 5%; width: 90%; height: 50px;
-            border-bottom: 2px dashed rgba(212, 175, 55, 0.3);
+            bottom: 18px; left: 5%; width: 90%; height: 50px;
+            border-bottom: 2px dashed rgba(212, 175, 55, var(--stitch-opacity));
             border-radius: 50%;
+            transition: inherit;
         }
 
-        .header h1 { color: #fff; margin: 0; font-size: 32px; font-weight: 800; }
-        .rank { color: var(--gold); font-size: 16px; margin: 8px 0; font-weight: 500; }
-        
-        .progress-bar {
-            width: 100%; height: 10px; background: #222;
-            border-radius: 5px; margin-top: 25px;
-        }
-        .progress-fill {
-            width: 65%; height: 100%;
-            background: linear-gradient(90deg, #b38f36, var(--gold));
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
-            border-radius: 5px;
-        }
-
-        /* MIDTPARTI */
+        /* MIDTPARTI - Knappene fyller her i Hjem-modus */
         .main-content {
             position: relative;
             z-index: 5;
@@ -106,7 +98,6 @@
             padding: 10px;
         }
 
-        /* De massive knappene dine */
         .action-card {
             width: 250px;
             height: 280px;
@@ -117,42 +108,34 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: #fff;
-            box-shadow: inset 0 0 50px rgba(0,0,0,0.9), 0 25px 50px rgba(0,0,0,0.8), 0 0 20px rgba(212, 175, 55, 0.25);
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.9), 0 25px 50px rgba(0,0,0,0.8);
             backdrop-filter: blur(10px);
-            margin: 0 3px;
+            transition: transform 0.3s ease;
         }
 
         .action-card i { font-size: 90px; margin-bottom: 25px; color: var(--gold); }
-        .action-card.green-icon i { color: #2ecc71; }
-        .action-card span { font-size: 22px; font-weight: 950; letter-spacing: 2px; text-transform: uppercase; }
+        .action-card span { font-size: 22px; font-weight: 950; color: #fff; letter-spacing: 2px; }
 
         /* BUNN-PANEL */
         .bottom-panel {
             background: var(--leather);
             background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png");
-            padding: var(--bottom-padding);
+            padding: var(--bottom-p);
             z-index: 10;
             border-top-left-radius: 50% 50px;
             border-top-right-radius: 50% 50px;
             box-shadow: 0 -25px 45px rgba(0,0,0,0.9);
             position: relative;
-            transition: padding 0.4s ease;
+            transition: inherit;
         }
 
         .bottom-panel::before {
             content: "";
             position: absolute;
-            top: var(--stitch-pos-bottom); left: 5%; width: 90%; height: 50px;
-            border-top: 2px dashed rgba(212, 175, 55, 0.3);
+            top: 18px; left: 5%; width: 90%; height: 50px;
+            border-top: 2px dashed rgba(212, 175, 55, var(--stitch-opacity));
             border-radius: 50%;
-        }
-
-        .match-card {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid #333;
-            border-radius: 24px;
-            padding: 25px;
+            transition: inherit;
         }
 
         /* NAVBAR */
@@ -180,58 +163,67 @@
     <div class="felt-texture"></div>
 
     <header class="header">
-        <h1 id="user-greeting">Hei, Lasse!</h1>
-        <div class="rank">Cowboy Rank: Level 12 - Gunslinger</div>
-        <div class="progress-bar"><div class="progress-fill"></div></div>
+        <div class="hide-on-slim">
+            <h1 style="color:#fff; margin:0; font-size:36px; font-weight:800;">Hei, Lasse!</h1>
+            <div style="color:var(--gold); font-size:18px; margin:8px 0;">Cowboy Rank: Level 12</div>
+            <div style="width:100%; height:12px; background:#222; border-radius:6px; margin-top:30px;">
+                <div style="width:65%; height:100%; background:var(--gold); border-radius:6px;"></div>
+            </div>
+        </div>
     </header>
 
     <main class="main-content">
-        <div class="action-card green-icon">
-            <i class="fa-solid fa-circle-plus"></i>
+        <div class="action-card hide-on-slim">
+            <i class="fa-solid fa-circle-plus" style="color:#2ecc71;"></i>
             <span>NY KAMP</span>
         </div>
-        <div class="action-card">
+        <div class="action-card hide-on-slim">
             <i class="fa-solid fa-trophy"></i>
             <span>TOPPLISTE</span>
         </div>
-        <div class="action-card">
+        <div class="action-card hide-on-slim">
             <i class="fa-solid fa-book-open"></i>
             <span>REGLER</span>
         </div>
-    </main>
+        
+        </main>
 
     <section class="bottom-panel">
-        <div class="match-card">
-            <div style="color:#666; font-size:14px; margin-bottom:15px; font-weight:800; text-transform: uppercase;">Min Siste Kamp</div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div style="text-align:center;">
-                    <div style="width:60px; height:60px; border-radius:50%; background:#1a1a1a; border:3px solid var(--gold);"></div>
-                </div>
-                <div style="font-size:36px; font-weight:950; color:#fff;">0 - 0</div>
-                <div style="text-align:center;">
-                    <div style="width:60px; height:60px; border-radius:50%; background:#1a1a1a; border:3px solid #333;"></div>
+        <div class="hide-on-slim">
+            <div style="background:rgba(255,255,255,0.04); border:1px solid #333; border-radius:24px; padding:30px;">
+                <div style="color:#666; font-size:16px; margin-bottom:20px; font-weight:800; text-transform:uppercase;">Min Siste Kamp</div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="width:80px; height:80px; border-radius:50%; background:#1a1a1a; border:4px solid var(--gold);"></div>
+                    <div style="font-size:54px; font-weight:950; color:#fff;">0 - 0</div>
+                    <div style="width:80px; height:80px; border-radius:50%; background:#1a1a1a; border:4px solid #333;"></div>
                 </div>
             </div>
         </div>
     </section>
 
     <nav class="navbar">
-        <a href="#" class="nav-item active" onclick="toggleMode(false)"><i class="fa-solid fa-house-chimney"></i>HJEM</a>
-        <a href="#" class="nav-item" onclick="toggleMode(true)"><i class="fa-solid fa-infinity"></i>RANGE</a>
-        <a href="#" class="nav-item" onclick="toggleMode(true)"><i class="fa-solid fa-user"></i>PROFIL</a>
+        <a href="javascript:void(0)" class="nav-item active" id="homeBtn"><i class="fa-solid fa-house-chimney"></i>HJEM</a>
+        <a href="javascript:void(0)" class="nav-item" id="rangeBtn"><i class="fa-solid fa-infinity"></i>RANGE</a>
+        <a href="javascript:void(0)" class="nav-item"><i class="fa-solid fa-user"></i>PROFIL</a>
     </nav>
 </div>
 
 <script>
-    // Enkel funksjon for å demonstrere hvordan du bytter modus
-    function toggleMode(isSlim) {
-        const app = document.getElementById('app');
-        if(isSlim) {
-            app.classList.add('slim-mode');
-        } else {
-            app.classList.remove('slim-mode');
-        }
-    }
+    const app = document.getElementById('app');
+    const homeBtn = document.getElementById('homeBtn');
+    const rangeBtn = document.getElementById('rangeBtn');
+
+    rangeBtn.addEventListener('click', () => {
+        app.classList.add('slim-mode');
+        rangeBtn.classList.add('active');
+        homeBtn.classList.remove('active');
+    });
+
+    homeBtn.addEventListener('click', () => {
+        app.classList.remove('slim-mode');
+        homeBtn.classList.add('active');
+        rangeBtn.classList.remove('active');
+    });
 </script>
 
 </body>
