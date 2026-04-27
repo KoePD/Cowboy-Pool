@@ -8,29 +8,77 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
     <style>
-        /* Samme stil som før */
-        body { font-family: 'Segoe UI', sans-serif; background: radial-gradient(circle at top, #1e4d2b 0%, #0a1a0f 100%); background-attachment: fixed; color: white; margin: 0; padding: 0; display: flex; justify-content: center; min-height: 100vh; overflow-x: hidden; }
-        .app-container { width: 100%; max-width: 430px; padding: 20px; padding-bottom: 220px; }
+        /* 1. LAYOUT & BAKGRUNN */
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: radial-gradient(circle at top, #1e4d2b 0%, #0a1a0f 100%);
+            background-attachment: fixed;
+            color: white; margin: 0; padding: 0; 
+            display: flex; justify-content: center;
+            min-height: 100vh; overflow-x: hidden;
+        }
+
+        .app-container {
+            width: 100%; max-width: 430px;
+            padding: 20px; padding-bottom: 220px;
+        }
+
+        /* 2. MODUS VELGER */
         .mode-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
         .btn-mode { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #888; padding: 8px 18px; border-radius: 12px; cursor: pointer; font-weight: bold; }
         .btn-mode.active { background: #f1c40f; color: black; border-color: #f1c40f; }
-        .status-header { background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(15px); padding: 15px; border-radius: 20px; text-align: center; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); position: relative; }
+
+        /* 3. STATUS & HEADER */
+        .status-header {
+            background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(15px);
+            padding: 15px; border-radius: 20px; text-align: center;
+            margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05);
+        }
         .req-text { font-size: 0.8em; letter-spacing: 2px; color: #2ecc71; font-weight: 800; text-transform: uppercase; }
         .timer-text { font-family: monospace; font-size: 1.4em; color: #f1c40f; margin-top: 5px; display: block; }
         .btn-rotate { background: rgba(241, 196, 15, 0.1); border: 1px solid #f1c40f; color: #f1c40f; padding: 5px 10px; border-radius: 8px; font-size: 0.6em; font-weight: bold; cursor: pointer; margin-top: 10px; display: inline-block; }
-        .player-card { background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%); backdrop-filter: blur(10px); border-radius: 24px; padding: 20px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
+
+        /* 4. SPILLERKORT - FIKSET FOR LANGE NAVN */
+        .player-card {
+            background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%);
+            backdrop-filter: blur(10px); border-radius: 24px;
+            padding: 20px; margin-bottom: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            display: flex; justify-content: space-between; align-items: center;
+            transition: 0.3s;
+        }
         .player-card.active { border: 2px solid #f1c40f; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9); transform: scale(1.03); }
-        .player-name-input { background: transparent; border: none; color: #666; font-size: 1.2em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; width: 180px; padding: 0; outline: none; }
+        
+        .player-info { 
+            flex: 1; /* Tar all ledig plass til venstre */
+            overflow: hidden; /* Hindrer at innholdet dytter ut kortet */
+            padding-right: 10px;
+        }
+
+        /* Navne-input med auto-skalering følelse */
+        .player-name-input {
+            background: transparent; border: none; color: #666;
+            font-size: 1.1em; /* Litt mindre enn før for å tåle mer tekst */
+            font-weight: bold; text-transform: uppercase;
+            letter-spacing: 0.5px; width: 100%; /* Bruker all plass i .player-info */
+            padding: 0; outline: none;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
         .active .player-name-input { color: #f1c40f; }
-        .score-display { font-size: 3.5em; font-weight: 900; line-height: 1; margin: 0; color: #333; }
+        
+        .score-display { font-size: 3.5em; font-weight: 900; line-height: 1; margin: 0; color: #333; min-width: 60px; text-align: right; }
         .active .score-display { color: #f1c40f; }
-        .sub-stats { font-size: 0.6em; color: #444; margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-transform: uppercase; }
+
+        .sub-stats { font-size: 0.6em; color: #444; margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; text-transform: uppercase; }
         .active .sub-stats { color: #888; }
-        .stat-val { color: #eee; font-weight: 900; font-size: 1.2em; }
+        .stat-val { color: #eee; font-weight: 900; font-size: 1.1em; }
         .active .stat-val { color: #f1c40f; }
+
         .foul-container { display: flex; gap: 6px; margin-top: 12px; }
         .foul-dot { width: 12px; height: 12px; border-radius: 50%; background: #1a1a1a; border: 1px solid #222; }
         .foul-dot.active { background: #e74c3c; box-shadow: 0 0 10px #ff4757; }
+
+        /* 5. BALL KONTROLL */
         .ball-control-zone { display: flex; justify-content: space-around; margin: 30px 0; background: rgba(0,0,0,0.5); padding: 22px 10px; border-radius: 35px; border: 1px solid rgba(255,255,255,0.03); }
         .ball-group { display: flex; flex-direction: column; align-items: center; gap: 12px; }
         .ball { width: 80px; height: 80px; border-radius: 50%; border: none; cursor: pointer; box-shadow: inset -6px -6px 15px rgba(0,0,0,0.7), 6px 12px 20px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; transition: 0.1s; }
@@ -39,11 +87,15 @@
         #ball3 { background: radial-gradient(circle at 35% 35%, #e74c3c, #962d22); }
         .ball-inner { width: 30px; height: 30px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #000; }
         .btn-sub-carom { background: rgba(52, 152, 219, 0.12); color: #3498db; border: 1px solid #3498db; border-radius: 8px; padding: 6px 12px; font-size: 0.6em; font-weight: 800; cursor: pointer; }
+
+        /* 6. HANDLINGER BUNN */
         .action-area { position: fixed; bottom: 85px; left: 0; right: 0; padding: 0 20px; max-width: 430px; margin: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; z-index: 900; }
         .btn { padding: 16px; border-radius: 16px; border: none; font-weight: 800; text-transform: uppercase; cursor: pointer; font-size: 0.75em; }
         .btn-blue { background: #2980b9; color: white; border-bottom: 4px solid #1c5982; }
         .btn-foul { background: #c0392b; color: white; border-bottom: 4px solid #7b241c; }
         .btn-turn { background: #27ae60; color: white; border-bottom: 4px solid #1e8449; grid-column: span 2; padding: 20px; font-size: 1.1em; }
+
+        /* 7. NAVIGASJON */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: flex; justify-content: space-around; padding: 10px 0 35px 0; border-top: 1px solid #111; z-index: 1000; }
         .nav-item { color: #333; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.6em; font-weight: bold; }
         .nav-item.active { color: #f1c40f; }
@@ -116,17 +168,12 @@
 
     db.on('value', (snapshot) => {
         const data = snapshot.val();
-        if (data) { 
-            state = data; 
-            updateUI(); 
-        }
+        if (data) { state = data; updateUI(); }
     });
 
     function updateUI() {
-        // VIKTIG: Ikke tegn spillerkort på nytt hvis brukeren skriver i et navn!
         const activeEl = document.activeElement;
         if (activeEl && activeEl.classList.contains('player-name-input')) {
-            // Vi oppdaterer kun timer og tekst, ikke hele HTML-strukturen
             document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
             return; 
         }
@@ -167,91 +214,25 @@
         }
 
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
-        
-        let moveText = "VELG: CAROM / KULE";
-        if (!state.breakDone) moveText = "BREKK-STØT (3-BALL)";
-        else if (state.tableStatus === 'locked') {
-            moveText = state.lastType === 'pocket' ? "KRAV: CAROM" : "KRAV: POCKET";
-        }
-        document.getElementById('moveText').innerText = moveText;
+        document.getElementById('moveText').innerText = !state.breakDone ? "BREKK-STØT (3-BALL)" : (state.tableStatus === 'locked' ? (state.lastType === 'pocket' ? "KRAV: CAROM" : "KRAV: POCKET") : "VELG: CAROM / KULE");
         document.getElementById('rotate-container').style.display = state.breakDone ? 'none' : 'block';
 
         const isAtEnd = state.scores[state.currentPlayer] >= 90;
         const isLockedPocket = state.tableStatus === 'locked' && state.lastType === 'pocket';
-        
         document.getElementById('ball1').parentElement.className = (!state.breakDone || isLockedPocket || isAtEnd) ? 'ball-group waiting' : 'ball-group';
         document.getElementById('ball5').parentElement.className = (!state.breakDone || isLockedPocket || isAtEnd) ? 'ball-group waiting' : 'ball-group';
         document.getElementById('ball3').parentElement.className = (isLockedPocket || isAtEnd) ? 'ball-group waiting' : 'ball-group';
     }
 
-    function saveName(i, val) {
-        state.names[i] = val;
-        // Vi bruker en stille oppdatering til Firebase
-        db.child('names').set(state.names);
-    }
-
-    function setPlayerCount(n) {
-        if(confirm(`Bytte til ${n} spillere? Kampen resettes.`)) {
-            state.playerCount = n;
-            state.scores = [0,0,0]; state.foulCounts = [0,0,0];
-            state.scoreAtStart = [0,0,0]; state.bestSeries = [0,0,0];
-            state.lastSeries = [0,0,0]; state.breakDone = false;
-            state.seconds = 0; state.innings = 0; state.currentPlayer = 0;
-            db.set(state);
-        }
-    }
-
-    function rotateBreaker() {
-        if(!state.breakDone) {
-            state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
-            db.set(state);
-        }
-    }
-
-    function action(type, val) {
-        saveHistory();
-        let p = state.currentPlayer;
-        if (state.scores[p] < 90 && state.scores[p] + val > 90) return;
-        if (state.scores[p] >= 90 && state.scores[p] < 100 && state.scores[p] + val > 100) return;
-        state.breakDone = true; state.foulCounts[p] = 0;
-        if (type === 'pocket_carom') { if (state.tableStatus === 'locked') state.lastType = (state.lastType === 'pocket') ? 'carom' : 'pocket'; } 
-        else { state.tableStatus = 'locked'; state.lastType = type; }
-        state.scores[p] += val; db.set(state);
-    }
-
-    function nextTurn() {
-        saveHistory();
-        const p = state.currentPlayer;
-        const roundScore = state.scores[p] - state.scoreAtStart[p];
-        if (roundScore > (state.bestSeries[p] || 0)) state.bestSeries[p] = roundScore;
-        if (!state.lastSeries) state.lastSeries = [0,0,0];
-        state.lastSeries[p] = roundScore;
-        state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
-        state.tableStatus = 'open'; state.lastType = null;
-        state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer];
-        state.innings++; db.set(state);
-    }
-
-    function handleFoul() {
-        saveHistory();
-        state.foulCounts[state.currentPlayer]++;
-        if (state.foulCounts[state.currentPlayer] >= 3) { state.scores[state.currentPlayer] = 0; state.foulCounts[state.currentPlayer] = 0; } 
-        else { state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; }
-        nextTurn();
-    }
-
+    function saveName(i, val) { state.names[i] = val; db.child('names').set(state.names); }
+    function setPlayerCount(n) { if(confirm(`Bytte til ${n} spillere? Kampen resettes.`)) { state.playerCount = n; state.scores = [0,0,0]; state.foulCounts = [0,0,0]; state.scoreAtStart = [0,0,0]; state.bestSeries = [0,0,0]; state.lastSeries = [0,0,0]; state.breakDone = false; state.seconds = 0; state.innings = 0; state.currentPlayer = 0; db.set(state); } }
+    function rotateBreaker() { if(!state.breakDone) { state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; db.set(state); } }
+    function action(type, val) { saveHistory(); let p = state.currentPlayer; if (state.scores[p] < 90 && state.scores[p] + val > 90) return; if (state.scores[p] >= 90 && state.scores[p] < 100 && state.scores[p] + val > 100) return; state.breakDone = true; state.foulCounts[p] = 0; if (type === 'pocket_carom') { if (state.tableStatus === 'locked') state.lastType = (state.lastType === 'pocket') ? 'carom' : 'pocket'; } else { state.tableStatus = 'locked'; state.lastType = type; } state.scores[p] += val; db.set(state); }
+    function nextTurn() { saveHistory(); const p = state.currentPlayer; const roundScore = state.scores[p] - state.scoreAtStart[p]; if (roundScore > (state.bestSeries[p] || 0)) state.bestSeries[p] = roundScore; if (!state.lastSeries) state.lastSeries = [0,0,0]; state.lastSeries[p] = roundScore; state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; state.tableStatus = 'open'; state.lastType = null; state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; state.innings++; db.set(state); }
+    function handleFoul() { saveHistory(); state.foulCounts[state.currentPlayer]++; if (state.foulCounts[state.currentPlayer] >= 3) { state.scores[state.currentPlayer] = 0; state.foulCounts[state.currentPlayer] = 0; } else { state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; } nextTurn(); }
     function saveHistory() { history.push(JSON.stringify(state)); }
     function undo() { if(history.length) { state = JSON.parse(history.pop()); db.set(state); } }
-    
-    function resetGame() { 
-        if(confirm("Reset kampen?")) {
-            state.scores = [0,0,0]; state.foulCounts = [0,0,0];
-            state.breakDone = false; state.seconds = 0; state.innings = 0;
-            state.bestSeries = [0,0,0]; state.lastSeries = [0,0,0];
-            db.set(state);
-        }
-    }
-
+    function resetGame() { if(confirm("Reset kampen?")) { state.scores = [0,0,0]; state.foulCounts = [0,0,0]; state.breakDone = false; state.seconds = 0; state.innings = 0; state.bestSeries = [0,0,0]; state.lastSeries = [0,0,0]; db.set(state); } }
     setInterval(() => { if (state.breakDone) { state.seconds++; firebase.database().ref('gameData/seconds').set(state.seconds); } }, 1000);
 </script>
 </body>
