@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cowboy Pool Pro - All Buttons</title>
+    <title>Cowboy Pool Pro - Unified</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
@@ -14,6 +14,8 @@
             --gold: #f1c40f;
             --leather: #121212;
             --card-bg: rgba(0, 0, 0, 0.75);
+            --header-p: 80px 30px 140px;
+            --bottom-p: 130px 30px 40px;
         }
 
         html, body {
@@ -22,74 +24,86 @@
             -webkit-font-smoothing: antialiased; color: white;
         }
 
-        .app-container { height: 100%; display: flex; flex-direction: column; position: relative; }
+        .app-container {
+            height: 100%; display: flex; flex-direction: column; position: relative;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* SLIM MODE FOR RANGE */
+        .app-container.slim-mode {
+            --header-p: 20px 30px 40px; 
+            --bottom-p: 40px 30px 10px; 
+        }
+
         .felt-base { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--felt-green); z-index: 1; }
         .felt-texture { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: url("https://www.transparenttextures.com/patterns/felt.png"); opacity: 0.12; z-index: 2; pointer-events: none; }
 
-        /* LÆR-RAMME */
-        .leather-edge {
-            background: var(--leather);
-            background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png");
-            z-index: 100;
-            position: absolute;
-            left: 0; right: 0;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .edge-top { top: 0; height: 280px; border-bottom-left-radius: 50% 40px; border-bottom-right-radius: 50% 40px; box-shadow: 0 15px 30px rgba(0,0,0,0.8); }
-        .edge-bottom { bottom: 0; height: 220px; border-top-left-radius: 50% 40px; border-top-right-radius: 50% 40px; box-shadow: 0 -15px 30px rgba(0,0,0,0.8); }
+        /* LÆR PANELER */
+        .header { background: var(--leather); background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png"); padding: var(--header-p); z-index: 10; border-bottom-left-radius: 50% 50px; border-bottom-right-radius: 50% 50px; box-shadow: 0 25px 45px rgba(0,0,0,0.9); position: relative; transition: inherit; }
+        .bottom-panel { background: var(--leather); background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png"); padding: var(--bottom-p); z-index: 10; border-top-left-radius: 50% 50px; border-top-right-radius: 50% 50px; box-shadow: 0 -25px 45px rgba(0,0,0,0.9); position: relative; transition: inherit; }
 
-        /* RANGE MODUS (10px rammene du ba om) */
-        .slim-mode .edge-top { height: 10px; border-radius: 0; box-shadow: none; }
-        .slim-mode .edge-bottom { height: 10px; border-radius: 0; box-shadow: none; }
-        .slim-mode .hide-on-slim { display: none; }
+        .hide-on-slim { transition: opacity 0.3s ease; }
+        .slim-mode .hide-on-slim { opacity: 0; display: none; }
 
-        .main-content { position: relative; z-index: 50; flex-grow: 1; height: 100%; overflow-y: auto; display: flex; flex-direction: column; padding-bottom: 100px; }
-
-        /* HJEM-SKJERM: 3 MASSIVE KNAPPER */
-        .home-cards { 
-            display: flex; justify-content: center; align-items: center; 
-            gap: 12px; padding: 0 15px; min-height: 100%; width: 100%; box-sizing: border-box;
-        }
+        /* MIDTPARTIET */
+        .main-content { position: relative; z-index: 5; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; padding: 10px; }
+        
+        /* HJEM-KNAPPER (ULTRA MASSIVE) */
+        .home-cards { display: flex; justify-content: space-evenly; align-items: center; height: 100%; width: 100%; }
         .action-card { 
-            flex: 1; max-width: 130px; height: 160px; /* Justert for å få plass til 3 i bredden */
-            background: var(--card-bg); border: 2.5px solid var(--gold); border-radius: 20px; 
+            width: 250px; height: 280px; 
+            background: var(--card-bg); border: 3px solid var(--gold); border-radius: 35px; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            box-shadow: inset 0 0 30px rgba(0,0,0,0.9), 0 15px 25px rgba(0,0,0,0.6);
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.9), 0 25px 50px rgba(0,0,0,0.8);
             cursor: pointer;
         }
-        .action-card i { font-size: 45px; margin-bottom: 15px; color: var(--gold); }
-        .action-card.new-game-btn i { color: #2ecc71; }
-        .action-card span { font-size: 11px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; text-align: center; }
+        .action-card i { font-size: 90px; margin-bottom: 25px; color: var(--gold); }
+        .action-card span { font-size: 22px; font-weight: 950; color: #fff; letter-spacing: 2px; text-transform: uppercase; }
 
-        /* RANGE / INDEX KONTROLLER */
-        .range-content { display: none; width: 100%; max-width: 430px; margin: 0 auto; padding: 15px; box-sizing: border-box; }
+        /* RANGE CONTENT (DIN ORIGINALKODE) */
+        .range-content { display: none; width: 100%; max-width: 430px; margin: 0 auto; padding-bottom: 100px; }
         .slim-mode .home-cards { display: none; }
         .slim-mode .range-content { display: block; }
 
-        .player-card { background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%); border-radius: 20px; padding: 18px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; }
-        .player-card.active { border: 2.5px solid var(--gold); transform: scale(1.02); }
-        .score-display { font-size: 3em; font-weight: 950; color: #333; }
+        .player-card { background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%); border-radius: 24px; padding: 20px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
+        .player-card.active { border: 2px solid var(--gold); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9); transform: scale(1.03); }
+        .score-display { font-size: 3.5em; font-weight: 900; line-height: 1; color: #333; }
         .active .score-display { color: var(--gold); }
-        .foul-dot { width: 12px; height: 12px; border-radius: 50%; background: #1a1a1a; border: 1px solid #222; display: inline-block; margin-right: 3px; }
-        .foul-dot.active { background: #e74c3c; box-shadow: 0 0 8px #ff4757; }
+        .player-info h2 { margin: 0; font-size: 1.2em; text-transform: uppercase; color: #666; }
+        .active .player-info h2 { color: var(--gold); }
         
-        .game-status-zone { background: rgba(0,0,0,0.6); padding: 12px; border-radius: 20px 20px 0 0; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
-        .ball-control-zone { display: flex; justify-content: space-around; background: rgba(0,0,0,0.5); padding: 15px 5px; border-radius: 0 0 25px 25px; margin-bottom: 10px; }
-        
-        .ball { width: 70px; height: 70px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: inset -5px -5px 12px rgba(0,0,0,0.7), 4px 8px 15px rgba(0,0,0,0.6); }
+        .sub-stats { font-size: 0.55em; color: #444; margin-top: 12px; display: flex; gap: 10px; }
+        .active .sub-stats { color: #888; }
+        .stat-val { color: #eee; font-weight: 900; font-size: 1.1em; }
+        .foul-dot { width: 12px; height: 12px; border-radius: 50%; background: #1a1a1a; border: 1px solid #222; display: inline-block; }
+        .foul-dot.active { background: #e74c3c; box-shadow: 0 0 10px #ff4757; }
+
+        .ball-control-zone { display: flex; justify-content: space-around; background: rgba(0,0,0,0.5); padding: 20px 10px; border-radius: 35px; margin: 15px 0; border: 1px solid rgba(255,255,255,0.05); }
+        .ball { width: 75px; height: 75px; border-radius: 50%; border: none; cursor: pointer; box-shadow: inset -6px -6px 15px rgba(0,0,0,0.7), 6px 12px 20px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; }
         #ball1 { background: radial-gradient(circle at 35% 35%, #f1c40f, #b38f00); }
         #ball5 { background: radial-gradient(circle at 35% 35%, #8e44ad, #4b0082); }
         #ball3 { background: radial-gradient(circle at 35% 35%, #e74c3c, #962d22); }
-        .ball-inner { width: 26px; height: 26px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #000; font-size: 14px; }
-        .btn-sub-carom { background: rgba(52, 152, 219, 0.15); color: #3498db; border: 1.5px solid #3498db; border-radius: 8px; padding: 4px 10px; font-size: 0.6em; font-weight: 800; margin-top: 5px; }
+        .ball-inner { width: 28px; height: 28px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #000; }
         
-        .action-area { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .btn { padding: 15px; border-radius: 12px; border: none; font-weight: 800; text-transform: uppercase; color: white; cursor: pointer; }
-        .btn-blue { background: #2980b9; border-bottom: 3px solid #1c5982; }
-        .btn-foul { background: #c0392b; border-bottom: 3px solid #7b241c; }
-        .btn-turn { background: #27ae60; border-bottom: 3px solid #1e8449; grid-column: span 2; padding: 18px; font-size: 1.1em; }
+        .btn-sub-carom { background: rgba(52, 152, 219, 0.12); color: #3498db; border: 1px solid #3498db; border-radius: 8px; padding: 6px 12px; font-size: 0.6em; font-weight: 800; margin-top: 5px; }
+        
+        .action-area { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn { padding: 16px; border-radius: 16px; border: none; font-weight: 800; text-transform: uppercase; cursor: pointer; font-size: 0.75em; color: white; }
+        .btn-blue { background: #2980b9; border-bottom: 4px solid #1c5982; }
+        .btn-foul { background: #c0392b; border-bottom: 4px solid #7b241c; }
+        .btn-turn { background: #27ae60; border-bottom: 4px solid #1e8449; grid-column: span 2; padding: 20px; font-size: 1.1em; }
+        .btn-win { background: linear-gradient(45deg, #f1c40f, #d4ac0d); color: black; grid-column: span 2; padding: 20px; font-weight: 900; border-radius: 16px; border: none; margin-bottom: 10px; display: none; }
+        .waiting-ball { opacity: 0.15; filter: grayscale(1); pointer-events: none; }
 
-        .navbar { background: #000; height: 90px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #1a1a1a; z-index: 200; padding-bottom: 15px; position: fixed; bottom: 0; width: 100%; }
+        /* SETUP OVERLAY */
+        .setup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(10px); }
+        .setup-card { background: #000; border: 1px solid var(--gold); padding: 30px; border-radius: 30px; width: 100%; max-width: 350px; text-align: center; }
+        .btn-choice { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid #333; background: #111; color: white; font-weight: bold; }
+        .btn-choice.selected { background: var(--gold); color: black; }
+        .name-field { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #111; color: white; margin-bottom: 10px; text-align: center; }
+
+        /* NAVBAR */
+        .navbar { background: #080808; height: 95px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; z-index: 20; padding-bottom: 20px; }
         .nav-item { color: #444; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.6em; font-weight: 800; }
         .nav-item.active { color: var(--gold); }
         .nav-item i { font-size: 2.2em; margin-bottom: 4px; }
@@ -101,112 +115,206 @@
     <div class="felt-base"></div>
     <div class="felt-texture"></div>
 
-    <div class="leather-edge edge-top">
-        <div class="hide-on-slim" style="padding-top: 60px; text-align: center;">
+    <header class="header">
+        <div class="hide-on-slim">
             <h1 style="color:#fff; margin:0; font-size:36px; font-weight:800;">Hei, Marius!</h1>
-            <div style="color:var(--gold); font-size:18px; margin-top:5px;">Cowboy Rank: Level 12</div>
+            <div style="color:var(--gold); font-size:18px; margin:8px 0;">Cowboy Rank: Level 12</div>
+            <div style="width:100%; height:12px; background:#222; border-radius:6px; margin-top:30px;">
+                <div style="width:65%; height:100%; background:var(--gold); border-radius:6px;"></div>
+            </div>
         </div>
-    </div>
-
-    <div class="leather-edge edge-bottom">
-        <div class="hide-on-slim" style="padding-top: 80px; text-align: center;">
-            <div style="color:#666; font-size:14px; font-weight:800; text-transform:uppercase;">Siste Kamp: 100 - 82</div>
+        <div id="gameStatus" style="display:none; text-align:center;">
+             <div id="modeLabel" style="font-size:0.6em; color:var(--gold); opacity:0.6; text-transform:uppercase;">MODUS: STANDARD</div>
+             <span id="moveText" style="color:#2ecc71; font-weight:800; font-size:0.9em; letter-spacing:2px;">BREKK-STØT</span>
+             <div id="matchTimer" style="color:#f1c40f; font-family:monospace; font-size:1.3em; margin: 3px 0;">00:00:00</div>
+             <div id="inningDisplay" style="font-size:0.7em; color:#888; font-weight:bold; text-transform:uppercase;">INNING: 1</div>
         </div>
-    </div>
+    </header>
 
     <main class="main-content">
         <div class="home-cards">
-            <div class="action-card new-game-btn" onclick="navTo('range', document.getElementById('rBtn'))">
-                <i class="fa-solid fa-circle-plus"></i>
-                <span>NY KAMP</span>
-            </div>
-            <div class="action-card">
-                <i class="fa-solid fa-trophy"></i>
-                <span>TOPPLISTE</span>
-            </div>
-            <div class="action-card">
-                <i class="fa-solid fa-book-open"></i>
-                <span>REGLER</span>
-            </div>
+            <div class="action-card" onclick="checkActiveGame()"><i class="fa-solid fa-circle-plus" style="color:#2ecc71;"></i><span>NY KAMP</span></div>
+            <div class="action-card"><i class="fa-solid fa-trophy"></i><span>TOPPLISTE</span></div>
+            <div class="action-card"><i class="fa-solid fa-book-open"></i><span>REGLER</span></div>
         </div>
 
         <div class="range-content">
             <div id="scoreboard-container"></div>
             
-            <div class="game-status-zone">
-                <div style="font-size:0.6em; color:var(--gold); opacity:0.6; margin-bottom:5px;">MODUS: STANDARD</div>
-                <span id="moveText" style="color:#2ecc71; font-weight:800; letter-spacing:1.5px;">BREKK-STØT</span>
-                <div id="matchTimer" style="color:white; font-family:monospace; font-size:1.4em; margin-top:5px;">00:00:00</div>
-            </div>
-
             <div class="ball-control-zone">
-                <div style="text-align:center;"><button class="ball" id="ball1" onclick="action('pocket', 1)"><div class="ball-inner">1</div></button><button class="btn-sub-carom" onclick="action('pocket_carom', 2)">+ CAROM</button></div>
-                <div style="text-align:center;"><button class="ball" id="ball5" onclick="action('pocket', 5)"><div class="ball-inner">5</div></button><button class="btn-sub-carom" onclick="action('pocket_carom', 6)">+ CAROM</button></div>
-                <div style="text-align:center;"><button class="ball" id="ball3" onclick="action('pocket', 3)"><div class="ball-inner">3</div></button><button class="btn-sub-carom" onclick="action('pocket_carom', 4)">+ CAROM</button></div>
+                <div style="display:flex; flex-direction:column; align-items:center;">
+                    <button class="ball" id="ball1" onclick="action('pocket', 1)"><div class="ball-inner">1</div></button>
+                    <button class="btn-sub-carom" id="pc1" onclick="action('pocket_carom', 2)">+ CAROM</button>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center;">
+                    <button class="ball" id="ball5" onclick="action('pocket', 5)"><div class="ball-inner">5</div></button>
+                    <button class="btn-sub-carom" id="pc5" onclick="action('pocket_carom', 6)">+ CAROM</button>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center;">
+                    <button class="ball" id="ball3" onclick="action('pocket', 3)"><div class="ball-inner">3</div></button>
+                    <button class="btn-sub-carom" id="pc3" onclick="action('pocket_carom', 4)">+ CAROM</button>
+                </div>
             </div>
 
             <div class="action-area">
-                <button class="btn btn-blue" onclick="action('carom', 1)">Carom 1P</button>
-                <button class="btn btn-blue" onclick="action('carom', 2)">Carom 2P</button>
-                <button class="btn btn-foul" onclick="handleFoul()">FOUL</button>
-                <button class="btn btn-blue" onclick="undo()">ANGRE</button>
-                <button class="btn btn-turn" onclick="nextTurn()">AVSLUTT TUR</button>
+                <button id="winButton" class="btn-win" onclick="action('winning_shot', 1)">WINNING SHOT (CUE VIA 1)</button>
+                <button class="btn btn-blue" id="carom1PBtn" onclick="action('carom', 1)">Carom 1P</button>
+                <button class="btn btn-blue" id="carom2PBtn" onclick="action('carom', 2)">Carom 2P</button>
+                <button class="btn btn-blue" id="undoActionBtn" onclick="undo()">ANGRE</button>
+                <button class="btn btn-foul" id="foulActionBtn" onclick="handleFoul()">FOUL</button>
+                <button class="btn btn-turn" id="endTurnBtn" onclick="nextTurn()">AVSLUTT TUR</button>
+                <button class="btn btn-blue" style="grid-column: span 2; margin-top: 10px; background: rgba(241,196,15,0.1); border: 1px solid var(--gold);" onclick="rotateBreaker()" id="rotBtn">BYTT STARTSPILLER</button>
             </div>
         </div>
     </main>
 
+    <section class="bottom-panel">
+        <div class="hide-on-slim">
+            <div style="background:rgba(255,255,255,0.04); border:1px solid #333; border-radius:24px; padding:30px;">
+                <div style="color:#666; font-size:16px; margin-bottom:15px; font-weight:800; text-transform:uppercase;">Siste Kamp</div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="width:60px; height:60px; border-radius:50%; background:#1a1a1a; border:3px solid var(--gold);"></div>
+                    <div style="font-size:36px; font-weight:950; color:#fff;">100 - 82</div>
+                    <div style="width:60px; height:60px; border-radius:50%; background:#1a1a1a; border:3px solid #333;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <nav class="navbar">
         <a href="javascript:void(0)" class="nav-item active" onclick="navTo('home', this)"><i class="material-icons">home</i>HJEM</a>
-        <a href="javascript:void(0)" class="nav-item" id="rBtn" onclick="navTo('range', this)"><i class="material-icons">all_inclusive</i>RANGE</a>
+        <a href="javascript:void(0)" class="nav-item" onclick="navTo('range', this)"><i class="material-icons">all_inclusive</i>RANGE</a>
         <a href="javascript:void(0)" class="nav-item"><i class="material-icons">person</i>PROFIL</a>
+        <a href="javascript:void(0)" class="nav-item"><i class="material-icons">leaderboard</i>STATS</a>
     </nav>
 </div>
 
+<div id="setupOverlay" class="setup-overlay">
+    <div class="setup-card">
+        <h2 id="overlayHeader" style="color:var(--gold); margin-bottom: 20px;">NY MATCH</h2>
+        <div id="step-confirm" style="display: none;">
+            <p id="confirmText" style="color:#888; margin-bottom: 20px;">Kamp pågår. Hva vil du gjøre?</p>
+            <button class="btn btn-blue" style="width:100%; margin-bottom:10px;" onclick="handleFinishAndSave()">LAGRE & NY</button>
+            <button class="btn btn-foul" style="width:100%;" onclick="handleDiscard()">SLETT & NY</button>
+            <button style="background:none; border:none; color:#888; margin-top:20px; text-decoration:underline;" onclick="closeSetup()">Fortsett kampen</button>
+        </div>
+        <div id="step1" style="display: none;">
+            <p style="color:#888;">Spillmodus:</p>
+            <div style="display:flex; gap:10px; margin-bottom:20px;">
+                <button class="btn-choice" id="modeStd" onclick="setMode('standard')">Standard</button>
+                <button class="btn-choice" id="modeAlt" onclick="setMode('alternate')">Alternate</button>
+            </div>
+            <p id="playersText" style="color:#888;">Antall spillere?</p>
+            <div style="display:flex; gap:10px; margin-bottom:20px;">
+                <button class="btn-choice" onclick="selectPlayers(1)">1</button>
+                <button class="btn-choice" onclick="selectPlayers(2)">2</button>
+                <button class="btn-choice" onclick="selectPlayers(3)">3</button>
+            </div>
+            <button style="background:none; border:none; color:#888; text-decoration:underline;" onclick="closeSetup()">Avbryt</button>
+        </div>
+        <div id="step2" style="display: none;">
+            <p style="color:#888; margin-bottom: 15px;">Navn:</p>
+            <div id="nameInputs"></div>
+            <button class="btn btn-turn" onclick="finalizeSetup()">START KAMP</button>
+            <button style="background:none; border:none; color:#888; margin-top:15px; text-decoration:underline;" onclick="goToStep1()">Tilbake</button>
+        </div>
+    </div>
+</div>
+
 <script>
-    // --- FIREBASE OG LOGIKK ---
+    // --- FIREBASE & STATE ---
     const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('gameData');
 
-    let state = { playerCount: 2, scores: [0,0], foulCounts: [0,0], scoreAtStart: [0,0], currentPlayer: 0, breakDone: false, seconds: 0, names: ["Marius","Per"] };
+    let state = { gameMode: 'standard', playerCount: 2, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null, seconds: 0, names: ["P1","P2","P3"], bestSeries: [0,0,0], lastSeries: [0,0,0], lang: 'no', innings: 1 };
     let history = [];
+    let tempMode = 'standard';
+    let setupCount = 2;
 
-    db.on('value', (s) => { if(s.val()) { state = s.val(); updateUI(); } });
+    const dictionary = {
+        no: { now: "NÅ", best: "PERS", last: "SISTE", break: "BREKK-STØT", req_carom: "KRAV: CAROM", req_pocket: "KRAV: POCKET", any: "VELG: CAROM / POCKET", caroms_only: "KUN CAROMS", win: "VINNER STØTE", inn: "INNING", undo: "ANGRE", foul: "FEIL", turn: "AVSLUTT TUR", rotate: "BYTT STARTSPILLER" }
+    };
 
+    // --- NAVIGASJON ---
     function navTo(page, el) {
+        const app = document.getElementById('app');
+        const status = document.getElementById('gameStatus');
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         el.classList.add('active');
-        if(page === 'range') document.getElementById('app').classList.add('slim-mode');
-        else document.getElementById('app').classList.remove('slim-mode');
+        if(page === 'range') { app.classList.add('slim-mode'); status.style.display = 'block'; } 
+        else { app.classList.remove('slim-mode'); status.style.display = 'none'; }
     }
 
+    // --- SPILL LOGIKK (DIN KODE) ---
+    db.on('value', (s) => { if(s.val()) { state = s.val(); updateUI(); } });
+
     function action(type, val) {
-        saveHistory(); state.scores[state.currentPlayer] += val; state.breakDone = true; db.set(state);
+        saveHistory(); let p = state.currentPlayer; let cur = state.scores[p];
+        if ((cur < 90 && (cur + val) > 90) || (cur >= 90 && (cur + val) > 101)) { handleFoul(); return; }
+        if (cur >= 90 && cur < 100 && type.includes('pocket') && type !== 'pocket_carom') return;
+        state.breakDone = true; state.foulCounts[p] = 0;
+        
+        if (state.gameMode === 'alternate') {
+            if (state.tableStatus === 'open') {
+                if (type === 'pocket_carom') { state.tableStatus = 'open'; state.lastType = null; }
+                else { state.tableStatus = 'locked'; state.lastType = type; }
+            } else {
+                if (type === 'pocket_carom') { state.lastType = (state.lastType === 'pocket') ? 'carom' : 'pocket'; }
+                else { state.lastType = type; }
+            }
+        }
+        state.scores[p] += val;
+        db.set(state);
     }
 
     function updateUI() {
+        const l = dictionary[state.lang || 'no'];
         const cont = document.getElementById('scoreboard-container'); cont.innerHTML = '';
         for(let i=0; i<state.playerCount; i++) {
             const active = state.currentPlayer === i;
             cont.innerHTML += `<div class="player-card ${active?'active':''}">
                 <div class="player-info">
-                    <h2 style="margin:0; color:${active?'var(--gold)':'#555'}">${state.names[i]}</h2>
-                    <div style="margin-top:5px;">
+                    <h2>${state.names[i]}</h2>
+                    <div class="sub-stats">
+                        <span>${l.now}: <b class="stat-val">${active ? state.scores[i]-state.scoreAtStart[i] : 0}</b></span>
+                        <span>${l.best}: <b class="stat-val">${state.bestSeries[i]}</b></span>
+                    </div>
+                    <div style="margin-top:8px;">
                         <div class="foul-dot ${state.foulCounts[i]>=1?'active':''}"></div>
                         <div class="foul-dot ${state.foulCounts[i]>=2?'active':''}"></div>
+                        <div class="foul-dot ${state.foulCounts[i]>=3?'active':''}"></div>
                     </div>
                 </div>
                 <div class="score-display">${state.scores[i]}</div>
             </div>`;
         }
+        
+        const cur = state.scores[state.currentPlayer];
+        const winPhase = cur === 100;
+        const caromPhase = cur >= 90;
+        document.getElementById('winButton').style.display = winPhase ? 'block' : 'none';
+        document.getElementById('rotBtn').style.display = state.breakDone ? 'none' : 'block';
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
-        document.getElementById('moveText').innerText = state.breakDone ? "SPILL" : "BREKK-STØT";
+        document.getElementById('inningDisplay').innerText = l.inn + ": " + state.innings;
+        document.getElementById('moveText').innerText = winPhase ? l.win : (!state.breakDone ? l.break : l.any);
     }
 
-    function handleFoul() { saveHistory(); state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; state.foulCounts[state.currentPlayer]++; nextTurn(); }
-    function nextTurn() { state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; db.set(state); }
+    // --- SETUP SYSTEM ---
+    function checkActiveGame() { document.getElementById('setupOverlay').style.display = 'flex'; if (state.scores.some(s => s > 0)) { document.getElementById('step-confirm').style.display = 'block'; } else { goToStep1(); } }
+    function goToStep1() { document.getElementById('step-confirm').style.display = 'none'; document.getElementById('step1').style.display = 'block'; document.getElementById('step2').style.display = 'none'; }
+    function setMode(m) { tempMode = m; document.getElementById('modeStd').classList.toggle('selected', m==='standard'); document.getElementById('modeAlt').classList.toggle('selected', m==='alternate'); }
+    function selectPlayers(n) { setupCount = n; document.getElementById('step1').style.display = 'none'; document.getElementById('step2').style.display = 'block'; const c = document.getElementById('nameInputs'); c.innerHTML = ''; for(let i=0; i<n; i++) c.innerHTML += `<input type="text" id="n${i}" class="name-field" placeholder="Navn ${i+1}">`; }
+    function finalizeSetup() { const ns = []; for(let i=0; i<setupCount; i++) ns.push(document.getElementById(`n${i}`).value || `P${i+1}`); db.set({...state, gameMode: tempMode, playerCount: setupCount, names: ns, scores: [0,0,0], foulCounts:[0,0,0], scoreAtStart:[0,0,0], breakDone:false, seconds:0, currentPlayer:0, tableStatus:'open', innings:1}); closeSetup(); navTo('range', document.querySelectorAll('.nav-item')[1]); }
+    function handleFoul() { saveHistory(); state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; state.foulCounts[state.currentPlayer]++; if(state.foulCounts[state.currentPlayer] >= 3) { state.scores[state.currentPlayer] = 0; state.foulCounts[state.currentPlayer] = 0; } nextTurn(); }
+    function nextTurn() { saveHistory(); let p = state.currentPlayer; let s = state.scores[p] - state.scoreAtStart[p]; if(s > state.bestSeries[p]) state.bestSeries[p] = s; if(state.currentPlayer === state.playerCount - 1) state.innings++; state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; state.tableStatus = 'open'; state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; db.set(state); }
     function undo() { if(history.length) { state = JSON.parse(history.pop()); db.set(state); } }
     function saveHistory() { history.push(JSON.stringify(state)); if(history.length > 10) history.shift(); }
+    function closeSetup() { document.getElementById('setupOverlay').style.display = 'none'; }
+    function rotateBreaker() { if(!state.breakDone) { state.currentPlayer = (state.currentPlayer+1)%state.playerCount; db.set(state); } }
+    function handleDiscard() { db.set({...state, scores:[0,0,0], seconds:0, innings:1}).then(goToStep1); }
+    function handleFinishAndSave() { handleDiscard(); }
+
     setInterval(() => { if(state.breakDone) { state.seconds++; db.child('seconds').set(state.seconds); } }, 1000);
 </script>
 </body>
