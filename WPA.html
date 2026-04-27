@@ -216,7 +216,6 @@
         
         if (state.gameMode === 'alternate') {
             if (type === 'pocket_carom') { 
-                // Carom+ åpner alltid tabellen
                 state.tableStatus = 'open'; 
                 state.lastType = null; 
             } else { 
@@ -235,14 +234,14 @@
         document.getElementById('modeLabel').innerText = "MODUS: " + state.gameMode.toUpperCase();
         document.getElementById('profName').innerText = state.names[0];
         document.getElementById('profInitial').innerText = state.names[0].charAt(0).toUpperCase();
-        document.getElementById('profBest').innerText = state.bestSeries[0] + " Poeng";
+        document.getElementById('profBest').innerText = (state.bestSeries ? state.bestSeries[0] : 0) + " Poeng";
 
         const cont = document.getElementById('scoreboard-container'); cont.innerHTML = '';
         for(let i=0; i<state.playerCount; i++) {
             const active = state.currentPlayer === i;
             cont.innerHTML += `<div class="player-card ${active?'active':''}">
                 <div class="player-info">
-                    <h2>${state.names[i]}</h2>
+                    <h2 style="color: ${active ? '#f1c40f' : '#eee'}">${state.names[i]}</h2>
                     <div class="sub-stats">
                         <div class="stat-item">${l.now} <span class="stat-val" style="color: ${active ? '#f1c40f' : '#eee'}">${active ? state.scores[i]-state.scoreAtStart[i] : 0}</span></div>
                         <div class="stat-item">${l.best} <span class="stat-val" style="color: ${active ? '#f1c40f' : '#eee'}">${state.bestSeries[i]}</span></div>
@@ -251,13 +250,11 @@
                     <div style="display:flex; gap:5px; margin-top:10px;">
                         <div class="foul-dot ${state.foulCounts[i]>=1?'active':''}"></div><div class="foul-dot ${state.foulCounts[i]>=2?'active':''}"></div><div class="foul-dot ${state.foulCounts[i]>=3?'active':''}"></div>
                     </div>
-                </div><div class="score-display">${state.scores[i]}</div></div>`;
+                </div><div class="score-display" style="color: ${active ? '#f1c40f' : '#eee'}">${state.scores[i]}</div></div>`;
         }
 
         const cur = state.scores[state.currentPlayer];
-        const winPhase = cur === 100; 
-        const caromPhase = cur >= 90 && cur < 100;
-        
+        const winPhase = cur === 100; const caromPhase = cur >= 90 && cur < 100;
         const isAlternate = state.gameMode === 'alternate';
         const lockPocket = isAlternate && state.tableStatus === 'locked' && state.lastType === 'pocket';
         const lockCarom = isAlternate && state.tableStatus === 'locked' && state.lastType === 'carom';
@@ -273,7 +270,6 @@
         document.getElementById('ball5').className = pocketDisabled ? 'ball waiting-ball' : 'ball';
         document.getElementById('ball3').className = (caromPhase || winPhase || lockPocket) ? 'ball waiting-ball' : 'ball';
         
-        // Carom+ knappene følger carom-logikken (skal ikke låses hvis carom er lov)
         const subCaromDisabled = winPhase || (lockCarom && !caromPhase);
         document.getElementById('pc1').className = subCaromDisabled ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
         document.getElementById('pc5').className = subCaromDisabled ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
