@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Biljard App - Final 1000%</title>
+    <title>Biljard App - 1000% Fasit</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
             --felt-green: radial-gradient(circle at center, #2fa34b 0%, #155e2d 60%, #082411 100%);
             --gold: #d4af37;
             --leather: #121212;
-            --card-bg: rgba(0, 0, 0, 0.7);
+            --card-bg: rgba(0, 0, 0, 0.75);
         }
 
         html, body {
@@ -46,11 +46,11 @@
             pointer-events: none;
         }
 
-        /* TOPP-PANEL - Gjort betydelig lenger */
+        /* TOPP-PANEL */
         .header {
             background: var(--leather);
             background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png");
-            padding: 80px 30px 140px; /* Ekstremt lenger ned */
+            padding: 70px 30px 140px; 
             z-index: 10;
             border-bottom-left-radius: 50% 50px;
             border-bottom-right-radius: 50% 50px;
@@ -80,7 +80,7 @@
             border-radius: 5px;
         }
 
-        /* MIDTPARTI - Knappene fyller nå nesten hele høyden som er igjen */
+        /* MIDTPARTI - MASSIVE KNAPPER */
         .main-felt {
             position: relative;
             z-index: 5;
@@ -92,29 +92,30 @@
         }
 
         .action-card {
-            width: 140px; /* Bredere */
-            height: 155px; /* Mye høyere */
+            width: 180px; /* 100% større (fra ca 90-100px) */
+            height: 200px; /* 100% større */
             background: var(--card-bg);
-            border: 2px solid var(--gold);
-            border-radius: 22px;
+            border: 2.5px solid var(--gold);
+            border-radius: 28px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             color: #fff;
-            box-shadow: inset 0 0 35px rgba(0,0,0,0.8), 0 15px 30px rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px);
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.9), 0 20px 40px rgba(0,0,0,0.7), 0 0 15px rgba(212, 175, 55, 0.2);
+            backdrop-filter: blur(8px);
+            margin: 0 5px;
         }
 
-        .action-card i { font-size: 50px; margin-bottom: 15px; color: var(--gold); }
+        .action-card i { font-size: 70px; margin-bottom: 20px; color: var(--gold); }
         .action-card.green-icon i { color: #2ecc71; }
-        .action-card span { font-size: 14px; font-weight: 900; letter-spacing: 1.2px; }
+        .action-card span { font-size: 18px; font-weight: 950; letter-spacing: 1.5px; text-transform: uppercase; }
 
-        /* BUNN-PANEL - Gjort betydelig lenger */
+        /* BUNN-PANEL */
         .bottom-panel {
             background: var(--leather);
             background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png");
-            padding: 130px 30px 40px; /* Ekstremt lenger opp */
+            padding: 130px 30px 40px; 
             z-index: 10;
             border-top-left-radius: 50% 50px;
             border-top-right-radius: 50% 50px;
@@ -140,18 +141,18 @@
         /* NAVBAR */
         .navbar {
             background: #080808;
-            height: 90px;
+            height: 95px;
             display: flex;
             justify-content: space-around;
             align-items: center;
             border-top: 1px solid #1a1a1a;
             z-index: 20;
-            padding-bottom: 15px;
+            padding-bottom: 20px;
         }
 
-        .nav-item { color: #444; text-align: center; font-size: 13px; text-decoration: none; font-weight: 700; }
+        .nav-item { color: #444; text-align: center; font-size: 14px; text-decoration: none; font-weight: 800; }
         .nav-item.active { color: var(--gold); }
-        .nav-item i { display: block; font-size: 30px; margin-bottom: 6px; }
+        .nav-item i { display: block; font-size: 32px; margin-bottom: 8px; }
 
     </style>
 </head>
@@ -187,18 +188,18 @@
             <div style="color:#666; font-size:14px; margin-bottom:20px; font-weight:800; text-transform: uppercase; letter-spacing: 1.5px;">Min Siste Kamp</div>
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div style="text-align:center;">
-                    <div style="width:65px; height:65px; border-radius:50%; background:#1a1a1a; border:3px solid var(--gold); margin-bottom:10px;"></div>
-                    <div style="color:#fff; font-size:14px; font-weight: 700;">Lasse</div>
+                    <div style="width:70px; height:70px; border-radius:50%; background:#1a1a1a; border:3.5px solid var(--gold); margin-bottom:10px;"></div>
+                    <div style="color:#fff; font-size:15px; font-weight: 700;">Lasse</div>
                 </div>
                 <div style="text-align:center;">
-                    <div style="font-size:42px; font-weight:950; color:#fff; letter-spacing:2px;">
+                    <div style="font-size:46px; font-weight:950; color:#fff; letter-spacing:2px;">
                         <span style="color:#2ecc71">0</span> - <span style="color:#444">0</span>
                     </div>
-                    <div style="color:#666; font-size:12px; font-weight:900; margin-top:5px;">LASTER...</div>
+                    <div style="color:#666; font-size:13px; font-weight:900; margin-top:5px;">LASTER...</div>
                 </div>
                 <div style="text-align:center;">
-                    <div style="width:65px; height:65px; border-radius:50%; background:#1a1a1a; border:3px solid #333; margin-bottom:10px;"></div>
-                    <div style="color:#fff; font-size:14px; font-weight: 700;">?</div>
+                    <div style="width:70px; height:70px; border-radius:50%; background:#1a1a1a; border:3.5px solid #333; margin-bottom:10px;"></div>
+                    <div style="color:#fff; font-size:15px; font-weight: 700;">?</div>
                 </div>
             </div>
         </div>
