@@ -209,7 +209,6 @@
     function action(type, val) {
         saveHistory(); let p = state.currentPlayer; let cur = state.scores[p];
         
-        // Regelsjekk for 90-101 fasen
         if ((cur < 90 && (cur + val) > 90) || (cur >= 90 && (cur + val) > 101)) { handleFoul(); return; }
         if (cur >= 90 && cur < 100 && type.includes('pocket') && type !== 'pocket_carom') return;
         if (cur === 100 && type !== 'winning_shot') return;
@@ -218,19 +217,16 @@
         
         if (state.gameMode === 'alternate') {
             if (state.tableStatus === 'open') {
-                // Hvis bordet er åpent:
                 if (type === 'pocket_carom') {
-                    state.tableStatus = 'open'; // Forblir åpent ved Carom+
+                    state.tableStatus = 'open'; // Forblir åpent
                     state.lastType = null;
                 } else {
-                    state.tableStatus = 'locked'; // Låses til det du nettopp gjorde
+                    state.tableStatus = 'locked'; // Låses til det som ble gjort
                     state.lastType = type;
                 }
             } else {
-                // Hvis bordet allerede er låst (Alternate-fasen):
+                // Hvis låst: Pocket + Carom teller som å ha utført Pocket-kravet
                 if (type === 'pocket_carom') {
-                    // Hvis du gjør Carom+ når bordet er låst, teller det som en "Pocket" (kravet utført)
-                    // og neste krav blir Carom. Bordet forblir låst.
                     state.lastType = 'pocket'; 
                 } else {
                     state.lastType = type;
@@ -247,7 +243,6 @@
         const l = dictionary[state.lang || 'no'];
         document.getElementById('modeLabel').innerText = "MODUS: " + state.gameMode.toUpperCase();
         
-        // Profil-oppdateringer (forberedt for utskilling)
         if(document.getElementById('profName')) {
             document.getElementById('profName').innerText = state.names[0];
             document.getElementById('profInitial').innerText = state.names[0].charAt(0).toUpperCase();
@@ -279,16 +274,19 @@
 
         document.getElementById('winButton').style.display = winPhase ? 'block' : 'none';
         
+        // Carom-knapper (låses kun ved vinn-fase eller hvis kravet er Pocket i Alternate)
         const caromDisabled = winPhase || (lockCarom && !caromPhase);
         document.getElementById('carom1PBtn').className = caromDisabled ? 'btn btn-blue waiting-ball' : 'btn btn-blue';
         document.getElementById('carom2PBtn').className = caromDisabled ? 'btn btn-blue waiting-ball' : 'btn btn-blue';
 
+        // Kulene gråes ut hvis man må carome eller er i sluttfasen
         const pocketDisabled = !state.breakDone || caromPhase || winPhase || lockPocket;
         document.getElementById('ball1').className = pocketDisabled ? 'ball waiting-ball' : 'ball';
         document.getElementById('ball5').className = pocketDisabled ? 'ball waiting-ball' : 'ball';
         document.getElementById('ball3').className = (caromPhase || winPhase || lockPocket) ? 'ball waiting-ball' : 'ball';
         
-        const subCaromDisabled = caromPhase || winPhase || (lockCarom && !caromPhase);
+        // CAROM+ knappene er ALLTID synlige unntatt ved 90+ poeng
+        const subCaromDisabled = caromPhase || winPhase;
         document.getElementById('pc1').className = subCaromDisabled ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
         document.getElementById('pc5').className = subCaromDisabled ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
         document.getElementById('pc3').className = subCaromDisabled ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
@@ -298,6 +296,7 @@
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
     }
 
+    // Resten av funksjonene (checkActiveGame, nextTurn, etc.) forblir uendret
     function checkActiveGame() { document.getElementById('setupOverlay').style.display = 'flex'; if (state.scores.some(s => s > 0)) { document.getElementById('step-confirm').style.display = 'block'; document.getElementById('step1').style.display = 'none'; document.getElementById('step2').style.display = 'none'; } else { goToStep1(); } }
     function setMode(m) { tempMode = m; document.getElementById('modeStd').classList.toggle('selected', m === 'standard'); document.getElementById('modeAlt').classList.toggle('selected', m === 'alternate'); }
     function goToStep1() { document.getElementById('step-confirm').style.display = 'none'; document.getElementById('step1').style.display = 'block'; document.getElementById('step2').style.display = 'none'; setMode(tempMode); }
