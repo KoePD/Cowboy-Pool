@@ -9,206 +9,182 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         :root {
-            --pool-green: #143d21;
             --gold: #f1c40f;
-            --dark-bg: #0c0c0c;
-            --card-bg: #1a1a1a;
+            --pool-green: #1a4d2e;
+            --leather-dark: #121212;
         }
 
         body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            font-family: 'Segoe UI', sans-serif; 
             background: #000; color: white; margin: 0; padding: 0;
             display: flex; justify-content: center;
         }
 
         .app-container { 
             width: 100%; max-width: 430px; min-height: 100vh;
-            background: #000; position: relative;
-            box-sizing: border-box; padding-bottom: 110px;
+            background: #000; position: relative; padding-bottom: 110px;
+            display: flex; flex-direction: column;
         }
 
-        /* Lær-toppen (Leather header) */
-        .header-leather {
+        /* TOP SEKSJON: Lær-topp med bue nedover */
+        .header-section {
             background: linear-gradient(180deg, #222 0%, #111 100%);
-            padding: 40px 25px 20px;
-            border-bottom: 3px solid #000;
+            padding: 40px 25px 50px;
+            border-bottom: 2px solid #000;
+            border-radius: 0 0 50% 50% / 0 0 25px 25px; /* Skaper den myke buen ned mot filten */
+            z-index: 2;
             position: relative;
-        }
-        .header-leather::after {
-            content: ""; position: absolute; bottom: 5px; left: 0; right: 0;
-            border-bottom: 1px dashed rgba(255,255,255,0.1); /* Søm-effekt */
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
 
         .header-top { display: flex; justify-content: space-between; align-items: center; }
         .user-greeting h1 { margin: 0; font-size: 1.8em; color: var(--gold); font-weight: 800; }
-        .user-rank { font-size: 0.85em; color: #aaa; margin-top: 4px; }
+        .user-rank { font-size: 0.85em; color: #888; margin-top: 4px; }
         
-        .profile-circle { 
+        .profile-pic { 
             width: 50px; height: 50px; border-radius: 50%; 
             border: 2px solid var(--gold); background: #222;
             box-shadow: 0 0 15px rgba(241, 196, 15, 0.3);
-            overflow: hidden;
         }
 
-        .xp-bar-bg { background: #333; height: 10px; border-radius: 5px; margin-top: 15px; border: 1px solid #000; }
-        .xp-bar-fill { 
-            background: linear-gradient(90deg, #d4ac0d, #f1c40f); 
-            width: 70%; height: 100%; border-radius: 5px; 
-            box-shadow: 0 0 10px rgba(241, 196, 15, 0.5);
+        .xp-container { background: #000; height: 8px; border-radius: 4px; margin-top: 20px; border: 1px solid #333; position: relative; }
+        .xp-fill { background: linear-gradient(90deg, #d4ac0d, #f1c40f); width: 65%; height: 100%; border-radius: 4px; }
+
+        /* MIDT SEKSJON: Grønn filt som er buet i begge ender */
+        .felt-area {
+            background: radial-gradient(circle at center, #1e4d2b 0%, #0a1f11 100%);
+            margin-top: -30px; /* Overlapper lær-toppen for helhet */
+            padding: 50px 20px 60px;
+            z-index: 1;
+            position: relative;
+            box-shadow: inset 0 20px 40px rgba(0,0,0,0.6), inset 0 -20px 40px rgba(0,0,0,0.6);
+            border-left: 1px solid #1a3321;
+            border-right: 1px solid #1a3321;
         }
 
-        /* Grønn Filt-seksjon */
-        .felt-section {
-            background: radial-gradient(circle at center, #1e4d2b 0%, #0d2113 100%);
-            margin: -10px 10px 20px;
-            padding: 30px 20px;
-            border-radius: 0 0 40px 40px;
-            box-shadow: inset 0 10px 30px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.5);
-            border: 1px solid #1a3321;
-        }
-
-        /* Knappene - 100% som bildet */
         .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
         .action-card { 
-            background: rgba(0,0,0,0.4); 
-            border: 2px solid #555; 
-            border-radius: 12px; padding: 15px 5px; 
-            text-align: center; cursor: pointer; text-decoration: none; color: white;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.2); 
+            border: 2px solid rgba(241, 196, 15, 0.4); 
+            border-radius: 15px; padding: 20px 5px; 
+            text-align: center; text-decoration: none; color: white;
+            display: flex; flex-direction: column; align-items: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
-        .action-card.active-border { border-color: var(--gold); }
-        .action-card i { font-size: 2.8em; margin-bottom: 5px; }
-        .action-card span { font-size: 0.75em; font-weight: 900; letter-spacing: 0.5px; }
-        
-        .c-green i { color: #2ecc71; }
-        .c-gold i { color: var(--gold); }
-        .c-brown i { color: #b79468; } /* Mer nøytral bok-farge */
+        .action-card i { font-size: 2.8em; margin-bottom: 8px; }
+        .action-card span { font-size: 0.7em; font-weight: 900; letter-spacing: 1px; }
+        .card-green i { color: #2ecc71; }
+        .card-gold i { color: var(--gold); }
+        .card-white i { color: #eee; }
 
-        /* Siste Kamp - Mørkt panel */
-        .match-panel {
+        /* BUNN SEKSJON: Lær-panel med bue oppover */
+        .match-section {
             background: #121212;
-            margin: 0 15px;
-            border-radius: 25px;
-            padding: 20px;
-            border: 1px solid #222;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .match-title { 
-            font-size: 0.85em; font-weight: 800; color: #fff; 
-            margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;
+            margin-top: -40px; /* Overlapper filten */
+            padding: 50px 25px 30px;
+            border-radius: 40px 40px 0 0; /* Buen oppover */
+            z-index: 2;
+            position: relative;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.8);
+            flex-grow: 1;
         }
 
-        .score-row { display: flex; justify-content: space-around; align-items: center; position: relative; }
-        .p-block { text-align: center; flex: 1; }
-        .p-avatar { 
-            width: 60px; height: 60px; border-radius: 50%; 
-            border: 2px solid #333; margin: 0 auto 8px;
-            background: #222;
-        }
-        .p-avatar.winner-border { border-color: var(--gold); }
-        .p-name { font-size: 0.9em; font-weight: bold; margin-bottom: 4px; }
+        .section-header { font-size: 0.9em; font-weight: 800; color: #fff; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; }
         
-        .score-main { font-size: 2.2em; font-weight: 900; color: #2ecc71; }
-        .score-lose { font-size: 2.2em; font-weight: 900; color: var(--gold); }
-        .vs-text { font-size: 0.8em; color: #444; font-weight: 900; position: absolute; left: 50%; transform: translateX(-50%); top: 45px;}
+        .match-card { display: flex; justify-content: space-between; align-items: center; position: relative; }
+        .p-info { text-align: center; flex: 1; }
+        .p-img { width: 65px; height: 65px; border-radius: 50%; border: 2px solid #333; margin-bottom: 10px; background: #222; }
+        .winner .p-img { border-color: var(--gold); box-shadow: 0 0 15px rgba(241, 196, 15, 0.2); }
+        .score-num { font-size: 2.2em; font-weight: 900; color: var(--gold); }
+        .win-score { color: #2ecc71; }
+        .vs-divider { color: #333; font-weight: 900; font-size: 1.2em; padding-top: 20px; }
 
-        /* Stats rad under score */
-        .stats-row { 
+        /* Stats raden nederst i kortet */
+        .match-stats { 
             display: grid; grid-template-columns: repeat(5, 1fr); 
-            margin-top: 20px; border-top: 1px solid #222; padding-top: 15px;
-            text-align: center;
+            background: rgba(0,0,0,0.3);
+            margin-top: 25px; padding: 15px 5px; border-radius: 15px;
+            text-align: center; border: 1px solid #222;
         }
-        .s-item { display: flex; flex-direction: column; gap: 4px; }
-        .s-label { font-size: 0.6em; color: #666; font-weight: bold; }
-        .s-val { font-size: 0.85em; font-weight: bold; color: #fff; }
+        .stat-col { display: flex; flex-direction: column; gap: 4px; }
+        .stat-col label { font-size: 0.55em; color: #666; font-weight: 900; text-transform: uppercase; }
+        .stat-col span { font-size: 0.85em; font-weight: bold; color: #eee; }
 
-        /* Bunn Meny */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: flex; justify-content: space-around; padding: 10px 0 35px 0; border-top: 1px solid #111; max-width: 430px; margin: 0 auto; }
-        .nav-item { color: #555; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.65em; font-weight: bold; }
+        /* Navigasjon */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: flex; justify-content: space-around; padding: 10px 0 35px 0; border-top: 1px solid #111; z-index: 1000; }
+        .nav-item { color: #444; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.6em; font-weight: bold; }
         .nav-item.active { color: var(--gold); }
-        .nav-item i { font-size: 2em; margin-bottom: 4px; }
+        .nav-item i { font-size: 2.2em; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     
-    <div class="header-leather">
+    <div class="header-section">
         <div class="header-top">
             <div class="user-greeting">
                 <h1 id="greetName">Hei, Marius!</h1>
                 <div class="user-rank">Cowboy Rank: <span style="color:white">Level 12 - Gunslinger</span></div>
             </div>
-            <div class="profile-circle">
-                <img src="https://via.placeholder.com/50" alt="P" style="width:100%;">
-            </div>
+            <div class="profile-pic"></div>
         </div>
-        <div class="xp-bar-bg"><div class="xp-bar-fill"></div></div>
+        <div class="xp-container"><div class="xp-fill"></div></div>
     </div>
 
-    <div class="felt-section">
+    <div class="felt-area">
         <div class="action-grid">
-            <a href="index.html?setup=true" class="action-card c-green">
-                <i class="material-icons">add</i>
+            <a href="index.html?setup=true" class="action-card card-green">
+                <i class="material-icons">add_circle_outline</i>
                 <span>NY KAMP</span>
             </a>
-            <a href="CBstats.html" class="action-card c-gold active-border">
+            <a href="CBstats.html" class="action-card card-gold">
                 <i class="material-icons">emoji_events</i>
                 <span>TOPPLISTE</span>
             </a>
-            <div class="action-card c-brown">
-                <i class="material-icons">import_contacts</i>
+            <div class="action-card card-white">
+                <i class="material-icons">menu_book</i>
                 <span>REGLER</span>
             </div>
         </div>
     </div>
 
-    <div class="match-panel">
-        <div class="match-title">
-            <span>Min Siste Kamp</span>
-            <i class="material-icons" style="color:var(--pool-green)">gps_fixed</i>
+    <div class="match-section">
+        <div class="section-header">
+            <i class="material-icons" style="color:#2ecc71">history</i> MIN SISTE KAMP
         </div>
         
-        <div class="score-row">
-            <div class="p-block">
-                <div class="p-avatar winner-border"></div>
-                <div class="p-name" id="p1Name">Mav</div>
-                <div class="score-main" id="p1Score">100</div>
+        <div class="match-card">
+            <div class="p-info winner">
+                <div class="p-img"></div>
+                <div style="font-size:0.8em; font-weight:bold" id="p1Name">Mav</div>
+                <div class="score-num win-score" id="p1Score">100</div>
                 <div style="font-size:0.6em; color:#2ecc71; font-weight:900;">WIN</div>
             </div>
             
-            <div class="vs-text">VS</div>
+            <div class="vs-divider">VS</div>
 
-            <div class="p-block">
-                <div class="p-avatar"></div>
-                <div class="p-name" id="p2Name">Per</div>
-                <div class="score-lose" id="p2Score">82</div>
-                <div style="height:10px"></div>
+            <div class="p-info">
+                <div class="p-img"></div>
+                <div style="font-size:0.8em; font-weight:bold" id="p2Name">Per</div>
+                <div class="score-num" id="p2Score">82</div>
+                <div style="height:12px"></div>
             </div>
         </div>
 
-        <div class="stats-row">
-            <div class="s-item"><span class="s-label">Score</span><span class="s-val">82</span></div>
-            <div class="s-item"><span class="s-label">Turn</span><span class="s-val">8</span></div>
-            <div class="s-item"><span class="s-label">Serie</span><span class="s-val">16</span></div>
-            <div class="s-item"><span class="s-label">Foul</span><span class="s-val">2</span></div>
-            <div class="s-item"><span class="s-label">Kats.</span><span class="s-val">27</span></div>
+        <div class="match-stats">
+            <div class="stat-col"><label>Score</label><span>82</span></div>
+            <div class="stat-col"><label>Turn</label><span>8</span></div>
+            <div class="stat-col"><label>Serie</label><span>16</span></div>
+            <div class="stat-col"><label>Foul</label><span>2</span></div>
+            <div class="stat-col"><label>Kats.</label><span>27</span></div>
         </div>
     </div>
 
     <nav class="bottom-nav">
-        <a href="home.html" class="nav-item active">
-            <i class="material-icons">home</i>
-            <span>Hjem</span>
-        </a>
-        <a href="CBstats.html" class="nav-item">
-            <i class="material-icons">emoji_events</i>
-            <span>Toppliste</span>
-        </a>
-        <a href="#" class="nav-item">
-            <i class="material-icons">import_contacts</i>
-            <span>Regler</span>
-        </a>
+        <a href="home.html" class="nav-item active"><i class="material-icons">home</i><span>Hjem</span></a>
+        <a href="CBstats.html" class="nav-item"><i class="material-icons">emoji_events</i><span>Toppliste</span></a>
+        <a href="#" class="nav-item"><i class="material-icons">menu_book</i><span>Regler</span></a>
     </nav>
 </div>
 
