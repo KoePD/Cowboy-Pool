@@ -14,8 +14,8 @@
             --gold: #f1c40f;
             --leather: #121212;
             --card-bg: rgba(0, 0, 0, 0.75);
-            --header-p: 80px 30px 140px;
-            --bottom-p: 130px 30px 40px;
+            --header-p: 60px 30px 100px;
+            --bottom-p: 100px 30px 40px;
         }
 
         html, body {
@@ -31,82 +31,83 @@
 
         /* SLIM MODE FOR RANGE */
         .app-container.slim-mode {
-            --header-p: 20px 30px 40px; 
-            --bottom-p: 40px 30px 10px; 
+            --header-p: 20px 30px 30px; 
+            --bottom-p: 30px 30px 10px; 
         }
 
         .felt-base { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--felt-green); z-index: 1; }
         .felt-texture { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: url("https://www.transparenttextures.com/patterns/felt.png"); opacity: 0.12; z-index: 2; pointer-events: none; }
 
         /* LÆR PANELER */
-        .header { background: var(--leather); background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png"); padding: var(--header-p); z-index: 10; border-bottom-left-radius: 50% 50px; border-bottom-right-radius: 50% 50px; box-shadow: 0 25px 45px rgba(0,0,0,0.9); position: relative; transition: inherit; }
-        .bottom-panel { background: var(--leather); background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png"); padding: var(--bottom-p); z-index: 10; border-top-left-radius: 50% 50px; border-top-right-radius: 50% 50px; box-shadow: 0 -25px 45px rgba(0,0,0,0.9); position: relative; transition: inherit; }
+        .header { background: var(--leather); background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png"); padding: var(--header-p); z-index: 10; border-bottom-left-radius: 50% 40px; border-bottom-right-radius: 50% 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.9); position: relative; transition: inherit; text-align: center;}
+        .bottom-panel { background: var(--leather); background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png"); padding: var(--bottom-p); z-index: 10; border-top-left-radius: 50% 40px; border-top-right-radius: 50% 40px; box-shadow: 0 -20px 40px rgba(0,0,0,0.9); position: relative; transition: inherit; }
 
         .hide-on-slim { transition: opacity 0.3s ease; }
         .slim-mode .hide-on-slim { opacity: 0; display: none; }
 
         /* MIDTPARTIET */
-        .main-content { position: relative; z-index: 5; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; padding: 10px; }
+        .main-content { position: relative; z-index: 5; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; padding: 10px; scrollbar-width: none; }
+        .main-content::-webkit-scrollbar { display: none; }
         
-        /* HJEM-KNAPPER (ULTRA MASSIVE) */
-        .home-cards { display: flex; justify-content: space-evenly; align-items: center; height: 100%; width: 100%; }
+        /* HJEM-KNAPPER */
+        .home-cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 20px 10px; align-items: center; margin: auto 0; }
         .action-card { 
-            width: 250px; height: 280px; 
-            background: var(--card-bg); border: 3px solid var(--gold); border-radius: 35px; 
+            background: var(--card-bg); border: 2px solid var(--gold); border-radius: 20px; 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            box-shadow: inset 0 0 50px rgba(0,0,0,0.9), 0 25px 50px rgba(0,0,0,0.8);
+            padding: 25px 10px;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.9), 0 15px 30px rgba(0,0,0,0.8);
             cursor: pointer;
         }
-        .action-card i { font-size: 90px; margin-bottom: 25px; color: var(--gold); }
-        .action-card span { font-size: 22px; font-weight: 950; color: #fff; letter-spacing: 2px; text-transform: uppercase; }
+        .action-card i { font-size: 40px; margin-bottom: 15px; color: var(--gold); }
+        .action-card span { font-size: 10px; font-weight: 900; color: #fff; letter-spacing: 1px; text-transform: uppercase; }
 
-        /* RANGE CONTENT (DIN ORIGINALKODE) */
-        .range-content { display: none; width: 100%; max-width: 430px; margin: 0 auto; padding-bottom: 100px; }
+        /* RANGE CONTENT */
+        .range-content { display: none; width: 100%; max-width: 430px; margin: 0 auto; }
         .slim-mode .home-cards { display: none; }
         .slim-mode .range-content { display: block; }
 
-        .player-card { background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%); border-radius: 24px; padding: 20px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
-        .player-card.active { border: 2px solid var(--gold); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9); transform: scale(1.03); }
-        .score-display { font-size: 3.5em; font-weight: 900; line-height: 1; color: #333; }
+        .player-card { background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%); border-radius: 20px; padding: 15px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
+        .player-card.active { border: 2px solid var(--gold); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.9); transform: scale(1.02); }
+        .score-display { font-size: 3em; font-weight: 900; line-height: 1; color: #333; }
         .active .score-display { color: var(--gold); }
-        .player-info h2 { margin: 0; font-size: 1.2em; text-transform: uppercase; color: #666; }
+        .player-info h2 { margin: 0; font-size: 1.1em; text-transform: uppercase; color: #666; }
         .active .player-info h2 { color: var(--gold); }
         
-        .sub-stats { font-size: 0.55em; color: #444; margin-top: 12px; display: flex; gap: 10px; }
+        .sub-stats { font-size: 0.55em; color: #444; margin-top: 8px; display: flex; gap: 10px; }
         .active .sub-stats { color: #888; }
-        .stat-val { color: #eee; font-weight: 900; font-size: 1.1em; }
-        .foul-dot { width: 12px; height: 12px; border-radius: 50%; background: #1a1a1a; border: 1px solid #222; display: inline-block; }
-        .foul-dot.active { background: #e74c3c; box-shadow: 0 0 10px #ff4757; }
+        .stat-val { color: #eee; font-weight: 900; }
+        .foul-dot { width: 10px; height: 10px; border-radius: 50%; background: #1a1a1a; border: 1px solid #222; display: inline-block; }
+        .foul-dot.active { background: #e74c3c; box-shadow: 0 0 8px #ff4757; }
 
-        .ball-control-zone { display: flex; justify-content: space-around; background: rgba(0,0,0,0.5); padding: 20px 10px; border-radius: 35px; margin: 15px 0; border: 1px solid rgba(255,255,255,0.05); }
-        .ball { width: 75px; height: 75px; border-radius: 50%; border: none; cursor: pointer; box-shadow: inset -6px -6px 15px rgba(0,0,0,0.7), 6px 12px 20px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; }
+        .ball-control-zone { display: flex; justify-content: space-around; background: rgba(0,0,0,0.5); padding: 15px 5px; border-radius: 30px; margin: 10px 0; border: 1px solid rgba(255,255,255,0.05); }
+        .ball { width: 65px; height: 65px; border-radius: 50%; border: none; cursor: pointer; box-shadow: inset -5px -5px 12px rgba(0,0,0,0.7), 5px 10px 15px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; }
         #ball1 { background: radial-gradient(circle at 35% 35%, #f1c40f, #b38f00); }
         #ball5 { background: radial-gradient(circle at 35% 35%, #8e44ad, #4b0082); }
         #ball3 { background: radial-gradient(circle at 35% 35%, #e74c3c, #962d22); }
-        .ball-inner { width: 28px; height: 28px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #000; }
+        .ball-inner { width: 24px; height: 24px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #000; font-size: 12px;}
         
-        .btn-sub-carom { background: rgba(52, 152, 219, 0.12); color: #3498db; border: 1px solid #3498db; border-radius: 8px; padding: 6px 12px; font-size: 0.6em; font-weight: 800; margin-top: 5px; }
+        .btn-sub-carom { background: rgba(52, 152, 219, 0.12); color: #3498db; border: 1px solid #3498db; border-radius: 6px; padding: 4px 8px; font-size: 0.55em; font-weight: 800; margin-top: 5px; cursor: pointer;}
         
-        .action-area { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn { padding: 16px; border-radius: 16px; border: none; font-weight: 800; text-transform: uppercase; cursor: pointer; font-size: 0.75em; color: white; }
-        .btn-blue { background: #2980b9; border-bottom: 4px solid #1c5982; }
-        .btn-foul { background: #c0392b; border-bottom: 4px solid #7b241c; }
-        .btn-turn { background: #27ae60; border-bottom: 4px solid #1e8449; grid-column: span 2; padding: 20px; font-size: 1.1em; }
-        .btn-win { background: linear-gradient(45deg, #f1c40f, #d4ac0d); color: black; grid-column: span 2; padding: 20px; font-weight: 900; border-radius: 16px; border: none; margin-bottom: 10px; display: none; }
-        .waiting-ball { opacity: 0.15; filter: grayscale(1); pointer-events: none; }
-
-        /* SETUP OVERLAY */
-        .setup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(10px); }
-        .setup-card { background: #000; border: 1px solid var(--gold); padding: 30px; border-radius: 30px; width: 100%; max-width: 350px; text-align: center; }
-        .btn-choice { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid #333; background: #111; color: white; font-weight: bold; }
-        .btn-choice.selected { background: var(--gold); color: black; }
-        .name-field { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #111; color: white; margin-bottom: 10px; text-align: center; }
+        .action-area { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .btn { padding: 14px; border-radius: 12px; border: none; font-weight: 800; text-transform: uppercase; cursor: pointer; font-size: 0.7em; color: white; }
+        .btn-blue { background: #2980b9; border-bottom: 3px solid #1c5982; }
+        .btn-foul { background: #c0392b; border-bottom: 3px solid #7b241c; }
+        .btn-turn { background: #27ae60; border-bottom: 4px solid #1e8449; grid-column: span 2; padding: 18px; font-size: 1em; }
+        .btn-win { background: linear-gradient(45deg, #f1c40f, #d4ac0d); color: black; grid-column: span 2; padding: 18px; font-weight: 900; border-radius: 12px; border: none; margin-bottom: 8px; display: none; }
 
         /* NAVBAR */
-        .navbar { background: #080808; height: 95px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; z-index: 20; padding-bottom: 20px; }
-        .nav-item { color: #444; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.6em; font-weight: 800; }
+        .navbar { background: #080808; height: 85px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; z-index: 20; padding-bottom: 15px; }
+        .nav-item { color: #444; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.6em; font-weight: 800; cursor: pointer;}
         .nav-item.active { color: var(--gold); }
-        .nav-item i { font-size: 2.2em; margin-bottom: 4px; }
+        .nav-item i { font-size: 2em; margin-bottom: 4px; }
+        .lasso i { transform: rotate(-15deg); }
+
+        /* SETUP */
+        .setup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(10px); }
+        .setup-card { background: #000; border: 1px solid var(--gold); padding: 30px; border-radius: 30px; width: 100%; max-width: 350px; text-align: center; }
+        .btn-choice { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid #333; background: #111; color: white; font-weight: bold; cursor: pointer;}
+        .btn-choice.selected { background: var(--gold); color: black; }
+        .name-field { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #111; color: white; margin-bottom: 10px; text-align: center; box-sizing: border-box;}
     </style>
 </head>
 <body>
@@ -117,16 +118,16 @@
 
     <header class="header">
         <div class="hide-on-slim">
-            <h1 style="color:#fff; margin:0; font-size:36px; font-weight:800;">Hei, Marius!</h1>
-            <div style="color:var(--gold); font-size:18px; margin:8px 0;">Cowboy Rank: Level 12</div>
-            <div style="width:100%; height:12px; background:#222; border-radius:6px; margin-top:30px;">
-                <div style="width:65%; height:100%; background:var(--gold); border-radius:6px;"></div>
+            <h1 id="greetName" style="color:#fff; margin:0; font-size:32px; font-weight:800;">Hei, Marius!</h1>
+            <div style="color:var(--gold); font-size:16px; margin:5px 0;">Cowboy Rank: Level 12</div>
+            <div style="width:100%; height:10px; background:#222; border-radius:5px; margin-top:20px;">
+                <div style="width:65%; height:100%; background:var(--gold); border-radius:5px;"></div>
             </div>
         </div>
-        <div id="gameStatus" style="display:none; text-align:center;">
-             <div id="modeLabel" style="font-size:0.6em; color:var(--gold); opacity:0.6; text-transform:uppercase;">MODUS: STANDARD</div>
+        <div id="gameStatus" style="display:none;">
+             <div id="modeLabel" style="font-size:0.6em; color:var(--gold); opacity:0.6; text-transform:uppercase; margin-bottom:2px;">MODUS: STANDARD</div>
              <span id="moveText" style="color:#2ecc71; font-weight:800; font-size:0.9em; letter-spacing:2px;">BREKK-STØT</span>
-             <div id="matchTimer" style="color:#f1c40f; font-family:monospace; font-size:1.3em; margin: 3px 0;">00:00:00</div>
+             <div id="matchTimer" style="color:#f1c40f; font-family:monospace; font-size:1.3em;">00:00:00</div>
              <div id="inningDisplay" style="font-size:0.7em; color:#888; font-weight:bold; text-transform:uppercase;">INNING: 1</div>
         </div>
     </header>
@@ -134,7 +135,7 @@
     <main class="main-content">
         <div class="home-cards">
             <div class="action-card" onclick="checkActiveGame()"><i class="fa-solid fa-circle-plus" style="color:#2ecc71;"></i><span>NY KAMP</span></div>
-            <div class="action-card"><i class="fa-solid fa-trophy"></i><span>TOPPLISTE</span></div>
+            <div class="action-card" onclick="navTo('stats', document.querySelectorAll('.nav-item')[3])"><i class="fa-solid fa-trophy"></i><span>TOPPLISTE</span></div>
             <div class="action-card"><i class="fa-solid fa-book-open"></i><span>REGLER</span></div>
         </div>
 
@@ -160,22 +161,27 @@
                 <button id="winButton" class="btn-win" onclick="action('winning_shot', 1)">WINNING SHOT (CUE VIA 1)</button>
                 <button class="btn btn-blue" id="carom1PBtn" onclick="action('carom', 1)">Carom 1P</button>
                 <button class="btn btn-blue" id="carom2PBtn" onclick="action('carom', 2)">Carom 2P</button>
-                <button class="btn btn-blue" id="undoActionBtn" onclick="undo()">ANGRE</button>
-                <button class="btn btn-foul" id="foulActionBtn" onclick="handleFoul()">FOUL</button>
-                <button class="btn btn-turn" id="endTurnBtn" onclick="nextTurn()">AVSLUTT TUR</button>
-                <button class="btn btn-blue" style="grid-column: span 2; margin-top: 10px; background: rgba(241,196,15,0.1); border: 1px solid var(--gold);" onclick="rotateBreaker()" id="rotBtn">BYTT STARTSPILLER</button>
+                <button class="btn btn-blue" onclick="undo()">ANGRE</button>
+                <button class="btn btn-foul" onclick="handleFoul()">FEIL</button>
+                <button class="btn btn-turn" onclick="nextTurn()">AVSLUTT TUR</button>
+                <button class="btn btn-blue" style="grid-column: span 2; margin-top: 5px; background: rgba(241,196,15,0.05); border: 1px solid var(--gold); color: var(--gold);" onclick="rotateBreaker()" id="rotBtn">BYTT STARTSPILLER</button>
             </div>
+        </div>
+        
+        <div id="stats-content" style="display:none; padding:20px;">
+            <h2 style="text-align:center; color:var(--gold);">HISTORIKK</h2>
+            <div id="history-list"></div>
         </div>
     </main>
 
     <section class="bottom-panel">
         <div class="hide-on-slim">
-            <div style="background:rgba(255,255,255,0.04); border:1px solid #333; border-radius:24px; padding:30px;">
-                <div style="color:#666; font-size:16px; margin-bottom:15px; font-weight:800; text-transform:uppercase;">Siste Kamp</div>
+            <div style="background:rgba(255,255,255,0.04); border:1px solid #333; border-radius:24px; padding:20px;">
+                <div style="color:#666; font-size:12px; margin-bottom:10px; font-weight:800; text-transform:uppercase;">Siste Kamp</div>
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div style="width:60px; height:60px; border-radius:50%; background:#1a1a1a; border:3px solid var(--gold);"></div>
-                    <div style="font-size:36px; font-weight:950; color:#fff;">100 - 82</div>
-                    <div style="width:60px; height:60px; border-radius:50%; background:#1a1a1a; border:3px solid #333;"></div>
+                    <div id="lastP1" style="text-align:center; font-size:12px; font-weight:bold;">Mav</div>
+                    <div id="lastScore" style="font-size:28px; font-weight:950; color:#fff;">0 - 0</div>
+                    <div id="lastP2" style="text-align:center; font-size:12px; font-weight:bold;">Per</div>
                 </div>
             </div>
         </div>
@@ -183,9 +189,9 @@
 
     <nav class="navbar">
         <a href="javascript:void(0)" class="nav-item active" onclick="navTo('home', this)"><i class="material-icons">home</i>HJEM</a>
-        <a href="javascript:void(0)" class="nav-item" onclick="navTo('range', this)"><i class="material-icons">all_inclusive</i>RANGE</a>
+        <a href="javascript:void(0)" class="nav-item lasso" onclick="navTo('range', this)"><i class="material-icons">all_inclusive</i>RANGE</a>
         <a href="javascript:void(0)" class="nav-item"><i class="material-icons">person</i>PROFIL</a>
-        <a href="javascript:void(0)" class="nav-item"><i class="material-icons">leaderboard</i>STATS</a>
+        <a href="javascript:void(0)" class="nav-item" onclick="navTo('stats', this)"><i class="material-icons">leaderboard</i>STATS</a>
     </nav>
 </div>
 
@@ -193,7 +199,7 @@
     <div class="setup-card">
         <h2 id="overlayHeader" style="color:var(--gold); margin-bottom: 20px;">NY MATCH</h2>
         <div id="step-confirm" style="display: none;">
-            <p id="confirmText" style="color:#888; margin-bottom: 20px;">Kamp pågår. Hva vil du gjøre?</p>
+            <p style="color:#888; margin-bottom: 20px;">Kamp pågår. Hva vil du gjøre?</p>
             <button class="btn btn-blue" style="width:100%; margin-bottom:10px;" onclick="handleFinishAndSave()">LAGRE & NY</button>
             <button class="btn btn-foul" style="width:100%;" onclick="handleDiscard()">SLETT & NY</button>
             <button style="background:none; border:none; color:#888; margin-top:20px; text-decoration:underline;" onclick="closeSetup()">Fortsett kampen</button>
@@ -204,7 +210,7 @@
                 <button class="btn-choice" id="modeStd" onclick="setMode('standard')">Standard</button>
                 <button class="btn-choice" id="modeAlt" onclick="setMode('alternate')">Alternate</button>
             </div>
-            <p id="playersText" style="color:#888;">Antall spillere?</p>
+            <p style="color:#888;">Antall spillere?</p>
             <div style="display:flex; gap:10px; margin-bottom:20px;">
                 <button class="btn-choice" onclick="selectPlayers(1)">1</button>
                 <button class="btn-choice" onclick="selectPlayers(2)">2</button>
@@ -215,7 +221,7 @@
         <div id="step2" style="display: none;">
             <p style="color:#888; margin-bottom: 15px;">Navn:</p>
             <div id="nameInputs"></div>
-            <button class="btn btn-turn" onclick="finalizeSetup()">START KAMP</button>
+            <button class="btn btn-turn" style="width:100%;" onclick="finalizeSetup()">START KAMP</button>
             <button style="background:none; border:none; color:#888; margin-top:15px; text-decoration:underline;" onclick="goToStep1()">Tilbake</button>
         </div>
     </div>
@@ -233,21 +239,57 @@
     let setupCount = 2;
 
     const dictionary = {
-        no: { now: "NÅ", best: "PERS", last: "SISTE", break: "BREKK-STØT", req_carom: "KRAV: CAROM", req_pocket: "KRAV: POCKET", any: "VELG: CAROM / POCKET", caroms_only: "KUN CAROMS", win: "VINNER STØTE", inn: "INNING", undo: "ANGRE", foul: "FEIL", turn: "AVSLUTT TUR", rotate: "BYTT STARTSPILLER" }
+        no: { now: "NÅ", best: "PERS", break: "BREKK-STØT", win: "VINNER-STØT", inn: "INNING", any: "VELG: CAROM / POCKET" }
     };
 
     // --- NAVIGASJON ---
     function navTo(page, el) {
         const app = document.getElementById('app');
         const status = document.getElementById('gameStatus');
+        const home = document.querySelector('.home-cards');
+        const range = document.querySelector('.range-content');
+        const stats = document.getElementById('stats-content');
+        
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         el.classList.add('active');
-        if(page === 'range') { app.classList.add('slim-mode'); status.style.display = 'block'; } 
-        else { app.classList.remove('slim-mode'); status.style.display = 'none'; }
+
+        // Reset visning
+        home.style.display = 'none';
+        range.style.display = 'none';
+        stats.style.display = 'none';
+        status.style.display = 'none';
+        app.classList.remove('slim-mode');
+
+        if(page === 'range') { 
+            app.classList.add('slim-mode'); 
+            range.style.display = 'block'; 
+            status.style.display = 'block'; 
+        } else if(page === 'stats') {
+            stats.style.display = 'block';
+        } else { 
+            home.style.display = 'grid'; 
+        }
     }
 
-    // --- SPILL LOGIKK (DIN KODE) ---
-    db.on('value', (s) => { if(s.val()) { state = s.val(); updateUI(); } });
+    // --- SPILL LOGIKK ---
+    db.on('value', (s) => { 
+        if(s.val()) { 
+            state = s.val(); 
+            updateUI(); 
+            // Oppdater lobby hilsen
+            document.getElementById('greetName').innerText = "Hei, " + state.names[0] + "!";
+        } 
+    });
+
+    // Hent siste kamp til lobby
+    firebase.database().ref('matchHistory').limitToLast(1).on('value', (s) => {
+        if(s.val()) {
+            const last = Object.values(s.val())[0];
+            document.getElementById('lastP1').innerText = last.names[0];
+            document.getElementById('lastP2').innerText = last.names[1] || "Per";
+            document.getElementById('lastScore').innerText = `${last.scores[0]} - ${last.scores[1] || 0}`;
+        }
+    });
 
     function action(type, val) {
         saveHistory(); let p = state.currentPlayer; let cur = state.scores[p];
@@ -269,8 +311,11 @@
     }
 
     function updateUI() {
-        const l = dictionary[state.lang || 'no'];
-        const cont = document.getElementById('scoreboard-container'); cont.innerHTML = '';
+        const l = dictionary['no'];
+        const cont = document.getElementById('scoreboard-container'); 
+        if(!cont) return;
+        cont.innerHTML = '';
+        
         for(let i=0; i<state.playerCount; i++) {
             const active = state.currentPlayer === i;
             cont.innerHTML += `<div class="player-card ${active?'active':''}">
@@ -292,7 +337,6 @@
         
         const cur = state.scores[state.currentPlayer];
         const winPhase = cur === 100;
-        const caromPhase = cur >= 90;
         document.getElementById('winButton').style.display = winPhase ? 'block' : 'none';
         document.getElementById('rotBtn').style.display = state.breakDone ? 'none' : 'block';
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
@@ -302,7 +346,7 @@
 
     // --- SETUP SYSTEM ---
     function checkActiveGame() { document.getElementById('setupOverlay').style.display = 'flex'; if (state.scores.some(s => s > 0)) { document.getElementById('step-confirm').style.display = 'block'; } else { goToStep1(); } }
-    function goToStep1() { document.getElementById('step-confirm').style.display = 'none'; document.getElementById('step1').style.display = 'block'; document.getElementById('step2').style.display = 'none'; }
+    function goToStep1() { document.getElementById('step-confirm').style.display = 'none'; document.getElementById('step1').style.display = 'block'; document.getElementById('step2').style.display = 'none'; setMode('standard');}
     function setMode(m) { tempMode = m; document.getElementById('modeStd').classList.toggle('selected', m==='standard'); document.getElementById('modeAlt').classList.toggle('selected', m==='alternate'); }
     function selectPlayers(n) { setupCount = n; document.getElementById('step1').style.display = 'none'; document.getElementById('step2').style.display = 'block'; const c = document.getElementById('nameInputs'); c.innerHTML = ''; for(let i=0; i<n; i++) c.innerHTML += `<input type="text" id="n${i}" class="name-field" placeholder="Navn ${i+1}">`; }
     function finalizeSetup() { const ns = []; for(let i=0; i<setupCount; i++) ns.push(document.getElementById(`n${i}`).value || `P${i+1}`); db.set({...state, gameMode: tempMode, playerCount: setupCount, names: ns, scores: [0,0,0], foulCounts:[0,0,0], scoreAtStart:[0,0,0], breakDone:false, seconds:0, currentPlayer:0, tableStatus:'open', innings:1}); closeSetup(); navTo('range', document.querySelectorAll('.nav-item')[1]); }
@@ -312,8 +356,11 @@
     function saveHistory() { history.push(JSON.stringify(state)); if(history.length > 10) history.shift(); }
     function closeSetup() { document.getElementById('setupOverlay').style.display = 'none'; }
     function rotateBreaker() { if(!state.breakDone) { state.currentPlayer = (state.currentPlayer+1)%state.playerCount; db.set(state); } }
-    function handleDiscard() { db.set({...state, scores:[0,0,0], seconds:0, innings:1}).then(goToStep1); }
-    function handleFinishAndSave() { handleDiscard(); }
+    function handleDiscard() { db.set({...state, scores:[0,0,0], seconds:0, innings:1, breakDone:false}).then(goToStep1); }
+    function handleFinishAndSave() { 
+        firebase.database().ref('matchHistory').push({ date: new Date().toISOString(), names: state.names.slice(0, state.playerCount), scores: state.scores.slice(0, state.playerCount), innings: state.innings });
+        handleDiscard(); 
+    }
 
     setInterval(() => { if(state.breakDone) { state.seconds++; db.child('seconds').set(state.seconds); } }, 1000);
 </script>
