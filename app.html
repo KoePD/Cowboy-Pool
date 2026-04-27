@@ -20,7 +20,10 @@
 
         .app-container {
             width: 100%; max-width: 430px;
-            padding: 20px; padding-bottom: 240px; /* Mer plass nederst for den nye knappen */
+            padding: 20px;
+            padding-bottom: 120px; /* Plass til navigasjonslinjen nederst */
+            display: flex;
+            flex-direction: column;
         }
 
         /* 2. MODUS VELGER */
@@ -48,30 +51,26 @@
             transition: 0.3s;
         }
         .player-card.active { border: 2px solid #f1c40f; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9); transform: scale(1.03); }
-        
         .player-info { flex: 1; overflow: hidden; padding-right: 10px; }
-
-        .player-name-input {
-            background: transparent; border: none; color: #666;
-            font-size: 1.1em; font-weight: bold; text-transform: uppercase;
-            letter-spacing: 0.5px; width: 100%; padding: 0; outline: none;
-        }
+        .player-name-input { background: transparent; border: none; color: #666; font-size: 1.1em; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; width: 100%; padding: 0; outline: none; }
         .active .player-name-input { color: #f1c40f; }
-        
         .score-display { font-size: 3.5em; font-weight: 900; line-height: 1; margin: 0; color: #333; min-width: 60px; text-align: right; }
         .active .score-display { color: #f1c40f; }
-
         .sub-stats { font-size: 0.6em; color: #444; margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; text-transform: uppercase; }
         .active .sub-stats { color: #888; }
         .stat-val { color: #eee; font-weight: 900; font-size: 1.1em; }
         .active .stat-val { color: #f1c40f; }
-
         .foul-container { display: flex; gap: 6px; margin-top: 12px; }
         .foul-dot { width: 12px; height: 12px; border-radius: 50%; background: #1a1a1a; border: 1px solid #222; }
         .foul-dot.active { background: #e74c3c; box-shadow: 0 0 10px #ff4757; }
 
-        /* 5. BALL KONTROLL */
-        .ball-control-zone { display: flex; justify-content: space-around; margin: 20px 0; background: rgba(0,0,0,0.5); padding: 22px 10px; border-radius: 35px; border: 1px solid rgba(255,255,255,0.03); }
+        /* 5. BALL KONTROLL (Justert avstand) */
+        .ball-control-zone { 
+            display: flex; justify-content: space-around; 
+            margin: 15px 0; /* Redusert margin */
+            background: rgba(0,0,0,0.5); padding: 22px 10px; border-radius: 35px; 
+            border: 1px solid rgba(255,255,255,0.03); 
+        }
         .ball-group { display: flex; flex-direction: column; align-items: center; gap: 12px; }
         .ball { width: 80px; height: 80px; border-radius: 50%; border: none; cursor: pointer; box-shadow: inset -6px -6px 15px rgba(0,0,0,0.7), 6px 12px 20px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; transition: 0.1s; }
         #ball1 { background: radial-gradient(circle at 35% 35%, #f1c40f, #b38f00); }
@@ -80,18 +79,20 @@
         .ball-inner { width: 30px; height: 30px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #000; }
         .btn-sub-carom { background: rgba(52, 152, 219, 0.12); color: #3498db; border: 1px solid #3498db; border-radius: 8px; padding: 6px 12px; font-size: 0.6em; font-weight: 800; cursor: pointer; }
 
-        /* 6. HANDLINGER BUNN */
-        .action-area { position: fixed; bottom: 85px; left: 0; right: 0; padding: 0 20px; max-width: 430px; margin: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; z-index: 900; }
+        /* 6. HANDLINGER (Fjernet 'fixed' for å tette gapet) */
+        .action-area { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px; 
+            margin-top: 10px; /* Ligger nå rett under ballene */
+        }
         .btn { padding: 16px; border-radius: 16px; border: none; font-weight: 800; text-transform: uppercase; cursor: pointer; font-size: 0.75em; }
         .btn-blue { background: #2980b9; color: white; border-bottom: 4px solid #1c5982; }
         .btn-foul { background: #c0392b; color: white; border-bottom: 4px solid #7b241c; }
         .btn-turn { background: #27ae60; color: white; border-bottom: 4px solid #1e8449; grid-column: span 2; padding: 20px; font-size: 1.1em; }
-        
-        /* Den nye svarte knappen */
         .btn-finish { background: #000; color: white; border: 1px solid #333; grid-column: span 2; margin-top: 5px; padding: 12px; font-size: 0.7em; letter-spacing: 1px; opacity: 0.8; }
-        .btn-finish:active { background: #111; transform: scale(0.98); }
 
-        /* 7. NAVIGASJON */
+        /* 7. NAVIGASJON (Fortsatt låst til bunn) */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: flex; justify-content: space-around; padding: 10px 0 35px 0; border-top: 1px solid #111; z-index: 1000; }
         .nav-item { color: #333; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.6em; font-weight: bold; }
         .nav-item.active { color: #f1c40f; }
@@ -145,11 +146,12 @@
     <nav class="bottom-nav">
         <a href="#" class="nav-item active"><i class="material-icons">home</i>HJEM</a>
         <a href="stats.html" class="nav-item"><i class="material-icons">leaderboard</i>STATS</a>
-        <a href="#" class="nav-item" onclick="resetGame()"><i class="material-icons">refresh</i>RESET</a>
+        <a href="#" class="nav-item" onclick="resetGamePrompt()"><i class="material-icons">refresh</i>RESET</a>
     </nav>
 </div>
 
 <script>
+    // Samme JS som sist
     const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('gameData');
@@ -222,39 +224,16 @@
     }
 
     function saveName(i, val) { state.names[i] = val; db.child('names').set(state.names); }
-    function setPlayerCount(n) { if(confirm(`Bytte til ${n} spillere? Kampen resettes.`)) { state.playerCount = n; state.scores = [0,0,0]; state.foulCounts = [0,0,0]; state.scoreAtStart = [0,0,0]; state.bestSeries = [0,0,0]; state.lastSeries = [0,0,0]; state.breakDone = false; state.seconds = 0; state.innings = 0; state.currentPlayer = 0; db.set(state); } }
+    function setPlayerCount(n) { if(confirm(`Bytte til ${n} spillere? Kampen resettes.`)) { state.playerCount = n; resetGame(); } }
     function rotateBreaker() { if(!state.breakDone) { state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; db.set(state); } }
     function action(type, val) { saveHistory(); let p = state.currentPlayer; if (state.scores[p] < 90 && state.scores[p] + val > 90) return; if (state.scores[p] >= 90 && state.scores[p] < 100 && state.scores[p] + val > 100) return; state.breakDone = true; state.foulCounts[p] = 0; if (type === 'pocket_carom') { if (state.tableStatus === 'locked') state.lastType = (state.lastType === 'pocket') ? 'carom' : 'pocket'; } else { state.tableStatus = 'locked'; state.lastType = type; } state.scores[p] += val; db.set(state); }
     function nextTurn() { saveHistory(); const p = state.currentPlayer; const roundScore = state.scores[p] - state.scoreAtStart[p]; if (roundScore > (state.bestSeries[p] || 0)) state.bestSeries[p] = roundScore; if (!state.lastSeries) state.lastSeries = [0,0,0]; state.lastSeries[p] = roundScore; state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; state.tableStatus = 'open'; state.lastType = null; state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; state.innings++; db.set(state); }
     function handleFoul() { saveHistory(); state.foulCounts[state.currentPlayer]++; if (state.foulCounts[state.currentPlayer] >= 3) { state.scores[state.currentPlayer] = 0; state.foulCounts[state.currentPlayer] = 0; } else { state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; } nextTurn(); }
     function saveHistory() { history.push(JSON.stringify(state)); }
     function undo() { if(history.length) { state = JSON.parse(history.pop()); db.set(state); } }
-    
-    function resetGame() { 
-        state.scores = [0,0,0]; state.foulCounts = [0,0,0];
-        state.breakDone = false; state.seconds = 0; state.innings = 0;
-        state.bestSeries = [0,0,0]; state.lastSeries = [0,0,0];
-        db.set(state);
-    }
-
-    function saveMatchToHistory() {
-        if (confirm("Lagre kampen i historikken og avslutt?")) {
-            const historyRef = firebase.database().ref('matchHistory');
-            const kampData = {
-                dato: new Date().toLocaleString('no-NO'),
-                spillere: state.names.slice(0, state.playerCount),
-                resultat: state.scores.slice(0, state.playerCount),
-                varighet: document.getElementById('matchTimer').innerText,
-                innings: Math.floor(state.innings / state.playerCount) + 1
-            };
-            
-            historyRef.push(kampData).then(() => {
-                alert("Kampen er lagret!");
-                resetGame();
-            });
-        }
-    }
-
+    function resetGamePrompt() { if(confirm("Reset nåværende kamp?")) resetGame(); }
+    function resetGame() { state.scores = [0,0,0]; state.foulCounts = [0,0,0]; state.breakDone = false; state.seconds = 0; state.innings = 0; state.bestSeries = [0,0,0]; state.lastSeries = [0,0,0]; state.currentPlayer = 0; db.set(state); }
+    function saveMatchToHistory() { if (confirm("Lagre kampen og avslutt?")) { const historyRef = firebase.database().ref('matchHistory'); const kampData = { dato: new Date().toLocaleString('no-NO'), spillere: state.names.slice(0, state.playerCount), resultat: state.scores.slice(0, state.playerCount), varighet: document.getElementById('matchTimer').innerText, innings: Math.floor(state.innings / state.playerCount) + 1 }; historyRef.push(kampData).then(() => { alert("Kampen er lagret!"); resetGame(); }); } }
     setInterval(() => { if (state.breakDone) { state.seconds++; firebase.database().ref('gameData/seconds').set(state.seconds); } }, 1000);
 </script>
 </body>
