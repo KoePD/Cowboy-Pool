@@ -1,0 +1,66 @@
+<div id="playPage" class="page active">
+    <div class="header-actions">
+        <button class="btn-new-game-top" id="newMatchTopBtn" onclick="checkActiveGame()">New Match</button>
+    </div>
+    <div id="scoreboard-container"></div>
+    <div class="game-status-zone">
+        <div id="modeLabel" style="font-size:0.6em; color:#f1c40f; opacity:0.6; margin-bottom:5px; text-transform:uppercase;">MODUS: STANDARD</div>
+        <span class="req-text" id="moveText">BREKK-STØT</span>
+        <span class="timer-text" id="matchTimer">00:00:00</span>
+        <div id="inningDisplay" style="font-size:0.7em; color:#888; font-weight:bold; margin-top:5px; text-transform:uppercase;">INNING: 1</div>
+        <div id="rotate-container"><button class="btn-rotate" onclick="rotateBreaker()">BYTT STARTSPILLER</button></div>
+    </div>
+    <div class="ball-control-zone">
+        <div class="ball-group">
+            <button class="ball" id="ball1" onclick="action('pocket', 1)"><div class="ball-inner">1</div></button>
+            <button class="btn-sub-carom" id="pc1" onclick="action('pocket_carom', 2)">+ CAROM</button>
+        </div>
+        <div class="ball-group">
+            <button class="ball" id="ball5" onclick="action('pocket', 5)"><div class="ball-inner">5</div></button>
+            <button class="btn-sub-carom" id="pc5" onclick="action('pocket_carom', 6)">+ CAROM</button>
+        </div>
+        <div class="ball-group">
+            <button class="ball" id="ball3" onclick="action('pocket', 3)"><div class="ball-inner">3</div></button>
+            <button class="btn-sub-carom" id="pc3" onclick="action('pocket_carom', 4)">+ CAROM</button>
+        </div>
+    </div>
+    <div class="action-area">
+        <button id="winButton" class="btn-win" onclick="action('winning_shot', 1)">WINNING SHOT</button>
+        <button class="btn btn-blue" id="carom1PBtn" onclick="action('carom', 1)">Carom 1P</button>
+        <button class="btn btn-blue" id="carom2PBtn" onclick="action('carom', 2)">Carom 2P</button>
+        <button class="btn btn-foul" id="foulActionBtn" onclick="handleFoul()">FOUL</button>
+        <button class="btn btn-blue" id="undoActionBtn" onclick="undo()">ANGRE</button>
+        <button class="btn btn-turn" id="endTurnBtn" onclick="nextTurn()">AVSLUTT TUR</button>
+    </div>
+</div>
+
+<div id="setupOverlay" class="setup-overlay">
+    <div class="setup-card">
+        <h2 id="overlayHeader">NY MATCH</h2>
+        <div id="step-confirm" style="display: none;">
+            <p id="confirmText">En kamp pågår allerede. Hva vil du gjøre?</p>
+            <button class="btn-save-option" onclick="handleFinishAndSave()">LAGRE & START NY</button>
+            <button class="btn-discard-option" onclick="handleDiscard()">SLETT & START NY</button>
+            <button class="btn-back" onclick="closeSetup()">Fortsett</button>
+        </div>
+        <div id="step1" style="display: none;">
+            <p>Spillmodus:</p>
+            <div style="display:flex; gap:10px; margin-bottom:20px;">
+                <button class="btn-choice" id="modeStd" onclick="setMode('standard')">Standard</button>
+                <button class="btn-choice" id="modeAlt" onclick="setMode('alternate')">Alternate</button>
+            </div>
+            <p>Antall spillere?</p>
+            <div style="display:flex; gap:10px; margin-bottom:20px;">
+                <button class="btn-choice" onclick="selectPlayers(1)">1</button>
+                <button class="btn-choice" onclick="selectPlayers(2)">2</button>
+                <button class="btn-choice" onclick="selectPlayers(3)">3</button>
+            </div>
+            <button class="btn-back" onclick="closeSetup()">Avbryt</button>
+        </div>
+        <div id="step2" style="display: none;">
+            <p>Navn på spillere:</p>
+            <div id="nameInputs"></div>
+            <button class="btn-start" onclick="finalizeSetup()">START KAMP</button>
+        </div>
+    </div>
+</div>
