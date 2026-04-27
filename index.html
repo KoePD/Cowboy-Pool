@@ -349,6 +349,16 @@
     function handleFinishAndSave() { firebase.database().ref('matchHistory').push({ date: new Date().toISOString(), names: state.names.slice(0, state.playerCount), scores: state.scores.slice(0, state.playerCount), innings: state.innings }).then(() => { handleDiscard(); }); }
     function toggleLanguage() { state.lang = state.lang==='no'?'en':'no'; db.set(state); }
     setInterval(() => { if(state.breakDone) { state.seconds++; db.child('seconds').set(state.seconds); } }, 1000);
+    
+    // Sjekker om vi kom fra "Ny Kamp"-knappen i lobbyen
+        window.addEventListener('load', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('setup') === 'true') {
+        // Vi tvinger frem setup-menyen umiddelbart
+        document.getElementById('setupOverlay').style.display = 'flex';
+        goToStep1();
+    }
+});
 </script>
 </body>
 </html>
