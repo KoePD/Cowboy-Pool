@@ -8,7 +8,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
     <style>
-        /* 1. LAYOUT & BAKGRUNN */
         body { 
             font-family: 'Segoe UI', sans-serif; 
             background: radial-gradient(circle at top, #1e4d2b 0%, #0a1a0f 100%);
@@ -24,12 +23,21 @@
             display: flex; flex-direction: column;
         }
 
-        /* 2. MODUS VELGER */
-        .mode-row { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
-        .btn-mode { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #888; padding: 8px 18px; border-radius: 12px; cursor: pointer; font-weight: bold; }
-        .btn-mode.active { background: #f1c40f; color: black; border-color: #f1c40f; }
+        /* NY MODUS VELGER - MER DISKRET */
+        .player-selector {
+            display: flex; justify-content: center; 
+            background: rgba(0,0,0,0.5); border-radius: 12px;
+            padding: 4px; margin-top: 15px; border: 1px solid rgba(255,255,255,0.05);
+        }
+        .btn-mode { 
+            flex: 1; background: transparent; border: none;
+            color: #555; padding: 10px; border-radius: 8px; 
+            cursor: pointer; font-weight: bold; font-size: 0.8em;
+            transition: 0.2s;
+        }
+        .btn-mode.active { background: rgba(255,255,255,0.1); color: #f1c40f; }
 
-        /* 3. SPILLERKORT */
+        /* SPILLERKORT */
         .player-card {
             background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%);
             backdrop-filter: blur(10px); border-radius: 24px;
@@ -49,33 +57,25 @@
         .stat-item { width: 55px; display: flex; flex-direction: column; }
         .stat-val { color: #eee; font-weight: 900; font-size: 1.1em; }
         .active .stat-val { color: #f1c40f; }
-        .foul-container { display: flex; gap: 6px; margin-top: 12px; }
         .foul-dot { width: 12px; height: 12px; border-radius: 50%; background: #1a1a1a; border: 1px solid #222; }
         .foul-dot.active { background: #e74c3c; box-shadow: 0 0 10px #ff4757; }
 
-        /* 4. STATUS-SONE */
+        /* STATUS-SONE */
         .game-status-zone {
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(15px);
-            padding: 12px;
-            border-radius: 20px 20px 0 0;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.05);
-            border-bottom: none;
-            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(15px);
+            padding: 12px; border-radius: 20px 20px 0 0; text-align: center;
+            border: 1px solid rgba(255,255,255,0.05); border-bottom: none; margin-top: 20px;
         }
         .req-text { font-size: 0.8em; letter-spacing: 2px; color: #2ecc71; font-weight: 800; text-transform: uppercase; }
         .timer-text { font-family: monospace; font-size: 1.2em; color: #f1c40f; margin-top: 3px; display: block; }
         .btn-rotate { background: rgba(241, 196, 15, 0.1); border: 1px solid #f1c40f; color: #f1c40f; padding: 4px 10px; border-radius: 8px; font-size: 0.6em; font-weight: bold; cursor: pointer; margin-top: 8px; }
 
-        /* 5. BALL KONTROLL */
+        /* BALL KONTROLL */
         .ball-control-zone { 
             display: flex; justify-content: space-around; 
             background: rgba(0,0,0,0.5); padding: 20px 10px; 
-            border-radius: 0 0 35px 35px;
-            border: 1px solid rgba(255,255,255,0.03);
-            border-top: 1px solid rgba(255,255,255,0.05);
-            margin-bottom: 15px;
+            border-radius: 0 0 35px 35px; border: 1px solid rgba(255,255,255,0.03);
+            border-top: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px;
         }
         .ball-group { display: flex; flex-direction: column; align-items: center; gap: 12px; }
         .ball { width: 75px; height: 75px; border-radius: 50%; border: none; cursor: pointer; box-shadow: inset -6px -6px 15px rgba(0,0,0,0.7), 6px 12px 20px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; transition: 0.1s; }
@@ -85,34 +85,26 @@
         .ball-inner { width: 28px; height: 28px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #000; }
         .btn-sub-carom { background: rgba(52, 152, 219, 0.12); color: #3498db; border: 1px solid #3498db; border-radius: 8px; padding: 6px 12px; font-size: 0.6em; font-weight: 800; cursor: pointer; }
 
-        /* 6. HANDLINGER - OPPDATERT REKKEFØLGE */
+        /* HANDLINGER */
         .action-area { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .btn { padding: 16px; border-radius: 16px; border: none; font-weight: 800; text-transform: uppercase; cursor: pointer; font-size: 0.75em; }
         .btn-blue { background: #2980b9; color: white; border-bottom: 4px solid #1c5982; }
         .btn-foul { background: #c0392b; color: white; border-bottom: 4px solid #7b241c; }
         .btn-turn { background: #27ae60; color: white; border-bottom: 4px solid #1e8449; grid-column: span 2; padding: 20px; font-size: 1.1em; }
-        
         .btn-reset-match { background: #4d1a1a; color: #ff9999; border: 1px solid #7b241c; grid-column: span 2; padding: 12px; font-size: 0.75em; margin-top: 5px; }
         .btn-finish { background: #000; color: white; border: 1px solid #333; grid-column: span 2; padding: 12px; font-size: 0.7em; letter-spacing: 1px; opacity: 0.8; }
 
-        /* 7. NAVIGASJON */
+        /* NAVIGASJON */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: flex; justify-content: space-around; padding: 10px 0 35px 0; border-top: 1px solid #111; z-index: 1000; }
         .nav-item { color: #333; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.55em; font-weight: bold; }
         .nav-item.active { color: #f1c40f; }
         .nav-item i { font-size: 2.2em; margin-bottom: 4px; }
-        
         .waiting-ball { opacity: 0.15; filter: grayscale(1); pointer-events: none; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <div class="mode-row">
-        <button class="btn-mode" id="m1" onclick="setPlayerCount(1)">1P</button>
-        <button class="btn-mode" id="m2" onclick="setPlayerCount(2)">2P</button>
-        <button class="btn-mode" id="m3" onclick="setPlayerCount(3)">3P</button>
-    </div>
-
     <div id="scoreboard-container"></div>
 
     <div class="game-status-zone">
@@ -124,15 +116,15 @@
     </div>
 
     <div class="ball-control-zone">
-        <div class="ball-group" id="group1">
+        <div class="ball-group">
             <button class="ball" id="ball1" onclick="action('pocket', 1)"><div class="ball-inner">1</div></button>
             <button class="btn-sub-carom" id="carom1" onclick="action('pocket_carom', 2)">+ CAROM</button>
         </div>
-        <div class="ball-group" id="group5">
+        <div class="ball-group">
             <button class="ball" id="ball5" onclick="action('pocket', 5)"><div class="ball-inner">5</div></button>
             <button class="btn-sub-carom" id="carom5" onclick="action('pocket_carom', 6)">+ CAROM</button>
         </div>
-        <div class="ball-group" id="group3">
+        <div class="ball-group">
             <button class="ball" id="ball3" onclick="action('pocket', 3)"><div class="ball-inner">3</div></button>
             <button class="btn-sub-carom" id="carom3" onclick="action('pocket_carom', 4)">+ CAROM</button>
         </div>
@@ -146,6 +138,12 @@
         <button class="btn btn-turn" id="turnBtn" onclick="nextTurn()">AVSLUTT TUR</button>
         <button class="btn btn-reset-match" id="resetMatchBtn" onclick="resetGamePrompt()">RESET MATCH</button>
         <button class="btn btn-finish" id="finishBtn" onclick="saveMatchToHistory()">FINISH AND SAVE MATCH</button>
+
+        <div class="player-selector">
+            <button class="btn-mode" id="m1" onclick="setPlayerCount(1)">1 PLAYER</button>
+            <button class="btn-mode" id="m2" onclick="setPlayerCount(2)">2 PLAYERS</button>
+            <button class="btn-mode" id="m3" onclick="setPlayerCount(3)">3 PLAYERS</button>
+        </div>
     </div>
 
     <nav class="bottom-nav">
@@ -169,44 +167,10 @@
 
     const dictionary = {
         no: {
-            break: "BREKK-STØT (3-BALL)",
-            req_carom: "KRAV: CAROM",
-            req_pocket: "KRAV: POCKET",
-            req_any: "VELG: CAROM / KULE",
-            rotate: "BYTT STARTSPILLER",
-            foul: "FOUL",
-            undo: "ANGRE",
-            turn: "AVSLUTT TUR",
-            reset_btn: "RESET MATCH",
-            finish: "FINISH AND SAVE MATCH",
-            now: "NÅ",
-            best: "PERS",
-            last: "SISTE",
-            home: "HJEM",
-            stats: "STATS",
-            confirm_finish: "Lagre kampen og avslutt?",
-            confirm_reset: "Reset nåværende kamp?",
-            confirm_players: "Bytte til {n} spillere? Kampen resettes."
+            break: "BREKK-STØT (3-BALL)", req_carom: "KRAV: CAROM", req_pocket: "KRAV: POCKET", req_any: "VELG: CAROM / KULE", rotate: "BYTT STARTSPILLER", foul: "FOUL", undo: "ANGRE", turn: "AVSLUTT TUR", reset_btn: "RESET MATCH", finish: "FINISH AND SAVE MATCH", now: "NÅ", best: "PERS", last: "SISTE", home: "HJEM", stats: "STATS", confirm_finish: "Lagre kampen og avslutt?", confirm_reset: "Reset nåværende kamp?", confirm_players: "Bytte til {n} spillere? Kampen resettes."
         },
         en: {
-            break: "BREAK SHOT (3-BALL)",
-            req_carom: "REQ: CAROM",
-            req_pocket: "REQ: POCKET",
-            req_any: "CHOOSE: CAROM / POCKET",
-            rotate: "SWITCH STARTER",
-            foul: "FOUL",
-            undo: "UNDO",
-            turn: "END TURN",
-            reset_btn: "RESET MATCH",
-            finish: "FINISH AND SAVE MATCH",
-            now: "NOW",
-            best: "BEST",
-            last: "LAST",
-            home: "HOME",
-            stats: "STATS",
-            confirm_finish: "Save match and finish?",
-            confirm_reset: "Reset current match?",
-            confirm_players: "Switch to {n} players? Match will reset."
+            break: "BREAK SHOT (3-BALL)", req_carom: "REQ: CAROM", req_pocket: "REQ: POCKET", req_any: "CHOOSE: CAROM / POCKET", rotate: "SWITCH STARTER", foul: "FOUL", undo: "UNDO", turn: "END TURN", reset_btn: "RESET MATCH", finish: "FINISH AND SAVE MATCH", now: "NOW", best: "BEST", last: "LAST", home: "HOME", stats: "STATS", confirm_finish: "Save match and finish?", confirm_reset: "Reset current match?", confirm_players: "Switch to {n} players? Match will reset."
         }
     };
 
@@ -220,11 +184,7 @@
     function updateUI() {
         const activeEl = document.activeElement;
         const l = dictionary[state.lang || 'no'];
-
-        if (activeEl && activeEl.classList.contains('player-name-input')) {
-            document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
-            return; 
-        }
+        if (activeEl && activeEl.classList.contains('player-name-input')) return;
 
         document.getElementById('rotateBtn').innerText = l.rotate;
         document.getElementById('foulBtn').innerText = l.foul;
@@ -248,11 +208,8 @@
             const currentRun = isActive ? (state.scores[i] - state.scoreAtStart[i]) : 0;
             const lastRun = state.lastSeries ? (state.lastSeries[i] || 0) : 0;
             const fouls = state.foulCounts ? state.foulCounts[i] : 0;
-            
-            let foulHtml = '<div class="foul-container">';
-            for (let d = 1; d <= 3; d++) {
-                foulHtml += `<div class="foul-dot ${d <= fouls ? 'active' : ''}"></div>`;
-            }
+            let foulHtml = '<div style="display:flex; gap:6px; margin-top:12px;">';
+            for (let d = 1; d <= 3; d++) foulHtml += `<div class="foul-dot ${d <= fouls ? 'active' : ''}"></div>`;
             foulHtml += '</div>';
 
             container.innerHTML += `
@@ -260,9 +217,9 @@
                     <div class="player-info">
                         <input class="player-name-input" value="${state.names[i]}" oninput="saveName(${i}, this.value)">
                         <div class="sub-stats">
-                            <div class="stat-item"><span class="stat-label">${l.now}</span> <span class="stat-val">${currentRun}</span></div>
-                            <div class="stat-item"><span class="stat-label">${l.best}</span> <span class="stat-val">${state.bestSeries[i] || 0}</span></div>
-                            <div class="stat-item"><span class="stat-label">${l.last}</span> <span class="stat-val">${lastRun}</span></div>
+                            <div class="stat-item"><span style="color:#444">${l.now}</span> <span class="stat-val">${currentRun}</span></div>
+                            <div class="stat-item"><span style="color:#444">${l.best}</span> <span class="stat-val">${state.bestSeries[i] || 0}</span></div>
+                            <div class="stat-item"><span style="color:#444">${l.last}</span> <span class="stat-val">${lastRun}</span></div>
                         </div>
                         ${foulHtml}
                     </div>
@@ -277,35 +234,16 @@
         const isAtEnd = state.scores[state.currentPlayer] >= 90;
         const isLockedPocket = state.tableStatus === 'locked' && state.lastType === 'pocket';
         const ballsWaiting = !state.breakDone || isLockedPocket || isAtEnd;
-        
         document.getElementById('ball1').className = ballsWaiting ? 'ball waiting-ball' : 'ball';
         document.getElementById('ball5').className = ballsWaiting ? 'ball waiting-ball' : 'ball';
         document.getElementById('ball3').className = (isLockedPocket || isAtEnd) ? 'ball waiting-ball' : 'ball';
-
-        const caromsWaiting = state.scores[state.currentPlayer] >= 100;
-        document.getElementById('carom1').className = caromsWaiting ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
-        document.getElementById('carom5').className = caromsWaiting ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
-        document.getElementById('carom3').className = caromsWaiting ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
     }
 
     function toggleLanguage() { state.lang = (state.lang === 'no') ? 'en' : 'no'; db.child('lang').set(state.lang); }
     function saveName(i, val) { state.names[i] = val; db.child('names').set(state.names); }
     function setPlayerCount(n) { const l = dictionary[state.lang || 'no']; if(confirm(l.confirm_players.replace("{n}", n))) { state.playerCount = n; resetGame(); } }
     function rotateBreaker() { if(!state.breakDone) { state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; db.set(state); } }
-    
-    function action(type, val) { 
-        saveHistory(); 
-        let p = state.currentPlayer; 
-        if (state.scores[p] < 90 && state.scores[p] + val > 90) return; 
-        if (state.scores[p] >= 90 && state.scores[p] < 100 && state.scores[p] + val > 100) return; 
-        state.breakDone = true; 
-        state.foulCounts[p] = 0; 
-        if (type === 'pocket_carom') { state.tableStatus = 'open'; state.lastType = null; } 
-        else { state.tableStatus = 'locked'; state.lastType = type; } 
-        state.scores[p] += val; 
-        db.set(state); 
-    }
-    
+    function action(type, val) { saveHistory(); let p = state.currentPlayer; if (state.scores[p] < 90 && state.scores[p] + val > 90) return; if (state.scores[p] >= 90 && state.scores[p] < 100 && state.scores[p] + val > 100) return; state.breakDone = true; state.foulCounts[p] = 0; if (type === 'pocket_carom') { state.tableStatus = 'open'; state.lastType = null; } else { state.tableStatus = 'locked'; state.lastType = type; } state.scores[p] += val; db.set(state); }
     function nextTurn() { saveHistory(); const p = state.currentPlayer; const roundScore = state.scores[p] - state.scoreAtStart[p]; if (roundScore > (state.bestSeries[p] || 0)) state.bestSeries[p] = roundScore; if (!state.lastSeries) state.lastSeries = [0,0,0]; state.lastSeries[p] = roundScore; state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; state.tableStatus = 'open'; state.lastType = null; state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; state.innings++; db.set(state); }
     function handleFoul() { saveHistory(); state.foulCounts[state.currentPlayer]++; if (state.foulCounts[state.currentPlayer] >= 3) { state.scores[state.currentPlayer] = 0; state.foulCounts[state.currentPlayer] = 0; } else { state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; } nextTurn(); }
     function saveHistory() { history.push(JSON.stringify(state)); }
