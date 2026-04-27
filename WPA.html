@@ -264,7 +264,10 @@
     }
 
     function handleDiscard() {
-        db.set({...state, scores:[0,0,0], foulCounts:[0,0,0], scoreAtStart:[0,0,0], breakDone:false, seconds:0, currentPlayer:0, tableStatus:'open', innings:1, lastSeries:[0,0,0]}).then(() => { location.reload(); });
+        db.set({...state, scores:[0,0,0], foulCounts:[0,0,0], scoreAtStart:[0,0,0], breakDone:false, seconds:0, currentPlayer:0, tableStatus:'open', innings:1, lastSeries:[0,0,0]}).then(() => {
+            // Lukker vinner-skjerm (hvis den er åpen) og tvinger frem modus-velger
+            location.reload(); 
+        });
     }
 
     function updateUI() {
