@@ -67,7 +67,6 @@
         .btn-start { width: 100%; padding: 18px; border-radius: 15px; background: #27ae60; color: white; border: none; font-weight: 900; text-transform: uppercase; margin-top: 10px; cursor: pointer; }
         .btn-back { background: none; border: none; color: #888; margin-top: 20px; cursor: pointer; font-size: 0.8em; text-decoration: underline; }
 
-        /* SPESIELLE VALG FOR AVLEUTT KAMP */
         .btn-save-option { background: #2980b9; color: white; margin-bottom: 10px; width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; }
         .btn-discard-option { background: #c0392b; color: white; width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; }
 
@@ -82,23 +81,23 @@
 
 <div id="setupOverlay" class="setup-overlay">
     <div class="setup-card">
-        <h2 style="color:#f1c40f; margin-bottom: 20px;">NY KAMP</h2>
+        <h2 style="color:#f1c40f; margin-bottom: 20px;">NY MATCH</h2>
         
         <div id="step-confirm" style="display: none;">
             <p style="color:#888; margin-bottom: 20px;">En kamp pågår allerede. Hva vil du gjøre?</p>
             <button class="btn-save-option" onclick="handleFinishAndSave()">LAGRE & START NY</button>
             <button class="btn-discard-option" onclick="goToStep1()">SLETT & START NY</button>
-            <button class="btn-back" onclick="closeSetup()">Avbryt</button>
+            <button class="btn-back" onclick="closeSetup()">Fortsett kampen</button>
         </div>
 
-        <div id="step1">
+        <div id="step1" style="display: none;">
             <p style="color:#888; margin-bottom: 15px;">Antall spillere?</p>
             <div style="display:flex; gap:10px; margin-bottom:20px;">
                 <button class="btn-choice" onclick="selectPlayers(1)">1</button>
                 <button class="btn-choice" onclick="selectPlayers(2)">2</button>
                 <button class="btn-choice" onclick="selectPlayers(3)">3</button>
             </div>
-            <button class="btn-back" onclick="closeSetup()">Fortsett kampen</button>
+            <button class="btn-back" onclick="closeSetup()">Avbryt</button>
         </div>
 
         <div id="step2" style="display: none;">
@@ -151,7 +150,7 @@
 
     <nav class="bottom-nav">
         <a href="#" class="nav-item active"><i class="material-icons">home</i>HJEM</a>
-        <a href="stats.html" class="nav-item"><i class="material-icons">leaderboard</i>STATS</a>
+        <a href="#" class="nav-item"><i class="material-icons">leaderboard</i>STATS</a>
         <a href="#" class="nav-item" onclick="toggleLanguage()"><i class="material-icons">language</i>EN/NO</a>
     </nav>
 </div>
@@ -167,14 +166,21 @@
 
     db.on('value', (s) => { if(s.val()) { state = s.val(); updateUI(); } });
 
-    // --- NY NEW GAME LOGIKK ---
+    function hideAllSteps() {
+        document.getElementById('step-confirm').style.display = 'none';
+        document.getElementById('step1').style.display = 'none';
+        document.getElementById('step2').style.display = 'none';
+    }
+
     function checkActiveGame() {
         document.getElementById('setupOverlay').style.display = 'flex';
-        // Hvis noen har mer enn 0 poeng, spør vi om de vil lagre
-        const gameInProgress = state.scores.some(s => s > 0);
-        if (gameInProgress) {
+        hideAllSteps();
+        
+        // Sjekk om noen har poeng. Vi sjekker summen av poengene.
+        const totalPoints = state.scores.reduce((a, b) => a + b, 0);
+        
+        if (totalPoints > 0) {
             document.getElementById('step-confirm').style.display = 'block';
-            document.getElementById('step1').style.display = 'none';
         } else {
             goToStep1();
         }
@@ -195,18 +201,17 @@
     }
 
     function goToStep1() {
-        document.getElementById('step-confirm').style.display = 'none';
+        hideAllSteps();
         document.getElementById('step1').style.display = 'block';
-        document.getElementById('step2').style.display = 'none';
     }
 
     function selectPlayers(n) { 
         setupCount = n; 
-        document.getElementById('step1').style.display = 'none'; 
+        hideAllSteps();
         document.getElementById('step2').style.display = 'block';
         const container = document.getElementById('nameInputs');
         container.innerHTML = '';
-        for(let i=0; i<n; i++) container.innerHTML += `<input type="text" class="name-field" id="n${i}" placeholder="Navn ${i+1}">`;
+        for(let i=0; i<n; i++) container.innerHTML += `<input type="text" class="name-field" id="n${i}" placeholder="Navn spiller ${i+1}">`;
     }
 
     function finalizeSetup() {
@@ -218,7 +223,6 @@
 
     function closeSetup() { document.getElementById('setupOverlay').style.display = 'none'; }
 
-    // --- SPILL LOGIKK ---
     function action(type, val) {
         saveHistory();
         let p = state.currentPlayer;
