@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biljard App - Pixel Perfect Green</title>
+    <title>Biljard App - Pixel Perfect 1000%</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            /* Den nøyaktige, mettede radial gradienten fra bilde 1 */
-            --felt-green: radial-gradient(circle at center, #2fa34b 20%, #155e2d 60%, #0a2b15 100%);
+            /* Den nøyaktige, mettede grønnfargen med dybde */
+            --felt-green: radial-gradient(circle at center, #2fa34b 10%, #1a6331 50%, #082411 100%);
             --gold: #d4af37;
             --leather: #121212;
-            --card-bg: rgba(0, 0, 0, 0.6);
+            --card-bg: rgba(0, 0, 0, 0.65);
         }
 
         body {
@@ -26,7 +26,7 @@
         .phone {
             width: 360px;
             height: 760px;
-            background: #0a1f0f;
+            background: #082411;
             border-radius: 45px;
             border: 8px solid #282828;
             position: relative;
@@ -41,15 +41,24 @@
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             background: var(--felt-green);
-            background-image: url("https://www.transparenttextures.com/patterns/felt.png");
             z-index: 1;
+        }
+
+        /* Tekstur-lag uten pikselering */
+        .felt-layer::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url("https://www.transparenttextures.com/patterns/felt.png");
+            opacity: 0.15; /* Skrur ned støyen for å unngå piksler */
+            pointer-events: none;
         }
 
         /* TOPP-PANEL (Lær) */
         .header {
             background: var(--leather);
             background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png");
-            padding: 45px 25px 70px;
+            padding: 45px 25px 75px;
             z-index: 10;
             border-bottom-left-radius: 50% 35px;
             border-bottom-right-radius: 50% 35px;
@@ -57,7 +66,7 @@
             position: relative;
         }
 
-        /* Den stiplede sømmen langs buen */
+        /* Søm-detalj langs buen */
         .header::after {
             content: "";
             position: absolute;
@@ -80,7 +89,7 @@
             border-radius: 4px;
         }
 
-        /* MIDTPARTI (Kortene på grønn duk) */
+        /* MIDTPARTI (Kortene) */
         .main-felt {
             position: relative;
             z-index: 5;
@@ -114,7 +123,7 @@
         .bottom-panel {
             background: var(--leather);
             background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png");
-            padding: 70px 20px 20px;
+            padding: 75px 20px 20px;
             z-index: 10;
             border-top-left-radius: 50% 35px;
             border-top-right-radius: 50% 35px;
@@ -192,7 +201,7 @@
                     <div style="font-size:28px; font-weight:900; color:#fff;">
                         <span style="color:#2ecc71">100</span> - <span style="color:var(--gold)">82</span>
                     </div>
-                    <div style="color:#2ecc71; font-size:10px; font-weight:bold; margin-top:2px;">WIN</div>
+                    <div style="color:#2ecc71; font-size:10px; font-weight:bold; margin-top:4px;">WIN</div>
                 </div>
                 <div style="text-align:center;">
                     <div style="width:52px; height:52px; border-radius:50%; background:#333; border:2px solid #444; margin-bottom:5px;"></div>
