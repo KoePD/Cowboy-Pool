@@ -61,11 +61,12 @@
         .action-card i { font-size: 90px; margin-bottom: 25px; color: var(--gold); }
         .action-card span { font-size: 22px; font-weight: 950; color: #fff; letter-spacing: 2px; text-transform: uppercase; }
 
-        /* RANGE MODUS (100% LIK DIN KONTROLLER) */
+        /* RANGE MODUS (KONTROLLER) */
         .range-content { display: none; width: 100%; max-width: 430px; margin: 0 auto; padding: 15px; box-sizing: border-box; }
         .slim-mode .home-cards { display: none; }
         .slim-mode .range-content { display: block; }
 
+        /* DIN KONTROLLER STYLING */
         .player-card { background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%); border-radius: 24px; padding: 20px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; }
         .player-card.active { border: 2px solid var(--gold); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9); transform: scale(1.03); }
         .score-display { font-size: 3.5em; font-weight: 900; color: #333; }
@@ -95,9 +96,6 @@
         .nav-item { color: #444; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.6em; font-weight: 800; }
         .nav-item.active { color: var(--gold); }
         .nav-item i { font-size: 2.2em; margin-bottom: 4px; }
-
-        .setup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,20,5,0.98); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(10px); }
-        .setup-card { background: #000; border: 1px solid var(--gold); padding: 30px; border-radius: 30px; width: 100%; max-width: 350px; text-align: center; }
     </style>
 </head>
 <body>
@@ -126,23 +124,23 @@
             
             <div class="game-status-zone">
                 <div id="modeLabel" style="font-size:0.6em; color:var(--gold); opacity:0.6; margin-bottom:5px; text-transform:uppercase;">MODUS: STANDARD</div>
-                <span class="req-text" id="moveText" style="font-size: 0.8em; letter-spacing: 2px; color: #2ecc71; font-weight: 800; text-transform: uppercase;">BREKK-STØT</span>
-                <span class="timer-text" id="matchTimer" style="font-family: monospace; font-size: 1.2em; color: var(--gold); display: block;">00:00:00</span>
+                <span id="moveText" style="font-size: 0.8em; letter-spacing: 2px; color: #2ecc71; font-weight: 800; text-transform: uppercase;">BREKK-STØT</span>
+                <span id="matchTimer" style="font-family: monospace; font-size: 1.2em; color: var(--gold); display: block;">00:00:00</span>
                 <div id="inningDisplay" style="font-size:0.7em; color:#888; font-weight:bold; margin-top:5px; text-transform:uppercase;">INNING: 1</div>
             </div>
 
             <div class="ball-control-zone">
                 <div style="display:flex; flex-direction:column; align-items:center;">
                     <button class="ball" id="ball1" onclick="action('pocket', 1)"><div class="ball-inner">1</div></button>
-                    <button class="btn-sub-carom" id="pc1" onclick="action('pocket_carom', 2)">+ CAROM</button>
+                    <button class="btn-sub-carom" onclick="action('pocket_carom', 2)">+ CAROM</button>
                 </div>
                 <div style="display:flex; flex-direction:column; align-items:center;">
                     <button class="ball" id="ball5" onclick="action('pocket', 5)"><div class="ball-inner">5</div></button>
-                    <button class="btn-sub-carom" id="pc5" onclick="action('pocket_carom', 6)">+ CAROM</button>
+                    <button class="btn-sub-carom" onclick="action('pocket_carom', 6)">+ CAROM</button>
                 </div>
                 <div style="display:flex; flex-direction:column; align-items:center;">
                     <button class="ball" id="ball3" onclick="action('pocket', 3)"><div class="ball-inner">3</div></button>
-                    <button class="btn-sub-carom" id="pc3" onclick="action('pocket_carom', 4)">+ CAROM</button>
+                    <button class="btn-sub-carom" onclick="action('pocket_carom', 4)">+ CAROM</button>
                 </div>
             </div>
 
@@ -172,12 +170,12 @@
 </div>
 
 <script>
-    // --- FIREBASE OG DIN ORIGINALE LOGIKK ---
+    // --- DIN FIREBASE LOGIKK ---
     const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('gameData');
 
-    let state = { gameMode: 'standard', playerCount: 2, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null, seconds: 0, names: ["P1","P2","P3"], bestSeries: [0,0,0], lastSeries: [0,0,0], lang: 'no', innings: 1 };
+    let state = { gameMode: 'standard', playerCount: 2, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, seconds: 0, names: ["Lasse","Motstander","P3"], bestSeries: [0,0,0], lastSeries: [0,0,0], innings: 1 };
     let history = [];
 
     db.on('value', (s) => { if(s.val()) { state = s.val(); updateUI(); } });
@@ -190,8 +188,9 @@
     }
 
     function action(type, val) {
-        saveHistory(); let p = state.currentPlayer;
-        state.scores[p] += val; state.breakDone = true;
+        saveHistory(); 
+        state.scores[state.currentPlayer] += val; 
+        state.breakDone = true;
         db.set(state);
     }
 
@@ -212,6 +211,7 @@
             </div>`;
         }
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
+        document.getElementById('moveText').innerText = state.breakDone ? "SPILL" : "BREKK-STØT";
     }
 
     function handleFoul() { saveHistory(); state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; nextTurn(); }
