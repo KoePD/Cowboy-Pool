@@ -53,7 +53,7 @@
         .foul-dot { width: 12px; height: 12px; border-radius: 50%; background: #1a1a1a; border: 1px solid #222; }
         .foul-dot.active { background: #e74c3c; box-shadow: 0 0 10px #ff4757; }
 
-        /* 4. STATUS-SONE (OVER BALLENE) */
+        /* 4. STATUS-SONE */
         .game-status-zone {
             background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(15px);
@@ -85,13 +85,15 @@
         .ball-inner { width: 28px; height: 28px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #000; }
         .btn-sub-carom { background: rgba(52, 152, 219, 0.12); color: #3498db; border: 1px solid #3498db; border-radius: 8px; padding: 6px 12px; font-size: 0.6em; font-weight: 800; cursor: pointer; }
 
-        /* 6. HANDLINGER */
+        /* 6. HANDLINGER - OPPDATERT REKKEFØLGE */
         .action-area { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .btn { padding: 16px; border-radius: 16px; border: none; font-weight: 800; text-transform: uppercase; cursor: pointer; font-size: 0.75em; }
         .btn-blue { background: #2980b9; color: white; border-bottom: 4px solid #1c5982; }
         .btn-foul { background: #c0392b; color: white; border-bottom: 4px solid #7b241c; }
         .btn-turn { background: #27ae60; color: white; border-bottom: 4px solid #1e8449; grid-column: span 2; padding: 20px; font-size: 1.1em; }
-        .btn-finish { background: #000; color: white; border: 1px solid #333; grid-column: span 2; margin-top: 5px; padding: 12px; font-size: 0.7em; letter-spacing: 1px; opacity: 0.8; }
+        
+        .btn-reset-match { background: #4d1a1a; color: #ff9999; border: 1px solid #7b241c; grid-column: span 2; padding: 12px; font-size: 0.75em; margin-top: 5px; }
+        .btn-finish { background: #000; color: white; border: 1px solid #333; grid-column: span 2; padding: 12px; font-size: 0.7em; letter-spacing: 1px; opacity: 0.8; }
 
         /* 7. NAVIGASJON */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: flex; justify-content: space-around; padding: 10px 0 35px 0; border-top: 1px solid #111; z-index: 1000; }
@@ -99,9 +101,7 @@
         .nav-item.active { color: #f1c40f; }
         .nav-item i { font-size: 2.2em; margin-bottom: 4px; }
         
-        /* 8. WAITING STATUS - Endret for å kun ramme kulene */
         .waiting-ball { opacity: 0.15; filter: grayscale(1); pointer-events: none; }
-        .waiting-group { opacity: 0.15; filter: grayscale(1); pointer-events: none; }
     </style>
 </head>
 <body>
@@ -144,6 +144,7 @@
         <button class="btn btn-foul" id="foulBtn" onclick="handleFoul()">FOUL</button>
         <button class="btn btn-blue" id="undoBtn" onclick="undo()">ANGRE</button>
         <button class="btn btn-turn" id="turnBtn" onclick="nextTurn()">AVSLUTT TUR</button>
+        <button class="btn btn-reset-match" id="resetMatchBtn" onclick="resetGamePrompt()">RESET MATCH</button>
         <button class="btn btn-finish" id="finishBtn" onclick="saveMatchToHistory()">FINISH AND SAVE MATCH</button>
     </div>
 
@@ -151,7 +152,6 @@
         <a href="#" class="nav-item active"><i class="material-icons">home</i><span id="navHome">HJEM</span></a>
         <a href="stats.html" class="nav-item"><i class="material-icons">leaderboard</i><span id="navStats">STATS</span></a>
         <a href="#" class="nav-item" onclick="toggleLanguage()"><i class="material-icons">language</i><span id="navLang">EN / NO</span></a>
-        <a href="#" class="nav-item" onclick="resetGamePrompt()"><i class="material-icons">refresh</i><span id="navReset">RESET</span></a>
     </nav>
 </div>
 
@@ -177,12 +177,13 @@
             foul: "FOUL",
             undo: "ANGRE",
             turn: "AVSLUTT TUR",
+            reset_btn: "RESET MATCH",
             finish: "FINISH AND SAVE MATCH",
             now: "NÅ",
             best: "PERS",
             last: "SISTE",
             home: "HJEM",
-            reset: "RESET",
+            stats: "STATS",
             confirm_finish: "Lagre kampen og avslutt?",
             confirm_reset: "Reset nåværende kamp?",
             confirm_players: "Bytte til {n} spillere? Kampen resettes."
@@ -196,12 +197,13 @@
             foul: "FOUL",
             undo: "UNDO",
             turn: "END TURN",
+            reset_btn: "RESET MATCH",
             finish: "FINISH AND SAVE MATCH",
             now: "NOW",
             best: "BEST",
             last: "LAST",
             home: "HOME",
-            reset: "RESET",
+            stats: "STATS",
             confirm_finish: "Save match and finish?",
             confirm_reset: "Reset current match?",
             confirm_players: "Switch to {n} players? Match will reset."
@@ -228,9 +230,10 @@
         document.getElementById('foulBtn').innerText = l.foul;
         document.getElementById('undoBtn').innerText = l.undo;
         document.getElementById('turnBtn').innerText = l.turn;
+        document.getElementById('resetMatchBtn').innerText = l.reset_btn;
         document.getElementById('finishBtn').innerText = l.finish;
         document.getElementById('navHome').innerText = l.home;
-        document.getElementById('navReset').innerText = l.reset;
+        document.getElementById('navStats').innerText = l.stats;
 
         for(let i=1; i<=3; i++) {
             const btn = document.getElementById(`m${i}`);
@@ -271,21 +274,14 @@
         document.getElementById('moveText').innerText = !state.breakDone ? l.break : (state.tableStatus === 'locked' ? (state.lastType === 'pocket' ? l.req_carom : l.req_pocket) : l.req_any);
         document.getElementById('rotate-container').style.display = state.breakDone ? 'none' : 'block';
 
-        // --- SMART LOCK LOGIKK ---
         const isAtEnd = state.scores[state.currentPlayer] >= 90;
         const isLockedPocket = state.tableStatus === 'locked' && state.lastType === 'pocket';
-        
-        // Regel: Ved brekk er kule 1 og 5 låst (kun 3-ball lov). Ved 'locked pocket' er kuler låst. Ved 90+ er kuler låst.
         const ballsWaiting = !state.breakDone || isLockedPocket || isAtEnd;
         
-        // 1-eren og 5-eren (Låst ved brekk og pocket-krav)
         document.getElementById('ball1').className = ballsWaiting ? 'ball waiting-ball' : 'ball';
         document.getElementById('ball5').className = ballsWaiting ? 'ball waiting-ball' : 'ball';
-        
-        // 3-eren (Låst ved pocket-krav og 90+)
         document.getElementById('ball3').className = (isLockedPocket || isAtEnd) ? 'ball waiting-ball' : 'ball';
 
-        // Carom-knappene er ALLTID åpne så lenge man ikke har nådd 100 poeng
         const caromsWaiting = state.scores[state.currentPlayer] >= 100;
         document.getElementById('carom1').className = caromsWaiting ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
         document.getElementById('carom5').className = caromsWaiting ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
@@ -302,19 +298,10 @@
         let p = state.currentPlayer; 
         if (state.scores[p] < 90 && state.scores[p] + val > 90) return; 
         if (state.scores[p] >= 90 && state.scores[p] < 100 && state.scores[p] + val > 100) return; 
-        
         state.breakDone = true; 
         state.foulCounts[p] = 0; 
-        
-        if (type === 'pocket_carom') { 
-            // Hvis det er et krav om carom, og man trykker +CAROM, så har man oppfylt kravet og kan fortsette med hva som helst.
-            state.tableStatus = 'open'; 
-            state.lastType = null; 
-        } else { 
-            state.tableStatus = 'locked'; 
-            state.lastType = type; 
-        } 
-        
+        if (type === 'pocket_carom') { state.tableStatus = 'open'; state.lastType = null; } 
+        else { state.tableStatus = 'locked'; state.lastType = type; } 
         state.scores[p] += val; 
         db.set(state); 
     }
