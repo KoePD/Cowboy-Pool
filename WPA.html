@@ -241,7 +241,6 @@
         const setupCard = document.querySelector('.setup-card');
         const winnerName = state.names[p];
         const initial = winnerName.charAt(0).toUpperCase();
-        
         document.getElementById('setupOverlay').style.display = 'flex';
         
         setupCard.innerHTML = `
@@ -255,24 +254,16 @@
             </div>
             <button class="btn-save-option" onclick="handleFinishAndSave()">${l.save}</button>
             <button class="btn-save-option" style="background:#27ae60;" onclick="handleRematch()">${l.rematch}</button>
-            <button class="btn-discard-option" onclick="location.reload()">${l.discard}</button>
+            <button class="btn-discard-option" onclick="handleDiscard()">${l.discard}</button>
         `;
     }
 
     function handleRematch() {
-        // Beholder navn, modus og antall spillere, men nullstiller resten
-        db.set({
-            ...state,
-            scores: [0,0,0],
-            foulCounts: [0,0,0],
-            scoreAtStart: [0,0,0],
-            breakDone: false,
-            seconds: 0,
-            currentPlayer: 0,
-            tableStatus: 'open',
-            innings: 1,
-            lastSeries: [0,0,0]
-        }).then(() => { location.reload(); });
+        db.set({...state, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], breakDone: false, seconds: 0, currentPlayer: 0, tableStatus: 'open', innings: 1, lastSeries: [0,0,0]}).then(() => { location.reload(); });
+    }
+
+    function handleDiscard() {
+        db.set({...state, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], breakDone: false, seconds: 0, currentPlayer: 0, tableStatus: 'open', innings: 1, lastSeries: [0,0,0]}).then(() => { location.reload(); });
     }
 
     function updateUI() {
@@ -331,7 +322,12 @@
     }
     
     function setMode(m) { tempMode = m; document.getElementById('modeStd').classList.toggle('selected', m === 'standard'); document.getElementById('modeAlt').classList.toggle('selected', m === 'alternate'); }
-    function goToStep1() { location.reload(); }
+    function goToStep1() { 
+        document.getElementById('step-confirm').style.display = 'none'; 
+        document.getElementById('step1').style.display = 'block'; 
+        document.getElementById('step2').style.display = 'none'; 
+        setMode(tempMode); 
+    }
     function selectPlayers(n) { setupCount = n; document.getElementById('step1').style.display = 'none'; document.getElementById('step2').style.display = 'block'; const c = document.getElementById('nameInputs'); c.innerHTML = ''; for(let i=0; i<n; i++) c.innerHTML += `<input type="text" id="n${i}" class="name-field" placeholder="Navn ${i+1}">`; }
     function finalizeSetup() { 
         const ns = []; for(let i=0; i<setupCount; i++) ns.push(document.getElementById(`n${i}`).value || `P${i+1}`); 
@@ -352,7 +348,7 @@
     function saveHistory() { history.push(JSON.stringify(state)); if(history.length > 10) history.shift(); }
     function closeSetup() { document.getElementById('setupOverlay').style.display = 'none'; }
     function rotateBreaker() { if(!state.breakDone) { state.currentPlayer = (state.currentPlayer+1)%state.playerCount; db.set(state); } }
-    function handleFinishAndSave() { firebase.database().ref('matchHistory').push({ date: new Date().toISOString(), names: state.names.slice(0, state.playerCount), scores: state.scores.slice(0, state.playerCount), innings: state.innings }).then(() => { location.reload(); }); }
+    function handleFinishAndSave() { firebase.database().ref('matchHistory').push({ date: new Date().toISOString(), names: state.names.slice(0, state.playerCount), scores: state.scores.slice(0, state.playerCount), innings: state.innings }).then(() => { handleDiscard(); }); }
     function toggleLanguage() { state.lang = state.lang==='no'?'en':'no'; db.set(state); }
     setInterval(() => { if(state.breakDone) { state.seconds++; db.child('seconds').set(state.seconds); } }, 1000);
 </script>
