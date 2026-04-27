@@ -81,7 +81,7 @@
         .btn-new-game { background: #000; color: #f1c40f; border: 1px solid #f1c40f; grid-column: span 2; margin-top: 10px; padding: 15px; }
         .btn-finish { background: #000; color: white; border: 1px solid #333; grid-column: span 2; padding: 12px; font-size: 0.7em; letter-spacing: 1px; opacity: 0.8; }
 
-        /* OVERLAY / MODAL FOR NEW GAME */
+        /* SETUP OVERLAY */
         .setup-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,20,5,0.98); z-index: 2000;
@@ -109,7 +109,6 @@
 <div id="setupOverlay" class="setup-overlay">
     <div class="setup-card">
         <h2 id="setupTitle">New Game</h2>
-        
         <div id="step1">
             <p style="color: #888; font-size: 0.8em; margin-bottom: 15px;">Antall spillere?</p>
             <div class="setup-row">
@@ -118,7 +117,6 @@
                 <button class="btn-choice" onclick="selectPlayers(3)">3</button>
             </div>
         </div>
-
         <div id="step2" style="display: none;">
             <p style="color: #888; font-size: 0.8em; margin-bottom: 15px;">Navn på spillere:</p>
             <div id="nameInputs"></div>
@@ -155,8 +153,8 @@
     </div>
 
     <div class="action-area">
-        <button class="btn btn-blue" id="carom1Btn" onclick="action('carom', 1)">Carom 1P</button>
-        <button class="btn btn-blue" id="carom2Btn" onclick="action('carom', 2)">Carom 2P</button>
+        <button class="btn btn-blue" onclick="action('carom', 1)">Carom 1P</button>
+        <button class="btn btn-blue" onclick="action('carom', 2)">Carom 2P</button>
         <button class="btn btn-foul" id="foulBtn" onclick="handleFoul()">FOUL</button>
         <button class="btn btn-blue" id="undoBtn" onclick="undo()">ANGRE</button>
         <button class="btn btn-turn" id="turnBtn" onclick="nextTurn()">AVSLUTT TUR</button>
@@ -190,7 +188,10 @@
 
     db.on('value', (snapshot) => {
         const data = snapshot.val();
-        if (data) { state = data; updateUI(); }
+        if (data) { 
+            state = data; 
+            updateUI(); 
+        }
     });
 
     // SETUP FUNKSJONALITET
@@ -213,12 +214,25 @@
         for(let i=0; i<tempPlayers; i++) {
             newNames.push(document.getElementById(`name${i}`).value || `Spiller ${i+1}`);
         }
+        
+        // Viktig: Nullstill alt for det nye antallet spillere
         state.playerCount = tempPlayers;
         state.names = newNames;
-        resetGame();
-        document.getElementById('setupOverlay').style.display = 'none';
-        document.getElementById('step2').style.display = 'none';
-        document.getElementById('step1').style.display = 'block';
+        state.scores = [0, 0, 0];
+        state.foulCounts = [0, 0, 0];
+        state.scoreAtStart = [0, 0, 0];
+        state.bestSeries = [0, 0, 0];
+        state.lastSeries = [0, 0, 0];
+        state.currentPlayer = 0;
+        state.breakDone = false;
+        state.seconds = 0;
+        state.tableStatus = 'open';
+
+        db.set(state).then(() => {
+            document.getElementById('setupOverlay').style.display = 'none';
+            document.getElementById('step2').style.display = 'none';
+            document.getElementById('step1').style.display = 'block';
+        });
     }
 
     function updateUI() {
@@ -270,13 +284,82 @@
 
     function toggleLanguage() { state.lang = (state.lang === 'no') ? 'en' : 'no'; db.child('lang').set(state.lang); }
     function rotateBreaker() { if(!state.breakDone) { state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; db.set(state); } }
-    function action(type, val) { saveHistory(); let p = state.currentPlayer; if (state.scores[p] < 90 && state.scores[p] + val > 90) return; if (state.scores[p] >= 90 && state.scores[p] < 100 && state.scores[p] + val > 100) return; state.breakDone = true; state.foulCounts[p] = 0; if (type === 'pocket_carom') { state.tableStatus = 'open'; state.lastType = null; } else { state.tableStatus = 'locked'; state.lastType = type; } state.scores[p] += val; db.set(state); }
-    function nextTurn() { saveHistory(); const p = state.currentPlayer; const roundScore = state.scores[p] - state.scoreAtStart[p]; if (roundScore > (state.bestSeries[p] || 0)) state.bestSeries[p] = roundScore; if (!state.lastSeries) state.lastSeries = [0,0,0]; state.lastSeries[p] = roundScore; state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; state.tableStatus = 'open'; state.lastType = null; state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; state.innings++; db.set(state); }
-    function handleFoul() { saveHistory(); state.foulCounts[state.currentPlayer]++; if (state.foulCounts[state.currentPlayer] >= 3) { state.scores[state.currentPlayer] = 0; state.foulCounts[state.currentPlayer] = 0; } else { state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; } nextTurn(); }
-    function saveHistory() { history.push(JSON.stringify(state)); }
+    
+    function action(type, val) { 
+        saveHistory(); 
+        let p = state.currentPlayer; 
+        let currentScore = state.scores[p];
+
+        // Regler for 90 og 100 poeng
+        if (currentScore < 90 && currentScore + val > 90) return; 
+        if (currentScore >= 90 && currentScore < 100 && currentScore + val > 100) return; 
+
+        state.breakDone = true; 
+        state.foulCounts[p] = 0; 
+
+        if (type === 'pocket_carom') { 
+            state.tableStatus = 'open'; 
+            state.lastType = null; 
+        } else { 
+            state.tableStatus = 'locked'; 
+            state.lastType = type; 
+        } 
+        
+        state.scores[p] += val; 
+        db.set(state); 
+    }
+    
+    function nextTurn() { 
+        saveHistory(); 
+        const p = state.currentPlayer; 
+        const roundScore = state.scores[p] - state.scoreAtStart[p]; 
+        
+        if (roundScore > (state.bestSeries[p] || 0)) state.bestSeries[p] = roundScore; 
+        state.lastSeries[p] = roundScore; 
+        
+        state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; 
+        state.tableStatus = 'open'; 
+        state.lastType = null; 
+        state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; 
+        state.innings++; 
+        db.set(state); 
+    }
+
+    function handleFoul() { 
+        saveHistory(); 
+        state.foulCounts[state.currentPlayer]++; 
+        if (state.foulCounts[state.currentPlayer] >= 3) { 
+            state.scores[state.currentPlayer] = 0; 
+            state.foulCounts[state.currentPlayer] = 0; 
+        } else { 
+            state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; 
+        } 
+        nextTurn(); 
+    }
+
+    function saveHistory() { history.push(JSON.stringify(state)); if(history.length > 20) history.shift(); }
     function undo() { if(history.length) { state = JSON.parse(history.pop()); db.set(state); } }
-    function resetGame() { state.scores = [0,0,0,0]; state.foulCounts = [0,0,0,0]; state.breakDone = false; state.seconds = 0; state.innings = 0; state.bestSeries = [0,0,0,0]; state.lastSeries = [0,0,0,0]; state.currentPlayer = 0; db.set(state); }
-    function saveMatchToHistory() { if (confirm("Lagre og avslutte?")) { const historyRef = firebase.database().ref('matchHistory'); const kampData = { dato: new Date().toLocaleString('no-NO'), spillere: state.names.slice(0, state.playerCount), resultat: state.scores.slice(0, state.playerCount), varighet: document.getElementById('matchTimer').innerText, innings: Math.floor(state.innings / state.playerCount) + 1 }; historyRef.push(kampData).then(() => { resetGame(); }); } }
+    
+    function saveMatchToHistory() { 
+        if (confirm("Lagre og avslutte?")) { 
+            const historyRef = firebase.database().ref('matchHistory'); 
+            const kampData = { 
+                dato: new Date().toLocaleString('no-NO'), 
+                spillere: state.names.slice(0, state.playerCount), 
+                resultat: state.scores.slice(0, state.playerCount), 
+                varighet: document.getElementById('matchTimer').innerText, 
+                innings: Math.floor(state.innings / state.playerCount) + 1 
+            }; 
+            historyRef.push(kampData).then(() => { 
+                // Nullstill kampen etter lagring
+                state.scores = [0,0,0];
+                state.breakDone = false;
+                state.seconds = 0;
+                db.set(state);
+            }); 
+        } 
+    }
+
     setInterval(() => { if (state.breakDone) { state.seconds++; firebase.database().ref('gameData/seconds').set(state.seconds); } }, 1000);
 </script>
 </body>
