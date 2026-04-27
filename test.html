@@ -3,22 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biljard App UI - Buede Kanter</title>
+    <title>Biljard App UI</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #121212;
-            /* Grønn radial gradient for biljardduken */
-            --felt-green: radial-gradient(circle at center, #2e7d32 0%, #1a5e20 50%, #0d3b14 100%);
-            --leather-black: #1a1a1a;
+            /* Fargepalett fra bildet */
+            --bg-dark: #111111;
+            --bg-card: #1a1a1a;
+            --green-felt: linear-gradient(135deg, #1d6e3e 0%, #114e2b 100%);
             --gold: #d4af37;
             --text-gray: #b0b0b0;
-            --phone-width: 375px;
+            --white: #ffffff;
+            --green-win: #4caf50;
         }
 
         body {
             background-color: #222;
-            color: white;
+            color: var(--white);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             justify-content: center;
@@ -27,9 +28,9 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Mobil-container */
+        /* Ytre container (mobil-ramme) */
         .phone-container {
-            width: var(--phone-width);
+            width: 375px;
             height: 750px;
             background: var(--bg-dark);
             border: 12px solid #333;
@@ -41,26 +42,17 @@
             flex-direction: column;
         }
 
-        /* Felles stil for lærpaneler med bue */
-        .leather-panel {
-            background: linear-gradient(to bottom, #111, #1a1a1a);
-            position: relative;
-            z-index: 2;
-        }
-
-        /* Toppseksjon (bue nederst) */
+        /* 1. Header sektion */
         .header {
-            padding: 30px 20px 40px; /* Mer padding i bunn for buen */
-            /* Magien som skaper buen: En stor sirkelmaske som 'klipper' panelet */
-            -webkit-mask-image: radial-gradient(circle 500px at 50% -390px, transparent 100%, black 100%);
-            mask-image: radial-gradient(circle 500px at 50% -390px, transparent 100%, black 100%);
+            padding: 25px 20px 10px;
+            background: #111; /* Litt mørkere lær */
         }
 
         .profile-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .greeting h1 {
@@ -107,79 +99,74 @@
             border-radius: 3px;
         }
 
-        /* Hovedområde med grønn duk (ligger *bak* buen) */
+        /* 2. Seksjon med grønn duk og aktivitetskort */
+        .activity-felt-container {
+            padding: 10px 20px;
+            background-color: var(--bg-dark);
+        }
+
         .main-felt {
-            background: var(--felt-green);
-            height: 320px;
-            margin-top: -30px; /* Overlapper topp-buen */
-            margin-bottom: -30px; /* Overlapper bunn-buen */
-            position: relative;
-            z-index: 1;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 0 15px;
-            box-shadow: inset 0 0 80px rgba(0,0,0,0.6);
+            background: var(--green-felt);
+            border-radius: 15px; /* De buede hjørnene på det grønne */
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
         }
 
         .action-card {
-            width: 100px;
-            height: 120px;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.4);
             border: 1.5px solid var(--gold);
             border-radius: 12px;
+            aspect-ratio: 1; /* Gjør de firkantede */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-3px);
+            background: rgba(0,0,0,0.5);
         }
 
         .action-card i {
-            font-size: 35px;
-            margin-bottom: 10px;
+            font-size: 30px;
+            margin-bottom: 8px;
             color: var(--gold);
         }
 
         .action-card.green-plus i {
-            color: #4caf50;
+            color: var(--green-win);
         }
 
         .action-label {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: bold;
             text-transform: uppercase;
         }
 
-        /* Kamp-info seksjon (bue øverst) */
-        .match-section {
-            padding: 40px 20px 20px; /* Mer padding i topp for buen */
-            /* Magien som skaper buen: En stor sirkelmaske som 'klipper' panelet */
-            -webkit-mask-image: radial-gradient(circle 500px at 50% 540px, transparent 100%, black 100%);
-            mask-image: radial-gradient(circle 500px at 50% 540px, transparent 100%, black 100%);
+        /* 3. Seksjon for siste kamp */
+        .last-match-container {
+            padding: 10px 20px 20px;
+            background-color: var(--bg-dark);
             flex-grow: 1; /* Fyller resten av plassen */
         }
 
         .match-card {
-            background: #1e1e1e;
+            background: var(--bg-card);
             border-radius: 15px;
             padding: 15px;
             border: 1px solid #333;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
 
         .match-card h3 {
             margin: 0 0 15px 0;
             font-size: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .cat-icon {
-            color: #4caf50;
-            font-size: 18px;
         }
 
         .score-row {
@@ -220,8 +207,12 @@
             line-height: 1;
         }
 
+        .score-display .final {
+            color: var(--green-win);
+        }
+
         .win-tag {
-            color: #4caf50;
+            color: var(--green-win);
             font-size: 11px;
             font-weight: bold;
             display: block;
@@ -248,7 +239,7 @@
             font-weight: bold;
         }
 
-        /* Bunnmeny */
+        /* 4. Bunnmeny */
         .nav-bar {
             width: 100%;
             height: 70px;
@@ -286,7 +277,7 @@
 <body>
 
 <div class="phone-container">
-    <div class="header leather-panel">
+    <header class="header">
         <div class="profile-row">
             <div class="greeting">
                 <h1>Hei, Marius!</h1>
@@ -299,29 +290,28 @@
         <div class="progress-bar-container">
             <div class="progress-fill"></div>
         </div>
-    </div>
+    </header>
 
-    <div class="main-felt">
-        <div class="action-card green-plus">
-            <i class="fa-solid fa-plus"></i>
-            <div class="action-label">Ny Kamp</div>
+    <section class="activity-felt-container">
+        <div class="main-felt">
+            <div class="action-card green-plus">
+                <i class="fa-solid fa-plus"></i>
+                <div class="action-label">Ny Kamp</div>
+            </div>
+            <div class="action-card">
+                <i class="fa-solid fa-trophy"></i>
+                <div class="action-label">Toppliste</div>
+            </div>
+            <div class="action-card">
+                <i class="fa-solid fa-book-open"></i>
+                <div class="action-label">Regler</div>
+            </div>
         </div>
-        <div class="action-card">
-            <i class="fa-solid fa-trophy"></i>
-            <div class="action-label">Toppliste</div>
-        </div>
-        <div class="action-card">
-            <i class="fa-solid fa-book-open"></i>
-            <div class="action-label">Regler</div>
-        </div>
-    </div>
+    </section>
 
-    <div class="match-section leather-panel">
+    <section class="last-match-container">
         <div class="match-card">
-            <h3>
-                Min Siste Kamp
-                <i class="fa-solid fa-cat cat-icon"></i>
-            </h3>
+            <h3>Min Siste Kamp</h3>
             <div class="score-row">
                 <div class="player">
                     <div class="player-img">
@@ -330,7 +320,7 @@
                     <div class="player-name">Mav</div>
                 </div>
                 <div class="score-display">
-                    <span style="color: #4caf50;">100</span> - <span style="color: var(--gold);">82</span>
+                    <span class="final">100</span> - <span style="color: var(--gold);">82</span>
                     <span class="win-tag">WIN</span>
                 </div>
                 <div class="player">
@@ -348,9 +338,9 @@
                 <div><div class="stat-label">Kats.</div><div class="stat-value">27</div></div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <div class="nav-bar">
+    <nav class="nav-bar">
         <a href="#" class="nav-item active">
             <i class="fa-solid fa-house"></i>
             Hjem
@@ -363,7 +353,7 @@
             <i class="fa-solid fa-book"></i>
             Regler
         </a>
-    </div>
+    </nav>
 </div>
 
 </body>
