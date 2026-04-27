@@ -30,7 +30,7 @@
         .player-info h2 { margin: 0; font-size: 1.2em; text-transform: uppercase; letter-spacing: 1px; color: #666; }
         .active .player-info h2 { color: #f1c40f; }
         .score-display { font-size: 3.5em; font-weight: 900; line-height: 1; margin: 0; color: #333; min-width: 60px; text-align: right; }
-        .active .score-display { color: #f1c40f; }
+        .active .score-display { color: #f1c40f; text-shadow: 0 0 15px rgba(241, 196, 15, 0.3); }
 
         .sub-stats { font-size: 0.55em; color: #444; margin-top: 12px; display: flex; justify-content: flex-start; text-transform: uppercase; }
         .active .sub-stats { color: #888; }
@@ -61,11 +61,16 @@
         .btn-turn { background: #27ae60; color: white; border-bottom: 4px solid #1e8449; grid-column: span 2; padding: 20px; font-size: 1.1em; }
         .btn-finish { background: #000; color: white; border: 1px solid #333; grid-column: span 2; margin-top: 5px; padding: 12px; font-size: 0.7em; letter-spacing: 1px; opacity: 0.8; }
         
-        .setup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,20,5,0.98); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; box-sizing: border-box; backdrop-filter: blur(10px); }
+        /* SETUP OVERLAY STYLES */
+        .setup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,20,5,0.98); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(10px); }
         .setup-card { background: #000; border: 1px solid #f1c40f; padding: 30px; border-radius: 30px; width: 100%; max-width: 350px; text-align: center; }
         .btn-choice { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid #333; background: #111; color: white; font-weight: bold; cursor: pointer; }
-        .name-field { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #111; color: white; margin-bottom: 10px; box-sizing: border-box; text-align: center; }
-        .btn-start { width: 100%; padding: 18px; border-radius: 15px; background: #27ae60; color: white; border: none; font-weight: 900; text-transform: uppercase; margin-top: 10px; }
+        .name-field { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #111; color: white; margin-bottom: 10px; box-sizing: border-box; text-align: center; font-size: 1em; }
+        .btn-start { width: 100%; padding: 18px; border-radius: 15px; background: #27ae60; color: white; border: none; font-weight: 900; text-transform: uppercase; margin-top: 10px; cursor: pointer; }
+        
+        /* BACK BUTTON STYLE */
+        .btn-back { background: none; border: none; color: #888; margin-top: 20px; cursor: pointer; font-size: 0.8em; text-decoration: underline; }
+
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: flex; justify-content: space-around; padding: 10px 0 35px 0; border-top: 1px solid #111; z-index: 1000; }
         .nav-item { color: #333; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.55em; font-weight: bold; }
         .nav-item.active { color: #f1c40f; }
@@ -77,18 +82,24 @@
 
 <div id="setupOverlay" class="setup-overlay">
     <div class="setup-card">
-        <h2 style="color:#f1c40f">NEW MATCH</h2>
+        <h2 style="color:#f1c40f; margin-bottom: 20px;">NEW MATCH</h2>
+        
         <div id="step1">
-            <p style="color:#888">Players?</p>
+            <p style="color:#888; margin-bottom: 15px;">Antall spillere?</p>
             <div style="display:flex; gap:10px; margin-bottom:20px;">
                 <button class="btn-choice" onclick="selectPlayers(1)">1</button>
                 <button class="btn-choice" onclick="selectPlayers(2)">2</button>
                 <button class="btn-choice" onclick="selectPlayers(3)">3</button>
             </div>
+            <button class="btn-back" onclick="closeSetup()">Avbryt</button>
         </div>
+
         <div id="step2" style="display: none;">
+            <p style="color:#888; margin-bottom: 15px;">Navn på spillere:</p>
             <div id="nameInputs"></div>
             <button class="btn-start" onclick="finalizeSetup()">Start Match</button>
+            <br>
+            <button class="btn-back" onclick="goBackToStep1()">← Gå tilbake</button>
         </div>
     </div>
 </div>
@@ -149,24 +160,57 @@
 
     db.on('value', (s) => { if(s.val()) { state = s.val(); updateUI(); } });
 
-    function openSetup() { document.getElementById('setupOverlay').style.display = 'flex'; }
+    function openSetup() { 
+        document.getElementById('setupOverlay').style.display = 'flex'; 
+        goBackToStep1();
+    }
+
+    function closeSetup() {
+        document.getElementById('setupOverlay').style.display = 'none';
+    }
+
+    function goBackToStep1() {
+        document.getElementById('step1').style.display = 'block';
+        document.getElementById('step2').style.display = 'none';
+    }
+
     function selectPlayers(n) { 
         state.playerCount = n; 
         document.getElementById('step1').style.display = 'none'; 
         document.getElementById('step2').style.display = 'block';
         const container = document.getElementById('nameInputs');
         container.innerHTML = '';
-        for(let i=0; i<n; i++) container.innerHTML += `<input type="text" class="name-field" id="n${i}" placeholder="Navn ${i+1}">`;
+        for(let i=0; i<n; i++) {
+            container.innerHTML += `<input type="text" class="name-field" id="n${i}" placeholder="Spiller ${i+1} navn">`;
+        }
     }
+
     function finalizeSetup() {
         const namesArr = [];
-        for(let i=0; i<state.playerCount; i++) namesArr.push(document.getElementById(`n${i}`).value || `P${i+1}`);
-        state.names = namesArr;
-        state.scores = [0,0,0]; state.foulCounts = [0,0,0]; state.scoreAtStart = [0,0,0]; state.bestSeries = [0,0,0]; state.lastSeries = [0,0,0]; state.currentPlayer = 0; state.breakDone = false; state.seconds = 0; state.tableStatus = 'open'; state.lastType = null;
-        db.set(state);
-        document.getElementById('setupOverlay').style.display = 'none';
-        document.getElementById('step2').style.display = 'none';
-        document.getElementById('step1').style.display = 'block';
+        for(let i=0; i<state.playerCount; i++) {
+            const val = document.getElementById(`n${i}`).value;
+            namesArr.push(val || `Spiller ${i+1}`);
+        }
+        
+        const newState = {
+            ...state,
+            names: namesArr,
+            scores: [0,0,0],
+            foulCounts: [0,0,0],
+            scoreAtStart: [0,0,0],
+            bestSeries: [0,0,0],
+            lastSeries: [0,0,0],
+            currentPlayer: 0,
+            breakDone: false,
+            seconds: 0,
+            tableStatus: 'open',
+            lastType: null,
+            innings: 0
+        };
+
+        db.set(newState).then(() => {
+            closeSetup();
+        });
     }
 
     function action(type, val) {
@@ -221,21 +265,13 @@
         }
         
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
-        
-        // OPPGAVE: Skjul knapp og oppdater tekst dynamisk
-        const moveTextEl = document.getElementById('moveText');
         const rotateCont = document.getElementById('rotate-container');
-        
         if (!state.breakDone) {
-            moveTextEl.innerText = l.break;
+            document.getElementById('moveText').innerText = l.break;
             rotateCont.style.display = 'block';
         } else {
             rotateCont.style.display = 'none';
-            if (state.tableStatus === 'locked') {
-                moveTextEl.innerText = state.lastType === 'pocket' ? l.req_carom : l.req_pocket;
-            } else {
-                moveTextEl.innerText = l.any;
-            }
+            document.getElementById('moveText').innerText = state.tableStatus === 'locked' ? (state.lastType === 'pocket' ? l.req_carom : l.req_pocket) : l.any;
         }
 
         const lock = state.tableStatus === 'locked';
