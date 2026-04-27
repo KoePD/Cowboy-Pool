@@ -39,7 +39,6 @@
         .active .sub-stats { color: #888; }
         .stat-item { width: 55px; display: flex; flex-direction: column; }
         .stat-val { color: #eee; font-weight: 900; font-size: 1.1em; }
-        /* Farge styres nå av inline-style i JS for å skille aktiv/inaktiv */
         
         .foul-dot { width: 12px; height: 12px; border-radius: 50%; background: #1a1a1a; border: 1px solid #222; }
         .foul-dot.active { background: #e74c3c; box-shadow: 0 0 10px #ff4757; }
@@ -88,14 +87,12 @@
 <div id="setupOverlay" class="setup-overlay">
     <div class="setup-card">
         <h2 id="overlayHeader" style="color:#f1c40f; margin-bottom: 20px;">NY MATCH</h2>
-        
         <div id="step-confirm" style="display: none;">
             <p id="confirmText" style="color:#888; margin-bottom: 20px;">En kamp pågår allerede. Hva vil du gjøre?</p>
-            <button class="btn-save-option" id="saveAndStartBtn" onclick="handleFinishAndSave()">LAGRE & START NY</button>
-            <button class="btn-discard-option" id="discardAndStartBtn" onclick="goToStep1()">SLETT & START NY</button>
-            <button class="btn-back" id="cancelBtn" onclick="closeSetup()">Fortsett kampen</button>
+            <button class="btn-save-option" onclick="handleFinishAndSave()">LAGRE & START NY</button>
+            <button class="btn-discard-option" onclick="goToStep1()">SLETT & START NY</button>
+            <button class="btn-back" onclick="closeSetup()">Fortsett kampen</button>
         </div>
-
         <div id="step1" style="display: none;">
             <p style="color:#888; margin-bottom: 10px;">Spillmodus:</p>
             <div style="display:flex; gap:10px; margin-bottom:20px;">
@@ -108,15 +105,14 @@
                 <button class="btn-choice" onclick="selectPlayers(2)">2</button>
                 <button class="btn-choice" onclick="selectPlayers(3)">3</button>
             </div>
-            <button class="btn-back" id="abortBtn" onclick="closeSetup()">Avbryt</button>
+            <button class="btn-back" onclick="closeSetup()">Avbryt</button>
         </div>
-
         <div id="step2" style="display: none;">
             <p id="namesText" style="color:#888; margin-bottom: 15px;">Navn på spillere:</p>
             <div id="nameInputs"></div>
-            <button class="btn-start" id="startMatchBtn" onclick="finalizeSetup()">START KAMP</button>
+            <button class="btn-start" onclick="finalizeSetup()">START KAMP</button>
             <br>
-            <button class="btn-back" id="backBtn" onclick="goToStep1()">← Tilbake</button>
+            <button class="btn-back" onclick="goToStep1()">← Tilbake</button>
         </div>
     </div>
 </div>
@@ -136,15 +132,9 @@
         </div>
         <p style="text-align:center; color:#666; font-size:0.8em; text-transform:uppercase; margin:15px 0;">Dine Trofeer</p>
         <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;">
-            <div class="player-card" style="flex-direction:column; padding:15px; opacity:0.3; justify-content:center; text-align:center;">
-                <i class="material-icons">workspace_premium</i><small style="font-size:0.6em; margin-top:5px;">101 Club</small>
-            </div>
-            <div class="player-card" style="flex-direction:column; padding:15px; opacity:0.3; justify-content:center; text-align:center;">
-                <i class="material-icons">military_tech</i><small style="font-size:0.6em; margin-top:5px;">Sniper</small>
-            </div>
-            <div class="player-card" style="flex-direction:column; padding:15px; opacity:0.3; justify-content:center; text-align:center;">
-                <i class="material-icons">stars</i><small style="font-size:0.6em; margin-top:5px;">Carom King</small>
-            </div>
+            <div class="player-card" style="flex-direction:column; padding:15px; opacity:0.3; justify-content:center; text-align:center;"><i class="material-icons">workspace_premium</i><small style="font-size:0.6em; margin-top:5px;">101 Club</small></div>
+            <div class="player-card" style="flex-direction:column; padding:15px; opacity:0.3; justify-content:center; text-align:center;"><i class="material-icons">military_tech</i><small style="font-size:0.6em; margin-top:5px;">Sniper</small></div>
+            <div class="player-card" style="flex-direction:column; padding:15px; opacity:0.3; justify-content:center; text-align:center;"><i class="material-icons">stars</i><small style="font-size:0.6em; margin-top:5px;">Carom King</small></div>
         </div>
     </div>
 
@@ -152,33 +142,27 @@
         <div class="header-actions">
             <button class="btn-new-game-top" id="newMatchTopBtn" onclick="checkActiveGame()">New Match</button>
         </div>
-
         <div id="scoreboard-container"></div>
-
         <div class="game-status-zone">
             <div id="modeLabel" style="font-size:0.6em; color:#f1c40f; opacity:0.6; margin-bottom:5px; text-transform:uppercase;">MODUS: STANDARD</div>
             <span class="req-text" id="moveText">BREKK-STØT</span>
             <span class="timer-text" id="matchTimer">00:00:00</span>
-            <div id="rotate-container">
-                <button class="btn-rotate" id="rotateBtn" onclick="rotateBreaker()">BYTT STARTSPILLER</button>
-            </div>
+            <div id="rotate-container"><button class="btn-rotate" onclick="rotateBreaker()">BYTT STARTSPILLER</button></div>
         </div>
-
         <div class="ball-control-zone">
             <div class="ball-group">
                 <button class="ball" id="ball1" onclick="action('pocket', 1)"><div class="ball-inner">1</div></button>
-                <button class="btn-sub-carom" onclick="action('pocket_carom', 2)">+ CAROM</button>
+                <button class="btn-sub-carom" id="pc1" onclick="action('pocket_carom', 2)">+ CAROM</button>
             </div>
             <div class="ball-group">
                 <button class="ball" id="ball5" onclick="action('pocket', 5)"><div class="ball-inner">5</div></button>
-                <button class="btn-sub-carom" onclick="action('pocket_carom', 6)">+ CAROM</button>
+                <button class="btn-sub-carom" id="pc5" onclick="action('pocket_carom', 6)">+ CAROM</button>
             </div>
             <div class="ball-group">
                 <button class="ball" id="ball3" onclick="action('pocket', 3)"><div class="ball-inner">3</div></button>
-                <button class="btn-sub-carom" onclick="action('pocket_carom', 4)">+ CAROM</button>
+                <button class="btn-sub-carom" id="pc3" onclick="action('pocket_carom', 4)">+ CAROM</button>
             </div>
         </div>
-
         <div class="action-area">
             <button id="winButton" class="btn-win" onclick="action('winning_shot', 1)">WINNING SHOT (CUE VIA 1)</button>
             <button class="btn btn-blue" id="carom1PBtn" onclick="action('carom', 1)">Carom 1P</button>
@@ -190,10 +174,10 @@
     </div>
 
     <nav class="bottom-nav">
-        <a href="javascript:void(0)" class="nav-item" id="nav-profile" onclick="switchPage('profilePage')"><i class="material-icons">person</i><span id="txt-nav-prof">PROFIL</span></a>
-        <a href="javascript:void(0)" class="nav-item active" id="nav-play" onclick="switchPage('playPage')"><i class="material-icons">home</i><span id="txt-nav-home">HJEM</span></a>
-        <a href="stats.html" class="nav-item"><i class="material-icons">leaderboard</i><span id="navStats">STATS</span></a>
-        <a href="javascript:void(0)" class="nav-item" onclick="toggleLanguage()"><i class="material-icons">language</i><span id="navLang">EN/NO</span></a>
+        <a href="javascript:void(0)" class="nav-item" id="nav-profile" onclick="switchPage('profilePage')"><i class="material-icons">person</i><span>PROFIL</span></a>
+        <a href="javascript:void(0)" class="nav-item active" id="nav-play" onclick="switchPage('playPage')"><i class="material-icons">home</i><span>HJEM</span></a>
+        <a href="stats.html" class="nav-item"><i class="material-icons">leaderboard</i><span>STATS</span></a>
+        <a href="javascript:void(0)" class="nav-item" onclick="toggleLanguage()"><i class="material-icons">language</i><span>EN/NO</span></a>
     </nav>
 </div>
 
@@ -202,14 +186,13 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('gameData');
 
-    let setupCount = 2;
-    let tempMode = 'standard';
-    let state = { gameMode: 'standard', playerCount: 2, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null, innings: 0, seconds: 0, names: ["P1","P2","P3"], bestSeries: [0,0,0], lastSeries: [0,0,0], lang: 'no' };
+    let setupCount = 2; let tempMode = 'standard';
+    let state = { gameMode: 'standard', playerCount: 2, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null, seconds: 0, names: ["P1","P2","P3"], bestSeries: [0,0,0], lastSeries: [0,0,0], lang: 'no' };
     let history = [];
 
     const dictionary = {
-        no: { newMatch: "NY MATCH", confirm: "En kamp pågår allerede. Hva vil du gjøre?", saveStart: "LAGRE & START NY", discardStart: "SLETT & START NY", resume: "Fortsett kampen", players: "Antall spillere?", abort: "Avbryt", names: "Navn på spillere:", start: "START KAMP", back: "← Tilbake", now: "NÅ", best: "PERS", last: "SISTE", break: "BREKK-STØT", req_carom: "KRAV: CAROM", req_pocket: "KRAV: POCKET", any: "VELG: CAROM / KULE", caroms_only: "KUN CAROMS", winning_shot: "WINNING SHOT (CUE VIA 1)", rotate: "BYTT STARTSPILLER", foul: "FOUL", undo: "ANGRE", turn: "AVSLUTT TUR", home: "HJEM", stats: "STATS", prof: "PROFIL" },
-        en: { newMatch: "NEW MATCH", confirm: "A match is in progress. What do you want to do?", saveStart: "SAVE & START NEW", discardStart: "DISCARD & START NEW", resume: "Resume match", players: "Number of players?", abort: "Cancel", names: "Player names:", start: "START MATCH", back: "← Back", now: "NOW", best: "BEST", last: "LAST", break: "BREAK SHOT", req_carom: "REQ: CAROM", req_pocket: "REQ: POCKET", any: "CHOOSE: CAROM / POCKET", caroms_only: "CAROMS ONLY", winning_shot: "WINNING SHOT (CUE VIA 1)", rotate: "SWITCH STARTER", foul: "FOUL", undo: "UNDO", turn: "END TURN", home: "HOME", stats: "STATS", prof: "PROFILE" }
+        no: { now: "NÅ", best: "PERS", last: "SISTE", break: "BREKK-STØT", req_carom: "KRAV: CAROM", req_pocket: "KRAV: POCKET", any: "VELG: CAROM / KULE", caroms_only: "KUN CAROMS", win: "WINNING SHOT (CUE VIA 1)" },
+        en: { now: "NOW", best: "BEST", last: "LAST", break: "BREAK SHOT", req_carom: "REQ: CAROM", req_pocket: "REQ: POCKET", any: "ANY POINT", caroms_only: "CAROMS ONLY", win: "WINNING SHOT (CUE VIA 1)" }
     };
 
     db.on('value', (s) => { if(s.val()) { state = s.val(); updateUI(); } });
@@ -224,41 +207,26 @@
     }
 
     function action(type, val) {
-        saveHistory();
-        let p = state.currentPlayer;
-        let cur = state.scores[p];
-
-        if ((cur < 90 && (cur + val) > 90) || (cur >= 90 && (cur + val) > 101)) {
-            handleFoul(); return;
-        }
-
+        saveHistory(); let p = state.currentPlayer; let cur = state.scores[p];
+        if ((cur < 90 && (cur + val) > 90) || (cur >= 90 && (cur + val) > 101)) { handleFoul(); return; }
         if (cur >= 90 && cur < 100 && type.includes('pocket') && type !== 'pocket_carom') return;
         if (cur === 100 && type !== 'winning_shot') return;
-
-        state.breakDone = true;
-        state.foulCounts[p] = 0;
-
+        state.breakDone = true; state.foulCounts[p] = 0;
         if (state.gameMode === 'alternate') {
-            if (type === 'pocket_carom') {
-                state.tableStatus = state.tableStatus === 'open' ? 'open' : 'locked';
-                state.lastType = 'pocket';
-            } else { state.tableStatus = 'locked'; state.lastType = type; }
+            if (type === 'pocket_carom') { state.tableStatus = state.tableStatus === 'open' ? 'open' : 'locked'; state.lastType = 'pocket'; }
+            else { state.tableStatus = 'locked'; state.lastType = type; }
         } else { state.tableStatus = 'open'; }
-
-        state.scores[p] += val;
-        db.set(state);
+        state.scores[p] += val; db.set(state);
     }
 
     function updateUI() {
         const l = dictionary[state.lang || 'no'];
         document.getElementById('modeLabel').innerText = "MODUS: " + state.gameMode.toUpperCase();
-        
         document.getElementById('profName').innerText = state.names[0];
         document.getElementById('profInitial').innerText = state.names[0].charAt(0).toUpperCase();
         document.getElementById('profBest').innerText = state.bestSeries[0] + " Poeng";
 
-        const cont = document.getElementById('scoreboard-container');
-        cont.innerHTML = '';
+        const cont = document.getElementById('scoreboard-container'); cont.innerHTML = '';
         for(let i=0; i<state.playerCount; i++) {
             const active = state.currentPlayer === i;
             cont.innerHTML += `<div class="player-card ${active?'active':''}">
@@ -270,42 +238,40 @@
                         <div class="stat-item">${l.last} <span class="stat-val" style="color: ${active ? '#f1c40f' : '#eee'}">${state.lastSeries[i]||0}</span></div>
                     </div>
                     <div style="display:flex; gap:5px; margin-top:10px;">
-                        <div class="foul-dot ${state.foulCounts[i]>=1?'active':''}"></div>
-                        <div class="foul-dot ${state.foulCounts[i]>=2?'active':''}"></div>
-                        <div class="foul-dot ${state.foulCounts[i]>=3?'active':''}"></div>
+                        <div class="foul-dot ${state.foulCounts[i]>=1?'active':''}"></div><div class="foul-dot ${state.foulCounts[i]>=2?'active':''}"></div><div class="foul-dot ${state.foulCounts[i]>=3?'active':''}"></div>
                     </div>
-                </div>
-                <div class="score-display">${state.scores[i]}</div>
-            </div>`;
+                </div><div class="score-display">${state.scores[i]}</div></div>`;
         }
 
         const cur = state.scores[state.currentPlayer];
-        const winPhase = cur === 100;
-        const caromPhase = cur >= 90 && cur < 100;
-        
-        // Sjekk for låsing i Alternate modus
-        const isAlternate = state.gameMode === 'alternate';
-        const lockPocket = isAlternate && state.tableStatus === 'locked' && state.lastType === 'pocket';
-        const lockCarom = isAlternate && state.tableStatus === 'locked' && state.lastType === 'carom';
+        const winPhase = cur === 100; const caromPhase = cur >= 90 && cur < 100;
+        const lockPocket = state.gameMode === 'alternate' && state.tableStatus === 'locked' && state.lastType === 'pocket';
+        const lockCarom = state.gameMode === 'alternate' && state.tableStatus === 'locked' && state.lastType === 'carom';
 
-        // Knappekontroll
         document.getElementById('winButton').style.display = winPhase ? 'block' : 'none';
         
-        // Carom-knappene skal KUN skjules hvis vi er låst til Pocket i Alternate modus
-        const hideCarom = lockCarom; 
-        document.getElementById('carom1PBtn').style.display = winPhase ? 'none' : (hideCarom ? 'none' : 'block');
-        document.getElementById('carom2PBtn').style.display = winPhase ? 'none' : (hideCarom ? 'none' : 'block');
+        // Gråer ut carom-knapper ved låsing eller winning shot
+        const caromWaiting = winPhase || lockCarom;
+        document.getElementById('carom1PBtn').className = caromWaiting ? 'btn btn-blue waiting-ball' : 'btn btn-blue';
+        document.getElementById('carom2PBtn').className = caromWaiting ? 'btn btn-blue waiting-ball' : 'btn btn-blue';
 
-        // Ballkontroll
         document.getElementById('ball1').className = (!state.breakDone || caromPhase || winPhase || lockPocket) ? 'ball waiting-ball' : 'ball';
         document.getElementById('ball5').className = (!state.breakDone || caromPhase || winPhase || lockPocket) ? 'ball waiting-ball' : 'ball';
         document.getElementById('ball3').className = (caromPhase || winPhase || lockPocket) ? 'ball waiting-ball' : 'ball';
+        document.getElementById('pc1').className = caromPhase || winPhase ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
+        document.getElementById('pc5').className = caromPhase || winPhase ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
+        document.getElementById('pc3').className = caromPhase || winPhase ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
         
-        document.getElementById('moveText').innerText = winPhase ? l.winning_shot : (caromPhase ? l.caroms_only : (!state.breakDone ? l.break : (lockPocket ? l.req_carom : (lockCarom ? l.req_pocket : l.any))));
+        document.getElementById('moveText').innerText = winPhase ? l.win : (caromPhase ? l.caroms_only : (!state.breakDone ? l.break : (lockPocket ? l.req_carom : (lockCarom ? l.req_pocket : l.any))));
         document.getElementById('rotate-container').style.display = state.breakDone ? 'none' : 'block';
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
     }
 
+    function checkActiveGame() { document.getElementById('setupOverlay').style.display = 'flex'; if (state.scores.some(s => s > 0)) { document.getElementById('step-confirm').style.display = 'block'; document.getElementById('step1').style.display = 'none'; document.getElementById('step2').style.display = 'none'; } else { goToStep1(); } }
+    function setMode(m) { tempMode = m; document.getElementById('modeStd').classList.toggle('selected', m === 'standard'); document.getElementById('modeAlt').classList.toggle('selected', m === 'alternate'); }
+    function goToStep1() { document.getElementById('step-confirm').style.display = 'none'; document.getElementById('step1').style.display = 'block'; document.getElementById('step2').style.display = 'none'; setMode(tempMode); }
+    function selectPlayers(n) { setupCount = n; document.getElementById('step1').style.display = 'none'; document.getElementById('step2').style.display = 'block'; const c = document.getElementById('nameInputs'); c.innerHTML = ''; for(let i=0; i<n; i++) c.innerHTML += `<input type="text" id="n${i}" class="name-field" placeholder="Navn ${i+1}">`; }
+    function finalizeSetup() { const ns = []; for(let i=0; i<setupCount; i++) ns.push(document.getElementById(`n${i}`).value || `P${i+1}`); db.set({...state, gameMode: tempMode, playerCount: setupCount, names: ns, scores: [0,0,0], foulCounts:[0,0,0], scoreAtStart:[0,0,0], breakDone:false, seconds:0, currentPlayer:0, tableStatus:'open'}); closeSetup(); }
     function handleFoul() { saveHistory(); state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; state.foulCounts[state.currentPlayer]++; if(state.foulCounts[state.currentPlayer] >= 3) { state.scores[state.currentPlayer] = 0; state.foulCounts[state.currentPlayer] = 0; } nextTurn(); }
     function nextTurn() { saveHistory(); let p = state.currentPlayer; let s = state.scores[p] - state.scoreAtStart[p]; if(s > state.bestSeries[p]) state.bestSeries[p] = s; state.lastSeries[p] = s; state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; state.tableStatus = 'open'; state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; db.set(state); }
     function undo() { if(history.length) { state = JSON.parse(history.pop()); db.set(state); } }
@@ -314,11 +280,6 @@
     function rotateBreaker() { if(!state.breakDone) { state.currentPlayer = (state.currentPlayer+1)%state.playerCount; db.set(state); } }
     function handleFinishAndSave() { firebase.database().ref('matchHistory').push({ date: new Date().toISOString(), players: state.names.slice(0, state.playerCount), scores: state.scores.slice(0, state.playerCount) }).then(goToStep1); }
     function toggleLanguage() { state.lang = state.lang==='no'?'en':'no'; db.set(state); }
-    function checkActiveGame() { document.getElementById('setupOverlay').style.display = 'flex'; const inProgress = state.scores.some(s => s > 0); if (inProgress) { document.getElementById('step-confirm').style.display = 'block'; document.getElementById('step1').style.display = 'none'; document.getElementById('step2').style.display = 'none'; } else { goToStep1(); } }
-    function setMode(m) { tempMode = m; document.getElementById('modeStd').classList.toggle('selected', m === 'standard'); document.getElementById('modeAlt').classList.toggle('selected', m === 'alternate'); }
-    function goToStep1() { document.getElementById('step-confirm').style.display = 'none'; document.getElementById('step1').style.display = 'block'; document.getElementById('step2').style.display = 'none'; setMode(tempMode); }
-    function selectPlayers(n) { setupCount = n; document.getElementById('step1').style.display = 'none'; document.getElementById('step2').style.display = 'block'; const c = document.getElementById('nameInputs'); c.innerHTML = ''; for(let i=0; i<n; i++) c.innerHTML += `<input type="text" id="n${i}" class="name-field" placeholder="Navn ${i+1}">`; }
-    function finalizeSetup() { const ns = []; for(let i=0; i<setupCount; i++) ns.push(document.getElementById(`n${i}`).value || `P${i+1}`); db.set({...state, gameMode: tempMode, playerCount: setupCount, names: ns, scores: [0,0,0], foulCounts:[0,0,0], scoreAtStart:[0,0,0], breakDone:false, seconds:0, currentPlayer:0, tableStatus:'open'}); closeSetup(); }
     setInterval(() => { if(state.breakDone) { state.seconds++; db.child('seconds').set(state.seconds); } }, 1000);
 </script>
 </body>
