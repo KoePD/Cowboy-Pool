@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Biljard App - Ultra Max</title>
+    <title>Biljard App - Master Template</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -11,6 +11,11 @@
             --gold: #d4af37;
             --leather: #121212;
             --card-bg: rgba(0, 0, 0, 0.75);
+            /* Standard høyder for "Hjem" */
+            --header-padding: 80px 30px 140px;
+            --bottom-padding: 130px 30px 40px;
+            --stitch-pos-top: 18px;
+            --stitch-pos-bottom: 18px;
         }
 
         html, body {
@@ -28,6 +33,15 @@
             display: flex;
             flex-direction: column;
             position: relative;
+            transition: all 0.4s ease; /* Myk overgang mellom sider */
+        }
+
+        /* DYNAMISK JUSTERING FOR RANGE / ANDRE SIDER */
+        .app-container.slim-mode {
+            --header-padding: 40px 30px 60px; /* Mye lavere */
+            --bottom-padding: 60px 30px 30px;  /* Mye lavere */
+            --stitch-pos-top: 8px;
+            --stitch-pos-bottom: 8px;
         }
 
         .felt-base {
@@ -50,52 +64,54 @@
         .header {
             background: var(--leather);
             background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png");
-            padding: 80px 30px 140px; 
+            padding: var(--header-padding);
             z-index: 10;
             border-bottom-left-radius: 50% 50px;
             border-bottom-right-radius: 50% 50px;
             box-shadow: 0 25px 45px rgba(0,0,0,0.9);
             position: relative;
+            transition: padding 0.4s ease;
         }
 
         .header::after {
             content: "";
             position: absolute;
-            bottom: 18px; left: 5%; width: 90%; height: 50px;
+            bottom: var(--stitch-pos-top); left: 5%; width: 90%; height: 50px;
             border-bottom: 2px dashed rgba(212, 175, 55, 0.3);
             border-radius: 50%;
         }
 
-        .header h1 { color: #fff; margin: 0; font-size: 36px; font-weight: 800; }
-        .rank { color: var(--gold); font-size: 18px; margin: 8px 0; font-weight: 500; }
+        .header h1 { color: #fff; margin: 0; font-size: 32px; font-weight: 800; }
+        .rank { color: var(--gold); font-size: 16px; margin: 8px 0; font-weight: 500; }
         
         .progress-bar {
-            width: 100%; height: 12px; background: #222;
-            border-radius: 6px; margin-top: 30px;
+            width: 100%; height: 10px; background: #222;
+            border-radius: 5px; margin-top: 25px;
         }
         .progress-fill {
             width: 65%; height: 100%;
             background: linear-gradient(90deg, #b38f36, var(--gold));
             box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
-            border-radius: 6px;
+            border-radius: 5px;
         }
 
-        /* MIDTPARTI - ULTRA MASSIVE KNAPPER (+50%) */
-        .main-felt {
+        /* MIDTPARTI */
+        .main-content {
             position: relative;
             z-index: 5;
             flex-grow: 1;
             display: flex;
             justify-content: space-evenly;
             align-items: center;
-            padding: 5px;
+            padding: 10px;
         }
 
+        /* De massive knappene dine */
         .action-card {
-            width: 250px; /* Økt fra 180px */
-            height: 280px; /* Økt fra 200px */
+            width: 250px;
+            height: 280px;
             background: var(--card-bg);
-            border: 3px solid var(--gold);
+            border: 3.5px solid var(--gold);
             border-radius: 35px;
             display: flex;
             flex-direction: column;
@@ -115,18 +131,19 @@
         .bottom-panel {
             background: var(--leather);
             background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png");
-            padding: 130px 30px 40px; 
+            padding: var(--bottom-padding);
             z-index: 10;
             border-top-left-radius: 50% 50px;
             border-top-right-radius: 50% 50px;
             box-shadow: 0 -25px 45px rgba(0,0,0,0.9);
             position: relative;
+            transition: padding 0.4s ease;
         }
 
         .bottom-panel::before {
             content: "";
             position: absolute;
-            top: 18px; left: 5%; width: 90%; height: 50px;
+            top: var(--stitch-pos-bottom); left: 5%; width: 90%; height: 50px;
             border-top: 2px dashed rgba(212, 175, 55, 0.3);
             border-radius: 50%;
         }
@@ -135,40 +152,40 @@
             background: rgba(255,255,255,0.04);
             border: 1px solid #333;
             border-radius: 24px;
-            padding: 30px;
+            padding: 25px;
         }
 
         /* NAVBAR */
         .navbar {
             background: #080808;
-            height: 100px;
+            height: 95px;
             display: flex;
             justify-content: space-around;
             align-items: center;
             border-top: 1px solid #1a1a1a;
             z-index: 20;
-            padding-bottom: 25px;
+            padding-bottom: 20px;
         }
 
-        .nav-item { color: #444; text-align: center; font-size: 16px; text-decoration: none; font-weight: 800; }
+        .nav-item { color: #444; text-align: center; font-size: 14px; text-decoration: none; font-weight: 800; }
         .nav-item.active { color: var(--gold); }
-        .nav-item i { display: block; font-size: 36px; margin-bottom: 8px; }
+        .nav-item i { display: block; font-size: 32px; margin-bottom: 8px; }
 
     </style>
 </head>
 <body>
 
-<div class="app-container">
+<div class="app-container" id="app">
     <div class="felt-base"></div>
     <div class="felt-texture"></div>
 
     <header class="header">
-        <h1>Hei, Lasse!</h1>
+        <h1 id="user-greeting">Hei, Lasse!</h1>
         <div class="rank">Cowboy Rank: Level 12 - Gunslinger</div>
         <div class="progress-bar"><div class="progress-fill"></div></div>
     </header>
 
-    <main class="main-felt">
+    <main class="main-content">
         <div class="action-card green-icon">
             <i class="fa-solid fa-circle-plus"></i>
             <span>NY KAMP</span>
@@ -185,32 +202,37 @@
 
     <section class="bottom-panel">
         <div class="match-card">
-            <div style="color:#666; font-size:16px; margin-bottom:20px; font-weight:800; text-transform: uppercase; letter-spacing: 1.5px;">Min Siste Kamp</div>
+            <div style="color:#666; font-size:14px; margin-bottom:15px; font-weight:800; text-transform: uppercase;">Min Siste Kamp</div>
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div style="text-align:center;">
-                    <div style="width:80px; height:80px; border-radius:50%; background:#1a1a1a; border:4px solid var(--gold); margin-bottom:10px;"></div>
-                    <div style="color:#fff; font-size:18px; font-weight: 700;">Lasse</div>
+                    <div style="width:60px; height:60px; border-radius:50%; background:#1a1a1a; border:3px solid var(--gold);"></div>
                 </div>
+                <div style="font-size:36px; font-weight:950; color:#fff;">0 - 0</div>
                 <div style="text-align:center;">
-                    <div style="font-size:54px; font-weight:950; color:#fff; letter-spacing:3px;">
-                        <span style="color:#2ecc71">0</span> - <span style="color:#444">0</span>
-                    </div>
-                    <div style="color:#666; font-size:14px; font-weight:900; margin-top:5px;">LASTER...</div>
-                </div>
-                <div style="text-align:center;">
-                    <div style="width:80px; height:80px; border-radius:50%; background:#1a1a1a; border:4px solid #333; margin-bottom:10px;"></div>
-                    <div style="color:#fff; font-size:18px; font-weight: 700;">?</div>
+                    <div style="width:60px; height:60px; border-radius:50%; background:#1a1a1a; border:3px solid #333;"></div>
                 </div>
             </div>
         </div>
     </section>
 
     <nav class="navbar">
-        <a href="#" class="nav-item active"><i class="fa-solid fa-house-chimney"></i>HJEM</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-infinity"></i>RANGE</a>
-        <a href="#" class="nav-item"><i class="fa-solid fa-user"></i>PROFIL</a>
+        <a href="#" class="nav-item active" onclick="toggleMode(false)"><i class="fa-solid fa-house-chimney"></i>HJEM</a>
+        <a href="#" class="nav-item" onclick="toggleMode(true)"><i class="fa-solid fa-infinity"></i>RANGE</a>
+        <a href="#" class="nav-item" onclick="toggleMode(true)"><i class="fa-solid fa-user"></i>PROFIL</a>
     </nav>
 </div>
+
+<script>
+    // Enkel funksjon for å demonstrere hvordan du bytter modus
+    function toggleMode(isSlim) {
+        const app = document.getElementById('app');
+        if(isSlim) {
+            app.classList.add('slim-mode');
+        } else {
+            app.classList.remove('slim-mode');
+        }
+    }
+</script>
 
 </body>
 </html>
