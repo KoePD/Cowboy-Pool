@@ -7,120 +7,119 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
     <style>
-        /* DESIGN: Her styres farger og utseende på kontrolleren */
-        body { font-family: 'Segoe UI', sans-serif; background: #1a3c1a; color: white; text-align: center; margin: 0; padding: 10px; overflow-x: hidden; }
-        .container { max-width: 600px; margin: auto; background: #222; padding: 15px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); position: relative; }
-        
-        /* MODUS-VELGER: Knappene for 1P, 2P, 3P øverst */
-        .top-row { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; }
-        .mode-selector { flex: 1; height: 50px; background: #333; padding: 0 10px; border-radius: 10px; display: flex; justify-content: center; gap: 10px; align-items: center; }
-        .mode-selector button { background: #444; color: white; border: 1px solid #555; padding: 8px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 60px; }
-        .mode-selector button.active { background: #f1c40f !important; color: #000 !important; border-color: #f1c40f; }
-        
-        .lang-btn { background: #34495e; color: white; border: 2px solid #5d6d7e; padding: 0 15px; border-radius: 10px; cursor: pointer; font-weight: 800; height: 50px; font-size: 0.8em; }
-
-        /* NAVNE-FELT: Input-boksene der du skriver inn spillernavn */
-        .names-row { height: 40px; display: flex; gap: 5px; margin-bottom: 10px; justify-content: center; }
-        .names-row input { flex: 1; padding: 10px 5px; border-radius: 8px; border: none; background: #444; color: white; text-align: center; font-size: 0.85em; font-weight: bold; }
-        
-        /* SCOREBOARD-KORTENE: Boksene som viser score, fouls og serie */
-        .scoreboard { display: flex; justify-content: center; margin-bottom: 15px; gap: 8px; align-items: stretch; }
-        .player-box { flex: 1; min-width: 0; padding: 15px 5px; border-radius: 15px; background: #333; border: 4px solid transparent; position: relative; }
-        .active { border-color: #f1c40f; background: #3d3d3d; } /* Rammen rundt den aktive spilleren */
-        .score { font-size: 2.8em; font-weight: 900; display: block; line-height: 1; }
-        
-        /* SERIE-INFO: Viser "Nå" (gjeldende serie) og "Pers" */
-        .series-info { 
-            display: flex; 
-            justify-content: space-around; 
-            margin-top: 8px; 
-            border-top: 1px solid #444; 
-            padding-top: 5px; 
+        /* DESIGN: Premium App Look */
+body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    background: #0f1710; /* Dyp, mørk grønnsvart */
+    color: white; 
+    text-align: center; 
+    margin: 0; 
+    padding: 15px; 
+    overflow-x: hidden;
 }
 
-        .series-box { 
-            flex: 1; 
-            min-width: 45px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-}
-        
-        .series-val { 
-            font-size: 0.95em; 
-            color: #f1c40f; 
-            font-weight: 900; 
-            width: 100%; 
-            text-align: center; 
-}
-        
-        .series-label { 
-            font-size: 0.65em; 
-            color: #888; 
-            text-transform: uppercase; 
-            white-space: nowrap; 
-            text-align: center;
+.container { 
+    max-width: 500px; 
+    margin: auto; 
+    background: rgba(30, 30, 30, 0.6); 
+    backdrop-filter: blur(10px); /* Glass-effekt */
+    padding: 20px; 
+    border-radius: 30px; 
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6); 
 }
 
-        /* FOUL-DOTS: De tre små prikkene som blir røde ved feil */
-        .foul-dots { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
-        .dot { width: 12px; height: 12px; border-radius: 50%; background: #444; border: 1px solid #111; }
-        .dot.active { background: #c0392b; box-shadow: 0 0 8px #ff0000; }
+/* MODUS-VELGER */
+.top-row { display: flex; gap: 10px; margin-bottom: 20px; }
+.mode-selector { 
+    flex: 1; 
+    background: rgba(0,0,0,0.3); 
+    padding: 5px; 
+    border-radius: 15px; 
+    display: flex; 
+    justify-content: space-around; 
+}
+.mode-selector button { 
+    background: transparent; 
+    color: #888; 
+    border: none; 
+    padding: 10px; 
+    border-radius: 10px; 
+    cursor: pointer; 
+    font-weight: 800; 
+    transition: 0.3s;
+}
+.mode-selector button.active { background: #f1c40f; color: #000; box-shadow: 0 0 15px rgba(241, 196, 15, 0.4); }
 
-        /* TIMER: Match-klokken i midten */
-        .timer-row { display: flex; flex-direction: column; align-items: center; margin: 10px 0; padding: 10px 0; border-top: 1px solid #333; border-bottom: 1px solid #333; }
-        .timer-display { font-family: monospace; font-size: 1.8em; color: #f1c40f; font-weight: bold; }
-        
-        /* STATUS-BOKS: Den store boksen som forteller hva neste krav er (KRAV: CAROM osv.) */
-        .next-move-box { min-height: 60px; background: #2c3e50; padding: 12px; border-radius: 12px; margin: 10px 0; border-left: 6px solid #f1c40f; text-align: left; display: flex; flex-direction: column; justify-content: center; }
-        
-        /* BALL-KNAPPER: Knappene for 1, 3 og 5 baller */
-        .ball-row { display: flex; justify-content: space-around; margin: 20px 0; align-items: flex-start; min-height: 125px; }
-        .ball-btn { width: 75px; height: 75px; border-radius: 50%; border: 3px solid #000; display: flex; align-items: center; justify-content: center; box-shadow: inset -5px -5px 10px rgba(0,0,0,0.5); cursor: pointer; }
-       
-        /* Den hvite sirkelen bak tallet på kula */
-        .ball-num-circle { 
-            width: 32px; 
-            height: 32px; 
-            background: white; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: black; 
-            font-weight: 900; 
-            border: 3px solid #000; /* Dette lager den svarte kanten rundt det hvite */
-        }
+/* NAVNE-FELT */
+.names-row { display: flex; gap: 8px; margin-bottom: 15px; }
+.names-row input { 
+    flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #333; 
+    background: #111; color: white; text-align: center; font-weight: bold; 
+}
 
-        /* Fargene på selve kulene */
-        #b1 { background: radial-gradient(circle at 40% 40%, #f1c40f, #b38f00); }
-        #b3 { background: radial-gradient(circle at 40% 40%, #e74c3c, #962d22); }
-        #b5 { background: radial-gradient(circle at 40% 40%, #8e44ad, #4b0082); }
-        .waiting { opacity: 0.15; filter: grayscale(0.8); pointer-events: none; } /* Gjør baller grå når de ikke er lov å putte */
+/* SPILLER-BOKSENE */
+.scoreboard { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+.player-box { 
+    background: rgba(255,255,255,0.03); 
+    border-radius: 20px; 
+    padding: 15px; 
+    border: 2px solid transparent; 
+    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+}
+.player-box.active { 
+    background: rgba(241, 196, 15, 0.08); 
+    border-color: #f1c40f; 
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(241, 196, 15, 0.15);
+}
 
-        /* Lyseblå farge for Carom-knappene */
-        .btn-carom { background: #2980b9 !important; }
+.player-label-display { font-weight: 800; font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px; color: #aaa; }
+.active .player-label-display { color: #f1c40f; }
 
-        /* De små + CAROM knappene rett under kulene */
-        .btn-sub-carom { 
-            background: #3498db; 
-            color: white; 
-            border: none; 
-            padding: 6px 8px; 
-            border-radius: 5px; 
-            font-size: 0.65em; 
-            font-weight: bold; 
-            text-transform: uppercase; 
-            cursor: pointer; 
-            margin-top: 10px; 
-            width: 75px; 
-        }
+.score { font-size: 3.5em; font-weight: 900; color: white; margin: 5px 0; line-height: 1; }
+.active .score { color: #f1c40f; text-shadow: 0 0 10px rgba(241, 196, 15, 0.3); }
 
-        /* KONTROLL-KNAPPER: Carom, Angre, Foul og Avslutt tur */
-        .control-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        button.ctrl { padding: 14px 5px; font-size: 0.8em; border: none; border-radius: 10px; color: white; font-weight: bold; text-transform: uppercase; cursor: pointer; }
-        .btn-foul { background: #c0392b; grid-column: span 3; font-size: 1em; padding: 18px; }
-        .btn-turn { background: #27ae60; grid-column: span 3; font-size: 1.2em; padding: 18px; }
+/* SERIE-INFO */
+.series-info { display: flex; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); }
+.series-val { color: #f1c40f; font-weight: 900; font-size: 1.1em; }
+
+/* BALL-KNAPPER */
+.ball-row { 
+    display: flex; justify-content: space-around; 
+    background: rgba(0,0,0,0.4); 
+    padding: 20px 10px; 
+    border-radius: 25px; 
+    margin: 20px 0; 
+}
+.ball-btn { 
+    width: 70px; height: 70px; border-radius: 50%; border: none; 
+    display: flex; align-items: center; justify-content: center; 
+    cursor: pointer; position: relative; transition: 0.2s;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.4), inset -5px -5px 10px rgba(0,0,0,0.3);
+}
+.ball-btn:active { transform: scale(0.9); }
+.ball-num-circle { width: 28px; height: 28px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #000; }
+
+/* KONTROLL-KNAPPER */
+.control-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+button.ctrl { 
+    padding: 15px 5px; border-radius: 15px; border: none; 
+    color: white; font-weight: 800; text-transform: uppercase; 
+    cursor: pointer; font-size: 0.75em; transition: 0.2s;
+}
+.btn-carom { background: #2980b9 !important; border-bottom: 4px solid #1a5276 !important; }
+.btn-turn { background: #27ae60 !important; border-bottom: 4px solid #1e8449 !important; grid-column: span 3; font-size: 1.1em !important; padding: 20px !important; }
+.btn-foul { background: #c0392b !important; border-bottom: 4px solid #7b241c !important; grid-column: span 3; }
+.waiting { opacity: 0.2; filter: grayscale(1); pointer-events: none; }
+
+/* TIMER & INNING */
+.timer-display { font-size: 2em; font-weight: 900; color: #f1c40f; font-family: 'Courier New', Courier, monospace; }
+.next-move-box { 
+    background: #1a252f; border-left: 5px solid #f1c40f; 
+    padding: 15px; border-radius: 10px; margin: 15px 0; font-weight: bold; 
+}
     </style>
 </head>
 <body>
