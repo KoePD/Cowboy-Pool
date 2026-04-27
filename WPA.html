@@ -211,11 +211,22 @@
         if ((cur < 90 && (cur + val) > 90) || (cur >= 90 && (cur + val) > 101)) { handleFoul(); return; }
         if (cur >= 90 && cur < 100 && type.includes('pocket') && type !== 'pocket_carom') return;
         if (cur === 100 && type !== 'winning_shot') return;
+        
         state.breakDone = true; state.foulCounts[p] = 0;
+        
         if (state.gameMode === 'alternate') {
-            if (type === 'pocket_carom') { state.tableStatus = state.tableStatus === 'open' ? 'open' : 'locked'; state.lastType = 'pocket'; }
-            else { state.tableStatus = 'locked'; state.lastType = type; }
-        } else { state.tableStatus = 'open'; }
+            if (type === 'pocket_carom') { 
+                // Carom+ åpner alltid tabellen
+                state.tableStatus = 'open'; 
+                state.lastType = null; 
+            } else { 
+                state.tableStatus = 'locked'; 
+                state.lastType = type; 
+            }
+        } else { 
+            state.tableStatus = 'open'; 
+        }
+        
         state.scores[p] += val; db.set(state);
     }
 
@@ -251,21 +262,19 @@
         const lockPocket = isAlternate && state.tableStatus === 'locked' && state.lastType === 'pocket';
         const lockCarom = isAlternate && state.tableStatus === 'locked' && state.lastType === 'carom';
 
-        // VINN-KNAPP
         document.getElementById('winButton').style.display = winPhase ? 'block' : 'none';
         
-        // CAROM-KNAPPER (Skal ALDRI gråes ut i caromPhase 90-100)
         const caromDisabled = winPhase || (lockCarom && !caromPhase);
         document.getElementById('carom1PBtn').className = caromDisabled ? 'btn btn-blue waiting-ball' : 'btn btn-blue';
         document.getElementById('carom2PBtn').className = caromDisabled ? 'btn btn-blue waiting-ball' : 'btn btn-blue';
 
-        // BALLER OG SUB-CAROM
         const pocketDisabled = !state.breakDone || caromPhase || winPhase || lockPocket;
         document.getElementById('ball1').className = pocketDisabled ? 'ball waiting-ball' : 'ball';
         document.getElementById('ball5').className = pocketDisabled ? 'ball waiting-ball' : 'ball';
         document.getElementById('ball3').className = (caromPhase || winPhase || lockPocket) ? 'ball waiting-ball' : 'ball';
         
-        const subCaromDisabled = caromPhase || winPhase;
+        // Carom+ knappene følger carom-logikken (skal ikke låses hvis carom er lov)
+        const subCaromDisabled = winPhase || (lockCarom && !caromPhase);
         document.getElementById('pc1').className = subCaromDisabled ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
         document.getElementById('pc5').className = subCaromDisabled ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
         document.getElementById('pc3').className = subCaromDisabled ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
