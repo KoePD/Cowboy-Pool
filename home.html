@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cowboy Pool Pro - Lobby</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0a0a0a; color: white; margin: 0; padding: 20px; padding-bottom: 120px; }
+        .app-container { max-width: 430px; margin: 0 auto; }
+        
+        /* Profil Header */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .user-greeting h1 { margin: 0; font-size: 1.5em; color: #f1c40f; }
+        .user-rank { font-size: 0.8em; color: #888; margin-top: 5px; }
+        .profile-pic { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #f1c40f; background: #222; overflow: hidden; }
+
+        /* XP Bar */
+        .xp-container { background: #222; height: 6px; border-radius: 3px; margin-bottom: 30px; }
+        .xp-fill { background: #f1c40f; width: 65%; height: 100%; border-radius: 3px; box-shadow: 0 0 10px rgba(241, 196, 15, 0.5); }
+
+        /* Quick Actions Grid */
+        .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 30px; }
+        .action-card { background: linear-gradient(145deg, #1a1a1a, #0d0d0d); border: 1px solid #222; border-radius: 15px; padding: 15px 5px; text-align: center; cursor: pointer; text-decoration: none; color: white; }
+        .action-card i { font-size: 2em; color: #2ecc71; margin-bottom: 10px; display: block; }
+        .action-card span { font-size: 0.7em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .action-card.gold i { color: #f1c40f; }
+        .action-card.brown i { color: #d35400; }
+
+        /* Siste Kamp Kort */
+        .last-match { background: #151515; border-radius: 20px; padding: 20px; border: 1px solid #222; }
+        .section-title { font-size: 0.75em; color: #888; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; display: flex; justify-content: space-between; }
+        .match-card { display: flex; justify-content: space-between; align-items: center; }
+        .player-vs { text-align: center; flex: 1; }
+        .score { font-size: 1.8em; font-weight: 900; color: #f1c40f; margin: 10px 0; }
+        .win-tag { font-size: 0.6em; color: #2ecc71; font-weight: bold; }
+
+        /* Bunn-nav */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: flex; justify-content: space-around; padding: 10px 0 35px 0; border-top: 1px solid #111; }
+        .nav-item { color: #333; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.55em; font-weight: bold; }
+        .nav-item.active { color: #f1c40f; }
+        .nav-item i { font-size: 2.2em; margin-bottom: 4px; transform: rotate(-15deg); } /* Lasso-vinkel */
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <div class="user-greeting">
+            <h1 id="greetName">Hei, Cowboy!</h1>
+            <div class="user-rank">Cowboy Rank: <span style="color:white">Level 12 - Gunslinger</span></div>
+        </div>
+        <div class="profile-pic">
+            <img src="https://via.placeholder.com/50" alt="Profile" id="profImg">
+        </div>
+    </div>
+
+    <div class="xp-container"><div class="xp-fill"></div></div>
+
+    <div class="action-grid">
+        <a href="index.html" class="action-card">
+            <i class="material-icons">add_box</i>
+            <span>NY KAMP</span>
+        </a>
+        <a href="CBstats.html" class="action-card gold">
+            <i class="material-icons">emoji_events</i>
+            <span>TOPPLISTE</span>
+        </a>
+        <div class="action-card brown">
+            <i class="material-icons">menu_book</i>
+            <span>REGLER</span>
+        </div>
+    </div>
+
+    <div class="last-match">
+        <div class="section-title">
+            <span>Min Siste Kamp</span>
+            <i class="material-icons" style="font-size:1.2em">history</i>
+        </div>
+        <div class="match-card">
+            <div class="player-vs">
+                <div style="font-weight:bold" id="p1Name">Deg</div>
+                <div class="score" id="p1Score">101</div>
+                <div class="win-tag">WIN</div>
+            </div>
+            <div style="color:#333; font-weight:900">VS</div>
+            <div class="player-vs">
+                <div style="font-weight:bold" id="p2Name">Motstander</div>
+                <div class="score" id="p2Score">82</div>
+                <div style="height:11px"></div>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="home.html" class="nav-item active">
+            <i class="material-icons" style="transform:none">home</i>
+            <span>HJEM</span>
+        </a>
+        <a href="index.html" class="nav-item">
+            <i class="material-icons">all_inclusive</i>
+            <span>RANGE</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="material-icons" style="transform:none">person</i>
+            <span>PROFIL</span>
+        </a>
+    </nav>
+</div>
+
+<script>
+    // Firebase konfigurasjon (samme som index.html)
+    const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Hent siste kamp og navn dynamisk
+    db.ref('gameData').on('value', (s) => {
+        const data = s.val();
+        if(data && data.names) document.getElementById('greetName').innerText = "Hei, " + data.names[0] + "!";
+    });
+
+    db.ref('matchHistory').limitToLast(1).on('value', (s) => {
+        if(s.val()) {
+            const last = Object.values(s.val())[0];
+            document.getElementById('p1Name').innerText = last.names[0];
+            document.getElementById('p2Name').innerText = last.names[1] || "P2";
+            document.getElementById('p1Score').innerText = last.scores[0];
+            document.getElementById('p2Score').innerText = last.scores[1];
+        }
+    });
+</script>
+</body>
+</html>
