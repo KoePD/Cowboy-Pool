@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cowboy Pool Pro - Unified</title>
+    <title>Cowboy Pool Pro - Full Width Unified</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
@@ -41,14 +41,13 @@
             box-shadow: 0 -20px 40px rgba(0,0,0,0.8); transition: all 0.4s ease;
         }
 
-        /* SLIM MODE JUSTERINGER */
-        .slim-mode .header { padding: 10px 30px 15px; border-bottom-left-radius: 50% 15px; border-bottom-right-radius: 50% 15px; }
-        .slim-mode .bottom-panel { padding: 25px 30px 10px; border-top-left-radius: 50% 15px; border-top-right-radius: 50% 15px; }
+        .slim-mode .header { padding: 5px 30px 10px; border-bottom-left-radius: 50% 15px; border-bottom-right-radius: 50% 15px; }
+        .slim-mode .bottom-panel { padding: 15px 30px 5px; border-top-left-radius: 50% 15px; border-top-right-radius: 50% 15px; }
 
         .hide-on-slim { transition: opacity 0.3s ease; }
         .slim-mode .hide-on-slim { opacity: 0; display: none; }
 
-        .main-content { position: relative; z-index: 5; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; padding: 10px; scrollbar-width: none; }
+        .main-content { position: relative; z-index: 5; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; padding: 10px; scrollbar-width: none; width: 100%; box-sizing: border-box; }
         .main-content::-webkit-scrollbar { display: none; }
 
         /* HJEM-SKJERM */
@@ -64,43 +63,45 @@
         .slim-mode .home-cards { display: none; }
 
         /* RANGE-INNHOLD */
-        .range-content { display: none; width: 100%; max-width: 400px; margin: 0 auto; }
-        .slim-mode .range-content { display: flex; flex-direction: column; height: 100%; }
+        .range-content { display: none; width: 100%; }
+        .slim-mode .range-content { display: flex; flex-direction: column; }
 
-        /* SCOREBOARD */
+        /* SPILLERKORTENE DU VIL HA TILBAKE */
         .player-card { 
-            background: #000; border-radius: 20px; padding: 15px 20px; 
-            margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.1); 
-            display: flex; justify-content: space-between; align-items: center;
+            background: linear-gradient(180deg, #0a0a0a 0%, #000 100%); border-radius: 24px; padding: 20px; 
+            margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); 
+            display: flex; justify-content: space-between; align-items: center; transition: 0.3s;
         }
-        .player-card.active { border: 2px solid var(--gold); box-shadow: 0 0 20px rgba(241,196,15,0.2); }
-        .score-display { font-size: 2.8em; font-weight: 900; color: #222; }
+        .player-card.active { border: 2px solid var(--gold); box-shadow: 0 15px 35px rgba(0,0,0,0.9); transform: scale(1.02); }
+        .score-display { font-size: 3.5em; font-weight: 900; line-height: 1; color: #333; min-width: 60px; text-align: right; }
         .active .score-display { color: var(--gold); }
-        .player-info h2 { margin: 0; font-size: 1.2em; color: #fff; text-transform: uppercase; letter-spacing: 1px; }
+        .player-info h2 { margin: 0; font-size: 1.2em; text-transform: uppercase; letter-spacing: 1px; color: #666; }
         .active .player-info h2 { color: var(--gold); }
         
-        .sub-stats { display: flex; gap: 10px; font-size: 9px; color: #555; margin-top: 8px; text-transform: uppercase; }
+        .sub-stats { font-size: 0.55em; color: #444; margin-top: 12px; display: flex; justify-content: flex-start; text-transform: uppercase; }
         .active .sub-stats { color: #888; }
         .stat-item { width: 55px; display: flex; flex-direction: column; }
         .stat-val { color: #eee; font-weight: 900; font-size: 1.1em; }
+        .foul-dot { width: 12px; height: 12px; border-radius: 50%; background: #1a1a1a; border: 1px solid #222; display: inline-block; margin-right: 5px; }
+        .foul-dot.active { background: #e74c3c; box-shadow: 0 0 10px #ff4757; }
 
-        /* STATUS & BALLER */
-        .game-status-zone { background: rgba(0, 0, 0, 0.6); padding: 15px; border-radius: 20px 20px 0 0; text-align: center; border: 1px solid rgba(255,255,255,0.05); border-bottom: none; margin-top: 10px; }
+        /* STATUS & KONTROLLER FRA index.html */
+        .game-status-zone { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(15px); padding: 15px; border-radius: 20px 20px 0 0; text-align: center; border: 1px solid rgba(255,255,255,0.05); border-bottom: none; margin-top: 10px; }
         .req-text { font-size: 0.8em; letter-spacing: 2px; color: #2ecc71; font-weight: 800; text-transform: uppercase; }
         .timer-text { font-family: monospace; font-size: 1.2em; color: var(--gold); margin-top: 3px; display: block; }
-        
-        .ball-control-zone { display: flex; justify-content: space-around; background: rgba(0,0,0,0.5); padding: 15px 10px; border-radius: 0 0 35px 35px; border: 1px solid rgba(255,255,255,0.03); border-top: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px; }
-        .ball-group { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .ball { width: 68px; height: 68px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        .ball-inner { width: 24px; height: 24px; background: white; border-radius: 50%; color: #000; font-weight: 900; display: flex; align-items: center; justify-content: center; font-size: 11px; border: 2px solid #000; }
-        .btn-sub-carom { background: rgba(52, 152, 219, 0.12); color: #3498db; border: 1px solid #3498db; border-radius: 8px; padding: 5px 10px; font-size: 0.6em; font-weight: 800; cursor: pointer; }
-        
+
+        .ball-control-zone { display: flex; justify-content: space-around; background: rgba(0,0,0,0.5); padding: 20px 10px; border-radius: 0 0 35px 35px; border: 1px solid rgba(255,255,255,0.03); border-top: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px; }
+        .ball-group { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        .ball { width: 75px; height: 75px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: inset -6px -6px 15px rgba(0,0,0,0.7), 6px 12px 20px rgba(0,0,0,0.6); }
+        .ball-inner { width: 28px; height: 28px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #000; font-size: 13px; }
+        .btn-sub-carom { background: rgba(52, 152, 219, 0.12); color: #3498db; border: 1px solid #3498db; border-radius: 8px; padding: 6px 12px; font-size: 0.6em; font-weight: 800; cursor: pointer; margin-top: 5px; }
+
         .action-area { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn { padding: 14px; border-radius: 12px; border: none; font-weight: 800; text-transform: uppercase; cursor: pointer; font-size: 0.75em; color: white; }
+        .btn { padding: 16px; border-radius: 16px; border: none; font-weight: 800; text-transform: uppercase; cursor: pointer; font-size: 0.75em; color: white; }
         .btn-blue { background: #2980b9; border-bottom: 4px solid #1c5982; }
         .btn-foul { background: #c0392b; border-bottom: 4px solid #7b241c; }
-        .btn-turn { background: #27ae60; border-bottom: 4px solid #1e8449; grid-column: span 2; padding: 18px; font-size: 1.1em; }
-        .btn-win { background: linear-gradient(45deg, #f1c40f, #d4ac0d); color: black; grid-column: span 2; padding: 18px; font-weight: 900; border-radius: 16px; border: none; margin-bottom: 10px; display: none; }
+        .btn-turn { background: #27ae60; border-bottom: 4px solid #1e8449; grid-column: span 2; padding: 20px; font-size: 1.1em; }
+        .btn-win { background: linear-gradient(45deg, #f1c40f, #d4ac0d); color: black; grid-column: span 2; padding: 20px; font-weight: 900; border-radius: 16px; border: none; margin-bottom: 10px; display: none; }
 
         /* NAVBAR */
         .navbar { background: #000; height: 85px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #111; z-index: 20; padding-bottom: 20px; }
@@ -108,18 +109,8 @@
         .nav-item.active { color: var(--gold); }
         .nav-item i { font-size: 24px; margin-bottom: 4px; }
 
-        .foul-dot { width: 10px; height: 10px; border-radius: 50%; background: #222; display: inline-block; margin-right: 4px; border: 1px solid #333; }
-        .foul-dot.active { background: #e74c3c; box-shadow: 0 0 8px #e74c3c; }
-        .waiting-ball { opacity: 0.15; filter: grayscale(1); pointer-events: none; }
-
-        /* SETUP OVERLAY */
         .setup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,20,5,0.98); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(10px); }
-        .setup-card { background: #000; border: 1px solid var(--gold); padding: 30px; border-radius: 30px; width: 100%; max-width: 350px; text-align: center; }
-        .btn-choice { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid #333; background: #111; color: white; font-weight: bold; }
-        .btn-choice.selected { background: var(--gold); color: black; }
-        .btn-save-option { background: #2980b9; color: white; margin-bottom: 10px; width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; }
-        .btn-discard-option { background: #c0392b; color: white; width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; }
-        .name-field { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #111; color: white; margin-bottom: 10px; text-align: center; box-sizing: border-box; }
+        .waiting-ball { opacity: 0.15; filter: grayscale(1); pointer-events: none; }
     </style>
 </head>
 <body>
@@ -136,22 +127,13 @@
                 <div style="width:65%; height:100%; background:var(--gold); border-radius:3px;"></div>
             </div>
         </div>
-        </header>
+    </header>
 
     <main class="main-content">
         <div class="home-cards">
-            <div class="action-card" onclick="checkActiveGame()">
-                <i class="fa-solid fa-circle-plus" style="color:#2ecc71;"></i>
-                <span>Ny Kamp</span>
-            </div>
-            <div class="action-card">
-                <i class="fa-solid fa-trophy" style="color:var(--gold);"></i>
-                <span>Toppliste</span>
-            </div>
-            <div class="action-card">
-                <i class="fa-solid fa-book-open" style="color:var(--gold);"></i>
-                <span>Regler</span>
-            </div>
+            <div class="action-card" onclick="checkActiveGame()"><i class="fa-solid fa-circle-plus" style="color:#2ecc71;"></i><span>Ny Kamp</span></div>
+            <div class="action-card"><i class="fa-solid fa-trophy"></i><span>Toppliste</span></div>
+            <div class="action-card"><i class="fa-solid fa-book-open"></i><span>Regler</span></div>
         </div>
 
         <div class="range-content">
@@ -192,11 +174,9 @@
     </main>
 
     <footer class="bottom-panel">
-        <div class="hide-on-slim" style="text-align:center;">
-            <div style="background:rgba(255,255,255,0.05); border-radius:15px; padding:15px;">
-                <div style="font-size:10px; color:#666; text-transform:uppercase;">Siste Resultat</div>
-                <div style="font-size:20px; font-weight:900;">101 - 82</div>
-            </div>
+        <div class="hide-on-slim" style="text-align:center; background:rgba(255,255,255,0.05); border-radius:15px; padding:15px;">
+            <div style="font-size:10px; color:#666; text-transform:uppercase;">Siste Resultat</div>
+            <div style="font-size:20px; font-weight:900;">101 - 82</div>
         </div>
     </footer>
 
@@ -209,7 +189,8 @@
 </div>
 
 <div id="setupOverlay" class="setup-overlay">
-    <div class="setup-card" id="overlayCard"></div>
+    <div style="background:#000; border:1px solid var(--gold); padding:30px; border-radius:30px; width:80%; text-align:center;" id="setupCard">
+        </div>
 </div>
 
 <script>
@@ -217,14 +198,8 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('gameData');
 
-    let state = { gameMode: 'standard', playerCount: 2, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null, seconds: 0, names: ["P1","P2","P3"], bestSeries: [0,0,0], lastSeries: [0,0,0], lang: 'no', innings: 1 };
+    let state = { gameMode: 'standard', playerCount: 2, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null, seconds: 0, names: ["P1","P2","P3"], bestSeries: [0,0,0], lastSeries: [0,0,0], innings: 1 };
     let history = [];
-    let tempMode = 'standard';
-    let setupCount = 2;
-
-    const dictionary = {
-        no: { now: "NÅ", best: "PERS", last: "SISTE", break: "BREKK-STØT", req_carom: "KRAV: CAROM", req_pocket: "KRAV: POCKET", any: "VELG: CAROM / POCKET", caroms_only: "KUN CAROMS", undo: "ANGRE", foul: "FEIL", turn: "AVSLUTT TUR", rotate: "BYTT STARTSPILLER", win: "VINNER STØTET", inn: "INNING", winner: "VINNER!", save: "LAGRE & NY", rematch: "REMATCH", discard: "SLETT & NY", confirm_msg: "Kamp pågår. Hva vil du gjøre?", resume: "FORTSETT" }
-    };
 
     db.on('value', (s) => { if(s.val()) { state = s.val(); updateUI(); } });
 
@@ -232,15 +207,14 @@
         const app = document.getElementById('app');
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         el.classList.add('active');
-        if(page === 'range') { app.classList.add('slim-mode'); } 
-        else { app.classList.remove('slim-mode'); }
+        if(page === 'range') app.classList.add('slim-mode');
+        else app.classList.remove('slim-mode');
     }
 
     function action(type, val) {
         saveHistory(); let p = state.currentPlayer; let cur = state.scores[p];
         if ((cur < 90 && (cur + val) > 90) || (cur >= 90 && (cur + val) > 101)) { handleFoul(); return; }
         if (cur >= 90 && cur < 100 && type.includes('pocket') && type !== 'pocket_carom') return;
-        if (cur === 100 && type !== 'winning_shot') return;
         state.breakDone = true; state.foulCounts[p] = 0;
         
         if (state.gameMode === 'alternate') {
@@ -253,14 +227,11 @@
             }
         }
         state.scores[p] += val;
-        if (state.scores[p] === 101) { db.set(state).then(() => showWinnerUI(p)); } 
-        else db.set(state);
+        db.set(state);
     }
 
     function updateUI() {
-        const l = dictionary[state.lang || 'no'];
         const cont = document.getElementById('scoreboard-container');
-        if(!cont) return;
         cont.innerHTML = '';
         for(let i=0; i<state.playerCount; i++) {
             const active = state.currentPlayer === i;
@@ -268,9 +239,9 @@
                 <div class="player-info">
                     <h2 style="color: ${active ? '#f1c40f' : '#eee'}">${state.names[i]}</h2>
                     <div class="sub-stats">
-                        <div class="stat-item">${l.now} <span class="stat-val" style="color: ${active ? '#f1c40f' : '#eee'}">${active ? state.scores[i]-state.scoreAtStart[i] : 0}</span></div>
-                        <div class="stat-item">${l.best} <span class="stat-val" style="color: ${active ? '#f1c40f' : '#eee'}">${state.bestSeries[i]}</span></div>
-                        <div class="stat-item">${l.last} <span class="stat-val" style="color: ${active ? '#f1c40f' : '#eee'}">${state.lastSeries[i]||0}</span></div>
+                        <div class="stat-item">NÅ <span class="stat-val" style="color: ${active ? '#f1c40f' : '#eee'}">${active ? state.scores[i]-state.scoreAtStart[i] : 0}</span></div>
+                        <div class="stat-item">PERS <span class="stat-val" style="color: ${active ? '#f1c40f' : '#eee'}">${state.bestSeries[i]}</span></div>
+                        <div class="stat-item">SISTE <span class="stat-val" style="color: ${active ? '#f1c40f' : '#eee'}">${state.lastSeries[i]||0}</span></div>
                     </div>
                     <div style="margin-top:10px;">
                         <div class="foul-dot ${state.foulCounts[i]>=1?'active':''}"></div><div class="foul-dot ${state.foulCounts[i]>=2?'active':''}"></div><div class="foul-dot ${state.foulCounts[i]>=3?'active':''}"></div>
@@ -286,85 +257,25 @@
 
         document.getElementById('winButton').style.display = winPhase ? 'block' : 'none';
         document.getElementById('rotate-container').style.display = state.breakDone ? 'none' : 'block';
-        
         document.getElementById('carom1PBtn').className = (winPhase || (lockCarom && !caromPhase)) ? 'btn btn-blue waiting-ball' : 'btn btn-blue';
-        document.getElementById('carom2PBtn').className = (winPhase || (lockCarom && !caromPhase)) ? 'btn btn-blue waiting-ball' : 'btn btn-blue';
         document.getElementById('ball1').className = (!state.breakDone || caromPhase || winPhase || lockPocket) ? 'ball waiting-ball' : 'ball';
-        document.getElementById('ball5').className = (!state.breakDone || caromPhase || winPhase || lockPocket) ? 'ball waiting-ball' : 'ball';
-        document.getElementById('ball3').className = (caromPhase || winPhase || lockPocket) ? 'ball waiting-ball' : 'ball';
         
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
-        document.getElementById('inningDisplay').innerText = l.inn + ": " + state.innings;
-        document.getElementById('modeLabel').innerText = "MODUS: " + state.gameMode.toUpperCase();
-        document.getElementById('moveText').innerText = winPhase ? l.win : (caromPhase ? l.caroms_only : (!state.breakDone ? l.break : (lockPocket ? l.req_carom : (lockCarom ? l.req_pocket : l.any))));
+        document.getElementById('inningDisplay').innerText = "INNING: " + state.innings;
+        document.getElementById('moveText').innerText = winPhase ? "VINNER STØTET" : (!state.breakDone ? "BREKK-STØT" : "VELG: CAROM / POCKET");
     }
 
-    // SETUP SYSTEM
     function checkActiveGame() {
         document.getElementById('setupOverlay').style.display = 'flex';
-        if (state.scores.some(s => s > 0)) {
-            document.getElementById('overlayCard').innerHTML = `
-                <h2 style="color:var(--gold);">NY MATCH?</h2>
-                <button class="btn-save-option" onclick="handleFinishAndSave()">LAGRE & NY</button>
-                <button class="btn-discard-option" onclick="handleDiscard()">SLETT & NY</button>
-                <button onclick="closeSetup()" style="background:none; border:none; color:#555; text-decoration:underline; cursor:pointer; margin-top:15px;">Fortsett kamp</button>`;
-        } else { goToStep1(); }
+        document.getElementById('setupCard').innerHTML = `<h2 style="color:var(--gold);">START NY KAMP?</h2><button class="btn btn-turn" onclick="finalizeSetupSimple()">START KAMP</button><button onclick="closeSetup()" style="color:#555; background:none; border:none; margin-top:15px;">Avbryt</button>`;
     }
-
-    function goToStep1() {
-        document.getElementById('overlayCard').innerHTML = `
-            <h2 style="color:var(--gold);">MODUS</h2>
-            <div style="display:flex; gap:10px; margin-bottom:20px;">
-                <button class="btn-choice ${tempMode==='standard'?'selected':''}" onclick="tempMode='standard'; goToStep1()">Standard</button>
-                <button class="btn-choice ${tempMode==='alternate'?'selected':''}" onclick="tempMode='alternate'; goToStep1()">Alternate</button>
-            </div>
-            <p style="color:#555;">Antall spillere?</p>
-            <div style="display:flex; gap:10px; margin-bottom:20px;">
-                <button class="btn-choice" onclick="selectPlayers(1)">1</button>
-                <button class="btn-choice" onclick="selectPlayers(2)">2</button>
-                <button class="btn-choice" onclick="selectPlayers(3)">3</button>
-            </div>`;
-    }
-
-    function selectPlayers(n) {
-        setupCount = n; let inputs = '';
-        for(let i=0; i<n; i++) inputs += `<input type="text" id="n${i}" class="name-field" placeholder="Navn ${i+1}">`;
-        document.getElementById('overlayCard').innerHTML = `<h2 style="color:var(--gold);">NAVN</h2>${inputs}<button class="btn btn-turn" onclick="finalizeSetup()">START KAMP</button>`;
-    }
-
-    function finalizeSetup() {
-        const ns = []; for(let i=0; i<setupCount; i++) ns.push(document.getElementById(`n${i}`).value || `P${i+1}`);
-        db.set({...state, gameMode: tempMode, playerCount: setupCount, names: ns, scores: [0,0,0], foulCounts:[0,0,0], scoreAtStart:[0,0,0], breakDone:false, seconds:0, currentPlayer:0, innings:1, lastSeries:[0,0,0], bestSeries:[0,0,0]});
-        closeSetup(); navTo('range', document.querySelectorAll('.nav-item')[1]);
-    }
-
-    function showWinnerUI(p) {
-        document.getElementById('setupOverlay').style.display = 'flex';
-        document.getElementById('overlayCard').innerHTML = `<h1 style="color:var(--gold);">VINNER!</h1><h2 style="color:white;">${state.names[p]}</h2><div style="font-size:3em; font-weight:900; color:var(--gold);">101</div><button class="btn-turn" onclick="handleDiscard()">NY MATCH</button>`;
-    }
-
-    function nextTurn() {
-        saveHistory(); let p = state.currentPlayer; let s = state.scores[p] - state.scoreAtStart[p];
-        if(s > state.bestSeries[p]) state.bestSeries[p] = s; state.lastSeries[p] = s;
-        if(p === state.playerCount - 1) state.innings++;
-        state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
-        state.tableStatus = 'open'; state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer];
-        db.set(state);
-    }
-
-    function handleFoul() {
-        saveHistory(); state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer];
-        state.foulCounts[state.currentPlayer]++;
-        if(state.foulCounts[state.currentPlayer] >= 3) { state.scores[state.currentPlayer] = 0; state.foulCounts[state.currentPlayer] = 0; }
-        nextTurn();
-    }
-
+    function closeSetup() { document.getElementById('setupOverlay').style.display = 'none'; }
+    function finalizeSetupSimple() { db.set({...state, scores:[0,0,0], seconds:0, innings:1, breakDone:false}); closeSetup(); navTo('range', document.querySelectorAll('.nav-item')[1]); }
+    function nextTurn() { saveHistory(); let p = state.currentPlayer; let s = state.scores[p] - state.scoreAtStart[p]; if(s > state.bestSeries[p]) state.bestSeries[p] = s; state.lastSeries[p] = s; if(p === state.playerCount-1) state.innings++; state.currentPlayer = (state.currentPlayer+1)%state.playerCount; state.tableStatus = 'open'; state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; db.set(state); }
+    function handleFoul() { saveHistory(); state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; state.foulCounts[state.currentPlayer]++; nextTurn(); }
     function undo() { if(history.length) { state = JSON.parse(history.pop()); db.set(state); } }
     function saveHistory() { history.push(JSON.stringify(state)); if(history.length > 10) history.shift(); }
-    function closeSetup() { document.getElementById('setupOverlay').style.display = 'none'; }
     function rotateBreaker() { if(!state.breakDone) { state.currentPlayer = (state.currentPlayer+1)%state.playerCount; db.set(state); } }
-    function handleDiscard() { db.set({...state, scores:[0,0,0], seconds:0, innings:1, breakDone:false, lastSeries:[0,0,0], foulCounts:[0,0,0]}).then(goToStep1); }
-    function handleFinishAndSave() { firebase.database().ref('matchHistory').push({ date: new Date().toISOString(), names: state.names.slice(0, state.playerCount), scores: state.scores.slice(0, state.playerCount), innings: state.innings }).then(handleDiscard); }
 
     setInterval(() => { if(state.breakDone) { state.seconds++; db.child('seconds').set(state.seconds); } }, 1000);
 </script>
