@@ -7,7 +7,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            /* Den nøyaktige, mettede grønnfargen fra bilde 1 */
+            /* Den nøyaktige, mettede radial gradienten fra bilde 1 */
             --felt-green: radial-gradient(circle at center, #2fa34b 0%, #155e2d 60%, #0a2b15 100%);
             --gold: #d4af37;
             --leather: #121212;
@@ -71,13 +71,12 @@
         
         .progress-bar {
             width: 100%; height: 8px; background: #222;
-            border-radius: 4px; margin-top: 15px; position: relative;
+            border-radius: 4px; margin-top: 15px;
         }
         .progress-fill {
             width: 65%; height: 100%;
             background: linear-gradient(90deg, #b38f36, var(--gold));
             box-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
-            border-radius: 4px;
         }
 
         /* MIDTPARTI (Kortene på grønn duk) */
@@ -161,7 +160,7 @@
 
     <header class="header">
         <h1>Hei, Marius!</h1>
-        <div class="rank">Cowboy Rank: <span>Level 12 - Gunslinger</span></div>
+        <div class="rank">Cowboy Rank: Level 12 - Gunslinger</div>
         <div class="progress-bar"><div class="progress-fill"></div></div>
     </header>
 
