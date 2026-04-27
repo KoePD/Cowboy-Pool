@@ -8,167 +8,222 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
+        :root {
+            --pool-green: #143d21;
+            --gold: #f1c40f;
+            --dark-bg: #0c0c0c;
+            --card-bg: #1a1a1a;
+        }
+
         body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background: #0a0a0a; 
-            color: white; margin: 0; padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: #000; color: white; margin: 0; padding: 0;
             display: flex; justify-content: center;
         }
+
         .app-container { 
             width: 100%; max-width: 430px; min-height: 100vh;
-            background: linear-gradient(180deg, #1a1a1a 0%, #050505 100%);
-            padding: 20px; box-sizing: border-box; padding-bottom: 110px;
+            background: #000; position: relative;
+            box-sizing: border-box; padding-bottom: 110px;
         }
 
-        /* Top Section: Table Felt Style */
-        .lobby-table {
-            background: radial-gradient(circle at center, #1e4d2b 0%, #0d2615 100%);
-            border-radius: 30px;
-            padding: 25px;
-            border: 2px solid #333;
-            box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
-            margin-bottom: 25px;
+        /* Lær-toppen (Leather header) */
+        .header-leather {
+            background: linear-gradient(180deg, #222 0%, #111 100%);
+            padding: 40px 25px 20px;
+            border-bottom: 3px solid #000;
             position: relative;
         }
-
-        .header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px; }
-        .user-greeting h1 { margin: 0; font-size: 1.8em; color: #f1c40f; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        .user-rank { font-size: 0.85em; color: #ccc; margin-top: 5px; font-weight: 500; }
-        .profile-pic { 
-            width: 55px; height: 55px; border-radius: 50%; 
-            border: 2px solid #f1c40f; background: #222; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        .header-leather::after {
+            content: ""; position: absolute; bottom: 5px; left: 0; right: 0;
+            border-bottom: 1px dashed rgba(255,255,255,0.1); /* Søm-effekt */
         }
 
-        .xp-container { background: rgba(0,0,0,0.4); height: 8px; border-radius: 4px; margin-top: 15px; overflow: hidden; }
-        .xp-fill { background: linear-gradient(90deg, #f1c40f, #d4ac0d); width: 65%; height: 100%; box-shadow: 0 0 10px rgba(241, 196, 15, 0.4); }
+        .header-top { display: flex; justify-content: space-between; align-items: center; }
+        .user-greeting h1 { margin: 0; font-size: 1.8em; color: var(--gold); font-weight: 800; }
+        .user-rank { font-size: 0.85em; color: #aaa; margin-top: 4px; }
+        
+        .profile-circle { 
+            width: 50px; height: 50px; border-radius: 50%; 
+            border: 2px solid var(--gold); background: #222;
+            box-shadow: 0 0 15px rgba(241, 196, 15, 0.3);
+            overflow: hidden;
+        }
 
-        /* Action Buttons Grid */
-        .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 25px; }
+        .xp-bar-bg { background: #333; height: 10px; border-radius: 5px; margin-top: 15px; border: 1px solid #000; }
+        .xp-bar-fill { 
+            background: linear-gradient(90deg, #d4ac0d, #f1c40f); 
+            width: 70%; height: 100%; border-radius: 5px; 
+            box-shadow: 0 0 10px rgba(241, 196, 15, 0.5);
+        }
+
+        /* Grønn Filt-seksjon */
+        .felt-section {
+            background: radial-gradient(circle at center, #1e4d2b 0%, #0d2113 100%);
+            margin: -10px 10px 20px;
+            padding: 30px 20px;
+            border-radius: 0 0 40px 40px;
+            box-shadow: inset 0 10px 30px rgba(0,0,0,0.8), 0 5px 15px rgba(0,0,0,0.5);
+            border: 1px solid #1a3321;
+        }
+
+        /* Knappene - 100% som bildet */
+        .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
         .action-card { 
-            background: rgba(0,0,0,0.3); 
-            border: 2px solid #f1c40f66; 
-            border-radius: 15px; padding: 20px 5px; 
+            background: rgba(0,0,0,0.4); 
+            border: 2px solid #555; 
+            border-radius: 12px; padding: 15px 5px; 
             text-align: center; cursor: pointer; text-decoration: none; color: white;
-            transition: transform 0.2s;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .action-card:active { transform: scale(0.95); }
-        .action-card i { font-size: 2.5em; margin-bottom: 8px; display: block; }
-        .action-card span { font-size: 0.7em; font-weight: 800; letter-spacing: 1px; }
+        .action-card.active-border { border-color: var(--gold); }
+        .action-card i { font-size: 2.8em; margin-bottom: 5px; }
+        .action-card span { font-size: 0.75em; font-weight: 900; letter-spacing: 0.5px; }
         
-        .card-green i { color: #2ecc71; }
-        .card-gold i { color: #f1c40f; }
-        .card-brown i { color: #e67e22; }
+        .c-green i { color: #2ecc71; }
+        .c-gold i { color: var(--gold); }
+        .c-brown i { color: #b79468; } /* Mer nøytral bok-farge */
 
-        /* Last Match: Dashboard Style */
-        .last-match-box {
-            background: #1a1a1a; border-radius: 20px; padding: 20px;
-            border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        /* Siste Kamp - Mørkt panel */
+        .match-panel {
+            background: #121212;
+            margin: 0 15px;
+            border-radius: 25px;
+            padding: 20px;
+            border: 1px solid #222;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .match-header { font-size: 0.8em; font-weight: 800; color: #888; text-transform: uppercase; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
-        
-        .match-display { display: flex; justify-content: space-between; align-items: center; }
-        .match-player { text-align: center; flex: 1; }
-        .match-player img { width: 45px; height: 45px; border-radius: 50%; margin-bottom: 8px; border: 1px solid #444; }
-        .match-score { font-size: 2.2em; font-weight: 900; color: #f1c40f; margin: 5px 0; }
-        .win-label { color: #2ecc71; font-size: 0.7em; font-weight: 900; }
+        .match-title { 
+            font-size: 0.85em; font-weight: 800; color: #fff; 
+            margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;
+        }
 
-        /* Bottom Nav (Consistent) */
+        .score-row { display: flex; justify-content: space-around; align-items: center; position: relative; }
+        .p-block { text-align: center; flex: 1; }
+        .p-avatar { 
+            width: 60px; height: 60px; border-radius: 50%; 
+            border: 2px solid #333; margin: 0 auto 8px;
+            background: #222;
+        }
+        .p-avatar.winner-border { border-color: var(--gold); }
+        .p-name { font-size: 0.9em; font-weight: bold; margin-bottom: 4px; }
+        
+        .score-main { font-size: 2.2em; font-weight: 900; color: #2ecc71; }
+        .score-lose { font-size: 2.2em; font-weight: 900; color: var(--gold); }
+        .vs-text { font-size: 0.8em; color: #444; font-weight: 900; position: absolute; left: 50%; transform: translateX(-50%); top: 45px;}
+
+        /* Stats rad under score */
+        .stats-row { 
+            display: grid; grid-template-columns: repeat(5, 1fr); 
+            margin-top: 20px; border-top: 1px solid #222; padding-top: 15px;
+            text-align: center;
+        }
+        .s-item { display: flex; flex-direction: column; gap: 4px; }
+        .s-label { font-size: 0.6em; color: #666; font-weight: bold; }
+        .s-val { font-size: 0.85em; font-weight: bold; color: #fff; }
+
+        /* Bunn Meny */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: flex; justify-content: space-around; padding: 10px 0 35px 0; border-top: 1px solid #111; max-width: 430px; margin: 0 auto; }
-        .nav-item { color: #444; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.6em; font-weight: bold; }
-        .nav-item.active { color: #f1c40f; }
-        .nav-item i { font-size: 2.2em; margin-bottom: 4px; }
-        .lasso i { transform: rotate(-15deg); }
+        .nav-item { color: #555; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.65em; font-weight: bold; }
+        .nav-item.active { color: var(--gold); }
+        .nav-item i { font-size: 2em; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <div class="lobby-table">
-        <div class="header">
+    
+    <div class="header-leather">
+        <div class="header-top">
             <div class="user-greeting">
                 <h1 id="greetName">Hei, Marius!</h1>
-                <div class="user-rank">Cowboy Rank: <span style="color:#f1c40f">Level 12 - Gunslinger</span></div>
+                <div class="user-rank">Cowboy Rank: <span style="color:white">Level 12 - Gunslinger</span></div>
             </div>
-            <div class="profile-pic">
-                <img src="https://via.placeholder.com/55" alt="P" style="width:100%; border-radius:50%;">
+            <div class="profile-circle">
+                <img src="https://via.placeholder.com/50" alt="P" style="width:100%;">
             </div>
         </div>
+        <div class="xp-bar-bg"><div class="xp-bar-fill"></div></div>
+    </div>
 
-        <div class="xp-container"><div class="xp-fill"></div></div>
-
+    <div class="felt-section">
         <div class="action-grid">
-            <a href="index.html?setup=true" class="action-card card-green">
-                <i class="material-icons">add_circle</i>
+            <a href="index.html?setup=true" class="action-card c-green">
+                <i class="material-icons">add</i>
                 <span>NY KAMP</span>
             </a>
-            <a href="CBstats.html" class="action-card card-gold">
+            <a href="CBstats.html" class="action-card c-gold active-border">
                 <i class="material-icons">emoji_events</i>
                 <span>TOPPLISTE</span>
             </a>
-            <div class="action-card card-brown">
-                <i class="material-icons">menu_book</i>
+            <div class="action-card c-brown">
+                <i class="material-icons">import_contacts</i>
                 <span>REGLER</span>
             </div>
         </div>
     </div>
 
-    <div class="last-match-box">
-        <div class="match-header">
-            <i class="material-icons" style="font-size: 1.2em; color:#2ecc71;">history</i>
-            MIN SISTE KAMP
+    <div class="match-panel">
+        <div class="match-title">
+            <span>Min Siste Kamp</span>
+            <i class="material-icons" style="color:var(--pool-green)">gps_fixed</i>
         </div>
-        <div class="match-display">
-            <div class="match-player">
-                <img src="https://via.placeholder.com/45" alt="Mav">
-                <div style="font-size: 0.8em; font-weight: bold;" id="p1Name">Mav</div>
-                <div class="match-score" id="p1Score">100</div>
-                <div class="win-label">WIN</div>
+        
+        <div class="score-row">
+            <div class="p-block">
+                <div class="p-avatar winner-border"></div>
+                <div class="p-name" id="p1Name">Mav</div>
+                <div class="score-main" id="p1Score">100</div>
+                <div style="font-size:0.6em; color:#2ecc71; font-weight:900;">WIN</div>
             </div>
-            <div style="font-weight: 900; color: #333; font-size: 1.2em;">VS</div>
-            <div class="match-player">
-                <img src="https://via.placeholder.com/45" alt="Per">
-                <div style="font-size: 0.8em; font-weight: bold;" id="p2Name">Per</div>
-                <div class="match-score" id="p2Score" style="color:#444;">82</div>
-                <div style="height: 14px;"></div>
+            
+            <div class="vs-text">VS</div>
+
+            <div class="p-block">
+                <div class="p-avatar"></div>
+                <div class="p-name" id="p2Name">Per</div>
+                <div class="score-lose" id="p2Score">82</div>
+                <div style="height:10px"></div>
             </div>
+        </div>
+
+        <div class="stats-row">
+            <div class="s-item"><span class="s-label">Score</span><span class="s-val">82</span></div>
+            <div class="s-item"><span class="s-label">Turn</span><span class="s-val">8</span></div>
+            <div class="s-item"><span class="s-label">Serie</span><span class="s-val">16</span></div>
+            <div class="s-item"><span class="s-label">Foul</span><span class="s-val">2</span></div>
+            <div class="s-item"><span class="s-label">Kats.</span><span class="s-val">27</span></div>
         </div>
     </div>
 
     <nav class="bottom-nav">
         <a href="home.html" class="nav-item active">
             <i class="material-icons">home</i>
-            <span>HJEM</span>
+            <span>Hjem</span>
         </a>
-        <a href="index.html" class="nav-item lasso">
-            <i class="material-icons">all_inclusive</i>
-            <span>RANGE</span>
+        <a href="CBstats.html" class="nav-item">
+            <i class="material-icons">emoji_events</i>
+            <span>Toppliste</span>
         </a>
-        <a href="profile.html" class="nav-item">
-            <i class="material-icons">person</i>
-            <span>PROFIL</span>
+        <a href="#" class="nav-item">
+            <i class="material-icons">import_contacts</i>
+            <span>Regler</span>
         </a>
     </nav>
 </div>
 
 <script>
-    // Firebase Config (Bruk din egen her)
     const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Hent data for å gjøre lobbyen levende
-    db.ref('gameData').on('value', (s) => {
-        const data = s.val();
-        if(data && data.names) {
-            document.getElementById('greetName').innerText = "Hei, " + data.names[0] + "!";
-        }
+    db.ref('gameData/names').once('value', (s) => {
+        if(s.val()) document.getElementById('greetName').innerText = "Hei, " + s.val()[0] + "!";
     });
 
     db.ref('matchHistory').limitToLast(1).on('value', (s) => {
         if(s.val()) {
-            const matches = Object.values(s.val());
-            const last = matches[0];
+            const last = Object.values(s.val())[0];
             document.getElementById('p1Name').innerText = last.names[0];
             document.getElementById('p2Name').innerText = last.names[1] || "P2";
             document.getElementById('p1Score').innerText = last.scores[0];
