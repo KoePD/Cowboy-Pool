@@ -53,12 +53,12 @@
         .foul-dot { width: 12px; height: 12px; border-radius: 50%; background: #1a1a1a; border: 1px solid #222; }
         .foul-dot.active { background: #e74c3c; box-shadow: 0 0 10px #ff4757; }
 
-        /* 4. NY STATUS-SONE (OVER BALLENE) */
+        /* 4. STATUS-SONE (OVER BALLENE) */
         .game-status-zone {
             background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(15px);
             padding: 12px;
-            border-radius: 20px 20px 0 0; /* Rundet kun i toppen */
+            border-radius: 20px 20px 0 0;
             text-align: center;
             border: 1px solid rgba(255,255,255,0.05);
             border-bottom: none;
@@ -68,11 +68,11 @@
         .timer-text { font-family: monospace; font-size: 1.2em; color: #f1c40f; margin-top: 3px; display: block; }
         .btn-rotate { background: rgba(241, 196, 15, 0.1); border: 1px solid #f1c40f; color: #f1c40f; padding: 4px 10px; border-radius: 8px; font-size: 0.6em; font-weight: bold; cursor: pointer; margin-top: 8px; }
 
-        /* 5. BALL KONTROLL (Sammensmeltet med status) */
+        /* 5. BALL KONTROLL */
         .ball-control-zone { 
             display: flex; justify-content: space-around; 
             background: rgba(0,0,0,0.5); padding: 20px 10px; 
-            border-radius: 0 0 35px 35px; /* Rundet kun i bunnen */
+            border-radius: 0 0 35px 35px;
             border: 1px solid rgba(255,255,255,0.03);
             border-top: 1px solid rgba(255,255,255,0.05);
             margin-bottom: 15px;
@@ -98,7 +98,10 @@
         .nav-item { color: #333; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.55em; font-weight: bold; }
         .nav-item.active { color: #f1c40f; }
         .nav-item i { font-size: 2.2em; margin-bottom: 4px; }
-        .waiting { opacity: 0.15; filter: grayscale(1); pointer-events: none; }
+        
+        /* 8. WAITING STATUS - Endret for å kun ramme kulene */
+        .waiting-ball { opacity: 0.15; filter: grayscale(1); pointer-events: none; }
+        .waiting-group { opacity: 0.15; filter: grayscale(1); pointer-events: none; }
     </style>
 </head>
 <body>
@@ -113,7 +116,7 @@
     <div id="scoreboard-container"></div>
 
     <div class="game-status-zone">
-        <span class="req-text" id="moveText">BREKK-STØT (3-BALL)</span>
+        <span class="req-text" id="moveText">BREKK-STØT</span>
         <span class="timer-text" id="matchTimer">00:00:00</span>
         <div id="rotate-container">
             <button class="btn-rotate" id="rotateBtn" onclick="rotateBreaker()">BYTT STARTSPILLER</button>
@@ -121,17 +124,17 @@
     </div>
 
     <div class="ball-control-zone">
-        <div class="ball-group">
+        <div class="ball-group" id="group1">
             <button class="ball" id="ball1" onclick="action('pocket', 1)"><div class="ball-inner">1</div></button>
-            <button class="btn-sub-carom" onclick="action('pocket_carom', 2)">+ CAROM</button>
+            <button class="btn-sub-carom" id="carom1" onclick="action('pocket_carom', 2)">+ CAROM</button>
         </div>
-        <div class="ball-group">
+        <div class="ball-group" id="group5">
             <button class="ball" id="ball5" onclick="action('pocket', 5)"><div class="ball-inner">5</div></button>
-            <button class="btn-sub-carom" onclick="action('pocket_carom', 6)">+ CAROM</button>
+            <button class="btn-sub-carom" id="carom5" onclick="action('pocket_carom', 6)">+ CAROM</button>
         </div>
-        <div class="ball-group">
+        <div class="ball-group" id="group3">
             <button class="ball" id="ball3" onclick="action('pocket', 3)"><div class="ball-inner">3</div></button>
-            <button class="btn-sub-carom" onclick="action('pocket_carom', 4)">+ CAROM</button>
+            <button class="btn-sub-carom" id="carom3" onclick="action('pocket_carom', 4)">+ CAROM</button>
         </div>
     </div>
 
@@ -268,18 +271,54 @@
         document.getElementById('moveText').innerText = !state.breakDone ? l.break : (state.tableStatus === 'locked' ? (state.lastType === 'pocket' ? l.req_carom : l.req_pocket) : l.req_any);
         document.getElementById('rotate-container').style.display = state.breakDone ? 'none' : 'block';
 
+        // --- SMART LOCK LOGIKK ---
         const isAtEnd = state.scores[state.currentPlayer] >= 90;
         const isLockedPocket = state.tableStatus === 'locked' && state.lastType === 'pocket';
-        document.getElementById('ball1').parentElement.className = (!state.breakDone || isLockedPocket || isAtEnd) ? 'ball-group waiting' : 'ball-group';
-        document.getElementById('ball5').parentElement.className = (!state.breakDone || isLockedPocket || isAtEnd) ? 'ball-group waiting' : 'ball-group';
-        document.getElementById('ball3').parentElement.className = (isLockedPocket || isAtEnd) ? 'ball-group waiting' : 'ball-group';
+        
+        // Regel: Ved brekk er kule 1 og 5 låst (kun 3-ball lov). Ved 'locked pocket' er kuler låst. Ved 90+ er kuler låst.
+        const ballsWaiting = !state.breakDone || isLockedPocket || isAtEnd;
+        
+        // 1-eren og 5-eren (Låst ved brekk og pocket-krav)
+        document.getElementById('ball1').className = ballsWaiting ? 'ball waiting-ball' : 'ball';
+        document.getElementById('ball5').className = ballsWaiting ? 'ball waiting-ball' : 'ball';
+        
+        // 3-eren (Låst ved pocket-krav og 90+)
+        document.getElementById('ball3').className = (isLockedPocket || isAtEnd) ? 'ball waiting-ball' : 'ball';
+
+        // Carom-knappene er ALLTID åpne så lenge man ikke har nådd 100 poeng
+        const caromsWaiting = state.scores[state.currentPlayer] >= 100;
+        document.getElementById('carom1').className = caromsWaiting ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
+        document.getElementById('carom5').className = caromsWaiting ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
+        document.getElementById('carom3').className = caromsWaiting ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
     }
 
     function toggleLanguage() { state.lang = (state.lang === 'no') ? 'en' : 'no'; db.child('lang').set(state.lang); }
     function saveName(i, val) { state.names[i] = val; db.child('names').set(state.names); }
     function setPlayerCount(n) { const l = dictionary[state.lang || 'no']; if(confirm(l.confirm_players.replace("{n}", n))) { state.playerCount = n; resetGame(); } }
     function rotateBreaker() { if(!state.breakDone) { state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; db.set(state); } }
-    function action(type, val) { saveHistory(); let p = state.currentPlayer; if (state.scores[p] < 90 && state.scores[p] + val > 90) return; if (state.scores[p] >= 90 && state.scores[p] < 100 && state.scores[p] + val > 100) return; state.breakDone = true; state.foulCounts[p] = 0; if (type === 'pocket_carom') { if (state.tableStatus === 'locked') state.lastType = (state.lastType === 'pocket') ? 'carom' : 'pocket'; } else { state.tableStatus = 'locked'; state.lastType = type; } state.scores[p] += val; db.set(state); }
+    
+    function action(type, val) { 
+        saveHistory(); 
+        let p = state.currentPlayer; 
+        if (state.scores[p] < 90 && state.scores[p] + val > 90) return; 
+        if (state.scores[p] >= 90 && state.scores[p] < 100 && state.scores[p] + val > 100) return; 
+        
+        state.breakDone = true; 
+        state.foulCounts[p] = 0; 
+        
+        if (type === 'pocket_carom') { 
+            // Hvis det er et krav om carom, og man trykker +CAROM, så har man oppfylt kravet og kan fortsette med hva som helst.
+            state.tableStatus = 'open'; 
+            state.lastType = null; 
+        } else { 
+            state.tableStatus = 'locked'; 
+            state.lastType = type; 
+        } 
+        
+        state.scores[p] += val; 
+        db.set(state); 
+    }
+    
     function nextTurn() { saveHistory(); const p = state.currentPlayer; const roundScore = state.scores[p] - state.scoreAtStart[p]; if (roundScore > (state.bestSeries[p] || 0)) state.bestSeries[p] = roundScore; if (!state.lastSeries) state.lastSeries = [0,0,0]; state.lastSeries[p] = roundScore; state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; state.tableStatus = 'open'; state.lastType = null; state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; state.innings++; db.set(state); }
     function handleFoul() { saveHistory(); state.foulCounts[state.currentPlayer]++; if (state.foulCounts[state.currentPlayer] >= 3) { state.scores[state.currentPlayer] = 0; state.foulCounts[state.currentPlayer] = 0; } else { state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; } nextTurn(); }
     function saveHistory() { history.push(JSON.stringify(state)); }
