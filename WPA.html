@@ -195,8 +195,8 @@
     const dictionary = {
         no: { 
             now: "NÅ", best: "PERS", last: "SISTE", break: "BREKK-STØT", 
-            req_carom: "KRAV: CAROM", req_pocket: "KRAV: POCKET", any: "VELG: CAROM / KULE", 
-            caroms_only: "KUN CAROMS", win: "WINNING SHOT (CUE VIA 1)", inn: "INNING", 
+            req_carom: "KRAV: CAROM", req_pocket: "KRAV: POCKET", any: "VELG: CAROM / POCKET", 
+            caroms_only: "KUN CAROMS", undo: "ANGRE", foul: "FEIL", turn: "AVSLUTT TUR", win: "VINNER STØTET (PUTTE HVIT VIA 1)", inn: "INNING", 
             winner: "VINNER!", save: "LAGRE & NY", rematch: "REMATCH", discard: "SLETT & NY",
             confirm_msg: "En kamp pågår allerede. Hva vil du gjøre?", resume: "FORTSETT",
             new_match: "NY MATCH", game_mode: "SPILLMODUS", players_count: "ANTALL SPILLERE?",
@@ -205,7 +205,7 @@
         en: { 
             now: "NOW", best: "BEST", last: "LAST", break: "BREAK SHOT", 
             req_carom: "REQ: CAROM", req_pocket: "REQ: POCKET", any: "ANY POINT", 
-            caroms_only: "CAROMS ONLY", win: "WINNING SHOT (CUE VIA 1)", inn: "INNING", 
+            caroms_only: "CAROMS ONLY", undo: "UNDO", foul: "FOUL", Turn: "END TURN", win: "WINNING SHOT (POCKET CUE VIA 1)", inn: "INNING", 
             winner: "WINNER!", save: "SAVE & NEW", rematch: "REMATCH", discard: "DELETE & NEW",
             confirm_msg: "A match is in progress. What do you want to do?", resume: "RESUME",
             new_match: "NEW MATCH", game_mode: "GAME MODE", players_count: "NUMBER OF PLAYERS?",
@@ -276,6 +276,10 @@
 
     function updateUI() {
         const l = dictionary[state.lang || 'no'];
+
+        document.getElementById('undoActionBtn').innerText = l.undo;
+        document.getElementById('foulActionBtn').innerText = l.foul;
+        document.getElementById('endTurnBtn').innerText = l.turn;
         
         // Oppdater faste tekster i HTML
         document.getElementById('overlayHeader').innerText = l.new_match;
@@ -316,7 +320,7 @@
         const isAlternate = state.gameMode === 'alternate';
         const lockPocket = isAlternate && state.tableStatus === 'locked' && state.lastType === 'pocket';
         const lockCarom = isAlternate && state.tableStatus === 'locked' && state.lastType === 'carom';
-
+        
         document.getElementById('winButton').style.display = winPhase ? 'block' : 'none';
         const caromDisabled = winPhase || (lockCarom && !caromPhase);
         document.getElementById('carom1PBtn').className = caromDisabled ? 'btn btn-blue waiting-ball' : 'btn btn-blue';
