@@ -2,67 +2,50 @@
 <html lang="no">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biljard App - Pixel Perfect 1000%</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Biljard App</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            /* Den nøyaktige, mettede grønnfargen med dybde */
-            --felt-green: radial-gradient(circle at center, #2fa34b 10%, #1a6331 50%, #082411 100%);
+            /* Mettet grønnfarge med dyp gradient fra bilde 1 */
+            --felt-green: radial-gradient(circle at center, #2fa34b 0%, #155e2d 60%, #0a2b15 100%);
             --gold: #d4af37;
             --leather: #121212;
-            --card-bg: rgba(0, 0, 0, 0.65);
+            --card-bg: rgba(0, 0, 0, 0.6);
         }
 
-        body {
-            background-color: #1a1a1a;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start; /* Sørger for at innholdet starter øverst */
-            min-height: 100vh; /* Lar body strekke seg, men ikke containeren */
+        /* Fullskjerm setup */
+        html, body {
+            height: 100%;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            overflow: hidden; /* Hindrer rulling, vi låser layouten */
+            background-color: var(--leather); /* Basefarge */
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
-        .phone {
-            width: 360px;
-            /* ENDRING: Fjernet fast 'height: 760px' */
-            height: auto; /* Lar innholdet bestemme høyden */
-            background: #082411;
-            border-radius: 45px;
-            border: 8px solid #282828;
-            position: relative;
-            overflow: hidden;
+        /* Hoved-container fyller hele skjermen */
+        .app-container {
+            height: 100%;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 0 50px rgba(0,0,0,0.8);
-            margin-bottom: 20px; /* Litt luft i bunn */
+            position: relative;
         }
 
-        /* DUKEN (Bakgrunnen i midten) */
+        /* GRØNN DUK (Bakgrunnen i midten) */
         .felt-layer {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             background: var(--felt-green);
-            z-index: 1;
-        }
-
-        /* Tekstur-lag uten pikselering */
-        .felt-layer::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
             background-image: url("https://www.transparenttextures.com/patterns/felt.png");
-            opacity: 0.15; /* Skrur ned støyen for å unngå piksler */
-            pointer-events: none;
+            z-index: 1;
         }
 
         /* TOPP-PANEL (Lær) */
         .header {
             background: var(--leather);
             background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png");
-            padding: 45px 25px 75px;
+            padding: 50px 25px 80px; /* Mer padding i topp/bunn for buene */
             z-index: 10;
             border-bottom-left-radius: 50% 35px;
             border-bottom-right-radius: 50% 35px;
@@ -70,7 +53,7 @@
             position: relative;
         }
 
-        /* Søm-detalj langs buen */
+        /* Søm langs buen */
         .header::after {
             content: "";
             position: absolute;
@@ -93,15 +76,15 @@
             border-radius: 4px;
         }
 
-        /* MIDTPARTI (Kortene) */
+        /* MIDTPARTI (Her ligger kortene på grønn duk) */
         .main-felt {
             position: relative;
             z-index: 5;
-            flex-grow: 1;
+            flex-grow: 1; /* Fyller resten av plassen mellom topp og bunn */
             display: flex;
             justify-content: space-evenly;
             align-items: center;
-            padding: 40px 10px; /* Økt padding for å gi mer luft rundt kortene */
+            padding: 20px 10px;
         }
 
         .action-card {
@@ -127,13 +110,12 @@
         .bottom-panel {
             background: var(--leather);
             background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png");
-            padding: 75px 20px 20px;
+            padding: 80px 20px 20px; /* Mer padding i topp for buene */
             z-index: 10;
             border-top-left-radius: 50% 35px;
             border-top-right-radius: 50% 35px;
             box-shadow: 0 -15px 35px rgba(0,0,0,0.9);
             position: relative;
-            margin-top: -10px; /* Litt overlapp for å skjule kanten */
         }
 
         .bottom-panel::before {
@@ -149,10 +131,9 @@
             border: 1px solid #333;
             border-radius: 18px;
             padding: 18px;
-            margin-bottom: 10px; /* Luft før navbar */
         }
 
-        /* NAVBAR */
+        /* NAVBAR - Helt nederst */
         .navbar {
             background: #0a0a0a;
             height: 75px;
@@ -161,8 +142,6 @@
             align-items: center;
             border-top: 1px solid #222;
             z-index: 20;
-            margin-top: auto; /* Sørger for at den er nederst i containeren */
-            border-radius: 0 0 45px 45px; /* Matcher telefonens avrunding */
         }
 
         .nav-item { color: #666; text-align: center; font-size: 11px; text-decoration: none; }
@@ -173,12 +152,12 @@
 </head>
 <body>
 
-<div class="phone">
+<div class="app-container">
     <div class="felt-layer"></div>
 
     <header class="header">
         <h1>Hei, Marius!</h1>
-        <div class="rank">Cowboy Rank: <span>Level 12 - Gunslinger</span></div>
+        <div class="rank">Cowboy Rank: Level 12 - Gunslinger</div>
         <div class="progress-bar"><div class="progress-fill"></div></div>
     </header>
 
@@ -201,20 +180,14 @@
         <div class="last-match">
             <div style="color:#888; font-size:12px; margin-bottom:12px; font-weight:bold;">Min Siste Kamp</div>
             <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="width:50px; height:50px; border-radius:50%; background:#333; border:2px solid var(--gold);"></div>
                 <div style="text-align:center;">
-                    <div style="width:52px; height:52px; border-radius:50%; background:#333; border:2px solid var(--gold); margin-bottom:5px;"></div>
-                    <div style="color:#fff; font-size:12px;">Mav</div>
-                </div>
-                <div style="text-align:center;">
-                    <div style="font-size:28px; font-weight:900; color:#fff;">
+                    <div style="font-size:26px; font-weight:bold; color:#fff;">
                         <span style="color:#2ecc71">100</span> - <span style="color:var(--gold)">82</span>
                     </div>
                     <div style="color:#2ecc71; font-size:10px; font-weight:bold; margin-top:2px;">WIN</div>
                 </div>
-                <div style="text-align:center;">
-                    <div style="width:52px; height:52px; border-radius:50%; background:#333; border:2px solid #444; margin-bottom:5px;"></div>
-                    <div style="color:#fff; font-size:12px;">Per</div>
-                </div>
+                <div style="width:50px; height:50px; border-radius:50%; background:#333; border:2px solid #444;"></div>
             </div>
         </div>
     </section>
