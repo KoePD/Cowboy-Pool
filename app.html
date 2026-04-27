@@ -81,38 +81,38 @@
 
 <div id="setupOverlay" class="setup-overlay">
     <div class="setup-card">
-        <h2 style="color:#f1c40f; margin-bottom: 20px;">NY MATCH</h2>
+        <h2 id="overlayHeader" style="color:#f1c40f; margin-bottom: 20px;">NY MATCH</h2>
         
         <div id="step-confirm" style="display: none;">
-            <p style="color:#888; margin-bottom: 20px;">En kamp pågår allerede. Hva vil du gjøre?</p>
-            <button class="btn-save-option" onclick="handleFinishAndSave()">LAGRE & START NY</button>
-            <button class="btn-discard-option" onclick="goToStep1()">SLETT & START NY</button>
-            <button class="btn-back" onclick="closeSetup()">Fortsett kampen</button>
+            <p id="confirmText" style="color:#888; margin-bottom: 20px;">En kamp pågår allerede. Hva vil du gjøre?</p>
+            <button class="btn-save-option" id="saveAndStartBtn" onclick="handleFinishAndSave()">LAGRE & START NY</button>
+            <button class="btn-discard-option" id="discardAndStartBtn" onclick="goToStep1()">SLETT & START NY</button>
+            <button class="btn-back" id="cancelBtn" onclick="closeSetup()">Fortsett kampen</button>
         </div>
 
         <div id="step1" style="display: none;">
-            <p style="color:#888; margin-bottom: 15px;">Antall spillere?</p>
+            <p id="playersText" style="color:#888; margin-bottom: 15px;">Antall spillere?</p>
             <div style="display:flex; gap:10px; margin-bottom:20px;">
                 <button class="btn-choice" onclick="selectPlayers(1)">1</button>
                 <button class="btn-choice" onclick="selectPlayers(2)">2</button>
                 <button class="btn-choice" onclick="selectPlayers(3)">3</button>
             </div>
-            <button class="btn-back" onclick="closeSetup()">Avbryt</button>
+            <button class="btn-back" id="abortBtn" onclick="closeSetup()">Avbryt</button>
         </div>
 
         <div id="step2" style="display: none;">
-            <p style="color:#888; margin-bottom: 15px;">Navn på spillere:</p>
+            <p id="namesText" style="color:#888; margin-bottom: 15px;">Navn på spillere:</p>
             <div id="nameInputs"></div>
-            <button class="btn-start" onclick="finalizeSetup()">START KAMP</button>
+            <button class="btn-start" id="startMatchBtn" onclick="finalizeSetup()">START KAMP</button>
             <br>
-            <button class="btn-back" onclick="goToStep1()">← Tilbake</button>
+            <button class="btn-back" id="backBtn" onclick="goToStep1()">← Tilbake</button>
         </div>
     </div>
 </div>
 
 <div class="app-container">
     <div class="header-actions">
-        <button class="btn-new-game-top" onclick="checkActiveGame()">New Match</button>
+        <button class="btn-new-game-top" id="newMatchTopBtn" onclick="checkActiveGame()">New Match</button>
     </div>
 
     <div id="scoreboard-container"></div>
@@ -121,7 +121,7 @@
         <span class="req-text" id="moveText">BREKK-STØT</span>
         <span class="timer-text" id="matchTimer">00:00:00</span>
         <div id="rotate-container">
-            <button class="btn-rotate" onclick="rotateBreaker()">BYTT STARTSPILLER</button>
+            <button class="btn-rotate" id="rotateBtn" onclick="rotateBreaker()">BYTT STARTSPILLER</button>
         </div>
     </div>
 
@@ -141,17 +141,17 @@
     </div>
 
     <div class="action-area">
-        <button class="btn btn-blue" onclick="action('carom', 1)">Carom 1P</button>
-        <button class="btn btn-blue" onclick="action('carom', 2)">Carom 2P</button>
-        <button class="btn btn-foul" onclick="handleFoul()">FOUL</button>
-        <button class="btn btn-blue" onclick="undo()">ANGRE</button>
-        <button class="btn btn-turn" onclick="nextTurn()">AVSLUTT TUR</button>
+        <button class="btn btn-blue" id="carom1PBtn" onclick="action('carom', 1)">Carom 1P</button>
+        <button class="btn btn-blue" id="carom2PBtn" onclick="action('carom', 2)">Carom 2P</button>
+        <button class="btn btn-foul" id="foulActionBtn" onclick="handleFoul()">FOUL</button>
+        <button class="btn btn-blue" id="undoActionBtn" onclick="undo()">ANGRE</button>
+        <button class="btn btn-turn" id="endTurnBtn" onclick="nextTurn()">AVSLUTT TUR</button>
     </div>
 
     <nav class="bottom-nav">
-        <a href="#" class="nav-item active"><i class="material-icons">home</i>HJEM</a>
-        <a href="#" class="nav-item"><i class="material-icons">leaderboard</i>STATS</a>
-        <a href="#" class="nav-item" onclick="toggleLanguage()"><i class="material-icons">language</i>EN/NO</a>
+        <a href="#" class="nav-item active"><i class="material-icons">home</i><span id="navHome">HJEM</span></a>
+        <a href="stats.html" class="nav-item"><i class="material-icons">leaderboard</i><span id="navStats">STATS</span></a>
+        <a href="#" class="nav-item" onclick="toggleLanguage()"><i class="material-icons">language</i><span id="navLang">EN/NO</span></a>
     </nav>
 </div>
 
@@ -164,6 +164,41 @@
     let state = { playerCount: 2, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null, innings: 0, seconds: 0, names: ["P1","P2","P3"], bestSeries: [0,0,0], lastSeries: [0,0,0], lang: 'no' };
     let history = [];
 
+    const dictionary = {
+        no: {
+            newMatch: "NY MATCH",
+            confirm: "En kamp pågår allerede. Hva vil du gjøre?",
+            saveStart: "LAGRE & START NY",
+            discardStart: "SLETT & START NY",
+            resume: "Fortsett kampen",
+            players: "Antall spillere?",
+            abort: "Avbryt",
+            names: "Navn på spillere:",
+            start: "START KAMP",
+            back: "← Tilbake",
+            now: "NÅ", best: "PERS", last: "SISTE",
+            break: "BREKK-STØT", req_carom: "KRAV: CAROM", req_pocket: "KRAV: POCKET", any: "VELG: CAROM / KULE",
+            rotate: "BYTT STARTSPILLER", foul: "FOUL", undo: "ANGRE", turn: "AVSLUTT TUR",
+            home: "HJEM", stats: "STATS"
+        },
+        en: {
+            newMatch: "NEW MATCH",
+            confirm: "A match is in progress. What do you want to do?",
+            saveStart: "SAVE & START NEW",
+            discardStart: "DISCARD & START NEW",
+            resume: "Resume match",
+            players: "Number of players?",
+            abort: "Cancel",
+            names: "Player names:",
+            start: "START MATCH",
+            back: "← Back",
+            now: "NOW", best: "BEST", last: "LAST",
+            break: "BREAK SHOT", req_carom: "REQ: CAROM", req_pocket: "REQ: POCKET", any: "CHOOSE: CAROM / POCKET",
+            rotate: "SWITCH STARTER", foul: "FOUL", undo: "UNDO", turn: "END TURN",
+            home: "HOME", stats: "STATS"
+        }
+    };
+
     db.on('value', (s) => { if(s.val()) { state = s.val(); updateUI(); } });
 
     function hideAllSteps() {
@@ -175,10 +210,7 @@
     function checkActiveGame() {
         document.getElementById('setupOverlay').style.display = 'flex';
         hideAllSteps();
-        
-        // Sjekk om noen har poeng. Vi sjekker summen av poengene.
         const totalPoints = state.scores.reduce((a, b) => a + b, 0);
-        
         if (totalPoints > 0) {
             document.getElementById('step-confirm').style.display = 'block';
         } else {
@@ -188,22 +220,11 @@
 
     function handleFinishAndSave() {
         const historyRef = firebase.database().ref('matchHistory'); 
-        const kampData = { 
-            dato: new Date().toLocaleString('no-NO'), 
-            spillere: state.names.slice(0, state.playerCount), 
-            resultat: state.scores.slice(0, state.playerCount), 
-            varighet: document.getElementById('matchTimer').innerText, 
-            innings: Math.floor(state.innings / state.playerCount) + 1 
-        }; 
-        historyRef.push(kampData).then(() => {
-            goToStep1();
-        });
+        const kampData = { dato: new Date().toLocaleString('no-NO'), spillere: state.names.slice(0, state.playerCount), resultat: state.scores.slice(0, state.playerCount), varighet: document.getElementById('matchTimer').innerText, innings: Math.floor(state.innings / state.playerCount) + 1 }; 
+        historyRef.push(kampData).then(() => { goToStep1(); });
     }
 
-    function goToStep1() {
-        hideAllSteps();
-        document.getElementById('step1').style.display = 'block';
-    }
+    function goToStep1() { hideAllSteps(); document.getElementById('step1').style.display = 'block'; }
 
     function selectPlayers(n) { 
         setupCount = n; 
@@ -211,46 +232,40 @@
         document.getElementById('step2').style.display = 'block';
         const container = document.getElementById('nameInputs');
         container.innerHTML = '';
-        for(let i=0; i<n; i++) container.innerHTML += `<input type="text" class="name-field" id="n${i}" placeholder="Navn spiller ${i+1}">`;
+        for(let i=0; i<n; i++) container.innerHTML += `<input type="text" class="name-field" id="n${i}" placeholder="${state.lang === 'no' ? 'Navn' : 'Name'} ${i+1}">`;
     }
 
     function finalizeSetup() {
         const namesArr = [];
-        for(let i=0; i<setupCount; i++) namesArr.push(document.getElementById(`n${i}`).value || `Spiller ${i+1}`);
+        for(let i=0; i<setupCount; i++) namesArr.push(document.getElementById(`n${i}`).value || (state.lang === 'no' ? `Spiller ${i+1}` : `Player ${i+1}`));
         const newState = { ...state, playerCount: setupCount, names: namesArr, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], bestSeries: [0,0,0], lastSeries: [0,0,0], currentPlayer: 0, breakDone: false, seconds: 0, tableStatus: 'open', lastType: null, innings: 0 };
         db.set(newState).then(() => { closeSetup(); });
     }
 
     function closeSetup() { document.getElementById('setupOverlay').style.display = 'none'; }
 
-    function action(type, val) {
-        saveHistory();
-        let p = state.currentPlayer;
-        if (state.scores[p] < 90 && state.scores[p] + val > 90) return;
-        if (state.scores[p] >= 90 && state.scores[p] < 100 && state.scores[p] + val > 100) return;
-        state.breakDone = true; state.foulCounts[p] = 0;
-        if(type === 'pocket_carom') { state.tableStatus = 'open'; state.lastType = null; }
-        else { state.tableStatus = 'locked'; state.lastType = type; }
-        state.scores[p] += val; db.set(state);
-    }
-
-    function nextTurn() {
-        saveHistory();
-        let p = state.currentPlayer;
-        let round = state.scores[p] - state.scoreAtStart[p];
-        if (round > state.bestSeries[p]) state.bestSeries[p] = round;
-        state.lastSeries[p] = round;
-        state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
-        state.tableStatus = 'open'; state.lastType = null;
-        state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer];
-        db.set(state);
-    }
-
     function updateUI() {
-        const l = state.lang === 'no' ? 
-            {now:"NÅ",best:"PERS",last:"SISTE",break:"BREKK-STØT",req_carom:"KRAV: CAROM",req_pocket:"KRAV: POCKET",any:"VELG: CAROM / KULE"} : 
-            {now:"NOW",best:"BEST",last:"LAST",break:"BREAK SHOT",req_carom:"REQ: CAROM",req_pocket:"REQ: POCKET",any:"CHOOSE: CAROM / POCKET"};
+        const l = dictionary[state.lang || 'no'];
         
+        // Oppdater faste tekster basert på språk
+        document.getElementById('newMatchTopBtn').innerText = l.newMatch;
+        document.getElementById('overlayHeader').innerText = l.newMatch;
+        document.getElementById('confirmText').innerText = l.confirm;
+        document.getElementById('saveAndStartBtn').innerText = l.saveStart;
+        document.getElementById('discardAndStartBtn').innerText = l.discardStart;
+        document.getElementById('cancelBtn').innerText = l.resume;
+        document.getElementById('playersText').innerText = l.players;
+        document.getElementById('abortBtn').innerText = l.abort;
+        document.getElementById('namesText').innerText = l.names;
+        document.getElementById('startMatchBtn').innerText = l.start;
+        document.getElementById('backBtn').innerText = l.back;
+        document.getElementById('rotateBtn').innerText = l.rotate;
+        document.getElementById('foulActionBtn').innerText = l.foul;
+        document.getElementById('undoActionBtn').innerText = l.undo;
+        document.getElementById('endTurnBtn').innerText = l.turn;
+        document.getElementById('navHome').innerText = l.home;
+        document.getElementById('navStats').innerText = l.stats;
+
         const cont = document.getElementById('scoreboard-container');
         cont.innerHTML = '';
         for(let i=0; i<state.playerCount; i++) {
@@ -286,6 +301,29 @@
         document.getElementById('ball1').className = (!state.breakDone || (lock && state.lastType==='pocket') || at90) ? 'ball waiting-ball' : 'ball';
         document.getElementById('ball5').className = (!state.breakDone || (lock && state.lastType==='pocket') || at90) ? 'ball waiting-ball' : 'ball';
         document.getElementById('ball3').className = ((lock && state.lastType==='pocket') || at90) ? 'ball waiting-ball' : 'ball';
+    }
+
+    function action(type, val) {
+        saveHistory();
+        let p = state.currentPlayer;
+        if (state.scores[p] < 90 && state.scores[p] + val > 90) return;
+        if (state.scores[p] >= 90 && state.scores[p] < 100 && state.scores[p] + val > 100) return;
+        state.breakDone = true; state.foulCounts[p] = 0;
+        if(type === 'pocket_carom') { state.tableStatus = 'open'; state.lastType = null; }
+        else { state.tableStatus = 'locked'; state.lastType = type; }
+        state.scores[p] += val; db.set(state);
+    }
+
+    function nextTurn() {
+        saveHistory();
+        let p = state.currentPlayer;
+        let round = state.scores[p] - state.scoreAtStart[p];
+        if (round > state.bestSeries[p]) state.bestSeries[p] = round;
+        state.lastSeries[p] = round;
+        state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
+        state.tableStatus = 'open'; state.lastType = null;
+        state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer];
+        db.set(state);
     }
 
     function handleFoul() { saveHistory(); state.foulCounts[state.currentPlayer]++; if(state.foulCounts[state.currentPlayer] >= 3) { state.scores[state.currentPlayer] = 0; state.foulCounts[state.currentPlayer] = 0; } else { state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; } nextTurn(); }
