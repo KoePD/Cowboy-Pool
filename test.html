@@ -3,18 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biljard App UI</title>
+    <title>Biljard App - Fasit UI</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
             /* Fargepalett fra bildet */
             --bg-dark: #111111;
-            --bg-card: #1a1a1a;
-            --green-felt: linear-gradient(135deg, #1d6e3e 0%, #114e2b 100%);
+            --leather-dark: #1a1a1a;
+            --felt-green: radial-gradient(circle at center, #2e7d32 0%, #1a5e20 50%, #0d3b14 100%);
             --gold: #d4af37;
-            --text-gray: #b0b0b0;
+            --text-gold: #e6c66a;
+            --text-gray: #aaaaaa;
             --white: #ffffff;
-            --green-win: #4caf50;
+            --border: #333333;
+            --win-green: #4caf50;
         }
 
         body {
@@ -28,8 +30,8 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Ytre container (mobil-ramme) */
-        .phone-container {
+        /* Ytre mobil-ramme */
+        .phone-frame {
             width: 375px;
             height: 750px;
             background: var(--bg-dark);
@@ -42,17 +44,23 @@
             flex-direction: column;
         }
 
-        /* 1. Header sektion */
-        .header {
-            padding: 25px 20px 10px;
-            background: #111; /* Litt mørkere lær */
+        /* ----- HEADER SEKSJON ----- */
+        .header-panel {
+            padding: 30px 20px 40px; /* Mer padding i bunn for buen */
+            background: var(--leather-dark);
+            position: relative;
+            z-index: 10;
+            /* Lær-tekstur filter */
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiIHZpZXdCb3g9IjAgMCA0IDQiPjxnIGZpbGwtcnVsZT0iZXZlbm9kZCI+PGcgZmlsbD0iIzIyMjIyMiIgZmlsbC1vcGFjaXR5PSIwLjA1Ij48cGF0aCBkPSJNMCAwaDF2MUgwVjB6TTEgMWgxdjFIMVYxeiBNMiAyNWgxdjFIMlYyegoiLz48L2c+PC9nPjwvc3ZnPg==');
+            /* CSS Bue-maske for overgangen */
+            -webkit-mask-image: radial-gradient(circle 500px at 50% -390px, transparent 100%, black 100%);
+            mask-image: radial-gradient(circle 500px at 50% -390px, transparent 100%, black 100%);
         }
 
         .profile-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
         }
 
         .greeting h1 {
@@ -63,15 +71,15 @@
 
         .rank-text {
             color: var(--text-gray);
-            font-size: 14px;
-            margin-top: 4px;
+            font-size: 13px;
+            margin-top: 2px;
         }
 
         .rank-text span {
-            color: var(--gold);
+            color: var(--text-gold);
         }
 
-        .avatar {
+        .avatar-circle {
             width: 50px;
             height: 50px;
             border-radius: 50%;
@@ -79,47 +87,50 @@
             background: #333;
             overflow: hidden;
         }
-        .avatar img {
+        
+        .avatar-circle img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .progress-bar-container {
+        .progress-container {
             width: 100%;
             height: 6px;
             background: #333;
             border-radius: 3px;
+            margin-top: 10px;
+            position: relative;
         }
 
-        .progress-fill {
+        .progress-bar {
             width: 65%;
             height: 100%;
             background: var(--gold);
             border-radius: 3px;
         }
 
-        /* 2. Seksjon med grønn duk og aktivitetskort */
-        .activity-felt-container {
-            padding: 10px 20px;
-            background-color: var(--bg-dark);
-        }
-
+        /* ----- MIDTRE SEKSJON: BILJARDDUK ----- */
         .main-felt {
-            background: var(--green-felt);
-            border-radius: 15px; /* De buede hjørnene på det grønne */
-            padding: 20px;
+            background: var(--felt-green);
+            flex-grow: 1;
+            padding: 30px 20px;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 15px;
-            box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
+            margin-top: -30px; /* Overlapp med topp-buen */
+            margin-bottom: -30px; /* Overlapp med bunn-buen */
+            position: relative;
+            z-index: 1;
+            box-shadow: inset 0 0 80px rgba(0,0,0,0.6);
+            /* Søm-tekstur filter */
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiIHZpZXdCb3g9IjAgMCA0IDQiPjxnIGZpbGwtcnVsZT0iZXZlbm9kZCI+PGcgZmlsbD0iIzAwMDAwMCIgZmlsbC1vcGFjaXR5PSIwLjA1Ij48cGF0aCBkPSJNMCAwaDF2MUgwVjB6TTEgMWgxdjFIMVYxeiBNMiAyNWgxdjFIMlYyegoiLz48L2c+PC9nPjwvc3ZnPg==');
         }
 
         .action-card {
-            background: rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.5);
             border: 1.5px solid var(--gold);
             border-radius: 12px;
-            aspect-ratio: 1; /* Gjør de firkantede */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -127,21 +138,22 @@
             text-align: center;
             transition: all 0.2s;
             cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
         
         .action-card:hover {
             transform: translateY(-3px);
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
         }
 
         .action-card i {
-            font-size: 30px;
+            font-size: 35px;
             margin-bottom: 8px;
-            color: var(--gold);
+            color: var(--text-gold);
         }
 
         .action-card.green-plus i {
-            color: var(--green-win);
+            color: var(--win-green);
         }
 
         .action-label {
@@ -150,18 +162,26 @@
             text-transform: uppercase;
         }
 
-        /* 3. Seksjon for siste kamp */
-        .last-match-container {
-            padding: 10px 20px 20px;
-            background-color: var(--bg-dark);
-            flex-grow: 1; /* Fyller resten av plassen */
+        /* ----- KAMP-INFO SEKSJON ----- */
+        .match-panel {
+            background: var(--leather-dark);
+            padding: 40px 20px 20px; /* Mer padding i topp for buen */
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            z-index: 10;
+            /* Lær-tekstur filter */
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiIHZpZXdCb3g9IjAgMCA0IDQiPjxnIGZpbGwtcnVsZT0iZXZlbm9kZCI+PGcgZmlsbD0iIzIyMjIyMiIgZmlsbC1vcGFjaXR5PSIwLjA1Ij48cGF0aCBkPSJNMCAwaDF2MUgwVjB6TTEgMWgxdjFIMVYxeiBNMiAyNWgxdjFIMlYyegoiLz48L2c+PC9nPjwvc3ZnPg==');
+            /* CSS Bue-maske for overgangen */
+            -webkit-mask-image: radial-gradient(circle 500px at 50% 540px, transparent 100%, black 100%);
+            mask-image: radial-gradient(circle 500px at 50% 540px, transparent 100%, black 100%);
         }
 
         .match-card {
-            background: var(--bg-card);
+            background: rgba(0,0,0,0.4);
             border-radius: 15px;
             padding: 15px;
-            border: 1px solid #333;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
 
         .match-card h3 {
@@ -188,8 +208,9 @@
             background: #444;
             margin: 0 auto 5px;
             overflow: hidden;
-            border: 1px solid #555;
+            border: 1px solid var(--border);
         }
+        
         .player-img img {
             width: 100%;
             height: 100%;
@@ -207,16 +228,20 @@
             line-height: 1;
         }
 
-        .score-display .final {
-            color: var(--green-win);
-        }
-
         .win-tag {
-            color: var(--green-win);
+            color: var(--win-green);
             font-size: 11px;
             font-weight: bold;
             display: block;
             margin-top: 2px;
+        }
+
+        .score-display .win {
+            color: var(--win-green);
+        }
+
+        .score-display .gold {
+            color: var(--text-gold);
         }
 
         /* Statistikk-tabell */
@@ -224,7 +249,7 @@
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             text-align: center;
-            border-top: 1px solid #333;
+            border-top: 1px solid var(--border);
             padding-top: 10px;
         }
 
@@ -239,7 +264,7 @@
             font-weight: bold;
         }
 
-        /* 4. Bunnmeny */
+        /* ----- BOTTOM NAV ----- */
         .nav-bar {
             width: 100%;
             height: 70px;
@@ -247,8 +272,7 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
-            border-top: 1px solid #333;
-            margin-top: auto; /* Sørger for at den alltid er nederst */
+            margin-top: auto;
         }
 
         .nav-item {
@@ -264,7 +288,7 @@
         }
 
         .nav-item.active {
-            color: var(--gold);
+            color: var(--text-gold);
         }
 
         .nav-item i {
@@ -276,40 +300,38 @@
 </head>
 <body>
 
-<div class="phone-container">
-    <header class="header">
+<div class="phone-frame">
+    <header class="header-panel">
         <div class="profile-row">
             <div class="greeting">
                 <h1>Hei, Marius!</h1>
                 <div class="rank-text">Cowboy Rank: <span>Level 12 - Gunslinger</span></div>
             </div>
-            <div class="avatar">
-                <img src="https://via.placeholder.com/50" alt="Marius Avatar">
+            <div class="avatar-circle">
+                <img src="https://via.placeholder.com/50" alt="Avatar">
             </div>
         </div>
-        <div class="progress-bar-container">
-            <div class="progress-fill"></div>
+        <div class="progress-container">
+            <div class="progress-bar"></div>
         </div>
     </header>
 
-    <section class="activity-felt-container">
-        <div class="main-felt">
-            <div class="action-card green-plus">
-                <i class="fa-solid fa-plus"></i>
-                <div class="action-label">Ny Kamp</div>
-            </div>
-            <div class="action-card">
-                <i class="fa-solid fa-trophy"></i>
-                <div class="action-label">Toppliste</div>
-            </div>
-            <div class="action-card">
-                <i class="fa-solid fa-book-open"></i>
-                <div class="action-label">Regler</div>
-            </div>
+    <div class="main-felt">
+        <div class="action-card green-plus">
+            <i class="fa-solid fa-plus"></i>
+            <div class="action-label">Ny Kamp</div>
         </div>
-    </section>
+        <div class="action-card">
+            <i class="fa-solid fa-trophy"></i>
+            <div class="action-label">Toppliste</div>
+        </div>
+        <div class="action-card">
+            <i class="fa-solid fa-book-open"></i>
+            <div class="action-label">Regler</div>
+        </div>
+    </div>
 
-    <section class="last-match-container">
+    <div class="match-panel">
         <div class="match-card">
             <h3>Min Siste Kamp</h3>
             <div class="score-row">
@@ -320,7 +342,7 @@
                     <div class="player-name">Mav</div>
                 </div>
                 <div class="score-display">
-                    <span class="final">100</span> - <span style="color: var(--gold);">82</span>
+                    <span class="win">100</span> - <span class="gold">82</span>
                     <span class="win-tag">WIN</span>
                 </div>
                 <div class="player">
@@ -338,7 +360,7 @@
                 <div><div class="stat-label">Kats.</div><div class="stat-value">27</div></div>
             </div>
         </div>
-    </section>
+    </div>
 
     <nav class="nav-bar">
         <a href="#" class="nav-item active">
