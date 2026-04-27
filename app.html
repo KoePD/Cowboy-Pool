@@ -20,10 +20,8 @@
 
         .app-container {
             width: 100%; max-width: 430px;
-            padding: 20px;
-            padding-bottom: 120px;
-            display: flex;
-            flex-direction: column;
+            padding: 20px; padding-bottom: 120px;
+            display: flex; flex-direction: column;
         }
 
         /* 2. MODUS VELGER */
@@ -41,7 +39,7 @@
         .timer-text { font-family: monospace; font-size: 1.4em; color: #f1c40f; margin-top: 5px; display: block; }
         .btn-rotate { background: rgba(241, 196, 15, 0.1); border: 1px solid #f1c40f; color: #f1c40f; padding: 5px 10px; border-radius: 8px; font-size: 0.6em; font-weight: bold; cursor: pointer; margin-top: 10px; display: inline-block; }
 
-        /* 4. SPILLERKORT */
+        /* 4. SPILLERKORT - LÅST LAYOUT */
         .player-card {
             background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%);
             backdrop-filter: blur(10px); border-radius: 24px;
@@ -51,15 +49,34 @@
             transition: 0.3s;
         }
         .player-card.active { border: 2px solid #f1c40f; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9); transform: scale(1.03); }
+        
         .player-info { flex: 1; overflow: hidden; padding-right: 10px; }
         .player-name-input { background: transparent; border: none; color: #666; font-size: 1.1em; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; width: 100%; padding: 0; outline: none; }
         .active .player-name-input { color: #f1c40f; }
+        
         .score-display { font-size: 3.5em; font-weight: 900; line-height: 1; margin: 0; color: #333; min-width: 60px; text-align: right; }
         .active .score-display { color: #f1c40f; }
-        .sub-stats { font-size: 0.55em; color: #444; margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; text-transform: uppercase; }
+
+        /* HER LÅSER VI KOLONNENE */
+        .sub-stats { 
+            font-size: 0.55em; color: #444; margin-top: 12px; 
+            display: flex; 
+            justify-content: flex-start; /* Starter fra venstre */
+            gap: 0; 
+            text-transform: uppercase; 
+        }
         .active .sub-stats { color: #888; }
+
+        .stat-item { 
+            width: 55px; /* FAST BREDDE SÅ TALLENE IKKE FLYTTER SEG */
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden;
+        }
+        .stat-label { white-space: nowrap; } /* Hindrer tekst-hopp */
         .stat-val { color: #eee; font-weight: 900; font-size: 1.1em; }
         .active .stat-val { color: #f1c40f; }
+
         .foul-container { display: flex; gap: 6px; margin-top: 12px; }
         .foul-dot { width: 12px; height: 12px; border-radius: 50%; background: #1a1a1a; border: 1px solid #222; }
         .foul-dot.active { background: #e74c3c; box-shadow: 0 0 10px #ff4757; }
@@ -188,7 +205,7 @@
             last: "LAST",
             home: "HOME",
             reset: "RESET",
-            confirm_finish: "Save match to history and finish?",
+            confirm_finish: "Save match and finish?",
             confirm_reset: "Reset current match?",
             confirm_players: "Switch to {n} players? Match will reset."
         }
@@ -210,7 +227,6 @@
             return; 
         }
 
-        // Oppdater faste knapper
         document.getElementById('rotateBtn').innerText = l.rotate;
         document.getElementById('foulBtn').innerText = l.foul;
         document.getElementById('undoBtn').innerText = l.undo;
@@ -244,9 +260,9 @@
                     <div class="player-info">
                         <input class="player-name-input" value="${state.names[i]}" oninput="saveName(${i}, this.value)">
                         <div class="sub-stats">
-                            <div class="stat-item">${l.now} <span class="stat-val">${currentRun}</span></div>
-                            <div class="stat-item">${l.best} <span class="stat-val">${state.bestSeries[i] || 0}</span></div>
-                            <div class="stat-item">${l.last} <span class="stat-val">${lastRun}</span></div>
+                            <div class="stat-item"><span class="stat-label">${l.now}</span> <span class="stat-val">${currentRun}</span></div>
+                            <div class="stat-item"><span class="stat-label">${l.best}</span> <span class="stat-val">${state.bestSeries[i] || 0}</span></div>
+                            <div class="stat-item"><span class="stat-label">${l.last}</span> <span class="stat-val">${lastRun}</span></div>
                         </div>
                         ${foulHtml}
                     </div>
@@ -255,13 +271,7 @@
         }
 
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
-        
-        let moveText = l.req_any;
-        if (!state.breakDone) moveText = l.break;
-        else if (state.tableStatus === 'locked') {
-            moveText = state.lastType === 'pocket' ? l.req_carom : l.req_pocket;
-        }
-        document.getElementById('moveText').innerText = moveText;
+        document.getElementById('moveText').innerText = !state.breakDone ? l.break : (state.tableStatus === 'locked' ? (state.lastType === 'pocket' ? l.req_carom : l.req_pocket) : l.req_any);
         document.getElementById('rotate-container').style.display = state.breakDone ? 'none' : 'block';
 
         const isAtEnd = state.scores[state.currentPlayer] >= 90;
@@ -271,35 +281,18 @@
         document.getElementById('ball3').parentElement.className = (isLockedPocket || isAtEnd) ? 'ball-group waiting' : 'ball-group';
     }
 
-    function toggleLanguage() {
-        state.lang = (state.lang === 'no') ? 'en' : 'no';
-        db.child('lang').set(state.lang);
-    }
-
+    function toggleLanguage() { state.lang = (state.lang === 'no') ? 'en' : 'no'; db.child('lang').set(state.lang); }
     function saveName(i, val) { state.names[i] = val; db.child('names').set(state.names); }
-    function setPlayerCount(n) { 
-        const l = dictionary[state.lang || 'no'];
-        if(confirm(l.confirm_players.replace("{n}", n))) { state.playerCount = n; resetGame(); } 
-    }
+    function setPlayerCount(n) { const l = dictionary[state.lang || 'no']; if(confirm(l.confirm_players.replace("{n}", n))) { state.playerCount = n; resetGame(); } }
     function rotateBreaker() { if(!state.breakDone) { state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; db.set(state); } }
     function action(type, val) { saveHistory(); let p = state.currentPlayer; if (state.scores[p] < 90 && state.scores[p] + val > 90) return; if (state.scores[p] >= 90 && state.scores[p] < 100 && state.scores[p] + val > 100) return; state.breakDone = true; state.foulCounts[p] = 0; if (type === 'pocket_carom') { if (state.tableStatus === 'locked') state.lastType = (state.lastType === 'pocket') ? 'carom' : 'pocket'; } else { state.tableStatus = 'locked'; state.lastType = type; } state.scores[p] += val; db.set(state); }
     function nextTurn() { saveHistory(); const p = state.currentPlayer; const roundScore = state.scores[p] - state.scoreAtStart[p]; if (roundScore > (state.bestSeries[p] || 0)) state.bestSeries[p] = roundScore; if (!state.lastSeries) state.lastSeries = [0,0,0]; state.lastSeries[p] = roundScore; state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; state.tableStatus = 'open'; state.lastType = null; state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; state.innings++; db.set(state); }
     function handleFoul() { saveHistory(); state.foulCounts[state.currentPlayer]++; if (state.foulCounts[state.currentPlayer] >= 3) { state.scores[state.currentPlayer] = 0; state.foulCounts[state.currentPlayer] = 0; } else { state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; } nextTurn(); }
     function saveHistory() { history.push(JSON.stringify(state)); }
     function undo() { if(history.length) { state = JSON.parse(history.pop()); db.set(state); } }
-    function resetGamePrompt() { 
-        const l = dictionary[state.lang || 'no'];
-        if(confirm(l.confirm_reset)) resetGame(); 
-    }
+    function resetGamePrompt() { const l = dictionary[state.lang || 'no']; if(confirm(l.confirm_reset)) resetGame(); }
     function resetGame() { state.scores = [0,0,0]; state.foulCounts = [0,0,0]; state.breakDone = false; state.seconds = 0; state.innings = 0; state.bestSeries = [0,0,0]; state.lastSeries = [0,0,0]; state.currentPlayer = 0; db.set(state); }
-    function saveMatchToHistory() { 
-        const l = dictionary[state.lang || 'no'];
-        if (confirm(l.confirm_finish)) { 
-            const historyRef = firebase.database().ref('matchHistory'); 
-            const kampData = { dato: new Date().toLocaleString('no-NO'), spillere: state.names.slice(0, state.playerCount), resultat: state.scores.slice(0, state.playerCount), varighet: document.getElementById('matchTimer').innerText, innings: Math.floor(state.innings / state.playerCount) + 1 }; 
-            historyRef.push(kampData).then(() => { resetGame(); }); 
-        } 
-    }
+    function saveMatchToHistory() { const l = dictionary[state.lang || 'no']; if (confirm(l.confirm_finish)) { const historyRef = firebase.database().ref('matchHistory'); const kampData = { dato: new Date().toLocaleString('no-NO'), spillere: state.names.slice(0, state.playerCount), resultat: state.scores.slice(0, state.playerCount), varighet: document.getElementById('matchTimer').innerText, innings: Math.floor(state.innings / state.playerCount) + 1 }; historyRef.push(kampData).then(() => { resetGame(); }); } }
     setInterval(() => { if (state.breakDone) { state.seconds++; firebase.database().ref('gameData/seconds').set(state.seconds); } }, 1000);
 </script>
 </body>
