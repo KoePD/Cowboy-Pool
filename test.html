@@ -22,9 +22,7 @@
             -webkit-font-smoothing: antialiased; color: white;
         }
 
-        .app-container {
-            height: 100%; display: flex; flex-direction: column; position: relative;
-        }
+        .app-container { height: 100%; display: flex; flex-direction: column; position: relative; }
 
         /* BAKGRUNN */
         .felt-base { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--felt-green); z-index: 1; }
@@ -33,75 +31,73 @@
         /* LÆR-PANELER */
         .header { 
             background: var(--leather); background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png"); 
-            padding: 60px 30px 100px; z-index: 10; 
-            border-bottom-left-radius: 50% 40px; border-bottom-right-radius: 50% 40px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8); transition: all 0.4s ease;
+            padding: 80px 30px 140px; z-index: 10; 
+            border-bottom-left-radius: 50% 50px; border-bottom-right-radius: 50% 50px; 
+            box-shadow: 0 25px 45px rgba(0,0,0,0.9); position: relative; transition: all 0.4s ease;
         }
         .bottom-panel { 
             background: var(--leather); background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png"); 
-            padding: 100px 30px 40px; z-index: 10; 
-            border-top-left-radius: 50% 40px; border-top-right-radius: 50% 40px; 
-            box-shadow: 0 -20px 40px rgba(0,0,0,0.8); transition: all 0.4s ease;
+            padding: 130px 30px 40px; z-index: 10; 
+            border-top-left-radius: 50% 50px; border-top-right-radius: 50% 50px; 
+            box-shadow: 0 -25px 45px rgba(0,0,0,0.9); position: relative; transition: all 0.4s ease;
         }
 
-        /* SLIM MODE (Når Range er aktiv) */
-        .slim-mode .header { padding: 0; height: 15px; border-radius: 0; }
-        .slim-mode .bottom-panel { padding: 0; height: 15px; border-radius: 0; }
+        /* SLIM MODE (Range) - Beholder 10px kanter */
+        .slim-mode .header { padding: 0; height: 10px; border-radius: 0; box-shadow: none; }
+        .slim-mode .bottom-panel { padding: 0; height: 10px; border-radius: 0; box-shadow: none; }
         .slim-mode .hide-on-slim { display: none; }
 
-        .main-content { position: relative; z-index: 5; flex-grow: 1; display: flex; flex-direction: column; }
+        .main-content { position: relative; z-index: 5; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; }
         
-        /* HJEM-SKJERM */
-        .home-cards { 
-            display: flex; flex-direction: column; gap: 20px; align-items: center; 
-            justify-content: center; height: 100%; padding: 20px;
-        }
+        /* HJEM-SKJERM: MASSIVE KNAPPER */
+        .home-cards { display: flex; justify-content: space-evenly; align-items: center; height: 100%; width: 100%; }
         .action-card { 
-            width: 85%; max-width: 300px; background: var(--card-bg); 
-            border: 2px solid var(--gold); border-radius: 25px; padding: 25px;
-            display: flex; align-items: center; gap: 20px; cursor: pointer;
+            width: 250px; height: 280px; 
+            background: var(--card-bg); border: 3px solid var(--gold); border-radius: 35px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.9), 0 25px 50px rgba(0,0,0,0.8);
+            cursor: pointer;
         }
-        .action-card i { font-size: 35px; color: var(--gold); }
-        .action-card span { font-size: 20px; font-weight: 800; }
+        .action-card i { font-size: 90px; margin-bottom: 25px; color: var(--gold); }
+        .action-card span { font-size: 22px; font-weight: 950; color: #fff; letter-spacing: 2px; text-transform: uppercase; }
 
-        /* RANGE MODUS (INDEX.HTML STIL) */
-        .range-content { display: none; width: 100%; flex-grow: 1; padding: 10px; box-sizing: border-box; }
+        /* RANGE MODUS (100% LIK DIN KONTROLLER) */
+        .range-content { display: none; width: 100%; max-width: 430px; margin: 0 auto; padding: 15px; box-sizing: border-box; }
         .slim-mode .home-cards { display: none; }
-        .slim-mode .range-content { display: flex; flex-direction: column; }
+        .slim-mode .range-content { display: block; }
 
-        /* Score-kort fra index */
-        .player-card { 
-            background: rgba(0,0,0,0.85); border-radius: 20px; padding: 15px 25px; 
-            margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.1);
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .player-card.active { border: 3px solid var(--gold); background: #000; transform: scale(1.02); }
-        .player-info h2 { margin: 0; font-size: 1.4em; }
-        .score-display { font-size: 3.5em; font-weight: 900; color: #fff; }
+        .player-card { background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%); border-radius: 24px; padding: 20px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; }
+        .player-card.active { border: 2px solid var(--gold); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9); transform: scale(1.03); }
+        .score-display { font-size: 3.5em; font-weight: 900; color: #333; }
         .active .score-display { color: var(--gold); }
+        .foul-dot { width: 12px; height: 12px; border-radius: 50%; background: #1a1a1a; border: 1px solid #222; display: inline-block; margin-right: 2px; }
+        .foul-dot.active { background: #e74c3c; box-shadow: 0 0 10px #ff4757; }
         
-        .game-status-zone { text-align: center; padding: 10px; }
-        .ball-control-zone { 
-            display: flex; justify-content: space-around; padding: 15px 0; 
-            background: rgba(0,0,0,0.3); border-radius: 20px; margin-bottom: 15px;
-        }
+        .game-status-zone { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(15px); padding: 15px; border-radius: 20px 20px 0 0; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .ball-control-zone { display: flex; justify-content: space-around; background: rgba(0,0,0,0.5); padding: 20px 10px; border-radius: 0 0 35px 35px; border: 1px solid rgba(255,255,255,0.03); margin-bottom: 15px; }
         
-        .ball { width: 80px; height: 80px; border-radius: 50%; border: none; position: relative; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
-        #ball1 { background: radial-gradient(circle at 30% 30%, #f1c40f, #9b7b00); }
-        #ball5 { background: radial-gradient(circle at 30% 30%, #a29bfe, #4834d4); }
-        #ball3 { background: radial-gradient(circle at 30% 30%, #ff7675, #d63031); }
-        .ball-num { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 30px; height: 30px; background: white; border-radius: 50%; color: #000; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #000; }
+        .ball { width: 75px; height: 75px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: inset -6px -6px 15px rgba(0,0,0,0.7), 6px 12px 20px rgba(0,0,0,0.6); }
+        #ball1 { background: radial-gradient(circle at 35% 35%, #f1c40f, #b38f00); }
+        #ball5 { background: radial-gradient(circle at 35% 35%, #8e44ad, #4b0082); }
+        #ball3 { background: radial-gradient(circle at 35% 35%, #e74c3c, #962d22); }
+        .ball-inner { width: 28px; height: 28px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #000; }
         
-        .action-area { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: auto; padding-bottom: 10px; }
-        .btn { padding: 18px; border-radius: 15px; border: none; font-weight: 900; font-size: 14px; text-transform: uppercase; color: white; box-shadow: 0 4px 0 rgba(0,0,0,0.3); }
-        .btn-blue { background: #2980b9; }
-        .btn-foul { background: #c0392b; }
-        .btn-turn { background: #27ae60; grid-column: span 2; font-size: 18px; padding: 22px; margin-top: 5px; }
+        .btn-sub-carom { background: rgba(52, 152, 219, 0.12); color: #3498db; border: 1px solid #3498db; border-radius: 8px; padding: 6px 12px; font-size: 0.6em; font-weight: 800; margin-top: 8px; }
+        
+        .action-area { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn { padding: 16px; border-radius: 16px; border: none; font-weight: 800; text-transform: uppercase; color: white; cursor: pointer; }
+        .btn-blue { background: #2980b9; border-bottom: 4px solid #1c5982; }
+        .btn-foul { background: #c0392b; border-bottom: 4px solid #7b241c; }
+        .btn-turn { background: #27ae60; border-bottom: 4px solid #1e8449; grid-column: span 2; padding: 20px; font-size: 1.1em; }
+        .waiting-ball { opacity: 0.15; filter: grayscale(1); pointer-events: none; }
 
-        .navbar { background: #000; height: 85px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; z-index: 20; padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { color: #555; text-decoration: none; text-align: center; font-size: 10px; font-weight: 700; }
+        .navbar { background: #000; height: 95px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #1a1a1a; z-index: 20; padding-bottom: 20px; }
+        .nav-item { color: #444; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.6em; font-weight: 800; }
         .nav-item.active { color: var(--gold); }
-        .nav-item i { font-size: 24px; display: block; margin-bottom: 4px; }
+        .nav-item i { font-size: 2.2em; margin-bottom: 4px; }
+
+        .setup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,20,5,0.98); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(10px); }
+        .setup-card { background: #000; border: 1px solid var(--gold); padding: 30px; border-radius: 30px; width: 100%; max-width: 350px; text-align: center; }
     </style>
 </head>
 <body>
@@ -112,118 +108,117 @@
 
     <header class="header">
         <div class="hide-on-slim">
-            <h1 style="margin:0; font-size:28px;">Hei, Marius!</h1>
-            <p style="color:var(--gold); margin:5px 0;">Pro Cowboy • Level 12</p>
+            <h1 style="color:#fff; margin:0; font-size:36px; font-weight:800;">Hei, Lasse!</h1>
+            <div style="color:var(--gold); font-size:18px; margin:8px 0;">Cowboy Rank: Level 12</div>
+            <div style="width:100%; height:12px; background:#222; border-radius:6px; margin-top:30px;"><div style="width:65%; height:100%; background:var(--gold); border-radius:6px;"></div></div>
         </div>
     </header>
 
     <main class="main-content">
         <div class="home-cards">
-            <div class="action-card" onclick="navTo('range', document.getElementById('nav-range'))">
-                <i class="fa-solid fa-play"></i>
-                <span>START NY KAMP</span>
-            </div>
-            <div class="action-card">
-                <i class="fa-solid fa-trophy"></i>
-                <span>TOPPLISTE</span>
-            </div>
+            <div class="action-card" onclick="navTo('range', document.getElementById('rBtn'))"><i class="fa-solid fa-circle-plus" style="color:#2ecc71;"></i><span>NY KAMP</span></div>
+            <div class="action-card"><i class="fa-solid fa-trophy"></i><span>TOPPLISTE</span></div>
+            <div class="action-card"><i class="fa-solid fa-book-open"></i><span>REGLER</span></div>
         </div>
 
         <div class="range-content">
             <div id="scoreboard-container"></div>
             
             <div class="game-status-zone">
-                <span id="moveText" style="color:var(--gold); font-weight:900; letter-spacing:1px;">BREKK-STØT</span>
-                <div id="matchTimer" style="font-size: 20px; font-family: monospace;">00:00:00</div>
+                <div id="modeLabel" style="font-size:0.6em; color:var(--gold); opacity:0.6; margin-bottom:5px; text-transform:uppercase;">MODUS: STANDARD</div>
+                <span class="req-text" id="moveText" style="font-size: 0.8em; letter-spacing: 2px; color: #2ecc71; font-weight: 800; text-transform: uppercase;">BREKK-STØT</span>
+                <span class="timer-text" id="matchTimer" style="font-family: monospace; font-size: 1.2em; color: var(--gold); display: block;">00:00:00</span>
+                <div id="inningDisplay" style="font-size:0.7em; color:#888; font-weight:bold; margin-top:5px; text-transform:uppercase;">INNING: 1</div>
             </div>
 
             <div class="ball-control-zone">
-                <button class="ball" id="ball1" onclick="action(1)"><div class="ball-num">1</div></button>
-                <button class="ball" id="ball5" onclick="action(5)"><div class="ball-num">5</div></button>
-                <button class="ball" id="ball3" onclick="action(3)"><div class="ball-num">3</div></button>
+                <div style="display:flex; flex-direction:column; align-items:center;">
+                    <button class="ball" id="ball1" onclick="action('pocket', 1)"><div class="ball-inner">1</div></button>
+                    <button class="btn-sub-carom" id="pc1" onclick="action('pocket_carom', 2)">+ CAROM</button>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center;">
+                    <button class="ball" id="ball5" onclick="action('pocket', 5)"><div class="ball-inner">5</div></button>
+                    <button class="btn-sub-carom" id="pc5" onclick="action('pocket_carom', 6)">+ CAROM</button>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center;">
+                    <button class="ball" id="ball3" onclick="action('pocket', 3)"><div class="ball-inner">3</div></button>
+                    <button class="btn-sub-carom" id="pc3" onclick="action('pocket_carom', 4)">+ CAROM</button>
+                </div>
             </div>
 
             <div class="action-area">
-                <button class="btn btn-blue" onclick="action(1)">Carom 1P</button>
-                <button class="btn btn-blue" onclick="action(2)">Carom 2P</button>
-                <button class="btn btn-foul" onclick="handleFoul()">FOUL</button>
-                <button class="btn btn-blue" onclick="undo()">ANGRE</button>
-                <button class="btn btn-turn" onclick="nextTurn()">AVSLUTT TUR</button>
+                <button class="btn btn-blue" id="carom1PBtn" onclick="action('carom', 1)">Carom 1P</button>
+                <button class="btn btn-blue" id="carom2PBtn" onclick="action('carom', 2)">Carom 2P</button>
+                <button class="btn btn-foul" id="foulActionBtn" onclick="handleFoul()">FOUL</button>
+                <button class="btn btn-blue" id="undoActionBtn" onclick="undo()">ANGRE</button>
+                <button class="btn btn-turn" id="endTurnBtn" onclick="nextTurn()">AVSLUTT TUR</button>
             </div>
         </div>
     </main>
 
     <section class="bottom-panel">
         <div class="hide-on-slim">
-            <div style="text-align:center; opacity:0.5;">Siste aktivitet: Seier over Erik (100-82)</div>
+            <div style="background:rgba(255,255,255,0.04); border:1px solid #333; border-radius:24px; padding:30px;">
+                <div style="color:#666; font-size:16px; margin-bottom:15px; font-weight:800; text-transform:uppercase;">Siste Kamp: 100 - 82</div>
+            </div>
         </div>
     </section>
 
     <nav class="navbar">
-        <a href="#" class="nav-item active" onclick="navTo('home', this)"><i class="material-icons">home</i>HJEM</a>
-        <a href="#" class="nav-item" id="nav-range" onclick="navTo('range', this)"><i class="material-icons">sports_handball</i>RANGE</a>
-        <a href="#" class="nav-item"><i class="material-icons">person</i>PROFIL</a>
+        <a href="javascript:void(0)" class="nav-item active" onclick="navTo('home', this)"><i class="material-icons">home</i>HJEM</a>
+        <a href="javascript:void(0)" class="nav-item" id="rBtn" onclick="navTo('range', this)"><i class="material-icons">all_inclusive</i>RANGE</a>
+        <a href="javascript:void(0)" class="nav-item"><i class="material-icons">person</i>PROFIL</a>
     </nav>
 </div>
 
 <script>
-    // Logikk
-    let state = {
-        playerCount: 2,
-        scores: [0, 0],
-        currentPlayer: 0,
-        names: ["Marius", "Motstander"],
-        seconds: 0,
-        isActive: false
-    };
+    // --- FIREBASE OG DIN ORIGINALE LOGIKK ---
+    const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database().ref('gameData');
+
+    let state = { gameMode: 'standard', playerCount: 2, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null, seconds: 0, names: ["P1","P2","P3"], bestSeries: [0,0,0], lastSeries: [0,0,0], lang: 'no', innings: 1 };
+    let history = [];
+
+    db.on('value', (s) => { if(s.val()) { state = s.val(); updateUI(); } });
 
     function navTo(page, el) {
+        const app = document.getElementById('app');
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         el.classList.add('active');
-        if(page === 'range') {
-            document.getElementById('app').classList.add('slim-mode');
-            state.isActive = true;
-        } else {
-            document.getElementById('app').classList.remove('slim-mode');
-        }
-        updateUI();
+        if(page === 'range') app.classList.add('slim-mode'); else app.classList.remove('slim-mode');
     }
 
-    function action(pts) {
-        state.scores[state.currentPlayer] += pts;
-        updateUI();
-    }
-
-    function nextTurn() {
-        state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
-        updateUI();
-    }
-
-    function handleFoul() {
-        alert("Foul registrert!");
-        nextTurn();
+    function action(type, val) {
+        saveHistory(); let p = state.currentPlayer;
+        state.scores[p] += val; state.breakDone = true;
+        db.set(state);
     }
 
     function updateUI() {
-        const cont = document.getElementById('scoreboard-container');
-        cont.innerHTML = '';
+        const cont = document.getElementById('scoreboard-container'); cont.innerHTML = '';
         for(let i=0; i<state.playerCount; i++) {
-            cont.innerHTML += `
-                <div class="player-card ${state.currentPlayer === i ? 'active' : ''}">
-                    <div class="player-info"><h2>${state.names[i]}</h2></div>
-                    <div class="score-display">${state.scores[i]}</div>
-                </div>`;
+            const active = state.currentPlayer === i;
+            cont.innerHTML += `<div class="player-card ${active?'active':''}">
+                <div class="player-info">
+                    <h2>${state.names[i]}</h2>
+                    <div style="margin-top:10px;">
+                        <div class="foul-dot ${state.foulCounts[i]>=1?'active':''}"></div>
+                        <div class="foul-dot ${state.foulCounts[i]>=2?'active':''}"></div>
+                        <div class="foul-dot ${state.foulCounts[i]>=3?'active':''}"></div>
+                    </div>
+                </div>
+                <div class="score-display">${state.scores[i]}</div>
+            </div>`;
         }
+        document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
     }
 
-    setInterval(() => {
-        if(state.isActive) {
-            state.seconds++;
-            document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
-        }
-    }, 1000);
-
-    updateUI();
+    function handleFoul() { saveHistory(); state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; nextTurn(); }
+    function nextTurn() { state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; db.set(state); }
+    function undo() { if(history.length) { state = JSON.parse(history.pop()); db.set(state); } }
+    function saveHistory() { history.push(JSON.stringify(state)); if(history.length > 10) history.shift(); }
+    setInterval(() => { if(state.breakDone) { state.seconds++; db.child('seconds').set(state.seconds); } }, 1000);
 </script>
 </body>
 </html>
