@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cowboy Pool Pro - Gjestemodus</title>
+    <title>Cowboy Pool Pro</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
@@ -34,25 +34,25 @@
         }
         .btn-mode.active { background: #f1c40f; color: black; border-color: #f1c40f; }
 
-        /* 3. NAVNE-INPUTS - RYDDIG DESIGN */
-        .name-inputs-row { display: flex; gap: 8px; margin-bottom: 20px; }
-        .name-input {
-            flex: 1; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px; color: white; padding: 10px; text-align: center;
-            font-size: 0.75em; font-weight: 800; text-transform: uppercase;
-        }
-        .name-input:focus { border-color: #f1c40f; outline: none; background: rgba(0,0,0,0.8); }
-
-        /* 4. STATUS & HEADER */
+        /* 3. STATUS & HEADER */
         .status-header {
             background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(15px);
             padding: 15px; border-radius: 20px; text-align: center;
             margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
         }
         .req-text { font-size: 0.8em; letter-spacing: 2px; color: #2ecc71; font-weight: 800; text-transform: uppercase; }
         .timer-text { font-family: monospace; font-size: 1.4em; color: #f1c40f; margin-top: 5px; display: block; }
+        
+        /* Bytt starter knapp */
+        .btn-rotate {
+            background: rgba(241, 196, 15, 0.1); border: 1px solid #f1c40f;
+            color: #f1c40f; padding: 5px 10px; border-radius: 8px;
+            font-size: 0.6em; font-weight: bold; cursor: pointer;
+            margin-top: 10px; display: inline-block;
+        }
 
-        /* 5. SPILLERKORT (KULLSORTE) */
+        /* 4. SPILLERKORT (KULLSORTE) */
         .player-card {
             background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%);
             backdrop-filter: blur(10px); border-radius: 24px;
@@ -65,8 +65,14 @@
             border: 2px solid #f1c40f; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9), 0 0 15px rgba(241, 196, 15, 0.15);
             transform: scale(1.03); background: linear-gradient(180deg, #111 0%, #000 100%);
         }
-        .player-info h2 { margin: 0; font-size: 1.2em; text-transform: uppercase; letter-spacing: 1px; color: #666; }
-        .active .player-info h2 { color: #f1c40f; }
+        
+        /* Navne-input inni kortet */
+        .player-name-input {
+            background: transparent; border: none; color: #666;
+            font-size: 1.2em; font-weight: bold; text-transform: uppercase;
+            letter-spacing: 1px; width: 150px; padding: 0; outline: none;
+        }
+        .active .player-name-input { color: #f1c40f; }
         
         .score-display { font-size: 3.5em; font-weight: 900; line-height: 1; margin: 0; color: #333; }
         .active .score-display { color: #f1c40f; text-shadow: 0 0 15px rgba(241, 196, 15, 0.3); }
@@ -81,7 +87,7 @@
         .foul-dot { width: 12px; height: 12px; border-radius: 50%; background: #1a1a1a; border: 1px solid #222; transition: 0.3s; }
         .foul-dot.active { background: #e74c3c; box-shadow: 0 0 10px #ff4757; }
 
-        /* 6. BALL KONTROLL */
+        /* 5. BALL KONTROLL */
         .ball-control-zone {
             display: flex; justify-content: space-around; margin: 30px 0;
             background: rgba(0,0,0,0.5); padding: 22px 10px; border-radius: 35px;
@@ -100,7 +106,7 @@
         .ball-inner { width: 30px; height: 30px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #000; font-size: 0.9em; }
         .btn-sub-carom { background: rgba(52, 152, 219, 0.12); color: #3498db; border: 1px solid #3498db; border-radius: 8px; padding: 6px 12px; font-size: 0.6em; font-weight: 800; cursor: pointer; }
 
-        /* 7. HANDLINGER BUNN */
+        /* 6. HANDLINGER BUNN */
         .action-area {
             position: fixed; bottom: 85px; left: 0; right: 0;
             padding: 0 20px; max-width: 430px; margin: auto;
@@ -111,7 +117,7 @@
         .btn-foul { background: #c0392b; color: white; border-bottom: 4px solid #7b241c; }
         .btn-turn { background: #27ae60; color: white; border-bottom: 4px solid #1e8449; grid-column: span 2; padding: 20px; font-size: 1.1em; }
 
-        /* 8. NAVIGASJON */
+        /* 7. NAVIGASJON */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
             background: #000; display: flex; justify-content: space-around;
@@ -133,11 +139,12 @@
         <button class="btn-mode" id="m3" onclick="setPlayerCount(3)">3P</button>
     </div>
 
-    <div class="name-inputs-row" id="name-inputs-container"></div>
-
     <div class="status-header">
         <span class="req-text" id="moveText">BREKK-STØT (3-BALL)</span>
         <span class="timer-text" id="matchTimer">00:00:00</span>
+        <div id="rotate-container">
+            <button class="btn-rotate" onclick="rotateBreaker()">BYTT STARTSPILLER</button>
+        </div>
     </div>
 
     <div id="scoreboard-container"></div>
@@ -180,7 +187,7 @@
     let state = {
         playerCount: 2, scores: [0, 0, 0], foulCounts: [0, 0, 0], scoreAtStart: [0, 0, 0],
         currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null,
-        innings: 0, seconds: 0, names: ["Simen Jøndal", "Lasse Kåring", "Ole Andreas Sandvik"],
+        innings: 0, seconds: 0, names: ["Spiller 1", "Spiller 2", "Spiller 3"],
         bestSeries: [0, 0, 0], lastSeries: [0, 0, 0]
     };
 
@@ -195,14 +202,6 @@
         for(let i=1; i<=3; i++) {
             const btn = document.getElementById(`m${i}`);
             if(btn) btn.className = (state.playerCount === i) ? 'btn-mode active' : 'btn-mode';
-        }
-
-        const nameInputCont = document.getElementById('name-inputs-container');
-        if (nameInputCont.children.length !== state.playerCount) {
-            nameInputCont.innerHTML = '';
-            for (let i = 0; i < state.playerCount; i++) {
-                nameInputCont.innerHTML += `<input class="name-input" id="p${i}-name-in" value="${state.names[i]}" oninput="saveName(${i}, this.value)">`;
-            }
         }
 
         const container = document.getElementById('scoreboard-container');
@@ -223,7 +222,7 @@
             container.innerHTML += `
                 <div class="player-card ${isActive ? 'active' : ''}">
                     <div class="player-info">
-                        <h2>${state.names[i]}</h2>
+                        <input class="player-name-input" value="${state.names[i]}" oninput="saveName(${i}, this.value)">
                         <div class="sub-stats">
                             <div class="stat-item">NÅ <span class="stat-val">${currentRun}</span></div>
                             <div class="stat-item">PERS <span class="stat-val">${state.bestSeries[i] || 0}</span></div>
@@ -243,6 +242,9 @@
             moveText = state.lastType === 'pocket' ? "KRAV: CAROM" : "KRAV: POCKET";
         }
         document.getElementById('moveText').innerText = moveText;
+        
+        // Skjul "Bytt starter" når spillet er i gang
+        document.getElementById('rotate-container').style.display = state.breakDone ? 'none' : 'block';
 
         const isAtEnd = state.scores[state.currentPlayer] >= 90;
         const isLockedPocket = state.tableStatus === 'locked' && state.lastType === 'pocket';
@@ -261,6 +263,13 @@
             state.scoreAtStart = [0,0,0]; state.bestSeries = [0,0,0];
             state.lastSeries = [0,0,0]; state.breakDone = false;
             state.seconds = 0; state.innings = 0; state.currentPlayer = 0;
+            db.set(state);
+        }
+    }
+
+    function rotateBreaker() {
+        if(!state.breakDone) {
+            state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
             db.set(state);
         }
     }
