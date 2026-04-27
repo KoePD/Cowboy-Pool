@@ -10,7 +10,7 @@
     <style>
         /* 1. LAYOUT & BAKGRUNN */
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            font-family: 'Segoe UI', sans-serif; 
             background: radial-gradient(circle at top, #1e4d2b 0%, #07120a 100%);
             background-attachment: fixed;
             color: white; 
@@ -26,7 +26,7 @@
             width: 100%;
             max-width: 430px;
             padding: 20px;
-            padding-bottom: 180px; /* God plass til de store knappene og nav */
+            padding-bottom: 200px; /* Plass til fixed action area */
         }
 
         /* 2. HEADER & STATUS */
@@ -54,7 +54,7 @@
             display: block;
         }
 
-        /* 3. SPILLERKORT (DESIGN FRA BILDE) */
+        /* 3. SPILLERKORT */
         .player-card {
             background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0.3) 100%);
             backdrop-filter: blur(10px);
@@ -85,26 +85,37 @@
         .active .sub-stats { color: #ccc; }
         .stat-val { color: #f1c40f; font-weight: bold; }
 
-        /* 4. BALL-KONTROLL SONE */
+        /* 4. FOUL MARKERING */
+        .foul-container { display: flex; gap: 6px; margin-top: 10px; }
+        .foul-dot { 
+            width: 10px; height: 10px; border-radius: 50%; 
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); 
+            transition: 0.3s;
+        }
+        .foul-dot.active { 
+            background: #e74c3c; box-shadow: 0 0 10px #ff4757; border: 1px solid #ff7f7f; 
+        }
+
+        /* 5. BALL-KONTROLL */
         .ball-control-zone {
             display: flex;
             justify-content: space-around;
-            margin: 30px 0;
+            margin: 25px 0;
             background: rgba(0,0,0,0.2);
-            padding: 20px 10px;
-            border-radius: 30px;
+            padding: 15px 10px;
+            border-radius: 25px;
         }
-        .ball-group { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        .ball-group { display: flex; flex-direction: column; align-items: center; gap: 8px; }
         
         .ball {
-            width: 80px; height: 80px; border-radius: 50%;
+            width: 75px; height: 75px; border-radius: 50%;
             border: none; cursor: pointer; position: relative;
-            box-shadow: inset -8px -8px 15px rgba(0,0,0,0.5), 5px 10px 15px rgba(0,0,0,0.4);
+            box-shadow: inset -8px -8px 15px rgba(0,0,0,0.5), 5px 8px 15px rgba(0,0,0,0.4);
             display: flex; align-items: center; justify-content: center;
             transition: 0.1s;
         }
         .ball:active { transform: scale(0.92); }
-        .ball-inner { width: 30px; height: 30px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #000; font-size: 0.9em; }
+        .ball-inner { width: 28px; height: 28px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #000; font-size: 0.85em; }
 
         #ball1 { background: radial-gradient(circle at 35% 35%, #f1c40f 0%, #b38f00 100%); }
         #ball5 { background: radial-gradient(circle at 35% 35%, #8e44ad 0%, #4b0082 100%); }
@@ -112,32 +123,33 @@
 
         .btn-sub-carom { 
             background: rgba(52, 152, 219, 0.15); color: #3498db; border: 1px solid #3498db; 
-            border-radius: 8px; padding: 6px 12px; font-size: 0.6em; font-weight: 800; cursor: pointer;
+            border-radius: 8px; padding: 5px 10px; font-size: 0.6em; font-weight: 800; cursor: pointer;
         }
 
-        /* 5. HOVEDHANDLINGER (FIXED I BUNN) */
+        /* 6. HANDLINGER I BUNN */
         .action-area {
-            position: fixed; bottom: 90px; left: 0; right: 0;
+            position: fixed; bottom: 85px; left: 0; right: 0;
             padding: 0 20px; max-width: 430px; margin: auto;
             display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+            z-index: 900;
         }
         .btn {
-            padding: 15px; border-radius: 12px; border: none; font-weight: 800; 
-            text-transform: uppercase; cursor: pointer; font-size: 0.8em;
+            padding: 14px; border-radius: 12px; border: none; font-weight: 800; 
+            text-transform: uppercase; cursor: pointer; font-size: 0.75em;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
         .btn-blue { background: #2980b9; color: white; border-bottom: 3px solid #1c5982; }
         .btn-foul { background: #c0392b; color: white; border-bottom: 3px solid #7b241c; }
-        .btn-turn { background: #27ae60; color: white; border-bottom: 3px solid #1e8449; grid-column: span 2; font-size: 1em; padding: 18px; }
+        .btn-turn { background: #27ae60; color: white; border-bottom: 3px solid #1e8449; grid-column: span 2; font-size: 0.95em; padding: 16px; }
         .btn:active { transform: translateY(2px); border-bottom-width: 1px; }
 
-        /* 6. NAVIGASJON */
+        /* 7. NAVIGASJON */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
             background: #0a0a0a; display: flex; justify-content: space-around;
-            padding: 12px 0 25px 0; border-top: 1px solid #222; z-index: 1000;
+            padding: 10px 0 25px 0; border-top: 1px solid #222; z-index: 1000;
         }
-        .nav-item { color: #444; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.6em; font-weight: bold; }
+        .nav-item { color: #444; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.55em; font-weight: bold; }
         .nav-item.active { color: #f1c40f; }
         .nav-item i { font-size: 1.8em; margin-bottom: 3px; }
 
@@ -152,8 +164,7 @@
         <span class="timer-text" id="matchTimer">00:00:00</span>
     </div>
 
-    <div id="scoreboard-container">
-        </div>
+    <div id="scoreboard-container"></div>
 
     <div class="ball-control-zone">
         <div class="ball-group">
@@ -186,7 +197,6 @@
 </div>
 
 <script>
-    // --- FIREBASE KONFIGURASJON ---
     const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('gameData');
@@ -194,19 +204,15 @@
     let state = {
         playerCount: 2, scores: [0, 0, 0], foulCounts: [0, 0, 0], scoreAtStart: [0, 0, 0],
         currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null,
-        innings: 0, seconds: 0, names: ["Simen", "Lasse", "Ole Andreas"],
-        bestSeries: [0, 0, 0], currentSeries: 0
+        innings: 0, seconds: 0, names: ["Spiller 1", "Spiller 2", "Spiller 3"],
+        bestSeries: [0, 0, 0]
     };
 
     let history = [];
 
-    // Lytt på endringer
     db.on('value', (snapshot) => {
         const data = snapshot.val();
-        if (data) { 
-            state = data; 
-            updateUI(); 
-        }
+        if (data) { state = data; updateUI(); }
     });
 
     function updateUI() {
@@ -216,7 +222,14 @@
         for (let i = 0; i < state.playerCount; i++) {
             const isActive = state.currentPlayer === i;
             const currentRun = isActive ? (state.scores[i] - state.scoreAtStart[i]) : 0;
+            const fouls = state.foulCounts ? state.foulCounts[i] : 0;
             
+            let foulHtml = '<div class="foul-container">';
+            for (let d = 1; d <= 3; d++) {
+                foulHtml += `<div class="foul-dot ${d <= fouls ? 'active' : ''}"></div>`;
+            }
+            foulHtml += '</div>';
+
             container.innerHTML += `
                 <div class="player-card ${isActive ? 'active' : ''}">
                     <div class="player-info">
@@ -225,13 +238,13 @@
                             <span>Serie: <span class="stat-val">${currentRun}</span></span>
                             <span>Best: <span class="stat-val">${state.bestSeries[i] || 0}</span></span>
                         </div>
+                        ${foulHtml}
                     </div>
                     <div class="score-display">${state.scores[i]}</div>
                 </div>
             `;
         }
 
-        // Oppdater timer og tekst
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
         
         let moveText = "VELG: CAROM / KULE";
@@ -241,7 +254,6 @@
         }
         document.getElementById('moveText').innerText = moveText;
 
-        // Ball-logikk: Grå ut baller basert på regler
         const isAtEnd = state.scores[state.currentPlayer] >= 90;
         const isLockedPocket = state.tableStatus === 'locked' && state.lastType === 'pocket';
         
@@ -253,14 +265,12 @@
     function action(type, val) {
         saveHistory();
         let p = state.currentPlayer;
-        let s = state.scores[p];
-
-        // 90/100 regler
-        if (s < 90 && s + val > 90) return;
-        if (s >= 90 && s < 100 && s + val > 100) return;
+        if (state.scores[p] < 90 && state.scores[p] + val > 90) return;
+        if (state.scores[p] >= 90 && state.scores[p] < 100 && state.scores[p] + val > 100) return;
 
         state.breakDone = true;
-        
+        state.foulCounts[p] = 0;
+
         if (type === 'pocket_carom') {
             if (state.tableStatus === 'locked') state.lastType = (state.lastType === 'pocket') ? 'carom' : 'pocket';
         } else {
@@ -276,7 +286,6 @@
         saveHistory();
         const p = state.currentPlayer;
         const roundScore = state.scores[p] - state.scoreAtStart[p];
-        
         if (roundScore > (state.bestSeries[p] || 0)) state.bestSeries[p] = roundScore;
         
         state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
@@ -289,7 +298,15 @@
 
     function handleFoul() {
         saveHistory();
-        state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer];
+        if (!state.foulCounts) state.foulCounts = [0, 0, 0];
+        state.foulCounts[state.currentPlayer]++;
+        
+        if (state.foulCounts[state.currentPlayer] >= 3) {
+            state.scores[state.currentPlayer] = 0; 
+            state.foulCounts[state.currentPlayer] = 0;
+        } else {
+            state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer];
+        }
         nextTurn();
     }
 
@@ -298,15 +315,12 @@
     
     function resetGame() { 
         if(confirm("Reset kampen?")) {
-            state.scores = [0,0,0];
-            state.breakDone = false;
-            state.seconds = 0;
-            state.innings = 0;
+            state.scores = [0,0,0]; state.foulCounts = [0,0,0];
+            state.breakDone = false; state.seconds = 0; state.innings = 0;
             db.set(state);
         }
     }
 
-    // Enkel timer lokalt som pusher til Firebase
     setInterval(() => {
         if (state.breakDone) {
             state.seconds++;
