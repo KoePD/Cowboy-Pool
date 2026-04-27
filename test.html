@@ -30,27 +30,28 @@
         /* LÆR PANELER (RAMMEN) */
         .header { 
             background: var(--leather); background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png"); 
-            padding: 50px 30px 70px; z-index: 10; 
-            border-bottom-left-radius: 50% 30px; border-bottom-right-radius: 50% 30px; 
+            padding: 50px 30px 80px; z-index: 10; 
+            border-bottom-left-radius: 50% 40px; border-bottom-right-radius: 50% 40px; 
             box-shadow: 0 20px 40px rgba(0,0,0,0.8); transition: all 0.5s ease;
         }
         .bottom-panel { 
             background: var(--leather); background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png"); 
-            padding: 70px 30px 15px; z-index: 10; 
-            border-top-left-radius: 50% 30px; border-top-right-radius: 50% 30px; 
+            padding: 80px 30px 20px; z-index: 10; 
+            border-top-left-radius: 50% 40px; border-top-right-radius: 50% 40px; 
             box-shadow: 0 -20px 40px rgba(0,0,0,0.8); transition: all 0.5s ease;
         }
 
-        /* MINSKET RAMME I RANGE */
+        /* JUSTERT RAMME I RANGE (SLIM-MODE) */
+        /* Her har jeg økt padding fra 10px til 35px for å gjøre rammen større */
         .slim-mode .header { 
-            padding: 10px 30px 15px; 
-            border-bottom-left-radius: 50% 15px; 
-            border-bottom-right-radius: 50% 15px; 
+            padding: 30px 30px 45px; 
+            border-bottom-left-radius: 50% 25px; 
+            border-bottom-right-radius: 50% 25px; 
         }
         .slim-mode .bottom-panel { 
-            padding: 20px 30px 5px; 
-            border-top-left-radius: 50% 15px; 
-            border-top-right-radius: 50% 15px; 
+            padding: 45px 30px 10px; 
+            border-top-left-radius: 50% 25px; 
+            border-top-right-radius: 50% 25px; 
         }
 
         .hide-on-slim { transition: opacity 0.3s ease; }
@@ -64,8 +65,8 @@
         }
         .main-content::-webkit-scrollbar { display: none; }
 
-        /* SENTRERING AV KONTROLLER I RANGE */
-        .slim-mode .main-content { justify-content: center; padding: 5px 15px; }
+        /* SENTRERING I RANGE */
+        .slim-mode .main-content { justify-content: center; padding: 10px 15px; }
 
         /* HJEM-SKJERM */
         .home-cards { display: flex; flex-direction: column; gap: 12px; align-items: center; justify-content: center; height: 100%; }
@@ -78,7 +79,7 @@
         .slim-mode .home-cards { display: none; }
 
         /* RANGE-INNHOLD */
-        .range-content { display: none; width: 100%; }
+        .range-content { display: none; width: 100%; max-width: 420px; margin: 0 auto; }
         .slim-mode .range-content { display: flex; flex-direction: column; }
 
         /* SPILLERKORT */
