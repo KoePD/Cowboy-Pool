@@ -18,13 +18,11 @@
         }
         .app-container { width: 100%; max-width: 430px; padding: 20px; padding-bottom: 120px; display: flex; flex-direction: column; }
         
-        /* NEW GAME KNAPP PÅ TOPPEN */
         .header-actions { display: flex; justify-content: center; margin-bottom: 20px; }
         .btn-new-game-top { 
             background: rgba(0,0,0,0.6); color: #f1c40f; border: 1px solid rgba(241, 196, 15, 0.5); 
             padding: 10px 30px; border-radius: 50px; font-weight: 800; font-size: 0.7em; 
             letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
         .player-card { background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%); backdrop-filter: blur(10px); border-radius: 24px; padding: 20px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
@@ -32,7 +30,8 @@
         .player-info h2 { margin: 0; font-size: 1.2em; text-transform: uppercase; letter-spacing: 1px; color: #666; }
         .active .player-info h2 { color: #f1c40f; }
         .score-display { font-size: 3.5em; font-weight: 900; line-height: 1; margin: 0; color: #333; min-width: 60px; text-align: right; }
-        .active .score-display { color: #f1c40f; text-shadow: 0 0 15px rgba(241, 196, 15, 0.3); }
+        .active .score-display { color: #f1c40f; }
+
         .sub-stats { font-size: 0.55em; color: #444; margin-top: 12px; display: flex; justify-content: flex-start; text-transform: uppercase; }
         .active .sub-stats { color: #888; }
         .stat-item { width: 55px; display: flex; flex-direction: column; }
@@ -41,10 +40,11 @@
         .foul-dot { width: 12px; height: 12px; border-radius: 50%; background: #1a1a1a; border: 1px solid #222; }
         .foul-dot.active { background: #e74c3c; box-shadow: 0 0 10px #ff4757; }
         
-        .game-status-zone { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(15px); padding: 12px; border-radius: 20px 20px 0 0; text-align: center; border: 1px solid rgba(255,255,255,0.05); border-bottom: none; margin-top: 20px; }
+        .game-status-zone { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(15px); padding: 15px; border-radius: 20px 20px 0 0; text-align: center; border: 1px solid rgba(255,255,255,0.05); border-bottom: none; margin-top: 20px; min-height: 60px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .req-text { font-size: 0.8em; letter-spacing: 2px; color: #2ecc71; font-weight: 800; text-transform: uppercase; }
         .timer-text { font-family: monospace; font-size: 1.2em; color: #f1c40f; margin-top: 3px; display: block; }
-        .btn-rotate { background: rgba(241, 196, 15, 0.1); border: 1px solid #f1c40f; color: #f1c40f; padding: 4px 10px; border-radius: 8px; font-size: 0.6em; font-weight: bold; cursor: pointer; margin-top: 8px; }
+        .btn-rotate { background: rgba(241, 196, 15, 0.1); border: 1px solid #f1c40f; color: #f1c40f; padding: 6px 15px; border-radius: 8px; font-size: 0.65em; font-weight: bold; cursor: pointer; margin-top: 10px; }
+
         .ball-control-zone { display: flex; justify-content: space-around; background: rgba(0,0,0,0.5); padding: 20px 10px; border-radius: 0 0 35px 35px; border: 1px solid rgba(255,255,255,0.03); border-top: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px; }
         .ball-group { display: flex; flex-direction: column; align-items: center; gap: 12px; }
         .ball { width: 75px; height: 75px; border-radius: 50%; border: none; cursor: pointer; box-shadow: inset -6px -6px 15px rgba(0,0,0,0.7), 6px 12px 20px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; transition: 0.1s; }
@@ -103,7 +103,9 @@
     <div class="game-status-zone">
         <span class="req-text" id="moveText">BREKK-STØT</span>
         <span class="timer-text" id="matchTimer">00:00:00</span>
-        <div id="rotate-container"><button class="btn-rotate" onclick="rotateBreaker()">BYTT STARTSPILLER</button></div>
+        <div id="rotate-container">
+            <button class="btn-rotate" onclick="rotateBreaker()">BYTT STARTSPILLER</button>
+        </div>
     </div>
 
     <div class="ball-control-zone">
@@ -160,7 +162,7 @@
         const namesArr = [];
         for(let i=0; i<state.playerCount; i++) namesArr.push(document.getElementById(`n${i}`).value || `P${i+1}`);
         state.names = namesArr;
-        state.scores = [0,0,0]; state.foulCounts = [0,0,0]; state.scoreAtStart = [0,0,0]; state.bestSeries = [0,0,0]; state.lastSeries = [0,0,0]; state.currentPlayer = 0; state.breakDone = false; state.seconds = 0;
+        state.scores = [0,0,0]; state.foulCounts = [0,0,0]; state.scoreAtStart = [0,0,0]; state.bestSeries = [0,0,0]; state.lastSeries = [0,0,0]; state.currentPlayer = 0; state.breakDone = false; state.seconds = 0; state.tableStatus = 'open'; state.lastType = null;
         db.set(state);
         document.getElementById('setupOverlay').style.display = 'none';
         document.getElementById('step2').style.display = 'none';
@@ -192,7 +194,10 @@
     }
 
     function updateUI() {
-        const l = state.lang === 'no' ? {now:"NÅ",best:"PERS",last:"SISTE"} : {now:"NOW",best:"BEST",last:"LAST"};
+        const l = state.lang === 'no' ? 
+            {now:"NÅ",best:"PERS",last:"SISTE",break:"BREKK-STØT",req_carom:"KRAV: CAROM",req_pocket:"KRAV: POCKET",any:"VELG: CAROM / KULE"} : 
+            {now:"NOW",best:"BEST",last:"LAST",break:"BREAK SHOT",req_carom:"REQ: CAROM",req_pocket:"REQ: POCKET",any:"CHOOSE: CAROM / POCKET"};
+        
         const cont = document.getElementById('scoreboard-container');
         cont.innerHTML = '';
         for(let i=0; i<state.playerCount; i++) {
@@ -214,7 +219,25 @@
                 <div class="score-display">${state.scores[i]}</div>
             </div>`;
         }
+        
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
+        
+        // OPPGAVE: Skjul knapp og oppdater tekst dynamisk
+        const moveTextEl = document.getElementById('moveText');
+        const rotateCont = document.getElementById('rotate-container');
+        
+        if (!state.breakDone) {
+            moveTextEl.innerText = l.break;
+            rotateCont.style.display = 'block';
+        } else {
+            rotateCont.style.display = 'none';
+            if (state.tableStatus === 'locked') {
+                moveTextEl.innerText = state.lastType === 'pocket' ? l.req_carom : l.req_pocket;
+            } else {
+                moveTextEl.innerText = l.any;
+            }
+        }
+
         const lock = state.tableStatus === 'locked';
         const at90 = state.scores[state.currentPlayer] >= 90;
         document.getElementById('ball1').className = (!state.breakDone || (lock && state.lastType==='pocket') || at90) ? 'ball waiting-ball' : 'ball';
@@ -227,7 +250,7 @@
     function undo() { if(history.length) { state = JSON.parse(history.pop()); db.set(state); } }
     function toggleLanguage() { state.lang = state.lang==='no'?'en':'no'; db.set(state); }
     function rotateBreaker() { if(!state.breakDone) { state.currentPlayer = (state.currentPlayer+1)%state.playerCount; db.set(state); } }
-    function saveMatchToHistory() { if(confirm("Lagre?")) db.child('history').push({names:state.names, scores:state.scores}).then(finalizeSetup); }
+    function saveMatchToHistory() { if(confirm("Lagre?")) db.child('history').push({names:state.names, scores:state.scores, date: new Date().toISOString()}).then(finalizeSetup); }
     setInterval(() => { if(state.breakDone) { state.seconds++; db.child('seconds').set(state.seconds); } }, 1000);
 </script>
 </body>
