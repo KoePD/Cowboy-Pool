@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cowboy Pool Pro</title>
+    <title>Cowboy Pool Pro - Controller</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
     <style>
-        /* 1. BAKGRUNN: Realistisk biljardbord-look */
+        /* 1. LAYOUT & BAKGRUNN */
         body { 
-            font-family: 'Segoe UI', sans-serif; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background: radial-gradient(circle at top, #1e4d2b 0%, #07120a 100%);
             background-attachment: fixed;
             color: white; 
@@ -19,121 +19,127 @@
             display: flex;
             justify-content: center;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
         .app-container {
             width: 100%;
-            max-width: 430px; /* Typisk iPhone-bredde */
+            max-width: 430px;
             padding: 20px;
-            padding-bottom: 120px; /* Plass til nav-bar */
-            position: relative;
+            padding-bottom: 180px; /* God plass til de store knappene og nav */
         }
 
-        /* 2. TOP BAR: Neste krav (Screen 2) */
+        /* 2. HEADER & STATUS */
         .status-header {
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(10px);
-            padding: 10px;
-            border-radius: 12px;
+            padding: 12px;
+            border-radius: 15px;
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             border: 1px solid rgba(255,255,255,0.1);
         }
         .req-text {
-            font-size: 0.75em;
+            font-size: 0.7em;
             letter-spacing: 2px;
             color: #27ae60;
             font-weight: 800;
             text-transform: uppercase;
         }
+        .timer-text {
+            font-family: monospace;
+            font-size: 1.2em;
+            color: #f1c40f;
+            margin-top: 5px;
+            display: block;
+        }
 
-        /* 3. SPILLERKORT: Den glødende gull-rammen */
+        /* 3. SPILLERKORT (DESIGN FRA BILDE) */
         .player-card {
-            background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.4) 100%);
-            backdrop-filter: blur(15px);
-            border-radius: 25px;
-            padding: 20px;
-            margin-bottom: 15px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0.3) 100%);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 15px 20px;
+            margin-bottom: 12px;
             border: 1px solid rgba(255,255,255,0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: 0.3s ease;
         }
 
         .player-card.active {
             border: 2px solid #f1c40f;
-            box-shadow: 0 0 25px rgba(241, 196, 15, 0.3), inset 0 0 15px rgba(241, 196, 15, 0.1);
+            box-shadow: 0 0 20px rgba(241, 196, 15, 0.25);
             transform: scale(1.02);
+            background: linear-gradient(180deg, rgba(241, 196, 15, 0.1) 0%, rgba(0,0,0,0.4) 100%);
         }
 
-        .player-info h2 { margin: 0; font-size: 1.4em; letter-spacing: 0.5px; }
+        .player-info h2 { margin: 0; font-size: 1.2em; letter-spacing: 0.5px; text-transform: uppercase; }
         .active .player-info h2 { color: #f1c40f; }
         
-        .score-display { font-size: 3.5em; font-weight: 900; margin: 0; line-height: 1; }
-        .active .score-display { color: #f1c40f; text-shadow: 0 0 15px rgba(241, 196, 15, 0.5); }
+        .score-display { font-size: 3em; font-weight: 900; line-height: 1; }
+        .active .score-display { color: #f1c40f; text-shadow: 0 0 10px rgba(241, 196, 15, 0.4); }
 
-        .sub-stats { font-size: 0.7em; color: #888; margin-top: 8px; display: flex; gap: 15px; }
+        .sub-stats { font-size: 0.65em; color: #888; margin-top: 5px; display: flex; gap: 10px; text-transform: uppercase; }
         .active .sub-stats { color: #ccc; }
+        .stat-val { color: #f1c40f; font-weight: bold; }
 
-        /* 4. BALLENE: 3D-effekt som på bildet */
+        /* 4. BALL-KONTROLL SONE */
         .ball-control-zone {
             display: flex;
             justify-content: space-around;
-            margin: 40px 0;
+            margin: 30px 0;
+            background: rgba(0,0,0,0.2);
+            padding: 20px 10px;
+            border-radius: 30px;
         }
+        .ball-group { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+        
         .ball {
-            width: 85px; height: 85px; border-radius: 50%;
+            width: 80px; height: 80px; border-radius: 50%;
             border: none; cursor: pointer; position: relative;
-            box-shadow: inset -10px -10px 20px rgba(0,0,0,0.5), 10px 15px 25px rgba(0,0,0,0.4);
+            box-shadow: inset -8px -8px 15px rgba(0,0,0,0.5), 5px 10px 15px rgba(0,0,0,0.4);
             display: flex; align-items: center; justify-content: center;
-            transition: 0.2s;
+            transition: 0.1s;
         }
-        .ball:active { transform: translateY(5px) scale(0.95); }
-
-        .ball-inner { width: 32px; height: 32px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #000; box-shadow: 2px 2px 5px rgba(0,0,0,0.5); }
+        .ball:active { transform: scale(0.92); }
+        .ball-inner { width: 30px; height: 30px; background: white; border-radius: 50%; color: black; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 2px solid #000; font-size: 0.9em; }
 
         #ball1 { background: radial-gradient(circle at 35% 35%, #f1c40f 0%, #b38f00 100%); }
         #ball5 { background: radial-gradient(circle at 35% 35%, #8e44ad 0%, #4b0082 100%); }
         #ball3 { background: radial-gradient(circle at 35% 35%, #e74c3c 0%, #962d22 100%); }
 
-        /* 5. HOVEDKNAPPER: "Foul" og "Avslutt" (Screen 2) */
-        .main-actions {
-            display: grid;
-            grid-template-columns: 1fr 1.5fr;
-            gap: 15px;
-            position: fixed;
-            bottom: 100px; /* Plass til nav-bar */
-            left: 20px;
-            right: 20px;
-            max-width: 390px;
-            margin: auto;
+        .btn-sub-carom { 
+            background: rgba(52, 152, 219, 0.15); color: #3498db; border: 1px solid #3498db; 
+            border-radius: 8px; padding: 6px 12px; font-size: 0.6em; font-weight: 800; cursor: pointer;
+        }
+
+        /* 5. HOVEDHANDLINGER (FIXED I BUNN) */
+        .action-area {
+            position: fixed; bottom: 90px; left: 0; right: 0;
+            padding: 0 20px; max-width: 430px; margin: auto;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
         }
         .btn {
-            padding: 18px;
-            border-radius: 15px;
-            border: none;
-            font-weight: 800;
-            text-transform: uppercase;
-            cursor: pointer;
-            font-size: 0.85em;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            padding: 15px; border-radius: 12px; border: none; font-weight: 800; 
+            text-transform: uppercase; cursor: pointer; font-size: 0.8em;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-        .btn-foul { background: #2c3e50; color: #bdc3c7; }
-        .btn-turn { background: #27ae60; color: white; border-bottom: 4px solid #1e8449; }
+        .btn-blue { background: #2980b9; color: white; border-bottom: 3px solid #1c5982; }
+        .btn-foul { background: #c0392b; color: white; border-bottom: 3px solid #7b241c; }
+        .btn-turn { background: #27ae60; color: white; border-bottom: 3px solid #1e8449; grid-column: span 2; font-size: 1em; padding: 18px; }
+        .btn:active { transform: translateY(2px); border-bottom-width: 1px; }
 
-        /* 6. NAVIGASJON (Screen 1 & 2) */
+        /* 6. NAVIGASJON */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
-            background: #111;
-            display: flex; justify-content: space-around;
-            padding: 15px 0 30px 0;
-            border-top: 1px solid #333;
-            z-index: 1000;
+            background: #0a0a0a; display: flex; justify-content: space-around;
+            padding: 12px 0 25px 0; border-top: 1px solid #222; z-index: 1000;
         }
-        .nav-item { color: #555; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.6em; font-weight: bold; }
+        .nav-item { color: #444; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.6em; font-weight: bold; }
         .nav-item.active { color: #f1c40f; }
-        .nav-item i { font-size: 2.2em; margin-bottom: 4px; }
+        .nav-item i { font-size: 1.8em; margin-bottom: 3px; }
 
         .waiting { opacity: 0.2; filter: grayscale(1); pointer-events: none; }
     </style>
@@ -142,81 +148,171 @@
 
 <div class="app-container">
     <div class="status-header">
-        <div class="req-text" id="moveText">BREKK-STØT (3-BALL)</div>
+        <span class="req-text" id="moveText">BREKK-STØT (3-BALL)</span>
+        <span class="timer-text" id="matchTimer">00:00:00</span>
     </div>
 
     <div id="scoreboard-container">
         </div>
 
     <div class="ball-control-zone">
-        <button class="ball" id="ball1" onclick="action('pocket', 1)"><div class="ball-inner">1</div></button>
-        <button class="ball" id="ball5" onclick="action('pocket', 5)"><div class="ball-inner">5</div></button>
-        <button class="ball" id="ball3" onclick="action('pocket', 3)"><div class="ball-inner">3</div></button>
+        <div class="ball-group">
+            <button class="ball" id="ball1" onclick="action('pocket', 1)"><div class="ball-inner">1</div></button>
+            <button class="btn-sub-carom" onclick="action('pocket_carom', 2)">+ CAROM</button>
+        </div>
+        <div class="ball-group">
+            <button class="ball" id="ball5" onclick="action('pocket', 5)"><div class="ball-inner">5</div></button>
+            <button class="btn-sub-carom" onclick="action('pocket_carom', 6)">+ CAROM</button>
+        </div>
+        <div class="ball-group">
+            <button class="ball" id="ball3" onclick="action('pocket', 3)"><div class="ball-inner">3</div></button>
+            <button class="btn-sub-carom" onclick="action('pocket_carom', 4)">+ CAROM</button>
+        </div>
     </div>
 
-    <div class="main-actions">
+    <div class="action-area">
+        <button class="btn btn-blue" onclick="action('carom', 1)">Carom 1P</button>
+        <button class="btn btn-blue" onclick="action('carom', 2)">Carom 2P</button>
         <button class="btn btn-foul" onclick="handleFoul()">FOUL</button>
+        <button class="btn btn-blue" onclick="undo()">ANGRE</button>
         <button class="btn btn-turn" onclick="nextTurn()" id="turnBtn">AVSLUTT TUR</button>
     </div>
 
     <nav class="bottom-nav">
         <a href="#" class="nav-item active"><i class="material-icons">home</i>HJEM</a>
-        <a href="stats.html" class="nav-item"><i class="material-icons">emoji_events</i>TOPPLISTE</a>
-        <a href="#" class="nav-item"><i class="material-icons">menu_book</i>REGLER</a>
+        <a href="stats.html" class="nav-item"><i class="material-icons">leaderboard</i>TOPPLISTE</a>
+        <a href="#" class="nav-item" onclick="resetGame()"><i class="material-icons">refresh</i>RESET</a>
     </nav>
 </div>
 
 <script>
-    // --- SAMME FIREBASE LOGIKK SOM FØR ---
+    // --- FIREBASE KONFIGURASJON ---
     const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('gameData');
 
-    let state = { playerCount: 2, scores: [0,0], currentPlayer: 0, names: ["Simen", "Lasse"], lang: 'no' };
+    let state = {
+        playerCount: 2, scores: [0, 0, 0], foulCounts: [0, 0, 0], scoreAtStart: [0, 0, 0],
+        currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null,
+        innings: 0, seconds: 0, names: ["Simen", "Lasse", "Ole Andreas"],
+        bestSeries: [0, 0, 0], currentSeries: 0
+    };
 
+    let history = [];
+
+    // Lytt på endringer
     db.on('value', (snapshot) => {
         const data = snapshot.val();
-        if (data) { state = data; updateUI(); }
+        if (data) { 
+            state = data; 
+            updateUI(); 
+        }
     });
 
     function updateUI() {
-        const scoreCont = document.getElementById('scoreboard-container');
-        scoreCont.innerHTML = '';
+        const container = document.getElementById('scoreboard-container');
+        container.innerHTML = '';
 
-        for(let i=0; i<state.playerCount; i++) {
+        for (let i = 0; i < state.playerCount; i++) {
             const isActive = state.currentPlayer === i;
-            scoreCont.innerHTML += `
+            const currentRun = isActive ? (state.scores[i] - state.scoreAtStart[i]) : 0;
+            
+            container.innerHTML += `
                 <div class="player-card ${isActive ? 'active' : ''}">
                     <div class="player-info">
                         <h2>${state.names[i]}</h2>
                         <div class="sub-stats">
-                            <span>SCORE: ${state.scores[i]}</span>
-                            <span>SERIE: ${state.currentSeries || 0}</span>
+                            <span>Serie: <span class="stat-val">${currentRun}</span></span>
+                            <span>Best: <span class="stat-val">${state.bestSeries[i] || 0}</span></span>
                         </div>
                     </div>
                     <div class="score-display">${state.scores[i]}</div>
-                </div>`;
+                </div>
+            `;
         }
+
+        // Oppdater timer og tekst
+        document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
         
-        // Oppdater tekst for krav
-        document.getElementById('moveText').innerText = state.breakDone ? "KRAV: CAROM / KULE" : "BREKK-STØT (3-BALL)";
+        let moveText = "VELG: CAROM / KULE";
+        if (!state.breakDone) moveText = "BREKK-STØT (3-BALL)";
+        else if (state.tableStatus === 'locked') {
+            moveText = state.lastType === 'pocket' ? "KRAV: CAROM" : "KRAV: POCKET";
+        }
+        document.getElementById('moveText').innerText = moveText;
+
+        // Ball-logikk: Grå ut baller basert på regler
+        const isAtEnd = state.scores[state.currentPlayer] >= 90;
+        const isLockedPocket = state.tableStatus === 'locked' && state.lastType === 'pocket';
+        
+        document.getElementById('ball1').parentElement.className = (!state.breakDone || isLockedPocket || isAtEnd) ? 'ball-group waiting' : 'ball-group';
+        document.getElementById('ball5').parentElement.className = (!state.breakDone || isLockedPocket || isAtEnd) ? 'ball-group waiting' : 'ball-group';
+        document.getElementById('ball3').parentElement.className = (isLockedPocket || isAtEnd) ? 'ball-group waiting' : 'ball-group';
     }
 
     function action(type, val) {
-        state.scores[state.currentPlayer] += val;
+        saveHistory();
+        let p = state.currentPlayer;
+        let s = state.scores[p];
+
+        // 90/100 regler
+        if (s < 90 && s + val > 90) return;
+        if (s >= 90 && s < 100 && s + val > 100) return;
+
         state.breakDone = true;
+        
+        if (type === 'pocket_carom') {
+            if (state.tableStatus === 'locked') state.lastType = (state.lastType === 'pocket') ? 'carom' : 'pocket';
+        } else {
+            state.tableStatus = 'locked';
+            state.lastType = type;
+        }
+
+        state.scores[p] += val;
         db.set(state);
     }
 
     function nextTurn() {
+        saveHistory();
+        const p = state.currentPlayer;
+        const roundScore = state.scores[p] - state.scoreAtStart[p];
+        
+        if (roundScore > (state.bestSeries[p] || 0)) state.bestSeries[p] = roundScore;
+        
         state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
+        state.tableStatus = 'open';
+        state.lastType = null;
+        state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer];
+        state.innings++;
         db.set(state);
     }
 
     function handleFoul() {
-        state.scores[state.currentPlayer] -= 5; // Eksempel
+        saveHistory();
+        state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer];
         nextTurn();
     }
+
+    function saveHistory() { history.push(JSON.stringify(state)); }
+    function undo() { if(history.length) { state = JSON.parse(history.pop()); db.set(state); } }
+    
+    function resetGame() { 
+        if(confirm("Reset kampen?")) {
+            state.scores = [0,0,0];
+            state.breakDone = false;
+            state.seconds = 0;
+            state.innings = 0;
+            db.set(state);
+        }
+    }
+
+    // Enkel timer lokalt som pusher til Firebase
+    setInterval(() => {
+        if (state.breakDone) {
+            state.seconds++;
+            firebase.database().ref('gameData/seconds').set(state.seconds);
+        }
+    }, 1000);
 </script>
 </body>
 </html>
