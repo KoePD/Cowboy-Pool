@@ -3,29 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Biljard App - Pixel Perfect Fyldig</title>
+    <title>Biljard App - Final 1000%</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            /* Den nøyaktige, mettede radial gradienten fra bilde 1 - Dyper Grønn */
-            --felt-green: radial-gradient(circle at center, #2fa34b 0%, #155e2d 60%, #0a2b15 100%);
+            /* Den nøyaktige, dype grønnfargen fra originalbildet */
+            --felt-green: radial-gradient(circle at center, #2fa34b 0%, #155e2d 60%, #082411 100%);
             --gold: #d4af37;
             --leather: #121212;
-            --card-bg: rgba(0, 0, 0, 0.6);
+            --card-bg: rgba(0, 0, 0, 0.65);
         }
 
-        /* Fullskjerm setup for en ren mobil-app følelse */
+        /* Fullskjerm reset */
         html, body {
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow: hidden; /* Hindrer rulling for å låse app-layouten */
-            background-color: var(--leather); /* Basefarge */
+            overflow: hidden;
+            background-color: #000;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Hoved-container som fyller telefonen */
         .app-container {
             height: 100%;
             display: flex;
@@ -33,133 +32,142 @@
             position: relative;
         }
 
-        /* GRØNN DUK (Bakgrunnen i midten) */
-        .felt-layer {
+        /* GRØNN DUK - Ren farge i bunn */
+        .felt-base {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             background: var(--felt-green);
-            background-image: url("https://www.transparenttextures.com/patterns/felt.png");
             z-index: 1;
         }
 
-        /* TOPP-PANEL (Lær) - STØRRE PADDING */
+        /* Tekstur-lag - Ligger over fargen med lav synlighet for å hindre gråskjær */
+        .felt-texture {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url("https://www.transparenttextures.com/patterns/felt.png");
+            opacity: 0.15;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* TOPP-PANEL - 50% Større */
         .header {
             background: var(--leather);
             background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png");
-            padding: 60px 30px 90px; /* Økt padding for å bli større */
+            padding: 70px 30px 110px; /* Massiv padding for å matche originalen */
             z-index: 10;
-            border-bottom-left-radius: 50% 40px;
-            border-bottom-right-radius: 50% 40px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.9);
+            border-bottom-left-radius: 50% 45px;
+            border-bottom-right-radius: 50% 45px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.9);
             position: relative;
         }
 
-        /* Den stiplede sømmen langs buen */
         .header::after {
             content: "";
             position: absolute;
-            bottom: 12px; left: 5%; width: 90%; height: 40px;
-            border-bottom: 1.5px dashed rgba(212, 175, 55, 0.35);
+            bottom: 15px; left: 5%; width: 90%; height: 45px;
+            border-bottom: 1.5px dashed rgba(212, 175, 55, 0.4);
             border-radius: 50%;
         }
 
-        .header h1 { color: #fff; margin: 0; font-size: 28px; letter-spacing: 0.5px; font-weight: 700; }
-        .rank { color: var(--gold); font-size: 15px; margin: 6px 0; font-weight: 500; }
+        .header h1 { color: #fff; margin: 0; font-size: 32px; font-weight: 700; }
+        .rank { color: var(--gold); font-size: 16px; margin: 8px 0; font-weight: 500; }
         
         .progress-bar {
-            width: 100%; height: 8px; background: #222;
-            border-radius: 4px; margin-top: 18px; position: relative;
+            width: 100%; height: 10px; background: #222;
+            border-radius: 5px; margin-top: 25px;
         }
         .progress-fill {
             width: 65%; height: 100%;
             background: linear-gradient(90deg, #b38f36, var(--gold));
-            box-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
-            border-radius: 4px;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+            border-radius: 5px;
         }
 
-        /* MIDTPARTI (Kortene på grønn duk) */
+        /* MIDTPARTI - Større knapper */
         .main-felt {
             position: relative;
             z-index: 5;
-            flex-grow: 1; /* Fyller resten av plassen mellom topp og bunn */
+            flex-grow: 1;
             display: flex;
             justify-content: space-evenly;
             align-items: center;
             padding: 20px 10px;
         }
 
-        /* KORTENE - MYE STØRRE */
         .action-card {
-            width: 125px; /* Økt bredde */
-            height: 130px; /* Økt høyde */
+            width: 130px; /* Blåst opp størrelse */
+            height: 140px; 
             background: var(--card-bg);
-            border: 1.5px solid var(--gold);
-            border-radius: 16px;
+            border: 2px solid var(--gold);
+            border-radius: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             color: #fff;
-            box-shadow: inset 0 0 25px rgba(0,0,0,0.7), 0 8px 20px rgba(0,0,0,0.4);
-            backdrop-filter: blur(2px);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 10px 25px rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
         }
 
-        .action-card i { font-size: 40px; margin-bottom: 15px; color: var(--gold); }
+        .action-card i { font-size: 45px; margin-bottom: 15px; color: var(--gold); }
         .action-card.green-icon i { color: #2ecc71; }
-        .action-card span { font-size: 12px; font-weight: 800; letter-spacing: 1px; }
+        .action-card span { font-size: 13px; font-weight: 900; letter-spacing: 1px; }
 
-        /* BUNN-PANEL (Lær) - STØRRE PADDING */
+        /* BUNN-PANEL - 50% Større */
         .bottom-panel {
             background: var(--leather);
             background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png");
-            padding: 85px 25px 25px; /* Økt padding i topp for å bli større */
+            padding: 100px 30px 30px; /* Massiv padding i topp for buen */
             z-index: 10;
-            border-top-left-radius: 50% 40px;
-            border-top-right-radius: 50% 40px;
-            box-shadow: 0 -15px 35px rgba(0,0,0,0.9);
+            border-top-left-radius: 50% 45px;
+            border-top-right-radius: 50% 45px;
+            box-shadow: 0 -20px 40px rgba(0,0,0,0.9);
             position: relative;
         }
 
         .bottom-panel::before {
             content: "";
             position: absolute;
-            top: 12px; left: 5%; width: 90%; height: 40px;
-            border-top: 1.5px dashed rgba(212, 175, 55, 0.35);
+            top: 15px; left: 5%; width: 90%; height: 45px;
+            border-top: 1.5px dashed rgba(212, 175, 55, 0.4);
             border-radius: 50%;
         }
 
-        .last-match {
-            background: rgba(255,255,255,0.05);
+        .match-card {
+            background: rgba(255,255,255,0.06);
             border: 1px solid #333;
-            border-radius: 20px;
-            padding: 20px;
+            border-radius: 22px;
+            padding: 25px;
         }
 
-        /* NAVBAR - Helt nederst */
+        /* NAVBAR */
         .navbar {
-            background: #0a0a0a;
-            height: 80px;
+            background: #0d0d0d;
+            height: 85px;
             display: flex;
             justify-content: space-around;
             align-items: center;
             border-top: 1px solid #222;
             z-index: 20;
+            padding-bottom: 10px; /* Plass for hjem-bar på iPhone */
         }
 
-        .nav-item { color: #666; text-align: center; font-size: 12px; text-decoration: none; font-weight: 500;}
+        .nav-item { color: #555; text-align: center; font-size: 13px; text-decoration: none; font-weight: 600; }
         .nav-item.active { color: var(--gold); }
-        .nav-item i { display: block; font-size: 26px; margin-bottom: 6px; }
+        .nav-item i { display: block; font-size: 28px; margin-bottom: 6px; }
 
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <div class="felt-layer"></div>
+    <div class="felt-base"></div>
+    <div class="felt-texture"></div>
 
     <header class="header">
         <h1>Hei, Marius!</h1>
-        <div class="rank">Cowboy Rank: <span>Level 12 - Gunslinger</span></div>
+        <div class="rank">Cowboy Rank: Level 12 - Gunslinger</div>
         <div class="progress-bar"><div class="progress-fill"></div></div>
     </header>
 
@@ -179,22 +187,22 @@
     </main>
 
     <section class="bottom-panel">
-        <div class="last-match">
-            <div style="color:#aaa; font-size:13px; margin-bottom:15px; font-weight:600;">Min Siste Kamp</div>
+        <div class="match-card">
+            <div style="color:#aaa; font-size:14px; margin-bottom:18px; font-weight:700; text-transform: uppercase; letter-spacing: 1px;">Min Siste Kamp</div>
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div style="text-align:center;">
-                    <div style="width:55px; height:55px; border-radius:50%; background:#333; border:2.5px solid var(--gold); margin-bottom:6px;"></div>
-                    <div style="color:#fff; font-size:13px;">Mav</div>
+                    <div style="width:60px; height:60px; border-radius:50%; background:#222; border:3px solid var(--gold); margin-bottom:8px;"></div>
+                    <div style="color:#fff; font-size:14px; font-weight: 600;">Mav</div>
                 </div>
                 <div style="text-align:center;">
-                    <div style="font-size:30px; font-weight:900; color:#fff; letter-spacing:1px;">
+                    <div style="font-size:36px; font-weight:900; color:#fff; letter-spacing:2px;">
                         <span style="color:#2ecc71">100</span> - <span style="color:var(--gold)">82</span>
                     </div>
-                    <div style="color:#2ecc71; font-size:11px; font-weight:bold; margin-top:3px;">WIN</div>
+                    <div style="color:#2ecc71; font-size:12px; font-weight:900; margin-top:5px; letter-spacing: 1px;">WIN</div>
                 </div>
                 <div style="text-align:center;">
-                    <div style="width:55px; height:55px; border-radius:50%; background:#333; border:2px solid #444; margin-bottom:6px;"></div>
-                    <div style="color:#fff; font-size:13px;">Per</div>
+                    <div style="width:60px; height:60px; border-radius:50%; background:#222; border:3px solid #333; margin-bottom:8px;"></div>
+                    <div style="color:#fff; font-size:14px; font-weight: 600;">Per</div>
                 </div>
             </div>
         </div>
