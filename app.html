@@ -8,11 +8,10 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
     <style>
-        /* 1. LAYOUT & DEN MØRKE BAKGRUNNEN */
+        /* 1. LAYOUT & GRØNN BILJARD-BAKGRUNN */
         body { 
             font-family: 'Segoe UI', sans-serif; 
-            /* Dypere, mørkere gradient for å matche bildet helt */
-            background: radial-gradient(circle at top, #0d1a0f 0%, #050805 100%);
+            background: radial-gradient(circle at top, #1e4d2b 0%, #0a1a0f 100%);
             background-attachment: fixed;
             color: white; 
             margin: 0; padding: 0; 
@@ -25,62 +24,72 @@
             padding: 20px; padding-bottom: 220px;
         }
 
-        /* 2. MODUS VELGER (1P, 2P, 3P) */
+        /* 2. MODUS VELGER */
         .mode-row {
             display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;
         }
         .btn-mode {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
             color: #888; padding: 8px 18px; border-radius: 12px; cursor: pointer; font-weight: bold;
         }
-        .btn-mode.active { background: #f1c40f; color: black; border-color: #f1c40f; box-shadow: 0 0 15px rgba(241, 196, 15, 0.3); }
+        .btn-mode.active { background: #f1c40f; color: black; border-color: #f1c40f; }
 
-        /* 3. STATUS & TIMER */
+        /* 3. STATUS & HEADER */
         .status-header {
-            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(15px);
+            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(15px);
             padding: 12px; border-radius: 18px; text-align: center;
             margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05);
         }
         .req-text { font-size: 0.75em; letter-spacing: 2px; color: #2ecc71; font-weight: 800; text-transform: uppercase; }
-        .timer-text { font-family: monospace; font-size: 1.3em; color: #f1c40f; margin-top: 5px; display: block; letter-spacing: 1px; }
+        .timer-text { font-family: monospace; font-size: 1.3em; color: #f1c40f; margin-top: 5px; display: block; }
 
-        /* 4. SPILLERKORT */
+        /* 4. SPILLERKORT (NÅ MØRKERE / SORTE) */
         .player-card {
-            background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.4) 100%);
-            backdrop-filter: blur(10px); border-radius: 22px;
-            padding: 18px 22px; margin-bottom: 12px;
-            border: 1px solid rgba(255,255,255,0.05);
-            display: flex; justify-content: space-between; align-items: center;
+            /* Her er endringen: Fra grå til dyp sort-gradient */
+            background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%);
+            backdrop-filter: blur(10px); 
+            border-radius: 22px;
+            padding: 18px 22px; 
+            margin-bottom: 12px;
+            border: 1px solid rgba(255,255,255,0.08); /* Tynn lys kant for definisjon */
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
             transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .player-card.active {
-            border: 2px solid #f1c40f; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7), 0 0 15px rgba(241, 196, 15, 0.2);
-            transform: scale(1.02); background: linear-gradient(180deg, rgba(241, 196, 15, 0.12) 0%, rgba(0,0,0,0.5) 100%);
+            border: 2px solid #f1c40f; 
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(241, 196, 15, 0.2);
+            transform: scale(1.03); 
+            /* Den aktive boksen får en ørliten touch av gull-glød i bunnen */
+            background: linear-gradient(180deg, #0f0f0f 0%, #000000 100%);
         }
-        .player-info h2 { margin: 0; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; color: #bbb; }
+        .player-info h2 { margin: 0; font-size: 1.1em; text-transform: uppercase; letter-spacing: 1px; color: #777; }
         .active .player-info h2 { color: #f1c40f; }
-        .score-display { font-size: 3.2em; font-weight: 900; line-height: 1; margin: 0; }
+        
+        .score-display { font-size: 3.2em; font-weight: 900; line-height: 1; margin: 0; color: #444; }
         .active .score-display { color: #f1c40f; text-shadow: 0 0 15px rgba(241, 196, 15, 0.4); }
 
-        /* 3 KOLONNER STATS */
+        /* STATS INNI BOKSENE */
         .sub-stats { 
-            font-size: 0.6em; color: #777; margin-top: 10px; 
+            font-size: 0.6em; color: #555; margin-top: 10px; 
             display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; text-transform: uppercase; 
         }
-        .active .sub-stats { color: #aaa; }
+        .active .sub-stats { color: #888; }
         .stat-item { display: flex; flex-direction: column; }
-        .stat-val { color: #f1c40f; font-weight: 900; font-size: 1.2em; }
+        .stat-val { color: #fff; font-weight: 900; font-size: 1.2em; }
+        .active .stat-val { color: #f1c40f; }
 
         /* FOUL MARKERING */
         .foul-container { display: flex; gap: 6px; margin-top: 10px; }
-        .foul-dot { width: 11px; height: 11px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; }
+        .foul-dot { width: 11px; height: 11px; border-radius: 50%; background: #222; border: 1px solid #333; transition: 0.3s; }
         .foul-dot.active { background: #e74c3c; box-shadow: 0 0 10px #ff4757; }
 
         /* BALL KONTROLL */
         .ball-control-zone {
             display: flex; justify-content: space-around; margin: 25px 0;
-            background: rgba(0,0,0,0.3); padding: 20px 10px; border-radius: 30px;
-            border: 1px solid rgba(255,255,255,0.03);
+            background: rgba(0,0,0,0.4); padding: 20px 10px; border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
         .ball-group { display: flex; flex-direction: column; align-items: center; gap: 10px; }
         .ball {
@@ -95,7 +104,7 @@
         #ball5 { background: radial-gradient(circle at 35% 35%, #8e44ad, #4b0082); }
         #ball3 { background: radial-gradient(circle at 35% 35%, #e74c3c, #962d22); }
 
-        .btn-sub-carom { background: rgba(52, 152, 219, 0.15); color: #3498db; border: 1px solid #3498db; border-radius: 6px; padding: 5px 10px; font-size: 0.6em; font-weight: 800; cursor: pointer; }
+        .btn-sub-carom { background: rgba(52, 152, 219, 0.1); color: #3498db; border: 1px solid #3498db; border-radius: 6px; padding: 5px 10px; font-size: 0.6em; font-weight: 800; cursor: pointer; }
 
         /* HANDLINGER BUNN */
         .action-area {
@@ -107,13 +116,12 @@
         .btn-blue { background: #2980b9; color: white; border-bottom: 4px solid #1c5982; }
         .btn-foul { background: #c0392b; color: white; border-bottom: 4px solid #7b241c; }
         .btn-turn { background: #27ae60; color: white; border-bottom: 4px solid #1e8449; grid-column: span 2; padding: 18px; font-size: 1em; }
-        .btn:active { transform: translateY(2px); border-bottom-width: 1px; }
 
         /* NAVIGASJON */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0;
-            background: #050505; display: flex; justify-content: space-around;
-            padding: 12px 0 30px 0; border-top: 1px solid #1a1a1a; z-index: 1000;
+            background: #000; display: flex; justify-content: space-around;
+            padding: 12px 0 30px 0; border-top: 1px solid #111; z-index: 1000;
         }
         .nav-item { color: #333; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 0.6em; font-weight: bold; }
         .nav-item.active { color: #f1c40f; }
@@ -176,7 +184,7 @@
     let state = {
         playerCount: 2, scores: [0, 0, 0], foulCounts: [0, 0, 0], scoreAtStart: [0, 0, 0],
         currentPlayer: 0, breakDone: false, tableStatus: 'open', lastType: null,
-        innings: 0, seconds: 0, names: ["Spiller 1", "Spiller 2", "Spiller 3"],
+        innings: 0, seconds: 0, names: ["Simen Jøndal", "Lasse Kåring", "Ole Andreas Sandvik"],
         bestSeries: [0, 0, 0], lastSeries: [0, 0, 0]
     };
 
@@ -214,7 +222,7 @@
                         <h2>${state.names[i]}</h2>
                         <div class="sub-stats">
                             <div class="stat-item">NÅ <span class="stat-val">${currentRun}</span></div>
-                            <div class="stat-item">PERS <span class="stat-val">${state.bestSeries[i] || 0}</span></div>
+                            <div class="stat-item">BEST <span class="stat-val">${state.bestSeries[i] || 0}</span></div>
                             <div class="stat-item">SISTE <span class="stat-val">${lastRun}</span></div>
                         </div>
                         ${foulHtml}
