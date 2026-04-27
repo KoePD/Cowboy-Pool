@@ -23,20 +23,6 @@
             display: flex; flex-direction: column;
         }
 
-        /* NY MODUS VELGER - MER DISKRET */
-        .player-selector {
-            display: flex; justify-content: center; 
-            background: rgba(0,0,0,0.5); border-radius: 12px;
-            padding: 4px; margin-top: 15px; border: 1px solid rgba(255,255,255,0.05);
-        }
-        .btn-mode { 
-            flex: 1; background: transparent; border: none;
-            color: #555; padding: 10px; border-radius: 8px; 
-            cursor: pointer; font-weight: bold; font-size: 0.8em;
-            transition: 0.2s;
-        }
-        .btn-mode.active { background: rgba(255,255,255,0.1); color: #f1c40f; }
-
         /* SPILLERKORT */
         .player-card {
             background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%);
@@ -47,11 +33,12 @@
             transition: 0.3s;
         }
         .player-card.active { border: 2px solid #f1c40f; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9); transform: scale(1.03); }
-        .player-info { flex: 1; overflow: hidden; padding-right: 10px; }
-        .player-name-input { background: transparent; border: none; color: #666; font-size: 1.1em; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; width: 100%; padding: 0; outline: none; }
-        .active .player-name-input { color: #f1c40f; }
+        .player-info h2 { margin: 0; font-size: 1.2em; text-transform: uppercase; letter-spacing: 1px; color: #666; }
+        .active .player-info h2 { color: #f1c40f; }
+        
         .score-display { font-size: 3.5em; font-weight: 900; line-height: 1; margin: 0; color: #333; min-width: 60px; text-align: right; }
-        .active .score-display { color: #f1c40f; }
+        .active .score-display { color: #f1c40f; text-shadow: 0 0 15px rgba(241, 196, 15, 0.3); }
+
         .sub-stats { font-size: 0.55em; color: #444; margin-top: 12px; display: flex; justify-content: flex-start; text-transform: uppercase; }
         .active .sub-stats { color: #888; }
         .stat-item { width: 55px; display: flex; flex-direction: column; }
@@ -91,8 +78,23 @@
         .btn-blue { background: #2980b9; color: white; border-bottom: 4px solid #1c5982; }
         .btn-foul { background: #c0392b; color: white; border-bottom: 4px solid #7b241c; }
         .btn-turn { background: #27ae60; color: white; border-bottom: 4px solid #1e8449; grid-column: span 2; padding: 20px; font-size: 1.1em; }
-        .btn-reset-match { background: #4d1a1a; color: #ff9999; border: 1px solid #7b241c; grid-column: span 2; padding: 12px; font-size: 0.75em; margin-top: 5px; }
+        .btn-new-game { background: #000; color: #f1c40f; border: 1px solid #f1c40f; grid-column: span 2; margin-top: 10px; padding: 15px; }
         .btn-finish { background: #000; color: white; border: 1px solid #333; grid-column: span 2; padding: 12px; font-size: 0.7em; letter-spacing: 1px; opacity: 0.8; }
+
+        /* OVERLAY / MODAL FOR NEW GAME */
+        .setup-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,20,5,0.98); z-index: 2000;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            padding: 30px; box-sizing: border-box; backdrop-filter: blur(10px);
+        }
+        .setup-card { background: #000; border: 1px solid #f1c40f; padding: 30px; border-radius: 30px; width: 100%; max-width: 350px; text-align: center; }
+        .setup-card h2 { color: #f1c40f; margin-bottom: 20px; text-transform: uppercase; }
+        .setup-row { display: flex; gap: 10px; margin-bottom: 20px; }
+        .btn-choice { flex: 1; padding: 15px; border-radius: 12px; border: 1px solid #333; background: #111; color: white; font-weight: bold; cursor: pointer; }
+        .btn-choice.selected { border-color: #f1c40f; color: #f1c40f; background: rgba(241,196,15,0.1); }
+        .name-field { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #111; color: white; margin-bottom: 10px; box-sizing: border-box; text-align: center; }
+        .btn-start { width: 100%; padding: 18px; border-radius: 15px; background: #27ae60; color: white; border: none; font-weight: 900; text-transform: uppercase; margin-top: 10px; }
 
         /* NAVIGASJON */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #000; display: flex; justify-content: space-around; padding: 10px 0 35px 0; border-top: 1px solid #111; z-index: 1000; }
@@ -103,6 +105,28 @@
     </style>
 </head>
 <body>
+
+<div id="setupOverlay" class="setup-overlay">
+    <div class="setup-card">
+        <h2 id="setupTitle">New Game</h2>
+        
+        <div id="step1">
+            <p style="color: #888; font-size: 0.8em; margin-bottom: 15px;">Antall spillere?</p>
+            <div class="setup-row">
+                <button class="btn-choice" onclick="selectPlayers(1)">1</button>
+                <button class="btn-choice" onclick="selectPlayers(2)">2</button>
+                <button class="btn-choice" onclick="selectPlayers(3)">3</button>
+            </div>
+        </div>
+
+        <div id="step2" style="display: none;">
+            <p style="color: #888; font-size: 0.8em; margin-bottom: 15px;">Navn på spillere:</p>
+            <div id="nameInputs"></div>
+            <button class="btn-start" onclick="finalizeSetup()">Start Match</button>
+            <button style="background:none; border:none; color:#555; margin-top:15px;" onclick="location.reload()">Avbryt</button>
+        </div>
+    </div>
+</div>
 
 <div class="app-container">
     <div id="scoreboard-container"></div>
@@ -136,14 +160,8 @@
         <button class="btn btn-foul" id="foulBtn" onclick="handleFoul()">FOUL</button>
         <button class="btn btn-blue" id="undoBtn" onclick="undo()">ANGRE</button>
         <button class="btn btn-turn" id="turnBtn" onclick="nextTurn()">AVSLUTT TUR</button>
-        <button class="btn btn-reset-match" id="resetMatchBtn" onclick="resetGamePrompt()">RESET MATCH</button>
+        <button class="btn btn-new-game" onclick="openSetup()">NEW GAME</button>
         <button class="btn btn-finish" id="finishBtn" onclick="saveMatchToHistory()">FINISH AND SAVE MATCH</button>
-
-        <div class="player-selector">
-            <button class="btn-mode" id="m1" onclick="setPlayerCount(1)">1 PLAYER</button>
-            <button class="btn-mode" id="m2" onclick="setPlayerCount(2)">2 PLAYERS</button>
-            <button class="btn-mode" id="m3" onclick="setPlayerCount(3)">3 PLAYERS</button>
-        </div>
     </div>
 
     <nav class="bottom-nav">
@@ -166,39 +184,52 @@
     };
 
     const dictionary = {
-        no: {
-            break: "BREKK-STØT (3-BALL)", req_carom: "KRAV: CAROM", req_pocket: "KRAV: POCKET", req_any: "VELG: CAROM / KULE", rotate: "BYTT STARTSPILLER", foul: "FOUL", undo: "ANGRE", turn: "AVSLUTT TUR", reset_btn: "RESET MATCH", finish: "FINISH AND SAVE MATCH", now: "NÅ", best: "PERS", last: "SISTE", home: "HJEM", stats: "STATS", confirm_finish: "Lagre kampen og avslutt?", confirm_reset: "Reset nåværende kamp?", confirm_players: "Bytte til {n} spillere? Kampen resettes."
-        },
-        en: {
-            break: "BREAK SHOT (3-BALL)", req_carom: "REQ: CAROM", req_pocket: "REQ: POCKET", req_any: "CHOOSE: CAROM / POCKET", rotate: "SWITCH STARTER", foul: "FOUL", undo: "UNDO", turn: "END TURN", reset_btn: "RESET MATCH", finish: "FINISH AND SAVE MATCH", now: "NOW", best: "BEST", last: "LAST", home: "HOME", stats: "STATS", confirm_finish: "Save match and finish?", confirm_reset: "Reset current match?", confirm_players: "Switch to {n} players? Match will reset."
-        }
+        no: { break: "BREKK-STØT", req_carom: "KRAV: CAROM", req_pocket: "KRAV: POCKET", req_any: "VELG: CAROM / KULE", rotate: "BYTT STARTSPILLER", foul: "FOUL", undo: "ANGRE", turn: "AVSLUTT TUR", finish: "FINISH AND SAVE MATCH", home: "HJEM", stats: "STATS" },
+        en: { break: "BREAK SHOT", req_carom: "REQ: CAROM", req_pocket: "REQ: POCKET", req_any: "CHOOSE: CAROM / POCKET", rotate: "SWITCH STARTER", foul: "FOUL", undo: "UNDO", turn: "END TURN", finish: "FINISH AND SAVE MATCH", home: "HOME", stats: "STATS" }
     };
-
-    let history = [];
 
     db.on('value', (snapshot) => {
         const data = snapshot.val();
         if (data) { state = data; updateUI(); }
     });
 
-    function updateUI() {
-        const activeEl = document.activeElement;
-        const l = dictionary[state.lang || 'no'];
-        if (activeEl && activeEl.classList.contains('player-name-input')) return;
+    // SETUP FUNKSJONALITET
+    let tempPlayers = 2;
+    function openSetup() { document.getElementById('setupOverlay').style.display = 'flex'; }
+    
+    function selectPlayers(n) {
+        tempPlayers = n;
+        document.getElementById('step1').style.display = 'none';
+        document.getElementById('step2').style.display = 'block';
+        const container = document.getElementById('nameInputs');
+        container.innerHTML = '';
+        for(let i=0; i<n; i++) {
+            container.innerHTML += `<input type="text" class="name-field" id="name${i}" placeholder="Navn spiller ${i+1}">`;
+        }
+    }
 
+    function finalizeSetup() {
+        const newNames = [];
+        for(let i=0; i<tempPlayers; i++) {
+            newNames.push(document.getElementById(`name${i}`).value || `Spiller ${i+1}`);
+        }
+        state.playerCount = tempPlayers;
+        state.names = newNames;
+        resetGame();
+        document.getElementById('setupOverlay').style.display = 'none';
+        document.getElementById('step2').style.display = 'none';
+        document.getElementById('step1').style.display = 'block';
+    }
+
+    function updateUI() {
+        const l = dictionary[state.lang || 'no'];
         document.getElementById('rotateBtn').innerText = l.rotate;
         document.getElementById('foulBtn').innerText = l.foul;
         document.getElementById('undoBtn').innerText = l.undo;
         document.getElementById('turnBtn').innerText = l.turn;
-        document.getElementById('resetMatchBtn').innerText = l.reset_btn;
         document.getElementById('finishBtn').innerText = l.finish;
         document.getElementById('navHome').innerText = l.home;
         document.getElementById('navStats').innerText = l.stats;
-
-        for(let i=1; i<=3; i++) {
-            const btn = document.getElementById(`m${i}`);
-            if(btn) btn.className = (state.playerCount === i) ? 'btn-mode active' : 'btn-mode';
-        }
 
         const container = document.getElementById('scoreboard-container');
         container.innerHTML = '';
@@ -206,7 +237,6 @@
         for (let i = 0; i < state.playerCount; i++) {
             const isActive = state.currentPlayer === i;
             const currentRun = isActive ? (state.scores[i] - state.scoreAtStart[i]) : 0;
-            const lastRun = state.lastSeries ? (state.lastSeries[i] || 0) : 0;
             const fouls = state.foulCounts ? state.foulCounts[i] : 0;
             let foulHtml = '<div style="display:flex; gap:6px; margin-top:12px;">';
             for (let d = 1; d <= 3; d++) foulHtml += `<div class="foul-dot ${d <= fouls ? 'active' : ''}"></div>`;
@@ -215,11 +245,11 @@
             container.innerHTML += `
                 <div class="player-card ${isActive ? 'active' : ''}">
                     <div class="player-info">
-                        <input class="player-name-input" value="${state.names[i]}" oninput="saveName(${i}, this.value)">
+                        <h2>${state.names[i]}</h2>
                         <div class="sub-stats">
-                            <div class="stat-item"><span style="color:#444">${l.now}</span> <span class="stat-val">${currentRun}</span></div>
-                            <div class="stat-item"><span style="color:#444">${l.best}</span> <span class="stat-val">${state.bestSeries[i] || 0}</span></div>
-                            <div class="stat-item"><span style="color:#444">${l.last}</span> <span class="stat-val">${lastRun}</span></div>
+                            <div class="stat-item">NÅ <span class="stat-val">${currentRun}</span></div>
+                            <div class="stat-item">BEST <span class="stat-val">${state.bestSeries[i] || 0}</span></div>
+                            <div class="stat-item">SISTE <span class="stat-val">${state.lastSeries[i] || 0}</span></div>
                         </div>
                         ${foulHtml}
                     </div>
@@ -233,24 +263,20 @@
 
         const isAtEnd = state.scores[state.currentPlayer] >= 90;
         const isLockedPocket = state.tableStatus === 'locked' && state.lastType === 'pocket';
-        const ballsWaiting = !state.breakDone || isLockedPocket || isAtEnd;
-        document.getElementById('ball1').className = ballsWaiting ? 'ball waiting-ball' : 'ball';
-        document.getElementById('ball5').className = ballsWaiting ? 'ball waiting-ball' : 'ball';
+        document.getElementById('ball1').className = (!state.breakDone || isLockedPocket || isAtEnd) ? 'ball waiting-ball' : 'ball';
+        document.getElementById('ball5').className = (!state.breakDone || isLockedPocket || isAtEnd) ? 'ball waiting-ball' : 'ball';
         document.getElementById('ball3').className = (isLockedPocket || isAtEnd) ? 'ball waiting-ball' : 'ball';
     }
 
     function toggleLanguage() { state.lang = (state.lang === 'no') ? 'en' : 'no'; db.child('lang').set(state.lang); }
-    function saveName(i, val) { state.names[i] = val; db.child('names').set(state.names); }
-    function setPlayerCount(n) { const l = dictionary[state.lang || 'no']; if(confirm(l.confirm_players.replace("{n}", n))) { state.playerCount = n; resetGame(); } }
     function rotateBreaker() { if(!state.breakDone) { state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; db.set(state); } }
     function action(type, val) { saveHistory(); let p = state.currentPlayer; if (state.scores[p] < 90 && state.scores[p] + val > 90) return; if (state.scores[p] >= 90 && state.scores[p] < 100 && state.scores[p] + val > 100) return; state.breakDone = true; state.foulCounts[p] = 0; if (type === 'pocket_carom') { state.tableStatus = 'open'; state.lastType = null; } else { state.tableStatus = 'locked'; state.lastType = type; } state.scores[p] += val; db.set(state); }
     function nextTurn() { saveHistory(); const p = state.currentPlayer; const roundScore = state.scores[p] - state.scoreAtStart[p]; if (roundScore > (state.bestSeries[p] || 0)) state.bestSeries[p] = roundScore; if (!state.lastSeries) state.lastSeries = [0,0,0]; state.lastSeries[p] = roundScore; state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; state.tableStatus = 'open'; state.lastType = null; state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; state.innings++; db.set(state); }
     function handleFoul() { saveHistory(); state.foulCounts[state.currentPlayer]++; if (state.foulCounts[state.currentPlayer] >= 3) { state.scores[state.currentPlayer] = 0; state.foulCounts[state.currentPlayer] = 0; } else { state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; } nextTurn(); }
     function saveHistory() { history.push(JSON.stringify(state)); }
     function undo() { if(history.length) { state = JSON.parse(history.pop()); db.set(state); } }
-    function resetGamePrompt() { const l = dictionary[state.lang || 'no']; if(confirm(l.confirm_reset)) resetGame(); }
-    function resetGame() { state.scores = [0,0,0]; state.foulCounts = [0,0,0]; state.breakDone = false; state.seconds = 0; state.innings = 0; state.bestSeries = [0,0,0]; state.lastSeries = [0,0,0]; state.currentPlayer = 0; db.set(state); }
-    function saveMatchToHistory() { const l = dictionary[state.lang || 'no']; if (confirm(l.confirm_finish)) { const historyRef = firebase.database().ref('matchHistory'); const kampData = { dato: new Date().toLocaleString('no-NO'), spillere: state.names.slice(0, state.playerCount), resultat: state.scores.slice(0, state.playerCount), varighet: document.getElementById('matchTimer').innerText, innings: Math.floor(state.innings / state.playerCount) + 1 }; historyRef.push(kampData).then(() => { resetGame(); }); } }
+    function resetGame() { state.scores = [0,0,0,0]; state.foulCounts = [0,0,0,0]; state.breakDone = false; state.seconds = 0; state.innings = 0; state.bestSeries = [0,0,0,0]; state.lastSeries = [0,0,0,0]; state.currentPlayer = 0; db.set(state); }
+    function saveMatchToHistory() { if (confirm("Lagre og avslutte?")) { const historyRef = firebase.database().ref('matchHistory'); const kampData = { dato: new Date().toLocaleString('no-NO'), spillere: state.names.slice(0, state.playerCount), resultat: state.scores.slice(0, state.playerCount), varighet: document.getElementById('matchTimer').innerText, innings: Math.floor(state.innings / state.playerCount) + 1 }; historyRef.push(kampData).then(() => { resetGame(); }); } }
     setInterval(() => { if (state.breakDone) { state.seconds++; firebase.database().ref('gameData/seconds').set(state.seconds); } }, 1000);
 </script>
 </body>
