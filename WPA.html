@@ -225,9 +225,14 @@
                     state.lastType = type;
                 }
             } else {
-                // Hvis låst: Pocket + Carom teller som å ha utført Pocket-kravet
+                // HVIS LÅST:
                 if (type === 'pocket_carom') {
-                    state.lastType = 'pocket'; 
+                    // Hvis du gjør Carom+ (Pocket+Carom), betyr det at du har gjort BEGGE.
+                    // Logikken må da sette "lastType" til det motsatte av det som var KRAVET,
+                    // slik at neste støt blir det man IKKE gjorde sist som hovedkrav.
+                    // Hvis kravet var Carom (lastType var pocket), så har du nå gjort Carom. Neste er Pocket.
+                    // Altså: lastType blir carom.
+                    state.lastType = (state.lastType === 'pocket') ? 'carom' : 'pocket';
                 } else {
                     state.lastType = type;
                 }
@@ -274,18 +279,15 @@
 
         document.getElementById('winButton').style.display = winPhase ? 'block' : 'none';
         
-        // Carom-knapper (låses kun ved vinn-fase eller hvis kravet er Pocket i Alternate)
         const caromDisabled = winPhase || (lockCarom && !caromPhase);
         document.getElementById('carom1PBtn').className = caromDisabled ? 'btn btn-blue waiting-ball' : 'btn btn-blue';
         document.getElementById('carom2PBtn').className = caromDisabled ? 'btn btn-blue waiting-ball' : 'btn btn-blue';
 
-        // Kulene gråes ut hvis man må carome eller er i sluttfasen
         const pocketDisabled = !state.breakDone || caromPhase || winPhase || lockPocket;
         document.getElementById('ball1').className = pocketDisabled ? 'ball waiting-ball' : 'ball';
         document.getElementById('ball5').className = pocketDisabled ? 'ball waiting-ball' : 'ball';
         document.getElementById('ball3').className = (caromPhase || winPhase || lockPocket) ? 'ball waiting-ball' : 'ball';
         
-        // CAROM+ knappene er ALLTID synlige unntatt ved 90+ poeng
         const subCaromDisabled = caromPhase || winPhase;
         document.getElementById('pc1').className = subCaromDisabled ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
         document.getElementById('pc5').className = subCaromDisabled ? 'btn-sub-carom waiting-ball' : 'btn-sub-carom';
@@ -296,7 +298,6 @@
         document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
     }
 
-    // Resten av funksjonene (checkActiveGame, nextTurn, etc.) forblir uendret
     function checkActiveGame() { document.getElementById('setupOverlay').style.display = 'flex'; if (state.scores.some(s => s > 0)) { document.getElementById('step-confirm').style.display = 'block'; document.getElementById('step1').style.display = 'none'; document.getElementById('step2').style.display = 'none'; } else { goToStep1(); } }
     function setMode(m) { tempMode = m; document.getElementById('modeStd').classList.toggle('selected', m === 'standard'); document.getElementById('modeAlt').classList.toggle('selected', m === 'alternate'); }
     function goToStep1() { document.getElementById('step-confirm').style.display = 'none'; document.getElementById('step1').style.display = 'block'; document.getElementById('step2').style.display = 'none'; setMode(tempMode); }
