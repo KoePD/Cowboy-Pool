@@ -2,14 +2,12 @@
 <html lang="no">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cowboy Pool Pro - Lobby</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biljard App - Pixel Perfect 1000%</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    
     <style>
         :root {
+            /* Den nøyaktige, mettede grønnfargen med dybde */
             --felt-green: radial-gradient(circle at center, #2fa34b 10%, #1a6331 50%, #082411 100%);
             --gold: #d4af37;
             --leather: #121212;
@@ -17,27 +15,32 @@
         }
 
         body {
-            background-color: #000;
+            background-color: #1a1a1a;
             display: flex;
             justify-content: center;
+            align-items: flex-start; /* Sørger for at innholdet starter øverst */
+            min-height: 100vh; /* Lar body strekke seg, men ikke containeren */
             margin: 0;
-            padding: 0;
+            padding: 20px;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            color: white;
         }
 
         .phone {
-            width: 100%;
-            max-width: 430px;
-            height: 100vh;
+            width: 360px;
+            /* ENDRING: Fjernet fast 'height: 760px' */
+            height: auto; /* Lar innholdet bestemme høyden */
             background: #082411;
+            border-radius: 45px;
+            border: 8px solid #282828;
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            margin-bottom: 20px; /* Litt luft i bunn */
         }
 
-        /* DUKEN */
+        /* DUKEN (Bakgrunnen i midten) */
         .felt-layer {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -45,27 +48,29 @@
             z-index: 1;
         }
 
+        /* Tekstur-lag uten pikselering */
         .felt-layer::after {
             content: "";
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             background-image: url("https://www.transparenttextures.com/patterns/felt.png");
-            opacity: 0.15;
+            opacity: 0.15; /* Skrur ned støyen for å unngå piksler */
             pointer-events: none;
         }
 
-        /* TOPP-PANEL */
+        /* TOPP-PANEL (Lær) */
         .header {
             background: var(--leather);
             background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png");
-            padding: 45px 25px 65px;
+            padding: 45px 25px 75px;
             z-index: 10;
-            border-bottom-left-radius: 50% 30px;
-            border-bottom-right-radius: 50% 30px;
+            border-bottom-left-radius: 50% 35px;
+            border-bottom-right-radius: 50% 35px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.9);
             position: relative;
         }
 
+        /* Søm-detalj langs buen */
         .header::after {
             content: "";
             position: absolute;
@@ -77,10 +82,18 @@
         .header h1 { color: #fff; margin: 0; font-size: 26px; letter-spacing: 0.5px; }
         .rank { color: var(--gold); font-size: 14px; margin: 6px 0; font-weight: 500; }
         
-        .progress-bar { width: 100%; height: 8px; background: #222; border-radius: 4px; margin-top: 15px; }
-        .progress-fill { width: 65%; height: 100%; background: linear-gradient(90deg, #b38f36, var(--gold)); border-radius: 4px; }
+        .progress-bar {
+            width: 100%; height: 8px; background: #222;
+            border-radius: 4px; margin-top: 15px; position: relative;
+        }
+        .progress-fill {
+            width: 65%; height: 100%;
+            background: linear-gradient(90deg, #b38f36, var(--gold));
+            box-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
+            border-radius: 4px;
+        }
 
-        /* MIDTPARTI */
+        /* MIDTPARTI (Kortene) */
         .main-felt {
             position: relative;
             z-index: 5;
@@ -88,12 +101,12 @@
             display: flex;
             justify-content: space-evenly;
             align-items: center;
-            padding: 20px 10px;
+            padding: 40px 10px; /* Økt padding for å gi mer luft rundt kortene */
         }
 
         .action-card {
-            width: 105px;
-            height: 120px;
+            width: 100px;
+            height: 115px;
             background: var(--card-bg);
             border: 1.5px solid var(--gold);
             border-radius: 15px;
@@ -103,24 +116,24 @@
             justify-content: center;
             color: #fff;
             box-shadow: inset 0 0 25px rgba(0,0,0,0.7), 0 8px 20px rgba(0,0,0,0.4);
-            backdrop-filter: blur(4px);
-            text-decoration: none;
+            backdrop-filter: blur(2px);
         }
 
         .action-card i { font-size: 34px; margin-bottom: 12px; color: var(--gold); }
         .action-card.green-icon i { color: #2ecc71; }
-        .action-card span { font-size: 10px; font-weight: 800; letter-spacing: 0.8px; text-align: center; }
+        .action-card span { font-size: 11px; font-weight: 800; letter-spacing: 0.8px; }
 
-        /* BUNN-PANEL */
+        /* BUNN-PANEL (Lær) */
         .bottom-panel {
             background: var(--leather);
             background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png");
-            padding: 65px 20px 30px;
+            padding: 75px 20px 20px;
             z-index: 10;
-            border-top-left-radius: 50% 30px;
-            border-top-right-radius: 50% 30px;
+            border-top-left-radius: 50% 35px;
+            border-top-right-radius: 50% 35px;
             box-shadow: 0 -15px 35px rgba(0,0,0,0.9);
             position: relative;
+            margin-top: -10px; /* Litt overlapp for å skjule kanten */
         }
 
         .bottom-panel::before {
@@ -132,35 +145,29 @@
         }
 
         .last-match {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid #222;
-            border-radius: 20px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid #333;
+            border-radius: 18px;
             padding: 18px;
-        }
-
-        .match-avatar { 
-            width: 52px; height: 52px; border-radius: 50%; 
-            background: #222; border: 2px solid #444; 
-            margin: 0 auto 5px; display: flex; align-items: center; justify-content: center;
-            font-weight: bold; color: var(--gold);
+            margin-bottom: 10px; /* Luft før navbar */
         }
 
         /* NAVBAR */
         .navbar {
-            background: #000;
-            height: 85px;
+            background: #0a0a0a;
+            height: 75px;
             display: flex;
             justify-content: space-around;
             align-items: center;
-            border-top: 1px solid #111;
+            border-top: 1px solid #222;
             z-index: 20;
-            padding-bottom: 15px;
+            margin-top: auto; /* Sørger for at den er nederst i containeren */
+            border-radius: 0 0 45px 45px; /* Matcher telefonens avrunding */
         }
 
-        .nav-item { color: #555; text-align: center; font-size: 10px; text-decoration: none; font-weight: bold; text-transform: uppercase; }
+        .nav-item { color: #666; text-align: center; font-size: 11px; text-decoration: none; }
         .nav-item.active { color: var(--gold); }
-        .nav-item i { display: block; font-size: 22px; margin-bottom: 5px; }
-        .lasso i { transform: rotate(-15deg); } /* Lasso-vinkelen */
+        .nav-item i { display: block; font-size: 24px; margin-bottom: 5px; }
 
     </style>
 </head>
@@ -170,95 +177,54 @@
     <div class="felt-layer"></div>
 
     <header class="header">
-        <h1 id="greetName">Hei, Cowboy!</h1>
+        <h1>Hei, Marius!</h1>
         <div class="rank">Cowboy Rank: <span>Level 12 - Gunslinger</span></div>
         <div class="progress-bar"><div class="progress-fill"></div></div>
     </header>
 
     <main class="main-felt">
-        <a href="index.html?setup=true" class="action-card green-icon">
-            <i class="fa-solid fa-circle-plus"></i>
+        <div class="action-card green-icon">
+            <i class="fa-solid fa-plus"></i>
             <span>NY KAMP</span>
-        </a>
-        <a href="CBstats.html" class="action-card">
+        </div>
+        <div class="action-card">
             <i class="fa-solid fa-trophy"></i>
             <span>TOPPLISTE</span>
-        </a>
-        <a href="#" class="action-card">
+        </div>
+        <div class="action-card">
             <i class="fa-solid fa-book-open"></i>
             <span>REGLER</span>
-        </a>
+        </div>
     </main>
 
     <section class="bottom-panel">
         <div class="last-match">
-            <div style="color:#666; font-size:11px; margin-bottom:15px; font-weight:900; text-transform: uppercase; letter-spacing: 1px;">Min Siste Kamp</div>
+            <div style="color:#888; font-size:12px; margin-bottom:12px; font-weight:bold;">Min Siste Kamp</div>
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div style="text-align:center; flex: 1;">
-                    <div class="match-avatar" id="p1Avatar" style="border-color: var(--gold);">?</div>
-                    <div style="color:#fff; font-size:12px; font-weight: bold;" id="p1Name">Laster...</div>
+                <div style="text-align:center;">
+                    <div style="width:52px; height:52px; border-radius:50%; background:#333; border:2px solid var(--gold); margin-bottom:5px;"></div>
+                    <div style="color:#fff; font-size:12px;">Mav</div>
                 </div>
-                
-                <div style="text-align:center; flex: 1;">
-                    <div style="font-size:26px; font-weight:900; color:#fff; letter-spacing: -1px;">
-                        <span id="p1Score" style="color:#2ecc71">0</span> - <span id="p2Score" style="color:var(--gold)">0</span>
+                <div style="text-align:center;">
+                    <div style="font-size:28px; font-weight:900; color:#fff;">
+                        <span style="color:#2ecc71">100</span> - <span style="color:var(--gold)">82</span>
                     </div>
-                    <div id="winTag" style="color:#2ecc71; font-size:10px; font-weight:900; margin-top:4px; display: none;">WIN</div>
+                    <div style="color:#2ecc71; font-size:10px; font-weight:bold; margin-top:2px;">WIN</div>
                 </div>
-                
-                <div style="text-align:center; flex: 1;">
-                    <div class="match-avatar" id="p2Avatar">?</div>
-                    <div style="color:#fff; font-size:12px; font-weight: bold;" id="p2Name">Laster...</div>
+                <div style="text-align:center;">
+                    <div style="width:52px; height:52px; border-radius:50%; background:#333; border:2px solid #444; margin-bottom:5px;"></div>
+                    <div style="color:#fff; font-size:12px;">Per</div>
                 </div>
             </div>
         </div>
     </section>
 
     <nav class="navbar">
-        <a href="home.html" class="nav-item active"><i class="fa-solid fa-house"></i>Hjem</a>
-        <a href="index.html" class="nav-item lasso"><i class="fa-solid fa-infinity"></i>Range</a>
-        <a href="profile.html" class="nav-item"><i class="fa-solid fa-user"></i>Profil</a>
-        <a href="CBstats.html" class="nav-item"><i class="material-icons">leaderboard</i>Stats</a>
+        <a href="#" class="nav-item active"><i class="fa-solid fa-house"></i>Hjem</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-trophy"></i>Toppliste</a>
+        <a href="#" class="nav-item"><i class="fa-solid fa-book"></i>Regler</a>
     </nav>
 </div>
-
-<script>
-    // Din Firebase Config
-    const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    // 1. Hent brukernavn for hilsen
-    db.ref('gameData/names').once('value', (s) => {
-        if(s.val()) document.getElementById('greetName').innerText = "Hei, " + s.val()[0] + "!";
-    });
-
-    // 2. Hent faktisk informasjon om siste kamp
-    db.ref('matchHistory').limitToLast(1).on('value', (s) => {
-        if(s.val()) {
-            const lastMatch = Object.values(s.val())[0];
-            
-            // Oppdater navn
-            const name1 = lastMatch.names[0];
-            const name2 = lastMatch.names[1] || "P2";
-            document.getElementById('p1Name').innerText = name1;
-            document.getElementById('p2Name').innerText = name2;
-            
-            // Oppdater bokstaver i sirkler
-            document.getElementById('p1Avatar').innerText = name1.charAt(0).toUpperCase();
-            document.getElementById('p2Avatar').innerText = name2.charAt(0).toUpperCase();
-            
-            // Oppdater poeng
-            const s1 = lastMatch.scores[0];
-            const s2 = lastMatch.scores[1];
-            document.getElementById('p1Score').innerText = s1;
-            document.getElementById('p2Score').innerText = s2;
-            
-            // Vis WIN-tag hvis P1 vant (101 poeng)
-            if(s1 === 101) document.getElementById('winTag').style.display = 'block';
-        }
-    });
-</script>
 
 </body>
 </html>
