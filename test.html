@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cowboy Pool Pro - Massive UI</title>
+    <title>Cowboy Pool Pro - Ultra Massive UI</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
@@ -41,7 +41,8 @@
         .main-content { 
             position: relative; z-index: 5; flex-grow: 1; 
             display: flex; flex-direction: column; 
-            padding: 5px 15px; width: 100%; box-sizing: border-box;
+            padding: 5px 10px; /* Redusert sidepadding for å gi plass til bredere kuler */
+            width: 100%; box-sizing: border-box;
             overflow-y: auto;
         }
 
@@ -78,21 +79,22 @@
 
         .ball-control-zone { 
             display: flex; justify-content: space-around; background: rgba(0,0,0,0.75); 
-            padding: 35px 5px; border-radius: 0 0 50px 50px; 
+            padding: 35px 2px; /* Minimal sidepadding for å gi plass til bredden */
+            border-radius: 0 0 50px 50px; 
             border: 1px solid rgba(255,255,255,0.05); border-top: none; margin-bottom: 20px; 
         }
-        .ball-group { display: flex; flex-direction: column; align-items: center; gap: 15px; width: 33%; }
+        .ball-group { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 33%; }
         
-        /* GIGANTISKE KULER */
+        /* ULTRA GIGANTISKE KULER (MAKS BREDDE) */
         .ball { 
-            width: 120px; height: 120px; 
+            width: 135px; height: 135px; /* Økt fra 120px - MAKS bredde for 3 på rad */
             border-radius: 50%; border: none; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            box-shadow: inset -8px -8px 25px rgba(0,0,0,0.9), 8px 18px 30px rgba(0,0,0,0.8); 
+            box-shadow: inset -10px -10px 30px rgba(0,0,0,0.9), 10px 20px 35px rgba(0,0,0,0.8); 
             transition: transform 0.1s;
         }
         .ball:active { transform: scale(0.92); }
-        .ball-inner { width: 40px; height: 40px; background: white; border-radius: 50%; color: black; font-weight: 950; display: flex; align-items: center; justify-content: center; border: 3px solid #000; font-size: 22px; }
+        .ball-inner { width: 45px; height: 45px; background: white; border-radius: 50%; color: black; font-weight: 950; display: flex; align-items: center; justify-content: center; border: 3px solid #000; font-size: 24px; }
         
         /* SMALERE + CAROM KNAPP */
         .btn-sub-carom { 
