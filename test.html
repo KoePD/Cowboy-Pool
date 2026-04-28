@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cowboy Pool Pro - Expanded UI</title>
+    <title>Cowboy Pool Pro - Ultra Expanded</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
@@ -24,16 +24,16 @@
         .felt-base { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--felt-green); z-index: 1; }
         .felt-texture { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: url("https://www.transparenttextures.com/patterns/felt.png"); opacity: 0.12; z-index: 2; pointer-events: none; }
 
-        /* LÆR RAMME */
+        /* LÆR RAMME (MINIMALISTISK I RANGE) */
         .header { 
             background: var(--leather); background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png"); 
-            padding: 30px 30px 45px; z-index: 10; 
+            padding: 20px 30px 35px; z-index: 10; 
             border-bottom-left-radius: 50% 20px; border-bottom-right-radius: 50% 20px; 
             box-shadow: 0 15px 30px rgba(0,0,0,0.8);
         }
         .bottom-panel { 
             background: var(--leather); background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png"); 
-            padding: 45px 30px 10px; z-index: 10; 
+            padding: 35px 30px 10px; z-index: 10; 
             border-top-left-radius: 50% 20px; border-top-right-radius: 50% 20px; 
             box-shadow: 0 -15px 30px rgba(0,0,0,0.8);
         }
@@ -41,75 +41,77 @@
         .main-content { 
             position: relative; z-index: 5; flex-grow: 1; 
             display: flex; flex-direction: column; 
-            padding: 20px; width: 100%; box-sizing: border-box;
+            padding: 10px 15px; width: 100%; box-sizing: border-box;
             justify-content: flex-start;
         }
 
-        /* LENGER SPILLERBOKSER MED MER GAP */
-        #scoreboard-container { width: 100%; margin-bottom: 20px; }
+        /* GIGANTISKE BOKSER SOM DEKKER 70% AV ROMMET */
+        #scoreboard-container { width: 100%; margin-bottom: 10px; }
 
         .player-card { 
             background: linear-gradient(180deg, #0a0a0a 0%, #000 100%); 
-            border-radius: 24px; 
-            padding: 25px 30px; /* Mer padding inni */
-            margin-bottom: 20px; /* MER GAP MELLOM BOKSENE */
+            border-radius: 28px; 
+            min-height: 120px; /* Gjør boksene mye høyere */
+            padding: 20px 30px; 
+            margin-bottom: 25px; /* Store gap hvor bakgrunnen synes */
             border: 1px solid rgba(255,255,255,0.08); 
             display: flex; 
             justify-content: space-between; 
             align-items: center;
-            width: 100%; /* Fyller hele bredden */
+            width: 100%; 
             box-sizing: border-box;
+            transition: 0.3s;
         }
-        .player-card.active { border: 3px solid var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.9); }
+        .player-card.active { border: 4px solid var(--gold); box-shadow: 0 15px 40px rgba(0,0,0,0.9); transform: scale(1.02); }
         
-        /* STØRRE TEKST INNI BOKSENE */
-        .player-info h2 { margin: 0; font-size: 1.6em; text-transform: uppercase; color: #555; letter-spacing: 2px; }
+        /* EKSTREMT STOR TEKST */
+        .player-info h2 { margin: 0; font-size: 2em; text-transform: uppercase; color: #444; letter-spacing: 3px; font-weight: 800; }
         .active .player-info h2 { color: var(--gold); }
         
-        .score-display { font-size: 4.5em; font-weight: 950; line-height: 1; color: #222; }
-        .active .score-display { color: var(--gold); }
+        .score-display { font-size: 6em; font-weight: 950; line-height: 1; color: #1a1a1a; }
+        .active .score-display { color: var(--gold); text-shadow: 0 0 20px rgba(241, 196, 15, 0.3); }
         
-        .sub-stats { font-size: 0.8em; color: #444; margin-top: 15px; display: flex; gap: 25px; text-transform: uppercase; font-weight: 900; }
-        .active .sub-stats { color: #aaa; }
-        .stat-val { color: #fff; font-size: 1.2em; }
+        .sub-stats { font-size: 0.9em; color: #333; margin-top: 15px; display: flex; gap: 30px; text-transform: uppercase; font-weight: 900; }
+        .active .sub-stats { color: #888; }
+        .stat-val { color: #fff; font-size: 1.3em; }
 
-        .foul-dot { width: 15px; height: 15px; border-radius: 50%; background: #1a1a1a; border: 1px solid #222; display: inline-block; margin-right: 8px; }
-        .foul-dot.active { background: #e74c3c; box-shadow: 0 0 12px #ff4757; }
+        .foul-dot { width: 18px; height: 18px; border-radius: 50%; background: #111; border: 1px solid #222; display: inline-block; margin-right: 10px; }
+        .foul-dot.active { background: #e74c3c; box-shadow: 0 0 15px #ff4757; }
 
-        /* KONTROLLER */
-        .controls-group { width: 100%; margin-top: auto; margin-bottom: 10px; }
+        /* KONTROLL-SEKSJON */
+        .controls-group { width: 100%; margin-top: auto; }
 
-        .game-status-zone { background: rgba(0, 0, 0, 0.7); padding: 15px; border-radius: 20px 20px 0 0; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
-        .req-text { font-size: 1em; letter-spacing: 3px; color: #2ecc71; font-weight: 900; text-transform: uppercase; }
-        .timer-text { font-family: monospace; font-size: 1.6em; color: var(--gold); margin-top: 4px; display: block; }
+        .game-status-zone { background: rgba(0, 0, 0, 0.8); padding: 15px; border-radius: 25px 25px 0 0; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+        .req-text { font-size: 1.2em; letter-spacing: 4px; color: #2ecc71; font-weight: 900; text-transform: uppercase; }
+        .timer-text { font-family: monospace; font-size: 1.8em; color: var(--gold); margin-top: 5px; display: block; }
 
         .ball-control-zone { 
-            display: flex; justify-content: space-around; background: rgba(0,0,0,0.6); 
-            padding: 25px 10px; border-radius: 0 0 40px 40px; 
+            display: flex; justify-content: space-around; background: rgba(0,0,0,0.7); 
+            padding: 30px 10px; border-radius: 0 0 45px 45px; 
             border: 1px solid rgba(255,255,255,0.05); border-top: none; margin-bottom: 20px; 
         }
         .ball { 
-            width: 80px; height: 80px; border-radius: 50%; border: none; 
-            box-shadow: inset -5px -5px 15px rgba(0,0,0,0.8), 5px 12px 20px rgba(0,0,0,0.6); 
+            width: 90px; height: 90px; border-radius: 50%; border: none; 
+            box-shadow: inset -5px -5px 20px rgba(0,0,0,0.9), 5px 15px 25px rgba(0,0,0,0.7); 
         }
 
-        /* KNAPPER MED EKSTRA STOR TEKST */
-        .action-area { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        /* KNAPPER */
+        .action-area { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .btn { 
-            padding: 22px 10px; border-radius: 20px; border: none; 
+            padding: 25px 10px; border-radius: 22px; border: none; 
             font-weight: 900; text-transform: uppercase; cursor: pointer; 
-            font-size: 1.2em; color: white; letter-spacing: 1px;
+            font-size: 1.3em; color: white;
         }
-        .btn-blue { background: #2980b9; border-bottom: 6px solid #1c5982; }
-        .btn-foul { background: #c0392b; border-bottom: 6px solid #7b241c; }
+        .btn-blue { background: #2980b9; border-bottom: 7px solid #1c5982; }
+        .btn-foul { background: #c0392b; border-bottom: 7px solid #7b241c; }
         .btn-turn { 
-            background: #27ae60; border-bottom: 6px solid #1e8449; 
-            grid-column: span 2; padding: 28px; font-size: 1.6em; margin-top: 8px;
+            background: #27ae60; border-bottom: 8px solid #1e8449; 
+            grid-column: span 2; padding: 35px; font-size: 1.8em;
         }
 
         /* NAVBAR */
-        .navbar { background: #000; height: 85px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #111; z-index: 20; padding-bottom: 25px; }
-        .nav-item { color: #444; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: bold; }
+        .navbar { background: #000; height: 90px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #111; z-index: 20; padding-bottom: 25px; }
+        .nav-item { color: #333; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 12px; font-weight: 900; }
         .nav-item.active { color: var(--gold); }
     </style>
 </head>
@@ -124,14 +126,14 @@
         <div id="scoreboard-container">
             <div class="player-card active">
                 <div class="player-info">
-                    <h2>PLAYER 1</h2>
+                    <h2>MARIUS</h2>
                     <div class="sub-stats">
-                        <div>NÅ <span class="stat-val">0</span></div>
-                        <div>BEST <span class="stat-val">3</span></div>
-                        <div>SISTE <span class="stat-val">3</span></div>
+                        <div>NÅ <span class="stat-val">14</span></div>
+                        <div>BEST <span class="stat-val">32</span></div>
+                        <div>SISTE <span class="stat-val">12</span></div>
                     </div>
                 </div>
-                <div class="score-display">3</div>
+                <div class="score-display">82</div>
             </div>
 
             <div class="player-card">
@@ -139,14 +141,14 @@
                     <h2>PLAYER 2</h2>
                     <div class="sub-stats">
                         <div>NÅ <span class="stat-val">0</span></div>
-                        <div>BEST <span class="stat-val">0</span></div>
-                        <div>SISTE <span class="stat-val">0</span></div>
+                        <div>BEST <span class="stat-val">18</span></div>
+                        <div>SISTE <span class="stat-val">5</span></div>
                     </div>
-                    <div style="margin-top:15px;">
+                    <div style="margin-top:20px;">
                         <div class="foul-dot active"></div><div class="foul-dot"></div><div class="foul-dot"></div>
                     </div>
                 </div>
-                <div class="score-display">0</div>
+                <div class="score-display">45</div>
             </div>
 
             <div class="player-card">
@@ -164,7 +166,7 @@
 
         <div class="controls-group">
             <div class="game-status-zone">
-                <span class="req-text">BREKK-STØT</span>
+                <span class="req-text">VELG: CAROM / POCKET</span>
                 <span class="timer-text">00:21:36</span>
             </div>
 
