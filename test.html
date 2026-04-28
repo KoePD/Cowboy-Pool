@@ -239,8 +239,39 @@
         .then(() => { handleRematch(); });
     }
 
-    function handleFoul() { saveHistory(); state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; state.foulCounts[state.currentPlayer]++; if(state.foulCounts[state.currentPlayer] >= 3) { state.scores[state.currentPlayer] = 0; state.foulCounts[state.currentPlayer] = 0; } nextTurn(); }
-    function nextTurn() { saveHistory(); let p = state.currentPlayer; if(state.currentPlayer === state.playerCount - 1) state.innings++; state.currentPlayer = (state.currentPlayer + 1) % state.playerCount; state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; db.set(state); }
+    function handleFoul() {
+    saveHistory();
+    // Når noen bommer eller fouler på brekket, er brekket uansett utført for resten av kampen
+    state.breakDone = true; 
+    
+    state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer];
+    state.foulCounts[state.currentPlayer]++;
+    
+    if(state.foulCounts[state.currentPlayer] >= 3) {
+        state.scores[state.currentPlayer] = 0;
+        state.foulCounts[state.currentPlayer] = 0;
+    }
+    nextTurn();
+}
+    function nextTurn() {
+    saveHistory();
+    // Markerer brekket som gjort uansett hvem som avslutter turen sin
+    state.breakDone = true; 
+
+    let p = state.currentPlayer;
+    let s = state.scores[p] - state.scoreAtStart[p];
+    
+    if(s > state.bestSeries[p]) state.bestSeries[p] = s;
+    
+    if(state.currentPlayer === state.playerCount - 1) {
+        state.innings++;
+    }
+    
+    state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
+    state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer];
+    
+    db.set(state);
+}
     function undo() { if(history.length) { state = JSON.parse(history.pop()); db.set(state); } }
     function saveHistory() { history.push(JSON.stringify(state)); if(history.length > 10) history.shift(); }
     setInterval(() => { if(state.breakDone) { state.seconds++; db.child('seconds').set(state.seconds); } }, 1000);
