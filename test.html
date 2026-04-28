@@ -41,7 +41,7 @@
         .main-content { 
             position: relative; z-index: 5; flex-grow: 1; 
             display: flex; flex-direction: column; 
-            padding: 5px 10px; /* Redusert sidepadding for å gi plass til bredere kuler */
+            padding: 5px 10px; 
             width: 100%; box-sizing: border-box;
             overflow-y: auto;
         }
@@ -51,43 +51,50 @@
         /* SCOREBOARD */
         .player-card { 
             background: linear-gradient(180deg, #0a0a0a 0%, #000 100%); 
-            border-radius: 30px; min-height: 130px; padding: 25px 35px; 
+            border-radius: 30px; min-height: 130px; padding: 25px 30px; 
             margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.08); 
-            display: flex; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box;
+            display: flex; align-items: center; width: 100%; box-sizing: border-box;
+            gap: 20px;
         }
         .player-card.active { border: 5px solid var(--gold); box-shadow: 0 20px 50px rgba(0,0,0,0.9); transform: scale(1.02); }
         
-        .player-info h2 { margin: 0; font-size: 2.2em; text-transform: uppercase; color: #333; font-weight: 900; letter-spacing: 2px; }
-        .active .player-info h2 { color: var(--gold); }
-        .score-display { font-size: 6.5em; font-weight: 950; line-height: 1; color: #111; }
-        .active .score-display { color: var(--gold); }
-        
-        .sub-stats { font-size: 1em; color: #222; margin-top: 15px; display: flex; gap: 30px; text-transform: uppercase; font-weight: 900; }
-        .active .sub-stats { color: #888; }
-        .stat-val { color: #fff; font-size: 1.3em; }
-
-        .foul-container { margin-top: 15px; display: flex; gap: 12px; }
-        .foul-dot { width: 20px; height: 20px; border-radius: 50%; background: #000; border: 1px solid #222; }
+        .foul-sidebar { display: flex; flex-direction: column; gap: 10px; }
+        .foul-dot { width: 18px; height: 18px; border-radius: 50%; background: #000; border: 1px solid #222; }
         .foul-dot.active { background: #e74c3c; box-shadow: 0 0 15px #ff4757; }
 
-        /* KONTROLLER - MASSIVE */
-        .controls-group { width: 100%; margin-top: auto; padding-bottom: 5px; }
+        .player-info { flex-grow: 1; display: flex; flex-direction: column; }
+        .player-info h2 { margin: 0; font-size: 1.8em; text-transform: uppercase; color: #333; font-weight: 900; letter-spacing: 1px; }
+        .active .player-info h2 { color: var(--gold); }
+        
+        .sub-stats { margin-top: 10px; display: flex; gap: 25px; }
+        .stat-group { display: flex; flex-direction: column; align-items: flex-start; }
+        .stat-label { font-size: 0.9em; color: #222; text-transform: uppercase; font-weight: 900; margin-bottom: 2px; }
+        .active .stat-label { color: #888; }
+        .stat-val { color: #fff; font-size: 1.3em; font-weight: 900; }
 
+        .score-display { font-size: 6.5em; font-weight: 950; line-height: 1; color: #111; text-align: right; min-width: 1.2em; }
+        .active .score-display { color: var(--gold); }
+
+        /* KONTROLLER */
+        .controls-group { width: 100%; margin-top: auto; padding-bottom: 5px; }
+        
         .game-status-zone { background: rgba(0, 0, 0, 0.85); padding: 15px; border-radius: 25px 25px 0 0; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
-        .req-text { font-size: 1.2em; letter-spacing: 4px; color: #2ecc71; font-weight: 900; text-transform: uppercase; }
-        .timer-text { font-family: monospace; font-size: 1.8em; color: var(--gold); margin-top: 5px; display: block; }
+        
+        /* STØRRE TEKST */
+        .req-text { font-size: 1.6em; letter-spacing: 4px; color: #2ecc71; font-weight: 900; text-transform: uppercase; }
+        /* STØRRE TID */
+        .timer-text { font-family: monospace; font-size: 2.5em; color: var(--gold); margin-top: 5px; display: block; }
 
         .ball-control-zone { 
             display: flex; justify-content: space-around; background: rgba(0,0,0,0.75); 
-            padding: 35px 2px; /* Minimal sidepadding for å gi plass til bredden */
+            padding: 35px 2px; 
             border-radius: 0 0 50px 50px; 
             border: 1px solid rgba(255,255,255,0.05); border-top: none; margin-bottom: 20px; 
         }
         .ball-group { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 33%; }
         
-        /* ULTRA GIGANTISKE KULER (MAKS BREDDE) */
         .ball { 
-            width: 135px; height: 135px; /* Økt fra 120px - MAKS bredde for 3 på rad */
+            width: 135px; height: 135px; 
             border-radius: 50%; border: none; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
             box-shadow: inset -10px -10px 30px rgba(0,0,0,0.9), 10px 20px 35px rgba(0,0,0,0.8); 
@@ -96,7 +103,6 @@
         .ball:active { transform: scale(0.92); }
         .ball-inner { width: 45px; height: 45px; background: white; border-radius: 50%; color: black; font-weight: 950; display: flex; align-items: center; justify-content: center; border: 3px solid #000; font-size: 24px; }
         
-        /* SMALERE + CAROM KNAPP */
         .btn-sub-carom { 
             background: rgba(52, 152, 219, 0.2); color: #3498db; border: 2px solid #3498db; 
             border-radius: 15px; padding: 12px 15px; 
@@ -104,15 +110,13 @@
             text-transform: uppercase; width: fit-content; min-width: 80px;
         }
 
-        /* MASSIVE ACTION BUTTONS */
         .action-area { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .btn { padding: 30px 10px; border-radius: 25px; border: none; font-weight: 900; text-transform: uppercase; cursor: pointer; font-size: 1.4em; color: white; }
         .btn-blue { background: #2980b9; border-bottom: 8px solid #1c5982; }
         .btn-foul { background: #c0392b; border-bottom: 8px solid #7b241c; }
         .btn-turn { background: #27ae60; border-bottom: 10px solid #1e8449; grid-column: span 2; padding: 40px; font-size: 2em; margin-top: 10px; }
 
-        /* NAVBAR */
-        .navbar { background: #000; height: 95px; display: flex; justify-content: space-around; align-items: center; border-top: 2px solid #111; z-index: 20; padding-bottom: 25px; }
+        .navbar { background: #000; height: 95px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #111; z-index: 20; padding-bottom: 25px; }
         .nav-item { color: #333; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 12px; font-weight: 900; }
         .nav-item.active { color: var(--gold); }
     </style>
@@ -129,42 +133,60 @@
 
         <div id="scoreboard-container">
             <div class="player-card active">
+                <div class="foul-sidebar">
+                    <div class="foul-dot active"></div><div class="foul-dot"></div><div class="foul-dot"></div>
+                </div>
                 <div class="player-info">
                     <h2>MARIUS</h2>
                     <div class="sub-stats">
-                        <div>NÅ <span class="stat-val">12</span></div>
-                        <div>BEST <span class="stat-val">32</span></div>
-                    </div>
-                    <div class="foul-container">
-                        <div class="foul-dot active"></div><div class="foul-dot"></div><div class="foul-dot"></div>
+                        <div class="stat-group">
+                            <span class="stat-label">NÅ</span>
+                            <span class="stat-val">12</span>
+                        </div>
+                        <div class="stat-group">
+                            <span class="stat-label">BEST</span>
+                            <span class="stat-val">32</span>
+                        </div>
                     </div>
                 </div>
                 <div class="score-display">82</div>
             </div>
 
             <div class="player-card">
+                <div class="foul-sidebar">
+                    <div class="foul-dot"></div><div class="foul-dot"></div><div class="foul-dot"></div>
+                </div>
                 <div class="player-info">
                     <h2>PLAYER 2</h2>
                     <div class="sub-stats">
-                        <div>NÅ <span class="stat-val">0</span></div>
-                        <div>BEST <span class="stat-val">15</span></div>
-                    </div>
-                    <div class="foul-container">
-                        <div class="foul-dot"></div><div class="foul-dot"></div><div class="foul-dot"></div>
+                        <div class="stat-group">
+                            <span class="stat-label">NÅ</span>
+                            <span class="stat-val">0</span>
+                        </div>
+                        <div class="stat-group">
+                            <span class="stat-label">BEST</span>
+                            <span class="stat-val">15</span>
+                        </div>
                     </div>
                 </div>
                 <div class="score-display">45</div>
             </div>
 
             <div class="player-card">
+                <div class="foul-sidebar">
+                    <div class="foul-dot"></div><div class="foul-dot"></div><div class="foul-dot"></div>
+                </div>
                 <div class="player-info">
                     <h2>PLAYER 3</h2>
                     <div class="sub-stats">
-                        <div>NÅ <span class="stat-val">0</span></div>
-                        <div>BEST <span class="stat-val">0</span></div>
-                    </div>
-                    <div class="foul-container">
-                        <div class="foul-dot"></div><div class="foul-dot"></div><div class="foul-dot"></div>
+                        <div class="stat-group">
+                            <span class="stat-label">NÅ</span>
+                            <span class="stat-val">0</span>
+                        </div>
+                        <div class="stat-group">
+                            <span class="stat-label">BEST</span>
+                            <span class="stat-val">0</span>
+                        </div>
                     </div>
                 </div>
                 <div class="score-display">0</div>
