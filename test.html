@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cowboy Pool Pro - Ultra Expanded</title>
+    <title>Cowboy Pool Pro - Perfect Range</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
     <style>
         :root {
             --felt-green: radial-gradient(circle at center, #1e4d2b 0%, #0a1a0f 100%);
@@ -24,17 +26,17 @@
         .felt-base { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--felt-green); z-index: 1; }
         .felt-texture { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: url("https://www.transparenttextures.com/patterns/felt.png"); opacity: 0.12; z-index: 2; pointer-events: none; }
 
-        /* LÆR RAMME (MINIMALISTISK I RANGE) */
+        /* RAMME */
         .header { 
             background: var(--leather); background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png"); 
-            padding: 20px 30px 35px; z-index: 10; 
-            border-bottom-left-radius: 50% 20px; border-bottom-right-radius: 50% 20px; 
+            padding: 25px 30px 40px; z-index: 10; 
+            border-bottom-left-radius: 50% 25px; border-bottom-right-radius: 50% 25px; 
             box-shadow: 0 15px 30px rgba(0,0,0,0.8);
         }
         .bottom-panel { 
             background: var(--leather); background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png"); 
-            padding: 35px 30px 10px; z-index: 10; 
-            border-top-left-radius: 50% 20px; border-top-right-radius: 50% 20px; 
+            padding: 40px 30px 10px; z-index: 10; 
+            border-top-left-radius: 50% 25px; border-top-right-radius: 50% 25px; 
             box-shadow: 0 -15px 30px rgba(0,0,0,0.8);
         }
 
@@ -42,95 +44,87 @@
             position: relative; z-index: 5; flex-grow: 1; 
             display: flex; flex-direction: column; 
             padding: 10px 15px; width: 100%; box-sizing: border-box;
-            justify-content: flex-start;
+            overflow-y: auto;
         }
 
-        /* GIGANTISKE BOKSER SOM DEKKER 70% AV ROMMET */
-        #scoreboard-container { width: 100%; margin-bottom: 10px; }
+        /* SPACER FOR Å GI LUFT I TOPPEN */
+        .top-spacer { height: 25px; width: 100%; }
 
+        /* SCOREBOARD */
         .player-card { 
             background: linear-gradient(180deg, #0a0a0a 0%, #000 100%); 
-            border-radius: 28px; 
-            min-height: 120px; /* Gjør boksene mye høyere */
-            padding: 20px 30px; 
-            margin-bottom: 25px; /* Store gap hvor bakgrunnen synes */
-            border: 1px solid rgba(255,255,255,0.08); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            width: 100%; 
-            box-sizing: border-box;
-            transition: 0.3s;
+            border-radius: 28px; min-height: 120px; padding: 20px 30px; 
+            margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.08); 
+            display: flex; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box;
         }
         .player-card.active { border: 4px solid var(--gold); box-shadow: 0 15px 40px rgba(0,0,0,0.9); transform: scale(1.02); }
         
-        /* EKSTREMT STOR TEKST */
-        .player-info h2 { margin: 0; font-size: 2em; text-transform: uppercase; color: #444; letter-spacing: 3px; font-weight: 800; }
+        .player-info h2 { margin: 0; font-size: 1.8em; text-transform: uppercase; color: #444; letter-spacing: 2px; font-weight: 800; }
         .active .player-info h2 { color: var(--gold); }
+        .score-display { font-size: 5.5em; font-weight: 950; line-height: 1; color: #1a1a1a; }
+        .active .score-display { color: var(--gold); }
         
-        .score-display { font-size: 6em; font-weight: 950; line-height: 1; color: #1a1a1a; }
-        .active .score-display { color: var(--gold); text-shadow: 0 0 20px rgba(241, 196, 15, 0.3); }
-        
-        .sub-stats { font-size: 0.9em; color: #333; margin-top: 15px; display: flex; gap: 30px; text-transform: uppercase; font-weight: 900; }
+        .sub-stats { font-size: 0.8em; color: #333; margin-top: 12px; display: flex; gap: 25px; text-transform: uppercase; font-weight: 900; }
         .active .sub-stats { color: #888; }
-        .stat-val { color: #fff; font-size: 1.3em; }
+        .stat-val { color: #fff; font-size: 1.2em; }
 
-        .foul-dot { width: 18px; height: 18px; border-radius: 50%; background: #111; border: 1px solid #222; display: inline-block; margin-right: 10px; }
-        .foul-dot.active { background: #e74c3c; box-shadow: 0 0 15px #ff4757; }
+        .foul-container { margin-top: 15px; display: flex; gap: 8px; }
+        .foul-dot { width: 16px; height: 16px; border-radius: 50%; background: #111; border: 1px solid #222; }
+        .foul-dot.active { background: #e74c3c; box-shadow: 0 0 12px #ff4757; }
 
-        /* KONTROLL-SEKSJON */
-        .controls-group { width: 100%; margin-top: auto; }
+        /* KONTROLLER */
+        .controls-group { width: 100%; margin-top: auto; padding-bottom: 10px; }
 
         .game-status-zone { background: rgba(0, 0, 0, 0.8); padding: 15px; border-radius: 25px 25px 0 0; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
-        .req-text { font-size: 1.2em; letter-spacing: 4px; color: #2ecc71; font-weight: 900; text-transform: uppercase; }
-        .timer-text { font-family: monospace; font-size: 1.8em; color: var(--gold); margin-top: 5px; display: block; }
+        .req-text { font-size: 1.1em; letter-spacing: 3px; color: #2ecc71; font-weight: 900; text-transform: uppercase; }
+        .timer-text { font-family: monospace; font-size: 1.6em; color: var(--gold); margin-top: 4px; display: block; }
 
         .ball-control-zone { 
             display: flex; justify-content: space-around; background: rgba(0,0,0,0.7); 
-            padding: 30px 10px; border-radius: 0 0 45px 45px; 
-            border: 1px solid rgba(255,255,255,0.05); border-top: none; margin-bottom: 20px; 
+            padding: 25px 10px; border-radius: 0 0 45px 45px; 
+            border: 1px solid rgba(255,255,255,0.05); border-top: none; margin-bottom: 15px; 
         }
+        .ball-group { display: flex; flex-direction: column; align-items: center; gap: 10px; }
         .ball { 
-            width: 90px; height: 90px; border-radius: 50%; border: none; 
-            box-shadow: inset -5px -5px 20px rgba(0,0,0,0.9), 5px 15px 25px rgba(0,0,0,0.7); 
+            width: 85px; height: 85px; border-radius: 50%; border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: inset -5px -5px 18px rgba(0,0,0,0.9), 5px 12px 20px rgba(0,0,0,0.7); 
         }
+        .ball-inner { width: 30px; height: 30px; background: white; border-radius: 50%; color: black; font-weight: 950; display: flex; align-items: center; justify-content: center; border: 2px solid #000; font-size: 14px; }
+        .btn-sub-carom { background: rgba(52, 152, 219, 0.15); color: #3498db; border: 1px solid #3498db; border-radius: 10px; padding: 6px 12px; font-size: 0.65em; font-weight: 900; cursor: pointer; }
 
-        /* KNAPPER */
-        .action-area { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .btn { 
-            padding: 25px 10px; border-radius: 22px; border: none; 
-            font-weight: 900; text-transform: uppercase; cursor: pointer; 
-            font-size: 1.3em; color: white;
-        }
-        .btn-blue { background: #2980b9; border-bottom: 7px solid #1c5982; }
-        .btn-foul { background: #c0392b; border-bottom: 7px solid #7b241c; }
-        .btn-turn { 
-            background: #27ae60; border-bottom: 8px solid #1e8449; 
-            grid-column: span 2; padding: 35px; font-size: 1.8em;
-        }
+        .action-area { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .btn { padding: 22px 10px; border-radius: 20px; border: none; font-weight: 900; text-transform: uppercase; cursor: pointer; font-size: 1.1em; color: white; }
+        .btn-blue { background: #2980b9; border-bottom: 6px solid #1c5982; }
+        .btn-foul { background: #c0392b; border-bottom: 6px solid #7b241c; }
+        .btn-turn { background: #27ae60; border-bottom: 8px solid #1e8449; grid-column: span 2; padding: 30px; font-size: 1.5em; margin-top: 5px; }
 
         /* NAVBAR */
-        .navbar { background: #000; height: 90px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #111; z-index: 20; padding-bottom: 25px; }
-        .nav-item { color: #333; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 12px; font-weight: 900; }
+        .navbar { background: #000; height: 85px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #111; z-index: 20; padding-bottom: 25px; }
+        .nav-item { color: #333; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 11px; font-weight: bold; }
         .nav-item.active { color: var(--gold); }
     </style>
 </head>
 <body>
 
-<div class="app-container">
+<div class="app-container" id="app">
     <div class="felt-base"></div>
     <div class="felt-texture"></div>
     <header class="header"></header>
 
     <main class="main-content">
+        <div class="top-spacer"></div>
+
         <div id="scoreboard-container">
             <div class="player-card active">
                 <div class="player-info">
                     <h2>MARIUS</h2>
                     <div class="sub-stats">
-                        <div>NÅ <span class="stat-val">14</span></div>
+                        <div>NÅ <span class="stat-val">0</span></div>
                         <div>BEST <span class="stat-val">32</span></div>
-                        <div>SISTE <span class="stat-val">12</span></div>
+                    </div>
+                    <div class="foul-container">
+                        <div class="foul-dot"></div><div class="foul-dot"></div><div class="foul-dot"></div>
                     </div>
                 </div>
                 <div class="score-display">82</div>
@@ -141,10 +135,9 @@
                     <h2>PLAYER 2</h2>
                     <div class="sub-stats">
                         <div>NÅ <span class="stat-val">0</span></div>
-                        <div>BEST <span class="stat-val">18</span></div>
-                        <div>SISTE <span class="stat-val">5</span></div>
+                        <div>BEST <span class="stat-val">15</span></div>
                     </div>
-                    <div style="margin-top:20px;">
+                    <div class="foul-container">
                         <div class="foul-dot active"></div><div class="foul-dot"></div><div class="foul-dot"></div>
                     </div>
                 </div>
@@ -157,7 +150,9 @@
                     <div class="sub-stats">
                         <div>NÅ <span class="stat-val">0</span></div>
                         <div>BEST <span class="stat-val">0</span></div>
-                        <div>SISTE <span class="stat-val">0</span></div>
+                    </div>
+                    <div class="foul-container">
+                        <div class="foul-dot"></div><div class="foul-dot"></div><div class="foul-dot"></div>
                     </div>
                 </div>
                 <div class="score-display">0</div>
@@ -171,9 +166,18 @@
             </div>
 
             <div class="ball-control-zone">
-                <button class="ball" style="background: radial-gradient(circle at 35% 35%, #f1c40f, #b38f00);"></button>
-                <button class="ball" style="background: radial-gradient(circle at 35% 35%, #8e44ad, #4b0082);"></button>
-                <button class="ball" style="background: radial-gradient(circle at 35% 35%, #e74c3c, #962d22);"></button>
+                <div class="ball-group">
+                    <button class="ball" style="background: radial-gradient(circle at 35% 35%, #f1c40f, #b38f00);"><div class="ball-inner">1</div></button>
+                    <button class="btn-sub-carom">+ CAROM</button>
+                </div>
+                <div class="ball-group">
+                    <button class="ball" style="background: radial-gradient(circle at 35% 35%, #8e44ad, #4b0082);"><div class="ball-inner">5</div></button>
+                    <button class="btn-sub-carom">+ CAROM</button>
+                </div>
+                <div class="ball-group">
+                    <button class="ball" style="background: radial-gradient(circle at 35% 35%, #e74c3c, #962d22);"><div class="ball-inner">3</div></button>
+                    <button class="btn-sub-carom">+ CAROM</button>
+                </div>
             </div>
 
             <div class="action-area">
