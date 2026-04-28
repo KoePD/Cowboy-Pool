@@ -180,13 +180,34 @@
 
     // LOGIKK (UTDRAG)
     function action(type, val) {
-        saveHistory();
-        let p = state.currentPlayer;
-        if ((state.scores[p] < 90 && (state.scores[p] + val) > 90)) return;
-        state.breakDone = true;
-        state.scores[p] += val;
-        db.set(state);
+    saveHistory();
+    let p = state.currentPlayer;
+    let cur = state.scores[p];
+    
+    // Sjekk poenggrenser (90 og 100)
+    // Hvis man får en kombinasjon som bikker over 90, må vi stoppe det
+    if ((cur < 90 && (cur + val) > 90) || (cur >= 90 && (cur + val) > 101)) {
+        console.log("Ulovlig poengsum for gjeldende fase");
+        return; 
     }
+    
+    // Markerer brekket som gjort ved første poenggivende støt
+    state.breakDone = true;
+    state.foulCounts[p] = 0;
+    
+    // Legg til poeng
+    state.scores[p] += val;
+    
+    // Oppdater databasen umiddelbart
+    // Dette gjør at du kan trykke 5, så 3, så Carom raskt, 
+    // og poengsummen vil telle opp 5 -> 8 -> 9
+    db.set(state);
+
+    // Sjekk om noen vant
+    if (state.scores[p] === 101) {
+        setTimeout(() => { alert("Gratulerer " + state.names[p] + "! Du vant!"); }, 500);
+    }
+}
 
     function updateUI() {
         const cont = document.getElementById('scoreboard-container');
