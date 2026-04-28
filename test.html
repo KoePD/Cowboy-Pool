@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cowboy Pool Pro - Full Roster</title>
+    <title>Cowboy Pool Pro - Functional</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
     <style>
         :root {
             --felt-green: radial-gradient(circle at center, #1e4d2b 0%, #0a1a0f 100%);
@@ -23,207 +25,258 @@
         .felt-base { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: var(--felt-green); z-index: 1; }
         .felt-texture { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: url("https://www.transparenttextures.com/patterns/felt.png"); opacity: 0.12; z-index: 2; pointer-events: none; }
 
-        /* RAMME */
-        .header { 
-            background: var(--leather); background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png"); 
-            padding: 20px 30px 30px; z-index: 10; 
-            border-bottom-left-radius: 50% 20px; border-bottom-right-radius: 50% 20px; 
-            box-shadow: 0 15px 30px rgba(0,0,0,0.8);
-        }
-        .bottom-panel { 
-            background: var(--leather); background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png"); 
-            padding: 30px 30px 10px; z-index: 10; 
-            border-top-left-radius: 50% 20px; border-top-right-radius: 50% 20px; 
-            box-shadow: 0 -15px 30px rgba(0,0,0,0.8);
-        }
+        /* RAMMER */
+        .header { background: var(--leather); background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png"); padding: 20px; z-index: 10; border-bottom-left-radius: 50% 20px; border-bottom-right-radius: 50% 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.8); display: flex; justify-content: center; }
+        .bottom-panel { background: var(--leather); background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png"); padding: 20px; z-index: 10; border-top-left-radius: 50% 20px; border-top-right-radius: 50% 20px; box-shadow: 0 -15px 30px rgba(0,0,0,0.8); }
 
-        .main-content { 
-            position: relative; z-index: 5; flex-grow: 1; 
-            display: flex; flex-direction: column; 
-            padding: 5px 15px; width: 100%; box-sizing: border-box;
-            overflow-y: auto;
-        }
-
-        .top-spacer { height: 15px; width: 100%; }
+        .main-content { position: relative; z-index: 5; flex-grow: 1; display: flex; flex-direction: column; padding: 5px 15px; width: 100%; box-sizing: border-box; overflow-y: auto; }
+        .top-spacer { height: 10px; width: 100%; }
 
         /* SCOREBOARD */
         .player-card { 
             background: linear-gradient(180deg, #0a0a0a 0%, #000 100%); 
             border-radius: 30px; min-height: 130px; padding: 25px 30px; 
-            margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.08); 
+            margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.08); 
             display: flex; align-items: center; width: 100%; box-sizing: border-box; gap: 20px;
         }
         .player-card.active { border: 5px solid var(--gold); box-shadow: 0 20px 50px rgba(0,0,0,0.9); transform: scale(1.02); }
-        
         .foul-sidebar { display: flex; flex-direction: column; gap: 10px; }
         .foul-dot { width: 18px; height: 18px; border-radius: 50%; background: #000; border: 1px solid #222; }
         .foul-dot.active { background: #e74c3c; box-shadow: 0 0 15px #ff4757; }
-
-        .player-info { flex-grow: 1; display: flex; flex-direction: column; }
-        .player-info h2 { margin: 0; font-size: 1.8em; text-transform: uppercase; color: #333; font-weight: 900; letter-spacing: 1px; }
+        .player-info { flex-grow: 1; }
+        .player-info h2 { margin: 0; font-size: 1.8em; text-transform: uppercase; color: #333; font-weight: 900; }
         .active .player-info h2 { color: var(--gold); }
-        
-        .sub-stats { margin-top: 10px; display: flex; gap: 25px; }
-        .stat-group { display: flex; flex-direction: column; align-items: flex-start; }
-        .stat-label { font-size: 0.9em; color: #222; text-transform: uppercase; font-weight: 900; margin-bottom: 2px; }
+        .sub-stats { margin-top: 10px; display: flex; gap: 20px; }
+        .stat-group { display: flex; flex-direction: column; }
+        .stat-label { font-size: 0.8em; color: #222; font-weight: 900; }
         .active .stat-label { color: #888; }
-        .stat-val { color: #fff; font-size: 1.3em; font-weight: 900; }
-
-        .score-display { font-size: 6.5em; font-weight: 950; line-height: 1; color: #111; text-align: right; min-width: 1.2em; }
+        .stat-val { color: #fff; font-size: 1.2em; font-weight: 900; }
+        .score-display { font-size: 6em; font-weight: 950; line-height: 1; color: #111; }
         .active .score-display { color: var(--gold); }
 
         /* KONTROLLER */
         .controls-group { width: 100%; margin-top: auto; padding-bottom: 5px; }
         .game-status-zone { background: rgba(0, 0, 0, 0.85); padding: 15px; border-radius: 25px 25px 0 0; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
-        .req-text { font-size: 1.6em; letter-spacing: 4px; color: #2ecc71; font-weight: 900; text-transform: uppercase; }
-        .timer-text { font-family: monospace; font-size: 2.5em; color: var(--gold); margin-top: 5px; display: block; }
+        .req-text { font-size: 1.5em; color: #2ecc71; font-weight: 900; text-transform: uppercase; }
+        .timer-text { font-family: monospace; font-size: 2.2em; color: var(--gold); margin-top: 5px; display: block; }
 
-        .ball-control-zone { 
-            display: flex; justify-content: space-around; background: rgba(0,0,0,0.75); 
-            padding: 35px 2px; border-radius: 0 0 50px 50px; 
-            border: 1px solid rgba(255,255,255,0.05); border-top: none; margin-bottom: 20px; 
-        }
-        .ball-group { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 33%; }
-        .ball { 
-            width: 135px; height: 135px; border-radius: 50%; border: none; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: inset -10px -10px 30px rgba(0,0,0,0.9), 10px 20px 35px rgba(0,0,0,0.8); 
-            transition: transform 0.1s;
-        }
-        .ball-inner { width: 45px; height: 45px; background: white; border-radius: 50%; color: black; font-weight: 950; display: flex; align-items: center; justify-content: center; border: 3px solid #000; font-size: 24px; }
-        .btn-sub-carom { background: rgba(52, 152, 219, 0.2); color: #3498db; border: 1px solid #3498db; border-radius: 15px; padding: 12px 15px; font-size: 0.9em; font-weight: 900; cursor: pointer; text-transform: uppercase; width: fit-content; min-width: 80px; }
+        .ball-control-zone { display: flex; justify-content: space-around; background: rgba(0,0,0,0.75); padding: 30px 5px; border-radius: 0 0 50px 50px; margin-bottom: 15px; }
+        .ball-group { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 33%; }
+        .ball { width: 120px; height: 120px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: inset -8px -8px 25px rgba(0,0,0,0.9), 8px 18px 30px rgba(0,0,0,0.8); }
+        .ball-inner { width: 40px; height: 40px; background: white; border-radius: 50%; color: black; font-weight: 950; display: flex; align-items: center; justify-content: center; border: 3px solid #000; font-size: 22px; }
+        .btn-sub-carom { background: rgba(52, 152, 219, 0.2); color: #3498db; border: 1px solid #3498db; border-radius: 12px; padding: 8px 12px; font-size: 0.8em; font-weight: 900; text-transform: uppercase; cursor: pointer; }
 
-        .action-area { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .btn { padding: 30px 10px; border-radius: 25px; border: none; font-weight: 900; text-transform: uppercase; cursor: pointer; font-size: 1.7em; color: white; }
-        .btn-blue { background: #2980b9; border-bottom: 8px solid #1c5982; }
-        .btn-foul { background: #c0392b; border-bottom: 8px solid #7b241c; }
-        .btn-turn { background: #27ae60; border-bottom: 10px solid #1e8449; grid-column: span 2; padding: 40px; font-size: 2em; margin-top: 10px; }
+        .action-area { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .btn { padding: 25px 10px; border-radius: 22px; border: none; font-weight: 900; text-transform: uppercase; cursor: pointer; font-size: 1.4em; color: white; }
+        .btn-blue { background: #2980b9; border-bottom: 6px solid #1c5982; }
+        .btn-foul { background: #c0392b; border-bottom: 6px solid #7b241c; }
+        .btn-turn { background: #27ae60; border-bottom: 8px solid #1e8449; grid-column: span 2; padding: 35px; font-size: 1.8em; }
 
-        /* PREMIUM NAVBAR */
-        .navbar { 
-            background: var(--leather); 
-            background-image: url("https://www.transparenttextures.com/patterns/dark-leather.png");
-            height: 115px; 
-            display: flex; justify-content: space-around; align-items: center; 
-            border-top: 3px solid var(--gold); 
-            z-index: 20; 
-            padding-bottom: 25px; 
-            box-shadow: 0 -10px 30px rgba(0,0,0,1);
-        }
-        .nav-item { 
-            color: #555; 
-            text-decoration: none; 
-            display: flex; flex-direction: column; align-items: center; 
-            gap: 8px; 
-            transition: all 0.3s ease;
-            width: 25%;
-        }
-        .nav-item i { font-size: 38px; }
-        .nav-item span { 
-            font-size: 13px; 
-            font-weight: 900; 
-            text-transform: uppercase; 
-            letter-spacing: 1.5px; 
-        }
-        .nav-item.active { 
-            color: var(--gold); 
-            transform: translateY(-5px);
-            text-shadow: 0 0 15px rgba(241, 196, 15, 0.5);
-        }
+        /* OVERLAY / SETUP */
+        .setup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,20,5,0.98); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; backdrop-filter: blur(10px); }
+        .setup-card { background: #000; border: 2px solid var(--gold); padding: 30px; border-radius: 30px; width: 100%; max-width: 350px; text-align: center; }
+        .name-field { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #333; background: #111; color: white; margin-bottom: 10px; text-align: center; font-size: 1.2em; }
+        .btn-start { width: 100%; padding: 20px; border-radius: 15px; background: #27ae60; color: white; border: none; font-weight: 900; cursor: pointer; }
+        
+        .waiting-ball { opacity: 0.15; filter: grayscale(1); pointer-events: none; }
+
+        /* NAVBAR */
+        .navbar { background: #000; height: 95px; display: flex; justify-content: space-around; align-items: center; border-top: 2px solid #111; z-index: 20; padding-bottom: 25px; }
+        .nav-item { color: #333; text-decoration: none; display: flex; flex-direction: column; align-items: center; font-size: 12px; font-weight: 900; cursor: pointer; }
+        .nav-item.active { color: var(--gold); }
     </style>
 </head>
 <body>
 
+<div id="setupOverlay" class="setup-overlay">
+    <div class="setup-card" id="setupCardContent">
+        <h2 style="color:var(--gold);">NY KAMP</h2>
+        <div id="setupStep1">
+            <p>Antall spillere:</p>
+            <div style="display:flex; gap:10px; margin-bottom:20px;">
+                <button class="btn-start" style="background:#333;" onclick="selectPlayers(1)">1</button>
+                <button class="btn-start" style="background:#333;" onclick="selectPlayers(2)">2</button>
+                <button class="btn-start" style="background:#333;" onclick="selectPlayers(3)">3</button>
+            </div>
+        </div>
+        <div id="setupStep2" style="display:none;">
+            <div id="nameInputs"></div>
+            <button class="btn-start" onclick="finalizeSetup()">START</button>
+        </div>
+    </div>
+</div>
+
 <div class="app-container">
     <div class="felt-base"></div>
     <div class="felt-texture"></div>
-    <header class="header"></header>
+    
+    <header class="header">
+        <button onclick="checkActiveGame()" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:10px 20px; border-radius:20px; font-weight:900;">NY MATCH</button>
+    </header>
+
     <main class="main-content">
         <div class="top-spacer"></div>
-        <div id="scoreboard-container">
-            <div class="player-card active">
-                <div class="foul-sidebar">
-                    <div class="foul-dot active"></div><div class="foul-dot"></div><div class="foul-dot"></div>
-                </div>
-                <div class="player-info">
-                    <h2>MARIUS</h2>
-                    <div class="sub-stats">
-                        <div class="stat-group"><span class="stat-label">NÅ</span><span class="stat-val">12</span></div>
-                        <div class="stat-group"><span class="stat-label">BEST</span><span class="stat-val">32</span></div>
-                    </div>
-                </div>
-                <div class="score-display">82</div>
-            </div>
-
-            <div class="player-card">
-                <div class="foul-sidebar">
-                    <div class="foul-dot"></div><div class="foul-dot"></div><div class="foul-dot"></div>
-                </div>
-                <div class="player-info">
-                    <h2>PLAYER 2</h2>
-                    <div class="sub-stats">
-                        <div class="stat-group"><span class="stat-label">NÅ</span><span class="stat-val">0</span></div>
-                        <div class="stat-group"><span class="stat-label">BEST</span><span class="stat-val">15</span></div>
-                    </div>
-                </div>
-                <div class="score-display">45</div>
-            </div>
-
-            <div class="player-card">
-                <div class="foul-sidebar">
-                    <div class="foul-dot"></div><div class="foul-dot"></div><div class="foul-dot"></div>
-                </div>
-                <div class="player-info">
-                    <h2>PLAYER 3</h2>
-                    <div class="sub-stats">
-                        <div class="stat-group"><span class="stat-label">NÅ</span><span class="stat-val">0</span></div>
-                        <div class="stat-group"><span class="stat-label">BEST</span><span class="stat-val">0</span></div>
-                    </div>
-                </div>
-                <div class="score-display">0</div>
-            </div>
-        </div>
+        <div id="scoreboard-container"></div>
 
         <div class="controls-group">
             <div class="game-status-zone">
-                <span class="req-text">VELG: CAROM / POCKET</span>
-                <span class="timer-text">00:21:36</span>
+                <span class="req-text" id="moveText">BREKK-STØT</span>
+                <span class="timer-text" id="matchTimer">00:00:00</span>
+                <div id="inningDisplay" style="color:#888; font-weight:bold; margin-top:5px; font-size:0.8em;">INNING: 1</div>
             </div>
+
             <div class="ball-control-zone">
-                <div class="ball-group"><button class="ball" style="background: radial-gradient(circle at 35% 35%, #f1c40f, #b38f00);"><div class="ball-inner">1</div></button><button class="btn-sub-carom">+ CAROM</button></div>
-                <div class="ball-group"><button class="ball" style="background: radial-gradient(circle at 35% 35%, #8e44ad, #4b0082);"><div class="ball-inner">5</div></button><button class="btn-sub-carom">+ CAROM</button></div>
-                <div class="ball-group"><button class="ball" style="background: radial-gradient(circle at 35% 35%, #e74c3c, #962d22);"><div class="ball-inner">3</div></button><button class="btn-sub-carom">+ CAROM</button></div>
+                <div class="ball-group">
+                    <button class="ball" id="ball1" style="background:radial-gradient(circle at 35% 35%, #f1c40f, #b38f00);" onclick="action('pocket', 1)"><div class="ball-inner">1</div></button>
+                    <button class="btn-sub-carom" id="pc1" onclick="action('pocket_carom', 2)">+ CAROM</button>
+                </div>
+                <div class="ball-group">
+                    <button class="ball" id="ball5" style="background:radial-gradient(circle at 35% 35%, #8e44ad, #4b0082);" onclick="action('pocket', 5)"><div class="ball-inner">5</div></button>
+                    <button class="btn-sub-carom" id="pc5" onclick="action('pocket_carom', 6)">+ CAROM</button>
+                </div>
+                <div class="ball-group">
+                    <button class="ball" id="ball3" style="background:radial-gradient(circle at 35% 35%, #e74c3c, #962d22);" onclick="action('pocket', 3)"><div class="ball-inner">3</div></button>
+                    <button class="btn-sub-carom" id="pc3" onclick="action('pocket_carom', 4)">+ CAROM</button>
+                </div>
             </div>
+
             <div class="action-area">
-                <button class="btn btn-blue">CAROM 1P</button>
-                <button class="btn btn-blue">CAROM 2P</button>
-                <button class="btn btn-foul">FOUL</button>
-                <button class="btn btn-blue">ANGRE</button>
-                <button class="btn btn-turn">AVSLUTT TUR</button>
+                <button class="btn btn-blue" id="carom1PBtn" onclick="action('carom', 1)">Carom 1P</button>
+                <button class="btn btn-blue" id="carom2PBtn" onclick="action('carom', 2)">Carom 2P</button>
+                <button class="btn btn-foul" onclick="handleFoul()">FOUL</button>
+                <button class="btn btn-blue" onclick="undo()">ANGRE</button>
+                <button class="btn btn-turn" style="grid-column: span 2;" onclick="nextTurn()">AVSLUTT TUR</button>
             </div>
         </div>
     </main>
+
     <footer class="bottom-panel"></footer>
 
     <nav class="navbar">
-        <a href="#" class="nav-item">
-            <i class="material-icons">home</i>
-            <span>HJEM</span>
-        </a>
-        <a href="#" class="nav-item active">
-            <i class="material-icons">all_inclusive</i>
-            <span>RANGE</span>
-        </a>
-        <a href="#" class="nav-item">
-            <i class="material-icons">person</i>
-            <span>PROFIL</span>
-        </a>
-        <a href="#" class="nav-item">
-            <i class="material-icons">leaderboard</i>
-            <span>STATS</span>
-        </a>
+        <div class="nav-item"><i class="material-icons">home</i>HJEM</div>
+        <div class="nav-item active"><i class="material-icons">all_inclusive</i>RANGE</div>
+        <div class="nav-item"><i class="material-icons">person</i>PROFIL</div>
+        <div class="nav-item"><i class="material-icons">leaderboard</i>STATS</div>
     </nav>
 </div>
 
+<script>
+    const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database().ref('gameData');
+
+    let state = { gameMode: 'standard', playerCount: 1, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, seconds: 0, names: ["P1","P2","P3"], bestSeries: [0,0,0], lastSeries: [0,0,0], innings: 1 };
+    let history = [];
+    let setupPlayerCount = 1;
+
+    db.on('value', (s) => { if(s.val()) { state = s.val(); updateUI(); } });
+
+    function action(type, val) {
+        saveHistory();
+        let p = state.currentPlayer;
+        let cur = state.scores[p];
+        
+        // Regler for Cowboy Pool poenggrenser (90 og 100)
+        if ((cur < 90 && (cur + val) > 90) || (cur >= 90 && (cur + val) > 101)) { return; }
+        
+        state.breakDone = true;
+        state.foulCounts[p] = 0;
+        state.scores[p] += val;
+
+        if (state.scores[p] === 101) {
+            db.set(state).then(() => { alert("Gratulerer " + state.names[p] + "! Du vant!"); });
+        } else {
+            db.set(state);
+        }
+    }
+
+    function updateUI() {
+        const cont = document.getElementById('scoreboard-container');
+        cont.innerHTML = '';
+        for(let i=0; i<state.playerCount; i++) {
+            const active = state.currentPlayer === i;
+            cont.innerHTML += `
+            <div class="player-card ${active?'active':''}">
+                <div class="foul-sidebar">
+                    <div class="foul-dot ${state.foulCounts[i]>=1?'active':''}"></div>
+                    <div class="foul-dot ${state.foulCounts[i]>=2?'active':''}"></div>
+                    <div class="foul-dot ${state.foulCounts[i]>=3?'active':''}"></div>
+                </div>
+                <div class="player-info">
+                    <h2>${state.names[i]}</h2>
+                    <div class="sub-stats">
+                        <div class="stat-group"><span class="stat-label">NÅ</span><span class="stat-val">${active ? state.scores[i]-state.scoreAtStart[i] : 0}</span></div>
+                        <div class="stat-group"><span class="stat-label">BEST</span><span class="stat-val">${state.bestSeries[i]}</span></div>
+                    </div>
+                </div>
+                <div class="score-display">${state.scores[i]}</div>
+            </div>`;
+        }
+
+        const cur = state.scores[state.currentPlayer];
+        const caromPhase = cur >= 90 && cur < 100;
+        
+        document.getElementById('moveText').innerText = !state.breakDone ? "BREKK-STØT" : (caromPhase ? "KUN CAROMS" : "ANY POINT");
+        document.getElementById('inningDisplay').innerText = "INNING: " + (state.innings || 1);
+        document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
+
+        // Deaktiver baller i Carom-fasen
+        const ballElems = ['ball1', 'ball5', 'ball3', 'pc1', 'pc5', 'pc3'];
+        ballElems.forEach(id => {
+            document.getElementById(id).classList.toggle('waiting-ball', caromPhase);
+        });
+    }
+
+    function handleFoul() {
+        saveHistory();
+        state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer];
+        state.foulCounts[state.currentPlayer]++;
+        if(state.foulCounts[state.currentPlayer] >= 3) {
+            state.scores[state.currentPlayer] = 0;
+            state.foulCounts[state.currentPlayer] = 0;
+        }
+        nextTurn();
+    }
+
+    function nextTurn() {
+        saveHistory();
+        let p = state.currentPlayer;
+        let series = state.scores[p] - state.scoreAtStart[p];
+        if(series > state.bestSeries[p]) state.bestSeries[p] = series;
+        
+        if(state.currentPlayer === state.playerCount - 1) state.innings++;
+        
+        state.currentPlayer = (state.currentPlayer + 1) % state.playerCount;
+        state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer];
+        db.set(state);
+    }
+
+    function checkActiveGame() {
+        document.getElementById('setupOverlay').style.display = 'flex';
+        document.getElementById('setupStep1').style.display = 'block';
+        document.getElementById('setupStep2').style.display = 'none';
+    }
+
+    function selectPlayers(n) {
+        setupPlayerCount = n;
+        document.getElementById('setupStep1').style.display = 'none';
+        document.getElementById('setupStep2').style.display = 'block';
+        const c = document.getElementById('nameInputs');
+        c.innerHTML = '';
+        for(let i=0; i<n; i++) c.innerHTML += `<input type="text" id="n${i}" class="name-field" placeholder="Navn ${i+1}">`;
+    }
+
+    function finalizeSetup() {
+        const ns = [];
+        for(let i=0; i<setupPlayerCount; i++) ns.push(document.getElementById(`n${i}`).value || `P${i+1}`);
+        db.set({...state, playerCount: setupPlayerCount, names: ns, scores: [0,0,0], foulCounts:[0,0,0], scoreAtStart:[0,0,0], seconds:0, currentPlayer:0, innings:1});
+        document.getElementById('setupOverlay').style.display = 'none';
+    }
+
+    function undo() { if(history.length) { state = JSON.parse(history.pop()); db.set(state); } }
+    function saveHistory() { history.push(JSON.stringify(state)); if(history.length > 10) history.shift(); }
+
+    setInterval(() => { if(state.breakDone) { state.seconds++; db.child('seconds').set(state.seconds); } }, 1000);
+</script>
 </body>
 </html>
