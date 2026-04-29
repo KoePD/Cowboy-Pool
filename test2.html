@@ -5,265 +5,173 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cowboy Pool Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background-color: #0c0c0c; color: white; font-family: sans-serif; }
-        .pool-green { background: linear-gradient(180deg, #134e3a 0%, #0a2a1b 100%); }
-        .gold-border { border: 2px solid #d4af37; box-shadow: 0 0 10px rgba(212, 175, 55, 0.5); }
-        .btn-dark { background: #1a1a1a; border: 1px solid #333; }
-        .ball { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; color: black; box-shadow: inset -5px -5px 10px rgba(0,0,0,0.5); }
-        .ball-1 { background: #facc15; } /* Yellow */
-        .ball-3 { background: #ef4444; } /* Red */
-        .ball-5 { background: #a855f7; } /* Purple (In cowboy, 5 is often blue/purple) */
-        .nav-active { color: #facc15; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
+        }
+
+        /* App Container (Mobil-ramme) */
+        .app-container {
+            width: 100%;
+            max-width: 414px;
+            height: 100vh;
+            background: #121212;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-left: 1px solid #333;
+            border-right: 1px solid #333;
+        }
+
+        /* Farger og tema */
+        .pool-green-gradient {
+            background: linear-gradient(180deg, #1a4a36 0%, #0d251b 100%);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .gold-text { color: #d4af37; }
+        .gold-border { border: 2px solid #d4af37; box-shadow: 0 0 15px rgba(212, 175, 55, 0.4); }
+        
+        /* Spesifikke knapper fra bildet */
+        .grid-button {
+            background: linear-gradient(145deg, #1b4d36, #0f2d20);
+            border: 1px solid #d4af37;
+            border-radius: 12px;
+            aspect-ratio: 1/1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        /* Baller */
+        .ball {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: #000;
+            box-shadow: inset -8px -8px 15px rgba(0,0,0,0.4), 0 5px 10px rgba(0,0,0,0.5);
+        }
+
+        /* Bottom Nav */
+        .nav-bar {
+            background: #1a1a1a;
+            border-top: 1px solid #333;
+            padding: 10px 0;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .nav-item { color: #666; font-size: 0.7rem; text-align: center; }
+        .nav-item.active { color: #d4af37; }
+
+        /* Skjul skjermer */
+        .screen { display: none; height: 100%; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
+        .screen.active { display: block; }
+
     </style>
 </head>
-<body class="max-w-md mx-auto h-screen flex flex-col overflow-hidden">
+<body>
 
-    <!-- APP CONTENT -->
-    <main class="flex-1 overflow-y-auto p-4 pb-24">
+<div class="app-container">
+    
+    <!-- SCREEN 1: LOBBY -->
+    <div id="lobby" class="screen active">
+        <div class="flex justify-between items-center mt-4">
+            <div>
+                <h1 class="text-2xl font-black gold-text">Hei, Marius!</h1>
+                <p class="text-xs text-gray-400">Cowboy Rank: <span class="text-yellow-100">Level 12 - Gunslinger</span></p>
+                <div class="w-48 h-1.5 bg-gray-800 rounded-full mt-2">
+                    <div class="w-3/4 h-full bg-yellow-500 rounded-full" style="box-shadow: 0 0 10px #d4af37;"></div>
+                </div>
+            </div>
+            <img src="https://via.placeholder.com/40" class="rounded-full border-2 border-yellow-600">
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 mt-10">
+            <div class="grid-button" onclick="showScreen('range')">
+                <i class="fa-solid fa-plus text-3xl text-green-400 mb-2"></i>
+                <span class="text-[10px] font-bold">NY KAMP</span>
+            </div>
+            <div class="grid-button">
+                <i class="fa-solid fa-trophy text-3xl text-yellow-500 mb-2"></i>
+                <span class="text-[10px] font-bold">TOPPLISTE</span>
+            </div>
+            <div class="grid-button">
+                <i class="fa-solid fa-book text-3xl text-yellow-200 mb-2"></i>
+                <span class="text-[10px] font-bold">REGLER</span>
+            </div>
+        </div>
+
+        <div class="mt-10 bg-zinc-900/80 rounded-3xl p-5 border border-zinc-800">
+            <h3 class="text-xs font-bold uppercase tracking-widest mb-4 opacity-70">Min Siste Kamp</h3>
+            <div class="flex justify-between items-center px-2">
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-gray-700 rounded-full mb-1 border border-zinc-600"></div>
+                    <p class="text-[10px]">Mav</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-black text-green-500">100 - 82</div>
+                    <div class="text-[9px] font-bold bg-green-900/30 text-green-400 px-2 py-0.5 rounded italic">WIN</div>
+                </div>
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-gray-700 rounded-full mb-1 border border-zinc-600"></div>
+                    <p class="text-[10px]">Per</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 2: THE RANGE -->
+    <div id="range" class="screen">
+        <p class="text-center gold-text text-xs font-bold tracking-widest mb-4">NESTE KRAV: CAROM</p>
         
-        <!-- SCREEN 1: LOBBY -->
-        <section id="screen-lobby" class="">
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <h1 class="text-2xl font-bold text-yellow-500">Hei, Marius!</h1>
-                    <p class="text-gray-400 text-sm">Cowboy Rank: <span class="text-yellow-200">Level 12 - Gunslinger</span></p>
-                </div>
-                <div class="w-10 h-10 bg-gray-700 rounded-full border border-yellow-500"></div>
-            </div>
-
-            <div class="grid grid-cols-3 gap-3 mb-8">
-                <button onclick="changeTab('range')" class="pool-green p-4 rounded-xl border border-yellow-600/30 flex flex-col items-center">
-                    <i class="fa-solid fa-plus text-2xl text-green-400 mb-2"></i>
-                    <span class="text-xs font-bold uppercase">Ny Kamp</span>
-                </button>
-                <button onclick="changeTab('stats')" class="pool-green p-4 rounded-xl border border-yellow-600/30 flex flex-col items-center">
-                    <i class="fa-solid fa-trophy text-2xl text-yellow-500 mb-2"></i>
-                    <span class="text-xs font-bold uppercase">Toppliste</span>
-                </button>
-                <button class="pool-green p-4 rounded-xl border border-yellow-600/30 flex flex-col items-center">
-                    <i class="fa-solid fa-book text-2xl text-blue-300 mb-2"></i>
-                    <span class="text-xs font-bold uppercase">Regler</span>
-                </button>
-            </div>
-
-            <div class="bg-zinc-900 rounded-2xl p-4 border border-zinc-800">
-                <h3 class="text-sm font-bold mb-4 flex justify-between">Min Siste Kamp <i class="fa-solid fa-history opacity-50"></i></h3>
-                <div class="flex justify-between items-center bg-black/30 p-3 rounded-lg">
-                    <div class="text-center">
-                        <div class="w-10 h-10 bg-gray-600 rounded-full mx-auto mb-1"></div>
-                        <p class="text-[10px]">Marius</p>
-                    </div>
-                    <div class="text-center">
-                        <span class="text-xl font-bold text-green-500">100 - 82</span>
-                        <p class="text-[10px] text-gray-500 uppercase tracking-widest">Win</p>
-                    </div>
-                    <div class="text-center">
-                        <div class="w-10 h-10 bg-gray-600 rounded-full mx-auto mb-1"></div>
-                        <p class="text-[10px]">Per</p>
-                    </div>
+        <!-- Aktiv Spiller -->
+        <div class="gold-border pool-green-gradient rounded-3xl p-6 mb-4 flex justify-between items-center relative overflow-hidden">
+            <div class="text-6xl font-black text-yellow-500 opacity-80">1</div>
+            <div class="text-right">
+                <h2 class="text-2xl font-bold">Marius</h2>
+                <div class="flex flex-col">
+                    <span class="text-xs text-gray-300">Score</span>
+                    <span class="text-4xl font-black">85</span>
                 </div>
             </div>
-        </section>
+            <div class="absolute bottom-2 right-4 text-[10px] text-yellow-500/50 italic">Turn serie: 8</div>
+        </div>
 
-        <!-- SCREEN 2: THE RANGE (GAME CONTROL) -->
-        <section id="screen-range" class="hidden">
-            <div class="text-center mb-4">
-                <p class="text-yellow-500 font-bold text-xs tracking-widest">NESTE KRAV: <span id="next-requirement">ÅPENT</span></p>
+        <!-- Motstander -->
+        <div class="bg-zinc-900/50 rounded-2xl p-4 flex justify-between items-center border border-zinc-800 opacity-60">
+            <div class="w-10 h-10 bg-gray-600 rounded-full"></div>
+            <div class="flex-1 px-4">
+                <p class="font-bold">Per</p>
+                <p class="text-xs">Score: 20</p>
             </div>
+            <div class="text-right text-xs italic">Turn serie: 1</div>
+        </div>
 
-            <div class="gold-border rounded-2xl p-6 mb-4 flex justify-between items-center pool-green">
-                <div class="text-5xl font-black text-yellow-500">1</div>
-                <div class="text-right">
-                    <h2 class="text-2xl font-bold">Marius</h2>
-                    <p class="text-gray-300">Score: <span id="p1-score" class="text-white font-bold text-xl">0</span></p>
-                    <p class="text-xs text-gray-400 italic">Inning poeng: <span id="inning-score">0</span></p>
-                </div>
-            </div>
+        <!-- Baller -->
+        <div class="flex justify-center gap-6 my-10">
+            <div class="ball" style="background: #facc15;">1</div>
+            <div class="ball" style="background: #8b5cf6;">5</div>
+            <div class="ball" style="background: #ef4444;">3</div>
+        </div>
 
-            <!-- BALL CONTROLS -->
-            <div class="grid grid-cols-3 gap-4 mb-8">
-                <button onclick="scorePocket(1)" class="flex flex-col items-center gap-2 bg-zinc-800 p-3 rounded-xl">
-                    <div class="ball ball-1">1</div>
-                    <span class="text-xs">Putt</span>
-                </button>
-                <button onclick="scorePocket(5)" class="flex flex-col items-center gap-2 bg-zinc-800 p-3 rounded-xl">
-                    <div class="ball ball-5">5</div>
-                    <span class="text-xs">Putt</span>
-                </button>
-                <button onclick="scorePocket(3)" class="flex flex-col items-center gap-2 bg-zinc-800 p-3 rounded-xl">
-                    <div class="ball ball-3">3</div>
-                    <span class="text-xs">Putt</span>
-                </button>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 mb-4">
-                <button onclick="scoreCarom(1)" class="bg-zinc-700 p-4 rounded-xl font-bold uppercase text-sm">Carom (2 kuler)</button>
-                <button onclick="scoreCarom(2)" class="bg-zinc-700 p-4 rounded-xl font-bold uppercase text-sm">Carom (3 kuler)</button>
-            </div>
-
-            <div class="flex gap-4">
-                <button onclick="foul()" class="flex-1 bg-red-900/50 border border-red-500 p-4 rounded-xl font-bold uppercase">Foul</button>
-                <button onclick="endInning()" class="flex-1 bg-green-600 p-4 rounded-xl font-bold uppercase shadow-lg">Avslutt Tur</button>
-            </div>
-        </section>
-
-        <!-- SCREEN 3: STATS (Placeholder) -->
-        <section id="screen-stats" class="hidden">
-            <h2 class="text-center font-bold mb-6">ALL-TIME LEADERBOARD</h2>
-            <div class="space-y-4">
-                <div class="flex items-center justify-between bg-zinc-900 p-4 rounded-xl border-l-4 border-yellow-500">
-                    <span>1. Marius</span>
-                    <span class="font-bold text-yellow-500">2,450 pts</span>
-                </div>
-                <!-- Flere rader her -->
-            </div>
-        </section>
-
-        <!-- SCREEN 4: PREMIUM -->
-        <section id="screen-premium" class="hidden text-center py-10">
-            <div class="mb-6"><i class="fa-solid fa-crown text-6xl text-yellow-500"></i></div>
-            <h2 class="text-3xl font-black mb-4 italic uppercase">Cowboy Pool <span class="text-yellow-500">PRO</span></h2>
-            <ul class="text-left space-y-3 mb-10 max-w-xs mx-auto">
-                <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Ubegrenset Match Historikk</li>
-                <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Detaljert Motstander-analyse</li>
-                <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Ingen Reklame</li>
-            </ul>
-            <button class="w-full bg-green-500 p-4 rounded-xl font-bold text-black text-xl mb-2">PRØV GRATIS I 7 DAGER</button>
-            <p class="text-xs text-gray-500 underline text-center">Engangskjøp: 199,-</p>
-        </section>
-
-    </main>
-
-    <!-- BOTTOM NAVBAR -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-zinc-950 border-t border-zinc-800 px-6 py-3 flex justify-between items-center max-w-md mx-auto">
-        <button onclick="changeTab('lobby')" class="flex flex-col items-center gap-1 nav-btn text-gray-500" id="nav-lobby">
-            <i class="fa-solid fa-house"></i>
-            <span class="text-[10px]">Hjem</span>
-        </button>
-        <button onclick="changeTab('range')" class="flex flex-col items-center gap-1 nav-btn text-gray-500" id="nav-range">
-            <i class="fa-solid fa-gamepad"></i>
-            <span class="text-[10px]">Kamp</span>
-        </button>
-        <button onclick="changeTab('stats')" class="flex flex-col items-center gap-1 nav-btn text-gray-500" id="nav-stats">
-            <i class="fa-solid fa-chart-line"></i>
-            <span class="text-[10px]">Toppliste</span>
-        </button>
-        <button onclick="changeTab('premium')" class="flex flex-col items-center gap-1 nav-btn text-gray-500" id="nav-premium">
-            <i class="fa-solid fa-star"></i>
-            <span class="text-[10px]">Regler</span>
-        </button>
-    </nav>
-
-    <script>
-        // APP STATE
-        let totalScore = 0;
-        let inningScore = 0;
-        let nextRequirement = 'OPEN'; // 'OPEN', 'CAROM', 'POCKET'
-        let gamePhase = 'NORMAL'; // 'NORMAL', '90-PHASE', '101-PHASE'
-
-        function changeTab(tabId) {
-            // Hide all screens
-            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('nav-active'));
-            
-            // Show selected
-            document.getElementById('screen-' + tabId).classList.remove('hidden');
-            document.getElementById('nav-' + tabId).classList.add('nav-active');
-        }
-
-        function updateDisplay() {
-            document.getElementById('p1-score').innerText = totalScore;
-            document.getElementById('inning-score').innerText = inningScore;
-            document.getElementById('next-requirement').innerText = nextRequirement;
-
-            // Enkel fargekoding for kravet
-            const reqLabel = document.getElementById('next-requirement');
-            if(nextRequirement === 'CAROM') reqLabel.className = "text-red-400 font-bold";
-            else if(nextRequirement === 'POCKET') reqLabel.className = "text-blue-400 font-bold";
-            else reqLabel.className = "text-yellow-500 font-bold";
-        }
-
-        function scorePocket(points) {
-            if (nextRequirement === 'CAROM') {
-                alert("Du må gjøre en Carom!");
-                return;
-            }
-            
-            // Logikk for 90-100 (Kun caroms lov)
-            if (totalScore + inningScore >= 90 && totalScore + inningScore < 100) {
-                alert("I 90-fasen teller kun caroms!");
-                return;
-            }
-
-            // Logikk for 101 (Losing hazard på 1-ball)
-            if (totalScore + inningScore === 100) {
-                if (points === 1) {
-                    winGame();
-                    return;
-                } else {
-                    foul();
-                    return;
-                }
-            }
-
-            inningScore += points;
-            nextRequirement = 'CAROM';
-            check90Limit();
-            updateDisplay();
-        }
-
-        function scoreCarom(points) {
-            if (nextRequirement === 'POCKET') {
-                alert("Du må putte en kule!");
-                return;
-            }
-
-            inningScore += points;
-            nextRequirement = 'POCKET';
-            check90Limit();
-            updateDisplay();
-        }
-
-        function check90Limit() {
-            // Regelen om at man må treffe 90 nøyaktig
-            if (totalScore + inningScore > 90 && totalScore < 90) {
-                alert("Foul! Du gikk over 90 uten å treffe nøyaktig.");
-                foul();
-            }
-        }
-
-        function foul() {
-            alert("FOUL! Du mister alle poeng denne turen.");
-            inningScore = 0;
-            endInning();
-        }
-
-        function endInning() {
-            totalScore += inningScore;
-            inningScore = 0;
-            nextRequirement = 'OPEN';
-            
-            // HER SENDER DU DATA TIL FIREBASE
-            console.log("Oppdaterer Firebase med total score:", totalScore);
-            /*
-            db.collection('matches').doc('match_id').update({
-                scoreMarius: totalScore
-            });
-            */
-            
-            updateDisplay();
-        }
-
-        function winGame() {
-            alert("GRATULERER! Du har nådd 101 poeng og vunnet!");
-            totalScore = 101;
-            updateDisplay();
-        }
-
-        // Start på lobby
-        changeTab('lobby');
-    </script>
-</body>
-</html>
+        <!-- Knapper -->
+        <div class="flex gap-4 mt-auto">
+            <button class="flex-1 bg-zinc-8
