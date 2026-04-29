@@ -221,6 +221,7 @@
 
     // APP STATE
     let state = { gameMode: 'standard', playerCount: 1, scores: [0,0,0], foulCounts: [0,0,0], scoreAtStart: [0,0,0], currentPlayer: 0, breakDone: false, seconds: 0, names: ["P1","P2","P3"], bestSeries: [0,0,0], innings: 1, tableStatus: 'open', lastType: null };
+    let currentShotPoints = 0; // Holder poengene for det pågående støtet
     let history = [];
     let tempPlayers = 1;
     let tempMode = 'standard';
@@ -273,22 +274,31 @@
 
     // HOVEDLOGIKK
     function action(type, val) {
-        saveHistory();
-        let p = state.currentPlayer;
-        let cur = state.scores[p];
-        
-        // Cowboy poengsperre ved 90 og 101
-        if ((cur < 90 && (cur + val) > 90) || (cur >= 90 && (cur + val) > 101)) return;
+    let p = state.currentPlayer;
+    let cur = state.scores[p];
+    
+    // Cowboy poengsperre sjekk (inkludert det som allerede ligger i "bufferen")
+    if ((cur + currentShotPoints + val) > 101) return;
+    if (cur < 90 && (cur + currentShotPoints + val) > 90) return;
 
-        // Alternate Mode Logikk
-        if (state.gameMode === 'alternate') {
-            if (state.tableStatus === 'locked') {
-                const required = state.lastType === 'pocket' ? 'carom' : 'pocket';
-                if (!type.includes(required)) return;
-            }
-            state.tableStatus = 'locked';
-            state.lastType = type.includes('pocket') ? 'pocket' : 'carom';
+    // Alternate Mode Logikk
+    if (state.gameMode === 'alternate') {
+        if (state.tableStatus === 'locked') {
+            const required = state.lastType === 'pocket' ? 'carom' : 'pocket';
+            if (!type.includes(required)) return;
         }
+        state.tableStatus = 'locked';
+        state.lastType = type.includes('pocket') ? 'pocket' : 'carom';
+    }
+
+    // Legg poeng i "bufferen" i stedet for rett i scoren
+    currentShotPoints += val;
+    state.breakDone = true;
+    state.foulCounts[p] = 0;
+
+    // Vi lagrer ikke til DB her ennå, vi bare oppdaterer det visuelle
+    renderLiveScore(); 
+}
 
         state.breakDone = true;
         state.foulCounts[p] = 0;
@@ -300,6 +310,20 @@
         }
     }
 
+    function renderLiveScore() {
+    const activeCard = document.querySelector('.player-card.active');
+    if (activeCard) {
+        // Oppdaterer "NÅ" feltet i sanntid
+        const nowVal = activeCard.querySelector('.stat-val'); 
+        let turnTotal = (state.scores[state.currentPlayer] - state.scoreAtStart[state.currentPlayer]) + currentShotPoints;
+        nowVal.innerText = turnTotal;
+        
+        // Oppdaterer hovedscoren visuelt (uten å lagre i DB ennå)
+        const mainScore = activeCard.querySelector('.score-display');
+        mainScore.innerText = state.scores[state.currentPlayer] + currentShotPoints;
+    }
+}
+    
     function updateUI() {
     const cont = document.getElementById('scoreboard-container');
     cont.innerHTML = '';
