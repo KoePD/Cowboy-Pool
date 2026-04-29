@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Koe Paadd - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: radial-gradient(circle at center, #0a2f1f 0%, #041a11 100%);
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .card-bg {
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .gold-text { color: #facc15; }
+        .gold-bg { background-color: #facc15; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-6 pb-24">
+
+    <div class="w-full max-w-md flex justify-between items-start mb-8">
+        <div>
+            <h1 class="text-2xl font-bold">Hei, Koe Paadd!</h1>
+            <p class="text-xs tracking-widest opacity-80 uppercase">
+                Cowboy Rank: <span class="gold-text">Level 1</span> · Rookie
+            </p>
+        </div>
+        <button class="opacity-60 hover:opacity-100">
+            <i class="fa-solid fa-arrow-right-from-bracket text-xl"></i>
+        </button>
+    </div>
+
+    <div class="grid grid-cols-3 gap-4 w-full max-w-md mb-10">
+        <div class="card-bg p-4 rounded-xl flex flex-col items-center justify-center aspect-square cursor-pointer hover:bg-white/5 transition">
+            <i class="fa-solid fa-plus gold-text text-2xl mb-2"></i>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Ny Kamp</span>
+        </div>
+        <div class="card-bg p-4 rounded-xl flex flex-col items-center justify-center aspect-square cursor-pointer hover:bg-white/5 transition">
+            <i class="fa-solid fa-trophy gold-text text-2xl mb-2"></i>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Toppliste</span>
+        </div>
+        <div class="card-bg p-4 rounded-xl flex flex-col items-center justify-center aspect-square cursor-pointer hover:bg-white/5 transition">
+            <i class="fa-solid fa-book-open gold-text text-2xl mb-2"></i>
+            <span class="text-[10px] font-bold uppercase tracking-wider">Regler</span>
+        </div>
+    </div>
+
+    <div class="w-full max-w-md mb-10">
+        <h3 class="text-xs font-bold uppercase tracking-widest opacity-60 mb-3 ml-1">Min siste kamp</h3>
+        <div class="card-bg rounded-2xl p-8 flex flex-col items-center justify-center text-center">
+            <p class="text-sm opacity-60 mb-4">Ingen kamper enda</p>
+            <button class="gold-bg text-black font-bold py-3 px-6 rounded-xl text-sm hover:brightness-110 transition">
+                Start din første kamp
+            </button>
+        </div>
+    </div>
+
+    <div class="w-full max-w-md">
+        <h3 class="text-xs font-bold uppercase tracking-widest opacity-60 mb-3 ml-1">Totalt</h3>
+        <div class="grid grid-cols-3 gap-3">
+            <div class="card-bg rounded-xl py-4 flex flex-col items-center">
+                <span class="gold-text text-2xl font-bold">0</span>
+                <span class="text-[9px] uppercase opacity-60 font-bold">Kamper</span>
+            </div>
+            <div class="card-bg rounded-xl py-4 flex flex-col items-center">
+                <span class="gold-text text-2xl font-bold">0</span>
+                <span class="text-[9px] uppercase opacity-60 font-bold">Seire</span>
+            </div>
+            <div class="card-bg rounded-xl py-4 flex flex-col items-center">
+                <span class="gold-text text-2xl font-bold">0</span>
+                <span class="text-[9px] uppercase opacity-60 font-bold">Total Score</span>
+            </div>
+        </div>
+    </div>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-[#041a11] border-t border-white/5 px-6 py-3 flex justify-between items-center max-w-lg mx-auto">
+        <div class="flex flex-col items-center cursor-pointer">
+            <i class="fa-solid fa-house gold-text text-lg"></i>
+            <span class="text-[10px] gold-text mt-1">Hjem</span>
+        </div>
+        <div class="flex flex-col items-center opacity-40 cursor-pointer">
+            <i class="fa-solid fa-trophy text-lg"></i>
+            <span class="text-[10px] mt-1">Toppliste</span>
+        </div>
+        
+        <div class="relative -top-8">
+            <div class="gold-bg w-14 h-14 rounded-full flex items-center justify-center shadow-lg border-4 border-[#041a11] cursor-pointer">
+                <i class="fa-solid fa-plus text-black text-2xl"></i>
+            </div>
+        </div>
+
+        <div class="flex flex-col items-center opacity-40 cursor-pointer">
+            <i class="fa-solid fa-book-open text-lg"></i>
+            <span class="text-[10px] mt-1">Regler</span>
+        </div>
+        <div class="flex flex-col items-center opacity-40 cursor-pointer">
+            <i class="fa-solid fa-crown text-lg"></i>
+            <span class="text-[10px] mt-1">Pro</span>
+        </div>
+    </nav>
+
+</body>
+</html>
