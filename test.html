@@ -301,54 +301,63 @@
     }
 
     function updateUI() {
-        const cont = document.getElementById('scoreboard-container');
-        cont.innerHTML = '';
-        for(let i=0; i<state.playerCount; i++) {
-            const active = state.currentPlayer === i;
-            cont.innerHTML += `
-            <div class="player-card ${active?'active':''}">
-                <div class="foul-sidebar">
-                    <div class="foul-dot ${state.foulCounts[i]>=1?'active':''}"></div>
-                    <div class="foul-dot ${state.foulCounts[i]>=2?'active':''}"></div>
-                    <div class="foul-dot ${state.foulCounts[i]>=3?'active':''}"></div>
+    const cont = document.getElementById('scoreboard-container');
+    cont.innerHTML = '';
+    for(let i=0; i<state.playerCount; i++) {
+        const active = state.currentPlayer === i;
+        cont.innerHTML += `
+        <div class="player-card ${active?'active':''}">
+            <div class="foul-sidebar">
+                <div class="foul-dot ${state.foulCounts[i]>=1?'active':''}"></div>
+                <div class="foul-dot ${state.foulCounts[i]>=2?'active':''}"></div>
+                <div class="foul-dot ${state.foulCounts[i]>=3?'active':''}"></div>
+            </div>
+            <div class="player-info">
+                <h2>${state.names[i]}</h2>
+                <div class="sub-stats">
+                    <div class="stat-group"><span class="stat-label">NÅ</span><span class="stat-val">${active ? state.scores[i]-state.scoreAtStart[i] : 0}</span></div>
+                    <div class="stat-group"><span class="stat-label">BEST</span><span class="stat-val">${state.bestSeries[i]}</span></div>
                 </div>
-                <div class="player-info">
-                    <h2>${state.names[i]}</h2>
-                    <div class="sub-stats">
-                        <div class="stat-group"><span class="stat-label">NÅ</span><span class="stat-val">${active ? state.scores[i]-state.scoreAtStart[i] : 0}</span></div>
-                        <div class="stat-group"><span class="stat-label">BEST</span><span class="stat-val">${state.bestSeries[i]}</span></div>
-                    </div>
-                </div>
-                <div class="score-display">${state.scores[i]}</div>
-            </div>`;
-        }
-        
-        const cur = state.scores[state.currentPlayer];
-        const caromPhase = cur >= 90 && cur < 100;
-        
-        // Status melding
-        let moveTxt = !state.breakDone ? "BREKK-STØT" : "ANY POINT";
-        if (caromPhase) moveTxt = "KUN CAROMS";
-        if (state.gameMode === 'alternate' && state.tableStatus === 'locked' && !caromPhase) {
-            moveTxt = state.lastType === 'pocket' ? "KRAV: CAROM" : "KRAV: POCKET";
-        }
-
-        document.getElementById('modeDisplay').innerText = "MODUS: " + state.gameMode.toUpperCase();
-        document.getElementById('moveText').innerText = moveTxt;
-        document.getElementById('inningDisplay').innerText = "INNING: " + (state.innings || 1);
-        document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
-
-        // Deaktiver baller basert på modus/fase
-        const lockPocket = (state.gameMode === 'alternate' && state.tableStatus === 'locked' && state.lastType === 'pocket');
-        const lockCarom = (state.gameMode === 'alternate' && state.tableStatus === 'locked' && state.lastType === 'carom');
-
-        ['ball1','ball5','ball3','pc1','pc5','pc3'].forEach(id => {
-            document.getElementById(id).classList.toggle('waiting-ball', caromPhase || lockPocket);
-        });
-        ['carom1PBtn','carom2PBtn'].forEach(id => {
-            document.getElementById(id).classList.toggle('waiting-ball', lockCarom);
-        });
+            </div>
+            <div class="score-display">${state.scores[i]}</div>
+        </div>`;
     }
+    
+    const cur = state.scores[state.currentPlayer];
+    const caromPhase = cur >= 90 && cur < 100;
+    
+    // Status melding
+    let moveTxt = !state.breakDone ? "BREKK-STØT" : "ANY POINT";
+    if (caromPhase) moveTxt = "KUN CAROMS";
+    if (state.gameMode === 'alternate' && state.tableStatus === 'locked' && !caromPhase) {
+        moveTxt = state.lastType === 'pocket' ? "KRAV: CAROM" : "KRAV: POCKET";
+    }
+
+    document.getElementById('modeDisplay').innerText = "MODUS: " + state.gameMode.toUpperCase();
+    document.getElementById('moveText').innerText = moveTxt;
+    document.getElementById('inningDisplay').innerText = "INNING: " + (state.innings || 1);
+    document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
+
+    // LOGIKK FOR DEAKTIVERING (GRÅING) AV BALLER:
+    const lockPocket = (state.gameMode === 'alternate' && state.tableStatus === 'locked' && state.lastType === 'pocket');
+    const lockCarom = (state.gameMode === 'alternate' && state.tableStatus === 'locked' && state.lastType === 'carom');
+
+    // Kule 1 og 5 skal være grå hvis: Det er carom-fase, eller pocket er låst (alternate), eller det er BREKK
+    ['ball1','ball5','pc1','pc5'].forEach(id => {
+        document.getElementById(id).classList.toggle('waiting-ball', caromPhase || lockPocket || !state.breakDone);
+    });
+
+    // Kule 3 skal være grå hvis: Det er carom-fase, eller pocket er låst (alternate)
+    // (Kule 3 er alltid lov på brekk)
+    ['ball3','pc3'].forEach(id => {
+        document.getElementById(id).classList.toggle('waiting-ball', caromPhase || lockPocket);
+    });
+
+    // Carom-knapper skal være grå hvis: Carom er låst (alternate)
+    ['carom1PBtn','carom2PBtn'].forEach(id => {
+        document.getElementById(id).classList.toggle('waiting-ball', lockCarom);
+    });
+}
 
     function handleFoul() { 
         saveHistory(); 
