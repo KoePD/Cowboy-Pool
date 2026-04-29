@@ -231,3 +231,39 @@
             if (totalScore + inningScore > 90 && totalScore < 90) {
                 alert("Foul! Du gikk over 90 uten å treffe nøyaktig.");
                 foul();
+            }
+        }
+
+        function foul() {
+            alert("FOUL! Du mister alle poeng denne turen.");
+            inningScore = 0;
+            endInning();
+        }
+
+        function endInning() {
+            totalScore += inningScore;
+            inningScore = 0;
+            nextRequirement = 'OPEN';
+            
+            // HER SENDER DU DATA TIL FIREBASE
+            console.log("Oppdaterer Firebase med total score:", totalScore);
+            /*
+            db.collection('matches').doc('match_id').update({
+                scoreMarius: totalScore
+            });
+            */
+            
+            updateDisplay();
+        }
+
+        function winGame() {
+            alert("GRATULERER! Du har nådd 101 poeng og vunnet!");
+            totalScore = 101;
+            updateDisplay();
+        }
+
+        // Start på lobby
+        changeTab('lobby');
+    </script>
+</body>
+</html>
