@@ -159,38 +159,100 @@
     }
 
     function action(type, val) {
-        saveHistory();
-        let p = state.currentPlayer;
-        let nextScore = state.scores[p] + val;
-        // Regel: Treff nøyaktig 90 eller nøyaktig 101. Overstigning = Foul.
-        if ((state.scores[p] < 90 && nextScore > 90) || (state.scores[p] >= 90 && nextScore > 101)) { handleFoul(); return; }
-        
-        state.breakDone = true; state.foulCounts[p] = 0; state.scores[p] = nextScore;
-        db.set(state);
+    saveHistory();
+    let p = state.currentPlayer;
+    let nextScore = state.scores[p] + val;
+
+    // Regel: Treff nøyaktig 90 eller nøyaktig 101. Overstigning = Foul.
+    if ((state.scores[p] < 90 && nextScore > 90) || (state.scores[p] >= 90 && nextScore > 101)) { 
+        handleFoul(); 
+        return; 
     }
 
+    // Sjekk om man trykker på ulovlig knapp i Alternate-modus
+    if (state.gameMode === 'alternate' && state.tableStatus === 'locked') {
+        const required = state.lastType === 'pocket' ? 'carom' : 'pocket';
+        if (!type.includes(required)) return;
+    }
+
+    state.breakDone = true; 
+    state.foulCounts[p] = 0; 
+    state.scores[p] = nextScore;
+
+    if (state.gameMode === 'alternate') {
+        state.tableStatus = 'locked';
+        state.lastType = type.includes('pocket') ? 'pocket' : 'carom';
+    }
+
+    db.set(state);
+}
+
     function updateUI() {
-        const cont = document.getElementById('scoreboard-container');
-        if(!cont) return;
-        cont.innerHTML = '';
-        for(let i=0; i<state.playerCount; i++) {
-            const active = state.currentPlayer === i;
-            cont.innerHTML += `<div class="player-card ${active?'active':''}">
-                <div class="foul-sidebar">
-                    <div class="foul-dot ${state.foulCounts[i]>=1?'active':''}"></div>
-                    <div class="foul-dot ${state.foulCounts[i]>=2?'active':''}"></div>
-                    <div class="foul-dot ${state.foulCounts[i]>=3?'active':''}"></div>
+    const cont = document.getElementById('scoreboard-container');
+    if(!cont) return;
+    cont.innerHTML = '';
+    for(let i=0; i<state.playerCount; i++) {
+        const active = state.currentPlayer === i;
+        cont.innerHTML += `<div class="player-card ${active?'active':''}">
+            <div class="foul-sidebar">
+                <div class="foul-dot ${state.foulCounts[i]>=1?'active':''}"></div>
+                <div class="foul-dot ${state.foulCounts[i]>=2?'active':''}"></div>
+                <div class="foul-dot ${state.foulCounts[i]>=3?'active':''}"></div>
+            </div>
+            <div class="player-info">
+                <h2>${state.names[i]}</h2>
+                <div class="sub-stats">
+                    <div class="stat-group"><span class="stat-label">NÅ</span><span class="stat-val">${active?state.scores[i]-state.scoreAtStart[i]:0}</span></div>
+                    <div class="stat-group"><span class="stat-label">BEST</span><span class="stat-val">${state.bestSeries[i]}</span></div>
                 </div>
-                <div class="player-info">
-                    <h2>${state.names[i]}</h2>
-                    <div class="sub-stats">
-                        <div class="stat-group"><span class="stat-label">NÅ</span><span class="stat-val">${active?state.scores[i]-state.scoreAtStart[i]:0}</span></div>
-                        <div class="stat-group"><span class="stat-label">BEST</span><span class="stat-val">${state.bestSeries[i]}</span></div>
-                    </div>
-                </div>
-                <div class="score-display">${state.scores[i]}</div>
-            </div>`;
-        }
+            </div>
+            <div class="score-display">${state.scores[i]}</div>
+        </div>`;
+    }
+    
+    const cur = state.scores[state.currentPlayer];
+    const caromPhase = cur >= 90 && cur < 100;
+    
+    // LOGIKK FOR STATUS-TEKST
+    let moveTxt = "";
+    if (!state.breakDone) {
+        moveTxt = "BREKK-STØT";
+    } else if (caromPhase) {
+        moveTxt = "KUN CAROMS";
+    } else if (state.gameMode === 'alternate' && state.tableStatus === 'locked') {
+        // Her er teksten som manglet:
+        moveTxt = state.lastType === 'pocket' ? "KRAV: CAROM" : "KRAV: POCKET";
+    } else {
+        moveTxt = "ANY POINT";
+    }
+
+    document.getElementById('modeDisplay').innerText = "MODUS: " + state.gameMode.toUpperCase();
+    document.getElementById('moveText').innerText = moveTxt;
+    document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
+
+    // KULE-VISUALISERING (Gråing)
+    const lockPocket = state.gameMode === 'alternate' && state.tableStatus === 'locked' && state.lastType === 'pocket';
+    const lockCarom = state.gameMode === 'alternate' && state.tableStatus === 'locked' && state.lastType === 'carom';
+
+    // Ball 1 og 5: Grå ved carom-fase, brekk, eller hvis alternate krever carom
+    document.getElementById('ball1').classList.toggle('waiting-ball', caromPhase || !state.breakDone || lockPocket);
+    document.getElementById('ball5').classList.toggle('waiting-ball', caromPhase || !state.breakDone || lockPocket);
+    
+    // Ball 3: Grå ved carom-fase eller hvis alternate krever carom
+    document.getElementById('ball3').classList.toggle('waiting-ball', caromPhase || lockPocket);
+
+    // +CAROM og Carom-knapper: Grå hvis alternate krever pocket
+    const disCarom = lockCarom; 
+    const disSub = caromPhase || cur >= 100 || lockCarom;
+
+    document.getElementById('pc1').classList.toggle('waiting-ball', disSub);
+    document.getElementById('pc5').classList.toggle('waiting-ball', disSub);
+    document.getElementById('pc3').classList.toggle('waiting-ball', disSub);
+    
+    document.getElementById('carom1PBtn').classList.toggle('waiting-ball', disCarom);
+    document.getElementById('carom2PBtn').classList.toggle('waiting-ball', disCarom);
+}
+        
         const cur = state.scores[state.currentPlayer];
         const caromPhase = cur >= 90 && cur < 100;
         
