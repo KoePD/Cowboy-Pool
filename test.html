@@ -163,16 +163,19 @@
     let p = state.currentPlayer;
     let nextScore = state.scores[p] + val;
 
-    // Regel: Treff nøyaktig 90 eller nøyaktig 101. Overstigning = Foul.
+    // 1. Regel: Nøyaktig 90 eller 101. Overstigning = Foul.
     if ((state.scores[p] < 90 && nextScore > 90) || (state.scores[p] >= 90 && nextScore > 101)) { 
         handleFoul(); 
         return; 
     }
 
-    // Sjekk om man trykker på ulovlig knapp i Alternate-modus
+    // 2. Alternate Mode: Tillat flere trykk av samme kategori (for kombinasjoner)
     if (state.gameMode === 'alternate' && state.tableStatus === 'locked') {
-        const required = state.lastType === 'pocket' ? 'carom' : 'pocket';
-        if (!type.includes(required)) return;
+        const isCurrentlyPocket = type.includes('pocket');
+        const wasLastPocket = state.lastType === 'pocket';
+        // Hvis man prøver å bytte kategori (f.eks fra pocket til carom) før neste støt, 
+        // blokkerer vi det her, men tillater samme kategori.
+        if (isCurrentlyPocket !== wasLastPocket) return;
     }
 
     state.breakDone = true; 
@@ -190,6 +193,8 @@
     function updateUI() {
     const cont = document.getElementById('scoreboard-container');
     if(!cont) return;
+    
+    // TEGN BOKSENE
     cont.innerHTML = '';
     for(let i=0; i<state.playerCount; i++) {
         const active = state.currentPlayer === i;
@@ -213,65 +218,33 @@
     const cur = state.scores[state.currentPlayer];
     const caromPhase = cur >= 90 && cur < 100;
     
-    // LOGIKK FOR STATUS-TEKST
-    let moveTxt = "";
-    if (!state.breakDone) {
-        moveTxt = "BREKK-STØT";
-    } else if (caromPhase) {
-        moveTxt = "KUN CAROMS";
-    } else if (state.gameMode === 'alternate' && state.tableStatus === 'locked') {
-        // Her er teksten som manglet:
+    // STATUS-TEKST
+    let moveTxt = !state.breakDone ? "BREKK-STØT" : (caromPhase ? "KUN CAROMS" : "ANY POINT");
+    if (state.gameMode === 'alternate' && state.tableStatus === 'locked' && !caromPhase) {
         moveTxt = state.lastType === 'pocket' ? "KRAV: CAROM" : "KRAV: POCKET";
-    } else {
-        moveTxt = "ANY POINT";
     }
 
     document.getElementById('modeDisplay').innerText = "MODUS: " + state.gameMode.toUpperCase();
     document.getElementById('moveText').innerText = moveTxt;
     document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
 
-    // KULE-VISUALISERING (Gråing)
+    // GRÅING AV BALLER
     const lockPocket = state.gameMode === 'alternate' && state.tableStatus === 'locked' && state.lastType === 'pocket';
     const lockCarom = state.gameMode === 'alternate' && state.tableStatus === 'locked' && state.lastType === 'carom';
 
-    // Ball 1 og 5: Grå ved carom-fase, brekk, eller hvis alternate krever carom
     document.getElementById('ball1').classList.toggle('waiting-ball', caromPhase || !state.breakDone || lockPocket);
     document.getElementById('ball5').classList.toggle('waiting-ball', caromPhase || !state.breakDone || lockPocket);
-    
-    // Ball 3: Grå ved carom-fase eller hvis alternate krever carom
     document.getElementById('ball3').classList.toggle('waiting-ball', caromPhase || lockPocket);
 
-    // +CAROM og Carom-knapper: Grå hvis alternate krever pocket
-    const disCarom = lockCarom; 
+    // +CAROM skal lyse frem til 90 poeng
     const disSub = caromPhase || cur >= 100 || lockCarom;
-
     document.getElementById('pc1').classList.toggle('waiting-ball', disSub);
     document.getElementById('pc5').classList.toggle('waiting-ball', disSub);
     document.getElementById('pc3').classList.toggle('waiting-ball', disSub);
     
-    document.getElementById('carom1PBtn').classList.toggle('waiting-ball', disCarom);
-    document.getElementById('carom2PBtn').classList.toggle('waiting-ball', disCarom);
+    document.getElementById('carom1PBtn').classList.toggle('waiting-ball', lockCarom);
+    document.getElementById('carom2PBtn').classList.toggle('waiting-ball', lockCarom);
 }
-        
-        const cur = state.scores[state.currentPlayer];
-        const caromPhase = cur >= 90 && cur < 100;
-        
-        document.getElementById('modeDisplay').innerText = "MODUS: " + state.gameMode.toUpperCase();
-        document.getElementById('moveText').innerText = !state.breakDone ? "BREKK-STØT" : (caromPhase ? "KUN CAROMS" : "ANY POINT");
-        document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
-
-        // Kuler (1, 5, 3) gråes ut kun når man er i carom-fase (90-100 poeng)
-        // Ball 1 og 5 er også grå på brekket.
-        document.getElementById('ball1').classList.toggle('waiting-ball', caromPhase || !state.breakDone);
-        document.getElementById('ball5').classList.toggle('waiting-ball', caromPhase || !state.breakDone);
-        document.getElementById('ball3').classList.toggle('waiting-ball', caromPhase);
-
-        // +CAROM knapper (pc1, pc5, pc3) skal ALLTID lyse frem til man når 90 poeng
-        const disSub = caromPhase || cur >= 100;
-        document.getElementById('pc1').classList.toggle('waiting-ball', disSub);
-        document.getElementById('pc5').classList.toggle('waiting-ball', disSub);
-        document.getElementById('pc3').classList.toggle('waiting-ball', disSub);
-    }
 
     function handleFoul() { saveHistory(); state.breakDone=true; state.scores[state.currentPlayer]=state.scoreAtStart[state.currentPlayer]; state.foulCounts[state.currentPlayer]++; if(state.foulCounts[state.currentPlayer]>=3){state.scores[state.currentPlayer]=0;state.foulCounts[state.currentPlayer]=0;} nextTurn(); }
     function nextTurn() { saveHistory(); state.breakDone=true; let p = state.currentPlayer; let s = state.scores[p]-state.scoreAtStart[p]; if(s>state.bestSeries[p]) state.bestSeries[p]=s; if(p===state.playerCount-1) state.innings++; state.currentPlayer=(p+1)%state.playerCount; state.scoreAtStart[state.currentPlayer]=state.scores[state.currentPlayer]; db.set(state); }
