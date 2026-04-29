@@ -163,18 +163,16 @@
     let p = state.currentPlayer;
     let nextScore = state.scores[p] + val;
 
-    // 1. Regel: Nøyaktig 90 eller 101. Overstigning = Foul.
+    // 1. Foul-sjekk: Over 90 eller over 101
     if ((state.scores[p] < 90 && nextScore > 90) || (state.scores[p] >= 90 && nextScore > 101)) { 
         handleFoul(); 
         return; 
     }
 
-    // 2. Alternate Mode: Tillat flere trykk av samme kategori (for kombinasjoner)
+    // 2. Alternate Mode: Kun blokker hvis bordet faktisk er låst til den andre typen
     if (state.gameMode === 'alternate' && state.tableStatus === 'locked') {
         const isCurrentlyPocket = type.includes('pocket');
         const wasLastPocket = state.lastType === 'pocket';
-        // Hvis man prøver å bytte kategori (f.eks fra pocket til carom) før neste støt, 
-        // blokkerer vi det her, men tillater samme kategori.
         if (isCurrentlyPocket !== wasLastPocket) return;
     }
 
@@ -246,8 +244,37 @@
     document.getElementById('carom2PBtn').classList.toggle('waiting-ball', lockCarom);
 }
 
-    function handleFoul() { saveHistory(); state.breakDone=true; state.scores[state.currentPlayer]=state.scoreAtStart[state.currentPlayer]; state.foulCounts[state.currentPlayer]++; if(state.foulCounts[state.currentPlayer]>=3){state.scores[state.currentPlayer]=0;state.foulCounts[state.currentPlayer]=0;} nextTurn(); }
-    function nextTurn() { saveHistory(); state.breakDone=true; let p = state.currentPlayer; let s = state.scores[p]-state.scoreAtStart[p]; if(s>state.bestSeries[p]) state.bestSeries[p]=s; if(p===state.playerCount-1) state.innings++; state.currentPlayer=(p+1)%state.playerCount; state.scoreAtStart[state.currentPlayer]=state.scores[state.currentPlayer]; db.set(state); }
+    function handleFoul() { 
+    saveHistory(); 
+    state.breakDone = true; 
+    state.tableStatus = 'open'; // VIKTIG: Låser opp bordet etter foul!
+    state.lastType = null;
+    
+    state.scores[state.currentPlayer] = state.scoreAtStart[state.currentPlayer]; 
+    state.foulCounts[state.currentPlayer]++; 
+    if(state.foulCounts[state.currentPlayer] >= 3) {
+        state.scores[state.currentPlayer] = 0; 
+        state.foulCounts[state.currentPlayer] = 0;
+    } 
+    nextTurn(); 
+}
+    
+    function nextTurn() { 
+    saveHistory(); 
+    state.breakDone = true; 
+    state.tableStatus = 'open'; // VIKTIG: Låser opp bordet for nestemann!
+    state.lastType = null;
+    
+    let p = state.currentPlayer; 
+    let s = state.scores[p] - state.scoreAtStart[p]; 
+    if(s > state.bestSeries[p]) state.bestSeries[p] = s; 
+    
+    if(p === state.playerCount - 1) state.innings++; 
+    state.currentPlayer = (p + 1) % state.playerCount; 
+    state.scoreAtStart[state.currentPlayer] = state.scores[state.currentPlayer]; 
+    db.set(state); 
+}
+    
     function handleRematch() { db.set({...state, scores:[0,0,0], foulCounts:[0,0,0], scoreAtStart:[0,0,0], seconds:0, currentPlayer:0, innings:1, breakDone:false}); closeMenu(); }
     function handleFinishAndSave() { firebase.database().ref('matchHistory').push({ date: new Date().toISOString(), names: state.names, scores: state.scores }).then(()=>handleRematch()); }
     function undo() { if(history.length){state=JSON.parse(history.pop()); db.set(state);} }
