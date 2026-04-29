@@ -174,4 +174,67 @@
 
         <!-- Knapper -->
         <div class="flex gap-4 mt-auto">
-            <button class="flex-1 bg-zinc-8
+            <button class="flex-1 bg-zinc-800 py-4 rounded-xl font-black uppercase text-sm border border-zinc-700 shadow-xl">Foul</button>
+            <button class="flex-1 bg-green-700 py-4 rounded-xl font-black uppercase text-sm border border-green-500 shadow-lg shadow-green-900/20">Avslutt tur</button>
+        </div>
+    </div>
+
+    <!-- SCREEN 4: PRO -->
+    <div id="premium" class="screen">
+        <div class="flex flex-col items-center py-8">
+            <i class="fa-solid fa-hat-cowboy text-6xl gold-text mb-4"></i>
+            <h1 class="text-4xl font-black tracking-tighter text-center">COWBOY <br><span class="gold-text italic">POOL</span> PRO</h1>
+            
+            <ul class="mt-10 space-y-4 w-full px-6">
+                <li class="flex items-center gap-3"><i class="fa-solid fa-square-check text-green-500"></i> Ubegrenset Match Historikk</li>
+                <li class="flex items-center gap-3"><i class="fa-solid fa-square-check text-green-500"></i> Detaljert Motstander-analyse</li>
+                <li class="flex items-center gap-3"><i class="fa-solid fa-square-check text-green-500"></i> Eksport av PDF-rapporter</li>
+                <li class="flex items-center gap-3"><i class="fa-solid fa-square-check text-green-500"></i> Trening & Drills Modus</li>
+            </ul>
+
+            <div class="mt-12 w-full bg-zinc-900 rounded-3xl p-1 border border-yellow-600/50">
+                <div class="text-center py-2">
+                    <p class="text-xs font-bold">Engangskjøp: <span class="gold-text">199,-</span></p>
+                    <p class="text-[8px] opacity-50 uppercase">Lifetime</p>
+                </div>
+                <button class="w-full bg-green-600 py-4 rounded-2xl font-black text-sm uppercase">Prøv gratis i 7 dager</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAV BAR -->
+    <div class="nav-bar mt-auto">
+        <div class="nav-item active" onclick="showScreen('lobby')">
+            <i class="fa-solid fa-house text-lg"></i>
+            <p>Hjem</p>
+        </div>
+        <div class="nav-item" onclick="showScreen('range')">
+            <i class="fa-solid fa-trophy text-lg"></i>
+            <p>Toppliste</p>
+        </div>
+        <div class="nav-item" onclick="showScreen('premium')">
+            <i class="fa-solid fa-book text-lg"></i>
+            <p>Regler</p>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function showScreen(screenId) {
+        // Skjul alle
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        
+        // Vis valgt
+        document.getElementById(screenId).classList.add('active');
+        
+        // Oppdater nav-farge (enkelt-eksempel)
+        if(screenId === 'lobby') document.querySelectorAll('.nav-item')[0].classList.add('active');
+        if(screenId === 'range') document.querySelectorAll('.nav-item')[1].classList.add('active');
+        if(screenId === 'premium') document.querySelectorAll('.nav-item')[2].classList.add('active');
+    }
+</script>
+
+</body>
+</html>
