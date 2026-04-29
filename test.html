@@ -194,26 +194,57 @@
 }
 
    function updateUI() {
+    // 1. FINN BEHOLDEREN
     const cont = document.getElementById('scoreboard-container');
+    if (!cont) return; // Sikkerhetssjekk
+
+    // 2. TEGN SPILLERBOKSENE (Denne delen må være her for at de ikke skal forsvinne)
     cont.innerHTML = '';
-    for(let i=0; i<state.playerCount; i++) {
+    for(let i = 0; i < state.playerCount; i++) {
         const active = state.currentPlayer === i;
-        cont.innerHTML += `<div class="player-card ${active?'active':''}">
+        cont.innerHTML += `
+        <div class="player-card ${active ? 'active' : ''}">
             <div class="foul-sidebar">
-                <div class="foul-dot ${state.foulCounts[i]>=1?'active':''}"></div>
-                <div class="foul-dot ${state.foulCounts[i]>=2?'active':''}"></div>
-                <div class="foul-dot ${state.foulCounts[i]>=3?'active':''}"></div>
+                <div class="foul-dot ${state.foulCounts[i] >= 1 ? 'active' : ''}"></div>
+                <div class="foul-dot ${state.foulCounts[i] >= 2 ? 'active' : ''}"></div>
+                <div class="foul-dot ${state.foulCounts[i] >= 3 ? 'active' : ''}"></div>
             </div>
             <div class="player-info">
                 <h2>${state.names[i]}</h2>
                 <div class="sub-stats">
-                    <div class="stat-group"><span class="stat-label">NÅ</span><span class="stat-val">${active ? state.scores[i]-state.scoreAtStart[i] : 0}</span></div>
+                    <div class="stat-group"><span class="stat-label">NÅ</span><span class="stat-val">${active ? state.scores[i] - state.scoreAtStart[i] : 0}</span></div>
                     <div class="stat-group"><span class="stat-label">BEST</span><span class="stat-val">${state.bestSeries[i]}</span></div>
                 </div>
             </div>
             <div class="score-display">${state.scores[i]}</div>
         </div>`;
     }
+    
+    // 3. OPPDATER STATUS OG TIMER
+    const cur = state.scores[state.currentPlayer];
+    const caromPhase = cur >= 90 && cur < 100;
+    
+    document.getElementById('modeDisplay').innerText = "MODUS: " + state.gameMode.toUpperCase();
+    document.getElementById('moveText').innerText = !state.breakDone ? "BREKK-STØT" : (caromPhase ? "KUN CAROMS" : "ANY POINT");
+    document.getElementById('matchTimer').innerText = new Date(state.seconds * 1000).toISOString().substr(11, 8);
+
+    // 4. KULE-LOGIKK (Gråing)
+    // Ball 1 og 5 er grå på brekk og i carom-fase
+    document.getElementById('ball1').classList.toggle('waiting-ball', caromPhase || !state.breakDone);
+    document.getElementById('ball5').classList.toggle('waiting-ball', caromPhase || !state.breakDone);
+    // Ball 3 er kun grå i carom-fase
+    document.getElementById('ball3').classList.toggle('waiting-ball', caromPhase);
+
+    // 5. +CAROM LOGIKK (Skal alltid lyse under 90 poeng)
+    const disableSubCarom = caromPhase || cur >= 100;
+    document.getElementById('pc1').classList.toggle('waiting-ball', disableSubCarom);
+    document.getElementById('pc5').classList.toggle('waiting-ball', disableSubCarom);
+    document.getElementById('pc3').classList.toggle('waiting-ball', disableSubCarom);
+
+    // Carom-knappene nederst lyser alltid
+    document.getElementById('carom1PBtn').classList.remove('waiting-ball');
+    document.getElementById('carom2PBtn').classList.remove('waiting-ball');
+}
     
     const cur = state.scores[state.currentPlayer];
     const caromPhase = cur >= 90 && cur < 100;
