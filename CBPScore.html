@@ -4,209 +4,171 @@
     <meta charset="UTF-8">
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Rye&family=Sancreek&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
     <style>
-        /* --- OUTLAW THEME BASE --- */
+        /* --- DRECK-WOOD / LUXE BRASS THEME (MATCHING THE APP) --- */
         body { 
             background-color: rgba(0, 0, 0, 0); 
-            margin: 0; 
-            padding: 0; 
+            margin: 0; padding: 0; overflow: hidden; 
+            font-family: 'Cinzel Decorative', serif; 
+            height: 1080px; width: 1920px; 
+            display: flex; flex-direction: column; justify-content: flex-end; align-items: center; 
+        }
+
+        /* Hovedbeholder med messingramme fra appen */
+        .scoreline-wrapper { 
+            width: 1000px; margin-bottom: 50px; 
+            background: rgba(10, 5, 2, 0.95); /* Veldig mørk */
+            border: 5px solid #bd9b5b; /* Appens messingfarge */
+            border-radius: 15px; 
+            box-shadow: 0 25px 60px rgba(0,0,0,1), inset 0 0 50px rgba(189, 155, 91, 0.1);
             overflow: hidden; 
-            font-family: 'Rye', serif; 
-            height: 1080px; 
-            width: 1920px; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: flex-end; 
-            align-items: center; 
         }
 
-        /* Bakgrunnsvegg: Mørkt Saloon-treverk (CSS-generert) */
-        .scoreline-body { 
-            display: flex; 
-            flex-direction: column; 
-            background: #2c1b0e;
-            background-image: repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(0,0,0,0.2) 41px),
-                              linear-gradient(to bottom, #3d2b1f, #241409);
-            border: 6px solid #1a0f06;
-            border-radius: 0 0 10px 10px;
-            width: 100%;
-            position: relative;
-            z-index: 5;
-            overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9), inset 0 0 100px rgba(0,0,0,0.5);
-            transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        /* Header: Messingskilt med nagler */
+        /* Header: Mørk med gullskrift */
         .scoreline-header { 
-            display: flex; 
-            align-items: center; 
-            background: linear-gradient(145deg, #b8860b, #daa520, #8b4513);
-            border: 4px solid #5d4037;
-            border-bottom: none;
-            border-radius: 15px 15px 0 0;
-            height: 60px; 
-            width: 100%; 
-            position: relative;
-            z-index: 10;
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.3);
+            display: flex; align-items: center; 
+            background: linear-gradient(180deg, #1d0f06 0%, #000 100%);
+            border-bottom: 3px solid #6e5932;
+            height: 70px; width: 100%; position: relative; z-index: 10;
         }
 
-        /* Header Tekst */
-        .inning-text { color: #241409; font-weight: 900; font-size: 18px; text-shadow: 1px 1px 0px rgba(255,255,255,0.2); }
-        .status-msg { color: #3d2b1f; font-weight: 900; font-size: 16px; font-family: 'Sancreek', cursive; }
+        /* Header Tekst - matchende app-skrift */
+        .inning-text { color: #fdfaf0; font-weight: 700; font-size: 20px; text-shadow: 1px 1px 0px #000; }
+        .status-msg { color: #bd9b5b; font-weight: 700; font-size: 16px; font-family: 'Anton', sans-serif; text-transform: uppercase; }
 
-        /* SPILLERRADEN: Wanted-plakat stil */
+        /* --- ORGINALE 3D-KULER MED FARGEREF (Purple -> Orange) --- */
+        .header-balls { width: 220px; display: flex; justify-content: center; gap: 15px; }
+        .ball { width: 35px; height: 35px; border-radius: 50%; position: relative; box-shadow: 4px 4px 8px rgba(0,0,0,0.8); border: 2px solid #000; }
+        .ball-overlay-3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; z-index: 10; box-shadow: inset -3px -3px 5px rgba(0,0,0,0.6), inset 2px 2px 4px rgba(255,255,255,0.3); }
+        .ball-num { font-size: 14px; font-weight: 900; font-family: 'Anton', sans-serif; color: black; background: white; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5; }
+        
+        .f-1 { background: radial-gradient(circle at 30% 30%, #f1c40f 0%, #a67c00 100%); } /* Gul */
+        .f-5 { background: radial-gradient(circle at 30% 30%, #e67e22 0%, #834c16 100%); } /* ORANSJE (byttet fra lilla) */
+        .f-3 { background: radial-gradient(circle at 30% 30%, #e74c3c 0%, #962d22 100%); } /* Rød */
+
+        /* SPILLERRADEN: Mørk treplate med messingnagler */
         .player-row {
-            display: none; 
-            align-items: center; 
-            width: 96%;
-            margin: 0 2%;
-            height: 85px; 
-            background: #e4cf9b; /* Gammelt papir */
-            background-image: url('https://www.transparenttextures.com/patterns/papyros.png');
-            border: 2px solid #c4a484;
-            box-shadow: 3px 3px 10px rgba(0,0,0,0.5);
+            display: none; align-items: center; 
+            width: 98%; margin: 0 1%; 
+            height: 100px; 
+            background: #241409;
+            background-image: repeating-linear-gradient(90deg, transparent, transparent 30px, rgba(0,0,0,0.1) 31px);
+            border: 2px solid #3d2b1f;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
             position: absolute; 
             transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
-            transform-origin: top center;
-            animation: swing 4s infinite ease-in-out;
+            transform-origin: center center;
+            animation: app_wiggle 5s infinite ease-in-out;
         }
 
-        /* Sving-animasjon for "henger på veggen"-effekt */
-        @keyframes swing {
-            0% { transform: translateY(var(--y)) rotate(0.3deg); }
-            50% { transform: translateY(var(--y)) rotate(-0.3deg); }
-            100% { transform: translateY(var(--y)) rotate(0.3deg); }
+        @keyframes app_wiggle {
+            0% { transform: translateY(var(--y)) rotate(0.1deg); }
+            50% { transform: translateY(var(--y)) rotate(-0.1deg); }
+            100% { transform: translateY(var(--y)) rotate(0.1deg); }
         }
 
-        /* Navneområde */
+        /* Navneområde - Gullskrift som appen */
         .name { 
-            font-size: 34px; 
-            color: #3d2b1f; 
-            text-transform: uppercase; 
-            letter-spacing: -1px;
-            filter: drop-shadow(1px 1px 0px rgba(255,255,255,0.5));
+            font-size: 38px; color: #fdfaf0; text-transform: uppercase; letter-spacing: -1px;
+            filter: drop-shadow(1px 1px 0px #000); font-family: 'Cinzel Decorative', serif;
         }
 
-        /* Poengblokk: Metall-look */
+        /* Poengblokk: Mørk boks med gulltall */
         .score-block { 
-            min-width: 180px; 
-            height: 100%; 
-            background: rgba(0,0,0,0.1);
-            border-left: 2px dashed rgba(61,43,31,0.3);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            min-width: 200px; height: 100%; 
+            background: rgba(0,0,0,0.3); border-left: 3px solid #6e5932;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        /* Messing farge for poeng */
+        /* Gull messing-tall fra appen */
         .score-val { 
-            font-size: 65px; 
-            font-weight: 900; 
-            line-height: 0.8;
-            background: linear-gradient(to bottom, #b8860b 0%, #f1c40f 50%, #8b4513 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(3px 3px 2px rgba(0,0,0,0.4));
+            font-size: 80px; font-weight: 900; line-height: 0.8; font-family: 'Anton', sans-serif;
+            background: linear-gradient(to bottom, #fdfaf0 0%, #bd9b5b 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            filter: drop-shadow(3px 3px 2px rgba(0,0,0,0.8));
         }
 
-        /* Foul-prikker som Messing-kuler */
+        /* Foul-prikker som Messing-kuler fra appen */
         .dot { 
-            width: 14px; 
-            height: 14px; 
-            border-radius: 50%; 
-            background: rgba(0,0,0,0.4); /* Kulehull */
-            border: 2px solid #1a0f06;
-            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.8);
+            width: 16px; height: 16px; border-radius: 50%; 
+            background: #100804; border: 2px solid #6e5932;
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.9);
         }
         .dot.active { 
-            background: radial-gradient(circle at 35% 35%, #daa520, #b8860b, #4b3621); /* Messing kule */
-            border: 1px solid #5d4037;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.6);
+            background: radial-gradient(circle at 35% 35%, #fdfaf0 0%, #bd9b5b 50%, #6e5932 100%); /* Full messing kule */
+            border: 2px solid #fdfaf0;
+            box-shadow: 0 0 10px rgba(253, 250, 240, 0.4);
         }
 
-        /* Spesial-effekt: Eliminert */
-        .player-eliminated { 
-            filter: grayscale(1) sepia(0.5) brightness(0.6); 
-        }
+        /* Eliminert status - Matchende app-UI */
+        .player-eliminated { filter: sepia(0.8) brightness(0.4); opacity: 0.8 !important; }
         .player-eliminated::after {
-            content: "DECEASED";
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%) rotate(-15deg);
-            color: rgba(139, 0, 0, 0.7);
-            font-size: 60px;
-            border: 5px solid rgba(139, 0, 0, 0.7);
-            padding: 5px 20px;
-            font-family: 'Sancreek', cursive;
-            pointer-events: none;
+            content: "DECEASED"; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-10deg);
+            color: #daa520; font-size: 70px; border: 6px solid #daa520;
+            padding: 5px 30px; font-family: 'Anton', sans-serif; pointer-events: none; opacity: 0.9;
         }
 
-        /* Andre UI elementer */
-        .pers-val { font-size: 11px; color: #5d4037; font-weight: bold; }
-        .pers-val b { color: #8b4513; }
-        
-        .ball { box-shadow: 3px 3px 10px rgba(0,0,0,0.5); }
+        /* Småtallene */
+        .pers-val { font-size: 13px; color: #bd9b5b; font-weight: bold; font-family: 'Anton', sans-serif; }
+        .pers-val b { color: #fdfaf0; }
     </style>
 </head>
 <body>
 
-<div class="scoreline-wrapper" style="width: 1000px; margin-bottom: 50px;">
+<div class="scoreline-wrapper">
     <div class="scoreline-header">
-        <div style="flex: 1; display: flex; align-items: center; padding-left: 25px; gap: 20px;">
-            <div class="inning-text" id="inning-text">INNING 1</div>
-            <div style="color: rgba(0,0,0,0.3); font-weight: bold;">|</div>
-            <div class="status-msg" id="status-msg">SALOON OPEN</div>
+        <div style="flex: 1; display: flex; align-items: center; padding-left: 30px; gap: 20px;">
+            <div class="inning-text" id="inning-text">ROUND 1</div>
+            <div style="color: rgba(189, 155, 91, 0.3); font-weight: bold; font-size: 24px;">|</div>
+            <div class="status-msg" id="status-msg">DUEL STARTING</div>
         </div>
-        <div class="header-balls" style="width: 200px; display: flex; justify-content: center; gap: 15px;">
-            <div id="hdr-b1" class="ball" style="width:30px; height:30px; border-radius:50%; background:radial-gradient(circle at 30% 30%, #f1c40f, #b8860b); border:2px solid #000;"></div>
-            <div id="hdr-b5" class="ball" style="width:30px; height:30px; border-radius:50%; background:radial-gradient(circle at 30% 30%, #8e44ad, #4b0082); border:2px solid #000;"></div>
-            <div id="hdr-b3" class="ball" style="width:30px; height:30px; border-radius:50%; background:radial-gradient(circle at 30% 30%, #e74c3c, #962d22); border:2px solid #000;"></div>
+        <div class="header-balls">
+            <div id="hdr-b1" class="ball f-1"><div class="ball-num">1</div><div class="ball-overlay-3d"></div></div>
+            <div id="hdr-b5" class="ball f-5"><div class="ball-num">5</div><div class="ball-overlay-3d"></div></div>
+            <div id="hdr-b3" class="ball f-3"><div class="ball-num">3</div><div class="ball-overlay-3d"></div></div>
         </div>
     </div>
 
-    <div class="scoreline-body" id="main-body">
-        <!-- Rader genereres via JS (Samme IDer som før) -->
+    <div class="scoreline-body" id="main-body" style="background: rgba(10,5,2,0.8); border-top: 3px solid #bd9b5b;">
         <div class="player-row" id="p0-row">
             <div style="display:flex; align-items:center; flex:1; padding:0 35px;">
-                <div class="fouls" id="p0-fouls" style="display:flex; flex-direction:column; gap:5px; margin-right:20px;"></div>
+                <div class="fouls" id="p0-fouls" style="display:flex; flex-direction:column; gap:6px; margin-right:20px;"></div>
                 <div class="name" id="p0-name">PLAYER 1</div>
             </div>
             <div class="score-block">
                 <div class="score-val" id="p0-score">0</div>
-                <div class="pers-val"><span>NÅ <b id="p0-now">0</b></span> <span>PERS <b id="best-0">0</b></span></div>
+                <div class="pers-val"><span>NÅ <b id="p0-now">0</b></span> <span>| PERS <b id="best-0">0</b></span></div>
             </div>
         </div>
 
         <div class="player-row" id="p1-row">
             <div style="display:flex; align-items:center; flex:1; padding:0 35px;">
-                <div class="fouls" id="p1-fouls" style="display:flex; flex-direction:column; gap:5px; margin-right:20px;"></div>
+                <div class="fouls" id="p1-fouls" style="display:flex; flex-direction:column; gap:6px; margin-right:20px;"></div>
                 <div class="name" id="p1-name">PLAYER 2</div>
             </div>
             <div class="score-block">
                 <div class="score-val" id="p1-score">0</div>
-                <div class="pers-val"><span>NÅ <b id="p1-now">0</b></span> <span>PERS <b id="best-1">0</b></span></div>
+                <div class="pers-val"><span>NÅ <b id="p1-now">0</b></span> <span>| PERS <b id="best-1">0</b></span></div>
             </div>
         </div>
 
         <div class="player-row" id="p2-row">
             <div style="display:flex; align-items:center; flex:1; padding:0 35px;">
-                <div class="fouls" id="p2-fouls" style="display:flex; flex-direction:column; gap:5px; margin-right:20px;"></div>
+                <div class="fouls" id="p2-fouls" style="display:flex; flex-direction:column; gap:6px; margin-right:20px;"></div>
                 <div class="name" id="p2-name">PLAYER 3</div>
             </div>
             <div class="score-block">
                 <div class="score-val" id="p2-score">0</div>
-                <div class="pers-val"><span>NÅ <b id="p2-now">0</b></span> <span>PERS <b id="best-2">0</b></span></div>
+                <div class="pers-val"><span>NÅ <b id="p2-now">0</b></span> <span>| PERS <b id="best-2">0</b></span></div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // --- SAMME FIREBASE LOGIKK SOM FØR ---
+    // --- SAMME FIREBASE LOGIKK, KUN OPPSETT ER OPPDATERT ---
     const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('gameData');
@@ -216,10 +178,9 @@
         if (!data) return;
 
         const bodyEl = document.getElementById('main-body');
-        const rowHeight = 95; // Litt høyere for plakat-stilen
+        const rowHeight = 110; // Matcher den nye, tunge stilen
         bodyEl.style.height = (data.playerCount * rowHeight) + "px";
 
-        // Finn rangering
         let players = [];
         for (let i = 0; i < data.playerCount; i++) {
             players.push({ index: i, score: data.scores[i], eliminated: data.foulCounts[i] >= 3 });
@@ -236,16 +197,11 @@
             row.style.setProperty('--y', `${yPos}px`);
             row.style.transform = `translateY(${yPos}px)`;
 
-            // Oppdater Navn/Score
-            document.getElementById(`p${p}-name`).innerText = data.names[p];
+            document.getElementById(`p${p}-name`).innerText = data.names[p] || `PLAYER ${p+1}`;
             const scoreEl = document.getElementById(`p${p}-score`);
             scoreEl.innerText = data.scores[p];
 
-            // Messing/Sølv/Bronse farger basert på rang
-            if (rank === 0) scoreEl.style.filter = "drop-shadow(0 0 5px rgba(218,165,32,0.5))";
-            else if (rank === 1) scoreEl.style.filter = "grayscale(1) brightness(1.2)";
-
-            // Fouls (Messing-kuler)
+            // Fouls (Messing-kuler fra app-stil)
             let fHtml = '';
             for (let d = 0; d < 3; d++) {
                 let active = d < data.foulCounts[p] ? 'active' : '';
@@ -253,14 +209,23 @@
             }
             document.getElementById(`p${p}-fouls`).innerHTML = fHtml;
 
+            // Oppdater småtall
+            if (curP === p) {
+                document.getElementById(`p${p}-now`).innerText = data.scores[p] - (data.scoreAtStart ? data.scoreAtStart[p] : 0);
+            } else { document.getElementById(`p${p}-now`).innerText = "0"; }
+            
+            const bestSeries = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
+            document.getElementById(`best-${p}`).innerText = bestSeries;
+
             // Status effekter
             row.classList.toggle('player-eliminated', pData.eliminated);
-            row.style.opacity = (data.currentPlayer === p || pData.eliminated) ? "1" : "0.6";
+            row.style.opacity = (data.currentPlayer === p || pData.eliminated) ? "1" : "0.5"; // Tydelig turtaking
         });
 
         // Header info
-        document.getElementById('inning-text').innerText = `ROUND ${Math.floor(data.innings / data.playerCount) + 1}`;
-        document.getElementById('status-msg').innerText = data.breakDone ? "DUEL IN PROGRESS" : "OPENING SHOT";
+        const roundNum = Math.floor(data.innings / data.playerCount) + 1;
+        document.getElementById('inning-text').innerText = `ROUND ${roundNum}`;
+        document.getElementById('status-msg').innerText = data.breakDone ? "DUEL IN PROGRESS" : "OPENING BREAK";
     });
 </script>
 
