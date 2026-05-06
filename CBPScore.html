@@ -34,13 +34,16 @@
         .status-msg { color: #bd9b5b; font-size: 15px; font-family: 'Anton', sans-serif; text-transform: uppercase; margin-left: 15px; letter-spacing: 1px; }
 
         .header-balls { margin-left: auto; margin-right: 25px; display: flex; gap: 12px; }
-        .ball { width: 32px; height: 32px; border-radius: 50%; position: relative; box-shadow: 2px 2px 5px rgba(0,0,0,0.8); border: 2px solid #000; }
+        .ball { width: 32px; height: 32px; border-radius: 50%; position: relative; box-shadow: 2px 2px 5px rgba(0,0,0,0.8); border: 2px solid #000; transition: all 0.3s ease; }
         .ball-overlay-3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; z-index: 10; box-shadow: inset -2px -2px 4px rgba(0,0,0,0.6), inset 1.5px 1.5px 3px rgba(255,255,255,0.3); }
         .ball-num { font-size: 13px; font-weight: 900; font-family: 'Anton', sans-serif; color: black; background: white; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5; }
         
         .f-1 { background: radial-gradient(circle at 30% 30%, #f1c40f 0%, #a67c00 100%); }
         .f-5 { background: radial-gradient(circle at 30% 30%, #e67e22 0%, #834c16 100%); }
         .f-3 { background: radial-gradient(circle at 30% 30%, #e74c3c 0%, #962d22 100%); }
+
+        /* Dimming av kuler når de ikke er i spill */
+        .ball-dimmed { opacity: 0.15; filter: brightness(0.5) blur(0.5px); transform: scale(0.8); }
 
         .scoreline-body { position: relative; width: 100%; background: #0a0502; transition: height 0.6s ease; }
 
@@ -61,7 +64,6 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        /* POENG-FONT SOM I BILDE 1 */
         .score-val { 
             font-size: 70px; font-family: 'Anton', sans-serif; line-height: 0.8;
             background: linear-gradient(to bottom, #fdfaf0 0%, #bd9b5b 100%);
@@ -69,7 +71,6 @@
             filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.8));
         }
 
-        /* Gull, Sølv, Bronse Spesial-gradienter */
         .rank-0 .score-val { background: linear-gradient(to bottom, #fff7ad 0%, #f1c40f 50%, #b8860b 100%); -webkit-background-clip: text; filter: drop-shadow(0 0 10px rgba(218,165,32,0.4)); }
         .rank-1 .score-val { background: linear-gradient(to bottom, #ffffff 0%, #bdc3c7 50%, #7f8c8d 100%); -webkit-background-clip: text; }
         .rank-2 .score-val { background: linear-gradient(to bottom, #ffcc99 0%, #cd7f32 50%, #8b4513 100%); -webkit-background-clip: text; }
@@ -77,7 +78,6 @@
         .pers-val { font-size: 12px; color: #bd9b5b; font-family: 'Anton', sans-serif; text-transform: uppercase; margin-top: 2px; }
         .pers-val b { color: #fdfaf0; }
 
-        /* RØDE FOUL-PRIKKER */
         .dot { width: 14px; height: 14px; border-radius: 50%; background: #111; border: 1px solid #333; margin-bottom: 4px; }
         .dot.active { 
             background: #ff0000; 
@@ -94,7 +94,7 @@
     <div class="scoreline-header">
         <div class="inning-text" id="inning-text">ROUND 1</div>
         <div style="color: #6e5932; font-size: 20px; margin-left: 15px;">|</div>
-        <div class="status-msg" id="status-msg">READY</div>
+        <div class="status-msg" id="status-msg">OPPDATERER...</div>
         <div class="header-balls">
             <div id="hdr-b1" class="ball f-1"><div class="ball-num">1</div><div class="ball-overlay-3d"></div></div>
             <div id="hdr-b5" class="ball f-5"><div class="ball-num">5</div><div class="ball-overlay-3d"></div></div>
@@ -130,7 +130,7 @@
             </div>
             <div class="score-block">
                 <div class="score-val" id="p2-score">0</div>
-                <div class="pers-val">NÅ <b id="p2-now">0</b> | PERS <b id="best-2">0</b></div>
+                <div class="pers-val">NÅ <b id="p0-now">0</b> | PERS <b id="best-2">0</b></div>
             </div>
         </div>
     </div>
@@ -141,14 +141,22 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('gameData');
 
+    const i18n = {
+        no: { inn: "ROUND", break: "STARTSTØT (3-BALL)", open: "VALG: CAROM / POCKET", rc: "KRAV: CAROM", rp: "KRAV: POCKET" },
+        en: { inn: "ROUND", break: "BREAKSHOT (3-BALL)", open: "CHOICE: CAROM / POCKET", rc: "REQ: CAROM", rp: "REQ: POCKET" }
+    };
+
     db.on('value', snap => {
         const data = snap.val();
         if (!data) return;
 
+        const lang = data.lang || 'no';
+        const t = i18n[lang];
         const curP = data.currentPlayer;
         const rowH = 100;
         document.getElementById('main-body').style.height = (data.playerCount * rowH) + "px";
 
+        // --- RANGERING OG OPPSETT ---
         let pList = [];
         for (let i = 0; i < data.playerCount; i++) {
             pList.push({ idx: i, score: data.scores[i], elim: data.foulCounts[i] >= 3 });
@@ -167,7 +175,6 @@
             document.getElementById(`p${p}-name`).innerText = data.names[p] || `PLAYER ${p+1}`;
             document.getElementById(`p${p}-score`).innerText = data.scores[p];
 
-            // Fouls (Knallrøde)
             let fHtml = '';
             for (let d = 0; d < 3; d++) {
                 fHtml += `<div class="dot ${d < data.foulCounts[p] ? 'active' : ''}"></div>`;
@@ -183,8 +190,24 @@
             row.style.opacity = (curP === p || pData.elim) ? "1" : "0.5";
         });
 
-        document.getElementById('inning-text').innerText = `ROUND ${Math.floor(data.innings / data.playerCount) + 1}`;
-        document.getElementById('status-msg').innerText = data.breakDone ? "DUEL IN PROGRESS" : "OPENING BREAK";
+        // --- DYNAMISK STATUSMELDING (KRAV) ---
+        const roundNum = Math.floor(data.innings / data.playerCount) + 1;
+        document.getElementById('inning-text').innerText = `${t.inn} ${roundNum}`;
+
+        let statusText = t.break;
+        if (data.breakDone) {
+            statusText = (data.tableStatus === 'locked') ? (data.lastType === 'pocket' ? t.rc : t.rp) : t.open;
+        }
+        document.getElementById('status-msg').innerText = statusText;
+
+        // --- KULER I HEADER ---
+        const b1 = document.getElementById('hdr-b1'), b3 = document.getElementById('hdr-b3'), b5 = document.getElementById('hdr-b5');
+        [b1, b3, b5].forEach(b => b.classList.remove('ball-dimmed'));
+        
+        if (!data.breakDone) { 
+            b1.classList.add('ball-dimmed'); 
+            b5.classList.add('ball-dimmed'); 
+        }
     });
 </script>
 </body>
