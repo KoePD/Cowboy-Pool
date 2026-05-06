@@ -29,14 +29,13 @@
             background: linear-gradient(180deg, #1d0f06 0%, #000 100%);
             border-bottom: 3px solid #6e5932;
             height: 70px; width: 100%; position: relative; z-index: 10;
-            box-sizing: border-box;
         }
 
-        .inning-text { color: #fdfaf0; font-size: 20px; }
-        .status-msg { color: #bd9b5b; font-size: 16px; font-family: 'Anton', sans-serif; text-transform: uppercase; }
+        .inning-text { color: #fdfaf0; font-size: 22px; padding-left: 30px; }
+        .status-msg { color: #bd9b5b; font-size: 16px; font-family: 'Anton', sans-serif; text-transform: uppercase; margin-left: 20px; }
 
         /* KULER */
-        .header-balls { width: 220px; display: flex; justify-content: center; gap: 15px; }
+        .header-balls { margin-left: auto; margin-right: 30px; display: flex; gap: 15px; }
         .ball { width: 35px; height: 35px; border-radius: 50%; position: relative; box-shadow: 4px 4px 8px rgba(0,0,0,0.8); border: 2px solid #000; }
         .ball-overlay-3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; z-index: 10; box-shadow: inset -3px -3px 5px rgba(0,0,0,0.6), inset 2px 2px 4px rgba(255,255,255,0.3); }
         .ball-num { font-size: 14px; font-weight: 900; font-family: 'Anton', sans-serif; color: black; background: white; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5; }
@@ -45,19 +44,11 @@
         .f-5 { background: radial-gradient(circle at 30% 30%, #e67e22 0%, #834c16 100%); }
         .f-3 { background: radial-gradient(circle at 30% 30%, #e74c3c 0%, #962d22 100%); }
 
-        .scoreline-body { 
-            position: relative; 
-            width: 100%; 
-            background: rgba(10,5,2,0.9);
-            transition: height 0.6s ease;
-        }
+        .scoreline-body { position: relative; width: 100%; background: rgba(10,5,2,0.9); transition: height 0.6s ease; }
 
-        /* FIKSET PLAYER ROW: Låst bredde og posisjon */
         .player-row {
             display: none; align-items: center; 
-            width: 980px; /* Fast bredde (1000px minus border) */
-            left: 0; right: 0; margin: auto; /* Sentrerer raden */
-            height: 100px; 
+            width: 100%; height: 110px; 
             background: #1a0f06;
             border-bottom: 1px solid #3d2b1f;
             position: absolute; 
@@ -65,40 +56,43 @@
             transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
         }
 
-        .name { 
-            font-size: 38px; color: #fdfaf0; text-transform: uppercase; 
-            filter: drop-shadow(1px 1px 0px #000); 
-        }
+        .name { font-size: 38px; color: #fdfaf0; text-transform: uppercase; padding-left: 20px; font-family: 'Cinzel Decorative', serif; }
 
         .score-block { 
-            min-width: 200px; height: 100%; 
-            background: rgba(0,0,0,0.4); border-left: 3px solid #6e5932;
+            min-width: 220px; height: 100%; margin-left: auto;
+            background: rgba(0,0,0,0.5); border-left: 3px solid #6e5932;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
+        /* Standard sølv-hvit look */
         .score-val { 
-            font-size: 70px; font-family: 'Anton', sans-serif;
+            font-size: 65px; font-family: 'Anton', sans-serif; line-height: 1;
             background: linear-gradient(to bottom, #fdfaf0 0%, #bd9b5b 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-top: 5px;
         }
 
+        /* Gull, Sølv, Bronse Spesialstiler */
+        .rank-0 .score-val { background: linear-gradient(to bottom, #fff7ad 0%, #f1c40f 50%, #b8860b 100%); -webkit-background-clip: text; }
+        .rank-1 .score-val { background: linear-gradient(to bottom, #ffffff 0%, #bdc3c7 50%, #7f8c8d 100%); -webkit-background-clip: text; }
+        .rank-2 .score-val { background: linear-gradient(to bottom, #ffcc99 0%, #cd7f32 50%, #8b4513 100%); -webkit-background-clip: text; }
+
+        .pers-val { font-size: 14px; color: #bd9b5b; font-family: 'Anton', sans-serif; text-transform: uppercase; margin-top: 5px; }
+        .pers-val b { color: #fdfaf0; }
+
         .dot { width: 16px; height: 16px; border-radius: 50%; background: #000; border: 2px solid #6e5932; }
-        .dot.active { background: radial-gradient(circle at 35% 35%, #fdfaf0 0%, #bd9b5b 100%); border: 2px solid #fdfaf0; }
+        .dot.active { background: radial-gradient(circle at 35% 35%, #fdfaf0 0%, #bd9b5b 100%); border: 2px solid #fdfaf0; box-shadow: 0 0 8px rgba(189, 155, 91, 0.5); }
 
         .player-eliminated { filter: sepia(0.8) brightness(0.3); }
-        .pers-val { font-size: 13px; color: #bd9b5b; font-family: 'Anton', sans-serif; }
-        .pers-val b { color: #fdfaf0; }
     </style>
 </head>
 <body>
 
 <div class="scoreline-wrapper">
     <div class="scoreline-header">
-        <div style="flex: 1; display: flex; align-items: center; padding-left: 30px; gap: 20px;">
-            <div class="inning-text" id="inning-text">ROUND 1</div>
-            <div style="color: #6e5932; font-size: 24px;">|</div>
-            <div class="status-msg" id="status-msg">WAITING...</div>
-        </div>
+        <div class="inning-text" id="inning-text">ROUND 1</div>
+        <div style="color: #6e5932; font-size: 24px; margin-left: 20px;">|</div>
+        <div class="status-msg" id="status-msg">READY TO DUEL</div>
         <div class="header-balls">
             <div id="hdr-b1" class="ball f-1"><div class="ball-num">1</div><div class="ball-overlay-3d"></div></div>
             <div id="hdr-b5" class="ball f-5"><div class="ball-num">5</div><div class="ball-overlay-3d"></div></div>
@@ -108,8 +102,8 @@
 
     <div class="scoreline-body" id="main-body">
         <div class="player-row" id="p0-row">
-            <div style="display:flex; align-items:center; flex:1; padding:0 35px;">
-                <div class="fouls" id="p0-fouls" style="display:flex; flex-direction:column; gap:6px; margin-right:25px;"></div>
+            <div style="display:flex; align-items:center; padding:0 25px;">
+                <div class="fouls" id="p0-fouls" style="display:flex; flex-direction:column; gap:6px;"></div>
                 <div class="name" id="p0-name">PLAYER 1</div>
             </div>
             <div class="score-block">
@@ -118,8 +112,8 @@
             </div>
         </div>
         <div class="player-row" id="p1-row">
-            <div style="display:flex; align-items:center; flex:1; padding:0 35px;">
-                <div class="fouls" id="p1-fouls" style="display:flex; flex-direction:column; gap:6px; margin-right:25px;"></div>
+            <div style="display:flex; align-items:center; padding:0 25px;">
+                <div class="fouls" id="p1-fouls" style="display:flex; flex-direction:column; gap:6px;"></div>
                 <div class="name" id="p1-name">PLAYER 2</div>
             </div>
             <div class="score-block">
@@ -128,8 +122,8 @@
             </div>
         </div>
         <div class="player-row" id="p2-row">
-            <div style="display:flex; align-items:center; flex:1; padding:0 35px;">
-                <div class="fouls" id="p2-fouls" style="display:flex; flex-direction:column; gap:6px; margin-right:25px;"></div>
+            <div style="display:flex; align-items:center; padding:0 25px;">
+                <div class="fouls" id="p2-fouls" style="display:flex; flex-direction:column; gap:6px;"></div>
                 <div class="name" id="p2-name">PLAYER 3</div>
             </div>
             <div class="score-block">
@@ -149,10 +143,9 @@
         const data = snap.val();
         if (!data) return;
 
-        const curP = data.currentPlayer; // Definerer denne for bruk under
-        const bodyEl = document.getElementById('main-body');
-        const rowH = 100;
-        bodyEl.style.height = (data.playerCount * rowH) + "px";
+        const curP = data.currentPlayer;
+        const rowH = 110;
+        document.getElementById('main-body').style.height = (data.playerCount * rowH) + "px";
 
         let pList = [];
         for (let i = 0; i < data.playerCount; i++) {
@@ -165,21 +158,20 @@
             const row = document.getElementById(`p${p}-row`);
             if (!row) return;
 
+            row.className = `player-row rank-${rank}`; // Setter rank-klasse for farge
             row.style.display = "flex";
             row.style.transform = `translateY(${rank * rowH}px)`;
 
             document.getElementById(`p${p}-name`).innerText = data.names[p] || `PLAYER ${p+1}`;
             document.getElementById(`p${p}-score`).innerText = data.scores[p];
 
-            // Fouls
             let fHtml = '';
             for (let d = 0; d < 3; d++) {
                 fHtml += `<div class="dot ${d < data.foulCounts[p] ? 'active' : ''}"></div>`;
             }
             document.getElementById(`p${p}-fouls`).innerHTML = fHtml;
 
-            // Småtall
-            const nowVal = (curP === p && !pData.elim) ? (data.scores[p] - data.scoreAtStart[p]) : 0;
+            const nowVal = (curP === p && !pData.elim) ? (data.scores[p] - (data.scoreAtStart ? data.scoreAtStart[p] : 0)) : 0;
             document.getElementById(`p${p}-now`).innerText = nowVal;
             document.getElementById(`best-${p}`).innerText = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
 
@@ -187,8 +179,7 @@
             row.style.opacity = (curP === p || pData.elim) ? "1" : "0.5";
         });
 
-        const round = Math.floor(data.innings / data.playerCount) + 1;
-        document.getElementById('inning-text').innerText = `ROUND ${round}`;
+        document.getElementById('inning-text').innerText = `ROUND ${Math.floor(data.innings / data.playerCount) + 1}`;
         document.getElementById('status-msg').innerText = data.breakDone ? "DUEL IN PROGRESS" : "OPENING BREAK";
     });
 </script>
