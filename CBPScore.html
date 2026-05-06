@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel+Decorative:wght@700&family=Rye&family=Sancreek&display=swap" rel="stylesheet">
+    
     <style>
         body { 
             background-color: rgba(0, 0, 0, 0); 
             margin: 0; padding: 0; overflow: hidden; 
-            font-family: 'Cinzel Decorative', serif; 
             height: 1080px; width: 1920px; 
             display: flex; flex-direction: column; justify-content: flex-end; align-items: center; 
         }
@@ -31,10 +31,9 @@
             height: 70px; width: 100%; position: relative; z-index: 10;
         }
 
-        .inning-text { color: #fdfaf0; font-size: 22px; padding-left: 30px; }
-        .status-msg { color: #bd9b5b; font-size: 16px; font-family: 'Anton', sans-serif; text-transform: uppercase; margin-left: 20px; }
+        .inning-text { color: #fdfaf0; font-family: 'Rye', serif; font-size: 22px; padding-left: 30px; }
+        .status-msg { color: #bd9b5b; font-size: 16px; font-family: 'Anton', sans-serif; text-transform: uppercase; margin-left: 20px; letter-spacing: 1px; }
 
-        /* KULER */
         .header-balls { margin-left: auto; margin-right: 30px; display: flex; gap: 15px; }
         .ball { width: 35px; height: 35px; border-radius: 50%; position: relative; box-shadow: 4px 4px 8px rgba(0,0,0,0.8); border: 2px solid #000; }
         .ball-overlay-3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; z-index: 10; box-shadow: inset -3px -3px 5px rgba(0,0,0,0.6), inset 2px 2px 4px rgba(255,255,255,0.3); }
@@ -44,7 +43,7 @@
         .f-5 { background: radial-gradient(circle at 30% 30%, #e67e22 0%, #834c16 100%); }
         .f-3 { background: radial-gradient(circle at 30% 30%, #e74c3c 0%, #962d22 100%); }
 
-        .scoreline-body { position: relative; width: 100%; background: rgba(10,5,2,0.9); transition: height 0.6s ease; }
+        .scoreline-body { position: relative; width: 100%; background: rgba(10,5,2,0.95); transition: height 0.6s ease; }
 
         .player-row {
             display: none; align-items: center; 
@@ -64,26 +63,43 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        /* Standard sølv-hvit look */
+        /* POENG-STIL (Basert på din perfekte kode) */
         .score-val { 
-            font-size: 65px; font-family: 'Anton', sans-serif; line-height: 1;
+            font-size: 65px; font-family: 'Anton', sans-serif; line-height: 0.9;
             background: linear-gradient(to bottom, #fdfaf0 0%, #bd9b5b 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin-top: 5px;
+            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
         }
 
-        /* Gull, Sølv, Bronse Spesialstiler */
-        .rank-0 .score-val { background: linear-gradient(to bottom, #fff7ad 0%, #f1c40f 50%, #b8860b 100%); -webkit-background-clip: text; }
-        .rank-1 .score-val { background: linear-gradient(to bottom, #ffffff 0%, #bdc3c7 50%, #7f8c8d 100%); -webkit-background-clip: text; }
-        .rank-2 .score-val { background: linear-gradient(to bottom, #ffcc99 0%, #cd7f32 50%, #8b4513 100%); -webkit-background-clip: text; }
+        /* GULL, SØLV, BRONSE LOGIKK */
+        .rank-0 .score-val { 
+            background: linear-gradient(to bottom, #fff7ad 0%, #f1c40f 50%, #b8860b 100%); 
+            -webkit-background-clip: text;
+            filter: drop-shadow(0 0 8px rgba(218,165,32,0.6));
+        }
+        .rank-1 .score-val { 
+            background: linear-gradient(to bottom, #ffffff 0%, #bdc3c7 50%, #7f8c8d 100%); 
+            -webkit-background-clip: text;
+            filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
+        }
+        .rank-2 .score-val { 
+            background: linear-gradient(to bottom, #ffcc99 0%, #cd7f32 50%, #8b4513 100%); 
+            -webkit-background-clip: text;
+        }
 
         .pers-val { font-size: 14px; color: #bd9b5b; font-family: 'Anton', sans-serif; text-transform: uppercase; margin-top: 5px; }
         .pers-val b { color: #fdfaf0; }
 
-        .dot { width: 16px; height: 16px; border-radius: 50%; background: #000; border: 2px solid #6e5932; }
-        .dot.active { background: radial-gradient(circle at 35% 35%, #fdfaf0 0%, #bd9b5b 100%); border: 2px solid #fdfaf0; box-shadow: 0 0 8px rgba(189, 155, 91, 0.5); }
+        .dot { width: 16px; height: 16px; border-radius: 50%; background: #000; border: 2px solid #6e5932; box-shadow: inset 2px 2px 3px rgba(0,0,0,0.8); }
+        .dot.active { background: radial-gradient(circle at 35% 35%, #daa520, #b8860b, #4b3621); border: 1px solid #fdfaf0; box-shadow: 0 0 8px rgba(189, 155, 91, 0.5); }
 
-        .player-eliminated { filter: sepia(0.8) brightness(0.3); }
+        .player-eliminated { filter: grayscale(1) sepia(0.5) brightness(0.3); }
+        .player-eliminated::after {
+            content: "DECEASED"; position: absolute; top: 50%; left: 40%;
+            transform: translate(-50%, -50%) rotate(-10deg);
+            color: rgba(139, 0, 0, 0.8); font-size: 60px; border: 5px solid rgba(139, 0, 0, 0.8);
+            padding: 5px 20px; font-family: 'Sancreek', cursive; pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -151,6 +167,7 @@
         for (let i = 0; i < data.playerCount; i++) {
             pList.push({ idx: i, score: data.scores[i], elim: data.foulCounts[i] >= 3 });
         }
+        // Sorterer for rangering (gull/sølv/bronse)
         pList.sort((a, b) => b.score - a.score);
 
         pList.forEach((pData, rank) => {
@@ -158,19 +175,22 @@
             const row = document.getElementById(`p${p}-row`);
             if (!row) return;
 
-            row.className = `player-row rank-${rank}`; // Setter rank-klasse for farge
+            // Oppdaterer klassen for å trigge gull/sølv/bronse CSS
+            row.className = `player-row rank-${rank}`;
             row.style.display = "flex";
             row.style.transform = `translateY(${rank * rowH}px)`;
 
             document.getElementById(`p${p}-name`).innerText = data.names[p] || `PLAYER ${p+1}`;
             document.getElementById(`p${p}-score`).innerText = data.scores[p];
 
+            // Fouls (Messing-kuler)
             let fHtml = '';
             for (let d = 0; d < 3; d++) {
                 fHtml += `<div class="dot ${d < data.foulCounts[p] ? 'active' : ''}"></div>`;
             }
             document.getElementById(`p${p}-fouls`).innerHTML = fHtml;
 
+            // Beregn "NÅ" score
             const nowVal = (curP === p && !pData.elim) ? (data.scores[p] - (data.scoreAtStart ? data.scoreAtStart[p] : 0)) : 0;
             document.getElementById(`p${p}-now`).innerText = nowVal;
             document.getElementById(`best-${p}`).innerText = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
@@ -179,7 +199,9 @@
             row.style.opacity = (curP === p || pData.elim) ? "1" : "0.5";
         });
 
-        document.getElementById('inning-text').innerText = `ROUND ${Math.floor(data.innings / data.playerCount) + 1}`;
+        // Header oppdatering
+        const round = Math.floor(data.innings / data.playerCount) + 1;
+        document.getElementById('inning-text').innerText = `ROUND ${round}`;
         document.getElementById('status-msg').innerText = data.breakDone ? "DUEL IN PROGRESS" : "OPENING BREAK";
     });
 </script>
