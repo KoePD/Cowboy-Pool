@@ -40,7 +40,7 @@
         .ball-num { font-size: 14px; font-weight: 900; font-family: 'Anton', sans-serif; color: black; background: white; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5; }
         
         .f-1 { background: radial-gradient(circle at 30% 30%, #f1c40f 0%, #a67c00 100%); }
-        .f-5 { background: radial-gradient(circle at 30% 30%, #e67e22 0%, #834c16 100%); }
+        .f-5 { background: radial-gradient(circle at 30% 30%, #e67e22 0%, #834c16 100%); } /* Oransje 5er */
         .f-3 { background: radial-gradient(circle at 30% 30%, #e74c3c 0%, #962d22 100%); }
 
         .scoreline-body { position: relative; width: 100%; background: rgba(10,5,2,0.95); transition: height 0.6s ease; }
@@ -63,7 +63,6 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        /* POENG-STIL (Basert på din perfekte kode) */
         .score-val { 
             font-size: 65px; font-family: 'Anton', sans-serif; line-height: 0.9;
             background: linear-gradient(to bottom, #fdfaf0 0%, #bd9b5b 100%);
@@ -71,35 +70,23 @@
             filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
         }
 
-        /* GULL, SØLV, BRONSE LOGIKK */
-        .rank-0 .score-val { 
-            background: linear-gradient(to bottom, #fff7ad 0%, #f1c40f 50%, #b8860b 100%); 
-            -webkit-background-clip: text;
-            filter: drop-shadow(0 0 8px rgba(218,165,32,0.6));
-        }
-        .rank-1 .score-val { 
-            background: linear-gradient(to bottom, #ffffff 0%, #bdc3c7 50%, #7f8c8d 100%); 
-            -webkit-background-clip: text;
-            filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
-        }
-        .rank-2 .score-val { 
-            background: linear-gradient(to bottom, #ffcc99 0%, #cd7f32 50%, #8b4513 100%); 
-            -webkit-background-clip: text;
-        }
+        /* Rangering farger */
+        .rank-0 .score-val { background: linear-gradient(to bottom, #fff7ad 0%, #f1c40f 50%, #b8860b 100%); -webkit-background-clip: text; filter: drop-shadow(0 0 8px rgba(218,165,32,0.6)); }
+        .rank-1 .score-val { background: linear-gradient(to bottom, #ffffff 0%, #bdc3c7 50%, #7f8c8d 100%); -webkit-background-clip: text; filter: drop-shadow(0 0 5px rgba(255,255,255,0.3)); }
+        .rank-2 .score-val { background: linear-gradient(to bottom, #ffcc99 0%, #cd7f32 50%, #8b4513 100%); -webkit-background-clip: text; }
 
         .pers-val { font-size: 14px; color: #bd9b5b; font-family: 'Anton', sans-serif; text-transform: uppercase; margin-top: 5px; }
         .pers-val b { color: #fdfaf0; }
 
-        .dot { width: 16px; height: 16px; border-radius: 50%; background: #000; border: 2px solid #6e5932; box-shadow: inset 2px 2px 3px rgba(0,0,0,0.8); }
-        .dot.active { background: radial-gradient(circle at 35% 35%, #daa520, #b8860b, #4b3621); border: 1px solid #fdfaf0; box-shadow: 0 0 8px rgba(189, 155, 91, 0.5); }
+        /* RØDE FOUL PRIKKER */
+        .dot { width: 16px; height: 16px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 2px solid #333; transition: all 0.3s ease; }
+        .dot.active { 
+            background: #ff0000; 
+            border: 2px solid #ff6666; 
+            box-shadow: 0 0 10px #ff0000, inset 0 0 5px rgba(255,255,255,0.5); 
+        }
 
         .player-eliminated { filter: grayscale(1) sepia(0.5) brightness(0.3); }
-        .player-eliminated::after {
-            content: "DECEASED"; position: absolute; top: 50%; left: 40%;
-            transform: translate(-50%, -50%) rotate(-10deg);
-            color: rgba(139, 0, 0, 0.8); font-size: 60px; border: 5px solid rgba(139, 0, 0, 0.8);
-            padding: 5px 20px; font-family: 'Sancreek', cursive; pointer-events: none;
-        }
     </style>
 </head>
 <body>
@@ -108,7 +95,7 @@
     <div class="scoreline-header">
         <div class="inning-text" id="inning-text">ROUND 1</div>
         <div style="color: #6e5932; font-size: 24px; margin-left: 20px;">|</div>
-        <div class="status-msg" id="status-msg">READY TO DUEL</div>
+        <div class="status-msg" id="status-msg">READY</div>
         <div class="header-balls">
             <div id="hdr-b1" class="ball f-1"><div class="ball-num">1</div><div class="ball-overlay-3d"></div></div>
             <div id="hdr-b5" class="ball f-5"><div class="ball-num">5</div><div class="ball-overlay-3d"></div></div>
@@ -167,7 +154,6 @@
         for (let i = 0; i < data.playerCount; i++) {
             pList.push({ idx: i, score: data.scores[i], elim: data.foulCounts[i] >= 3 });
         }
-        // Sorterer for rangering (gull/sølv/bronse)
         pList.sort((a, b) => b.score - a.score);
 
         pList.forEach((pData, rank) => {
@@ -175,7 +161,6 @@
             const row = document.getElementById(`p${p}-row`);
             if (!row) return;
 
-            // Oppdaterer klassen for å trigge gull/sølv/bronse CSS
             row.className = `player-row rank-${rank}`;
             row.style.display = "flex";
             row.style.transform = `translateY(${rank * rowH}px)`;
@@ -183,14 +168,13 @@
             document.getElementById(`p${p}-name`).innerText = data.names[p] || `PLAYER ${p+1}`;
             document.getElementById(`p${p}-score`).innerText = data.scores[p];
 
-            // Fouls (Messing-kuler)
+            // Fouls - Nå knallrøde!
             let fHtml = '';
             for (let d = 0; d < 3; d++) {
                 fHtml += `<div class="dot ${d < data.foulCounts[p] ? 'active' : ''}"></div>`;
             }
             document.getElementById(`p${p}-fouls`).innerHTML = fHtml;
 
-            // Beregn "NÅ" score
             const nowVal = (curP === p && !pData.elim) ? (data.scores[p] - (data.scoreAtStart ? data.scoreAtStart[p] : 0)) : 0;
             document.getElementById(`p${p}-now`).innerText = nowVal;
             document.getElementById(`best-${p}`).innerText = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
@@ -199,9 +183,7 @@
             row.style.opacity = (curP === p || pData.elim) ? "1" : "0.5";
         });
 
-        // Header oppdatering
-        const round = Math.floor(data.innings / data.playerCount) + 1;
-        document.getElementById('inning-text').innerText = `ROUND ${round}`;
+        document.getElementById('inning-text').innerText = `ROUND ${Math.floor(data.innings / data.playerCount) + 1}`;
         document.getElementById('status-msg').innerText = data.breakDone ? "DUEL IN PROGRESS" : "OPENING BREAK";
     });
 </script>
