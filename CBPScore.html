@@ -138,8 +138,7 @@
     </div>
 </div>
 
-<script>
-    const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" };
+const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('gameData');
 
@@ -147,57 +146,71 @@
         const data = snap.val();
         if (!data) return;
 
-        const rowH = 110;
+        const rowH = 110; // Høyden på hver rad
+        const playerCount = data.playerCount || 3;
+
+        // 1. Lag en liste over alle spillere
         let pList = [];
-        for (let i = 0; i < data.playerCount; i++) {
-            pList.push({ idx: i, score: data.scores[i], fouls: data.foulCounts[i] });
+        for (let i = 0; i < playerCount; i++) {
+            pList.push({ 
+                idx: i, 
+                score: (data.scores && data.scores[i]) ? data.scores[i] : 0, 
+                fouls: (data.foulCounts && data.foulCounts[i]) ? data.foulCounts[i] : 0,
+                name: (data.names && data.names[i]) ? data.names[i] : `PLAYER ${i + 1}`
+            });
         }
+
+        // 2. Sorter lista (valgfritt - her sorterer vi etter poengsum)
         pList.sort((a, b) => b.score - a.score);
 
+        // 3. Oppdater hver rad basert på sorteringen
         pList.forEach((pData, rank) => {
             const p = pData.idx;
             const row = document.getElementById(`p${p}-row`);
             if (!row) return;
 
+            // VIS RADEN OG FLYTT DEN TIL RIKTIG PLASS
             row.style.display = "flex";
             row.style.transform = `translateY(${rank * rowH}px)`;
             
-            document.getElementById(`p${p}-name`).innerText = data.names[p] || `P${p+1}`;
-            document.getElementById(`p${p}-score`).innerText = data.scores[p];
+            // OPPDATER NAVN OG POENG
+            const nameEl = document.getElementById(`p${p}-name`);
+            const scoreEl = document.getElementById(`p${p}-score`);
+            if (nameEl) nameEl.innerText = pData.name;
+            if (scoreEl) scoreEl.innerText = pData.score;
 
-            // Trigger mekanisk spinn ved ny foul
+            // REVOLVER-ANIMASJON OG HYLSER
             const cylinder = row.querySelector('.revolver-cylinder');
             const lastFouls = row.dataset.fouls || 0;
+            
             if (pData.fouls > lastFouls) {
                 cylinder.classList.remove('spinning');
-                void cylinder.offsetWidth; 
+                void cylinder.offsetWidth; // Trigger reflow for å restarte animasjon
                 cylinder.classList.add('spinning');
             }
             row.dataset.fouls = pData.fouls;
 
-            // Oppdater hylser (KUN 3 KAMRE)
+            // Oppdater hylser
             const chambers = cylinder.querySelectorAll('.chamber');
-            chambers.forEach((c, i) => c.classList.toggle('active', i < pData.fouls));
-            cylinder.classList.toggle('warning', pData.fouls === 2);
+            chambers.forEach((c, i) => {
+                c.classList.toggle('active', i < pData.fouls);
+            });
 
-            // Stempler logikk for slutten av matchen
-            const stamps = row.querySelectorAll('.stamp');
-            stamps.forEach(s => s.style.display = 'none');
-            
+            // STEMPEL-LOGIKK (Sjekker om spilleren er ute)
+            const deadStamp = row.querySelector('.dead');
             if (pData.fouls >= 3) {
-                row.querySelector('.dead').style.display = 'block';
+                if (deadStamp) deadStamp.style.display = 'block';
                 row.style.opacity = "0.4";
-            } else if (data.matchEnded) {
-                if (rank === 0) row.querySelector('.survivor').style.display = 'block';
-                else row.querySelector('.caught').style.display = 'block';
             } else {
+                if (deadStamp) deadStamp.style.display = 'none';
                 row.style.opacity = (data.currentPlayer === p) ? "1" : "0.6";
             }
         });
 
-        const roundNum = Math.floor(data.innings / data.playerCount) + 1;
-        document.getElementById('inning-text').innerText = `ROUND ${roundNum}`;
+        // OPPDATER HEADER INFO
+        const roundNum = Math.floor((data.innings || 0) / playerCount) + 1;
+        const inningText = document.getElementById('inning-text');
+        if (inningText) inningText.innerText = `ROUND ${roundNum}`;
     });
-</script>
 </body>
 </html>
