@@ -42,7 +42,6 @@
             transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
         }
 
-        /* --- REVOLVER-TØNNE --- */
         .revolver-cylinder {
             width: 85px; height: 85px;
             background: url('https://koepd.github.io/Cowboy-Pool/image_b55599.png') no-repeat center center;
@@ -56,8 +55,6 @@
         @keyframes cylinder-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         .chamber { width: 18px; height: 18px; background: transparent; border-radius: 50%; position: absolute; z-index: 3; }
-        
-        /* Posisjoner over de 3 åpne hullene på bildet ditt */
         .c1 { top: 11px; left: 34px; }
         .c2 { bottom: 20px; left: 14px; }
         .c3 { bottom: 20px; right: 14px; }
@@ -134,6 +131,9 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('gameData');
 
+    // Vi lagrer forrige kjente foul-status i et objekt utenfor loopen
+    let lastKnownFouls = {};
+
     db.on('value', snap => {
         const data = snap.val();
         if (!data) return;
@@ -165,16 +165,18 @@
             document.getElementById(`p${p}-name`).innerText = pData.name;
             document.getElementById(`p${p}-score`).innerText = pData.score;
 
-            // --- ANIMASJON LOGIKK ---
+            // --- KORRIGERT ANIMASJON LOGIKK ---
             const cylinder = row.querySelector('.revolver-cylinder');
-            const lastFouls = parseInt(row.dataset.fouls || 0);
             
-            if (pData.fouls !== lastFouls) {
+            // Sjekk om denne spesifikke spilleren har fått en ny foul
+            if (lastKnownFouls[p] !== undefined && pData.fouls > lastKnownFouls[p]) {
                 cylinder.classList.remove('spinning');
-                void cylinder.offsetWidth; // Tvinger restart
+                void cylinder.offsetWidth; // Force restart
                 cylinder.classList.add('spinning');
             }
-            row.dataset.fouls = pData.fouls;
+            
+            // Oppdater den globale trackeren for denne spilleren
+            lastKnownFouls[p] = pData.fouls;
 
             const chambers = cylinder.querySelectorAll('.chamber');
             chambers.forEach((c, i) => c.classList.toggle('active', i < pData.fouls));
