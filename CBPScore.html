@@ -137,7 +137,8 @@
         </div>
     </div>
 </div>
-
+    
+<script>
 const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('gameData');
@@ -190,27 +191,29 @@ const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-w
             }
             row.dataset.fouls = pData.fouls;
 
-            // Oppdater hylser
+            // Oppdater hylser (KUN 3 KAMRE)
             const chambers = cylinder.querySelectorAll('.chamber');
-            chambers.forEach((c, i) => {
-                c.classList.toggle('active', i < pData.fouls);
-            });
+            chambers.forEach((c, i) => c.classList.toggle('active', i < pData.fouls));
+            cylinder.classList.toggle('warning', pData.fouls === 2);
 
-            // STEMPEL-LOGIKK (Sjekker om spilleren er ute)
-            const deadStamp = row.querySelector('.dead');
+            // Stempler logikk for slutten av matchen
+            const stamps = row.querySelectorAll('.stamp');
+            stamps.forEach(s => s.style.display = 'none');
+            
             if (pData.fouls >= 3) {
-                if (deadStamp) deadStamp.style.display = 'block';
+                row.querySelector('.dead').style.display = 'block';
                 row.style.opacity = "0.4";
+            } else if (data.matchEnded) {
+                if (rank === 0) row.querySelector('.survivor').style.display = 'block';
+                else row.querySelector('.caught').style.display = 'block';
             } else {
-                if (deadStamp) deadStamp.style.display = 'none';
                 row.style.opacity = (data.currentPlayer === p) ? "1" : "0.6";
             }
         });
 
-        // OPPDATER HEADER INFO
-        const roundNum = Math.floor((data.innings || 0) / playerCount) + 1;
-        const inningText = document.getElementById('inning-text');
-        if (inningText) inningText.innerText = `ROUND ${roundNum}`;
+        const roundNum = Math.floor(data.innings / data.playerCount) + 1;
+        document.getElementById('inning-text').innerText = `ROUND ${roundNum}`;
     });
+</script>
 </body>
 </html>
