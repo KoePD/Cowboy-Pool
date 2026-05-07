@@ -24,7 +24,6 @@
             z-index: 10;
         }
 
-        /* Stål-hjørner */
         .corner { position: absolute; width: 35px; height: 35px; background: linear-gradient(135deg, #777 0%, #333 100%); border: 1px solid #555; z-index: 100; }
         .top-left { top: -6px; left: -6px; border-radius: 4px 0 15px 0; }
         .top-right { top: -6px; right: -6px; border-radius: 0 4px 0 15px; }
@@ -44,7 +43,6 @@
         .players-container { 
             position: relative; 
             width: 100%; 
-            /* Høyden her justeres dynamisk i JS basert på antall spillere */
             min-height: 150px; 
             background: #0e0a07;
         }
@@ -52,13 +50,13 @@
         .player-row {
             display: none; 
             width: 100%;
-            height: 150px; /* Fast høyde for enkel animasjon */
+            height: 150px; 
             align-items: center;
             padding: 0 20px;
             box-sizing: border-box;
             border-bottom: 2px solid #1d140c;
             background: linear-gradient(90deg, #150e09 0%, #0e0a07 100%);
-            position: absolute; /* Påkrevd for translateY-flytting */
+            position: absolute;
             top: 0;
             left: 0;
             transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
@@ -83,13 +81,26 @@
         .player-name { font-size: 30px; color: #fdfaf0; text-transform: uppercase; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .score-val { font-size: 55px; margin: 2px 0; line-height: 0.8; -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(2px 2px 2px #000); }
         
-        /* Metalliske farger basert på rangering */
         .rank-0 .score-val { background-image: linear-gradient(180deg, #fffceb 0%, #f1c40f 100%); }
         .rank-1 .score-val { background-image: linear-gradient(180deg, #ffffff 0%, #bdc3c7 100%); }
         .rank-2 .score-val { background-image: linear-gradient(180deg, #fff2e6 0%, #cd7f32 100%); }
 
-        .pers-val { font-size: 14px; color: #bd9b5b; font-family: 'Anton', sans-serif; }
-        .pers-val b { color: #fff; margin-left: 3px; }
+        /* --- HER ER OPPDATERINGEN FOR LESBARHET --- */
+        .pers-val { 
+            font-size: 14px; 
+            color: #bd9b5b; 
+            font-family: 'Anton', sans-serif; 
+            text-transform: uppercase;
+        }
+        
+        .pers-val b { 
+            font-family: 'Arial', sans-serif; /* Endret til ren font */
+            color: #ffffff; /* Ren hvit for maks kontrast */
+            font-size: 18px; /* Litt større enn teksten rundt */
+            margin-left: 2px;
+            margin-right: 5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8); /* Gjør det lettere å lese mot mørk bakgrunn */
+        }
 
         .stamp { position: absolute; font-size: 35px; border: 5px solid; border-radius: 6px; padding: 5px 15px; text-transform: uppercase; z-index: 50; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-15deg); display: none; }
         .elim-stamp { color: #d63031; border-color: #d63031; background: rgba(0,0,0,0.8); animation: slam 0.3s ease-out; }
@@ -151,10 +162,8 @@
         const data = snap.val();
         if (!data) return;
 
-        const rowH = 150; // Høyden på hver rad
+        const rowH = 150; 
         const playerCount = data.playerCount || 3;
-        
-        // Sett høyden på containeren basert på antall spillere
         document.getElementById('players-container').style.height = (playerCount * rowH) + "px";
 
         let pList = [];
@@ -167,21 +176,16 @@
             });
         }
 
-        // Sorter etter poeng (høyeste først)
         pList.sort((a, b) => b.score - a.score);
 
         pList.forEach((pData, rank) => {
             const row = document.getElementById(`p${pData.id}-row`);
             if (!row) return;
 
-            // FLYTT RADEN: Bruk translateY basert på rangering
             row.style.display = "flex";
             row.style.transform = `translateY(${rank * rowH}px)`;
-            
-            // Sett fargeklasse (Gull, Sølv, Bronse)
             row.className = `player-row rank-${rank}`;
             
-            // Oppdater data
             document.getElementById(`p${pData.id}-name`).innerText = pData.name;
             document.getElementById(`p${pData.id}-score`).innerText = pData.score;
             document.getElementById(`best-${pData.id}`).innerText = data.bestSeries ? (data.bestSeries[pData.id] || 0) : 0;
@@ -189,7 +193,6 @@
             const scoreStart = (data.scoreAtStart && data.scoreAtStart[pData.id] !== undefined) ? data.scoreAtStart[pData.id] : 0;
             document.getElementById(`p${pData.id}-now`).innerText = (data.currentPlayer === pData.id) ? (pData.score - scoreStart) : 0;
 
-            // Animasjon & Lyd
             const cylinder = row.querySelector('.revolver-cylinder');
             const prevFouls = parseInt(row.getAttribute('data-last-fouls') || 0);
             if (pData.fouls > prevFouls) {
@@ -204,7 +207,6 @@
             const chambers = cylinder.querySelectorAll('.chamber');
             chambers.forEach((c, i) => c.classList.toggle('active', i < pData.fouls));
 
-            // Status
             const stamp = row.querySelector('.elim-stamp');
             stamp.style.display = (pData.fouls >= 3) ? 'block' : 'none';
             row.style.opacity = (pData.fouls >= 3) ? "0.4" : (data.currentPlayer === pData.id ? "1" : "0.7");
