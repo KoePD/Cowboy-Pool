@@ -7,6 +7,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel+Decorative:wght@700&family=Rye&display=swap" rel="stylesheet">
     
     <style>
+        :root {
+            --brass: linear-gradient(180deg, #fffceb 0%, #f1c40f 45%, #b8860b 55%, #4a3600 100%);
+            --steel-bg: radial-gradient(circle, #2c2c2c 0%, #000 100%);
+            --paper: #d2b48c;
+        }
+
         body { 
             background-color: rgba(0, 0, 0, 0); 
             margin: 0; padding: 0; overflow: hidden; 
@@ -14,114 +20,90 @@
             display: flex; flex-direction: column; justify-content: flex-end; align-items: center; 
         }
 
+        /* 1. Visuelt Tema: Oljet stål / Saloon treverk */
         .scoreline-wrapper { 
             width: 1000px; margin-bottom: 50px; 
             background: #0a0502;
             border: 4px solid #bd9b5b;
             border-radius: 12px; 
             box-shadow: 0 25px 60px rgba(0,0,0,1);
-            overflow: hidden; 
-            position: relative;
+            overflow: hidden; position: relative;
         }
 
         .scoreline-header { 
             display: flex; align-items: center; 
             background: linear-gradient(180deg, #1d0f06 0%, #000 100%);
             border-bottom: 2px solid #6e5932;
-            height: 65px; width: 100%; position: relative; z-index: 10;
+            height: 70px; width: 100%; position: relative; z-index: 10;
         }
 
-        .inning-text { color: #fdfaf0; font-family: 'Rye', serif; font-size: 22px; padding-left: 25px; text-transform: uppercase; }
-        .status-msg { color: #bd9b5b; font-size: 16px; font-family: 'Rye', serif; text-transform: uppercase; margin-left: 15px; letter-spacing: 1px; }
-
-        .header-balls { 
-            position: absolute; right: 0; width: 220px; 
-            display: flex; justify-content: center; align-items: center; gap: 12px; height: 100%;
-        }
-
-        .ball { width: 32px; height: 32px; border-radius: 50%; position: relative; box-shadow: 2px 2px 5px rgba(0,0,0,0.8); border: 2px solid #000; transition: 0.3s ease; }
-        .ball-overlay-3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; z-index: 10; box-shadow: inset -2px -2px 4px rgba(0,0,0,0.6), inset 1.5px 1.5px 3px rgba(255,255,255,0.3); }
-        .ball-num { font-size: 13px; font-weight: 900; font-family: 'Anton', sans-serif; color: black; background: white; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5; }
-        
-        .f-1 { background: radial-gradient(circle at 30% 30%, #f1c40f 0%, #a67c00 100%); }
-        .f-5 { background: radial-gradient(circle at 30% 30%, #e67e22 0%, #834c16 100%); }
-        .f-3 { background: radial-gradient(circle at 30% 30%, #e74c3c 0%, #962d22 100%); }
-        .ball-dimmed { opacity: 0.15; filter: grayscale(1); transform: scale(0.85); }
-
-        .scoreline-body { position: relative; width: 100%; background: #0a0502; transition: height 0.6s ease; }
-
-        .player-row {
-            display: none; align-items: center; 
-            width: 100%; height: 110px; 
-            background: #150d08;
-            border-bottom: 2px solid #2a1a0f;
-            position: absolute; 
-            box-sizing: border-box;
-            transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
-        }
-
-        /* --- NYTT REVOLVER-CYLINDER DESIGN ISTEDENFOR PRIKKER --- */
-        .revolver-cylinder {
-            width: 60px; height: 60px;
-            background: radial-gradient(circle, #333 0%, #111 100%);
-            border: 2px solid #5d4037;
-            border-radius: 50%; position: relative; margin-right: 20px;
-            box-shadow: inset 0 0 10px #000, 2px 2px 5px rgba(0,0,0,0.5);
+        /* 2. Revolver-systemet (Trekant) */
+        .revolver-triangle {
+            width: 70px; height: 70px; position: relative; margin-right: 20px;
+            background: var(--steel-bg); border-radius: 50%; border: 2px solid #444;
             flex-shrink: 0;
         }
         .chamber {
-            width: 14px; height: 14px; background: #000; border-radius: 50%;
-            position: absolute; border: 1px solid #222; box-shadow: inset 1px 1px 3px rgba(0,0,0,0.8);
+            width: 16px; height: 16px; background: #000; border-radius: 50%;
+            position: absolute; border: 1px solid #222;
         }
-        /* Plassering av de 6 kamrene i ring */
-        .c1 { top: 6px; left: 23px; } .c2 { top: 18px; right: 8px; } .c3 { bottom: 18px; right: 8px; }
-        .c4 { bottom: 6px; left: 23px; } .c5 { bottom: 18px; left: 8px; } .c6 { top: 18px; left: 8px; }
+        /* Trekantformasjon */
+        .ch-1 { top: 10px; left: 27px; }
+        .ch-2 { bottom: 15px; left: 12px; }
+        .ch-3 { bottom: 15px; right: 12px; }
+
+        .chamber.filled {
+            background: var(--brass);
+            box-shadow: 0 0 10px #f1c40f; border: 1px solid #fff;
+        }
+
+        .shake { animation: cylinder-shake 0.2s infinite; }
+        @keyframes cylinder-shake { 0% {transform: rotate(0deg);} 50% {transform: rotate(3deg);} 100% {transform: rotate(0deg);} }
+
+        /* 3. Status-stempler */
+        .stamp {
+            position: absolute; font-family: 'Rye', serif; font-size: 40px;
+            padding: 5px 20px; border: 4px solid; border-radius: 5px;
+            text-transform: uppercase; z-index: 100; transform: rotate(-15deg);
+            display: none; pointer-events: none;
+        }
+        .dead { color: #ff0000; border-color: #ff0000; left: 30%; top: 20%; opacity: 0.8; }
+        .caught { color: #000; border-color: #000; left: 30%; top: 20%; opacity: 0.9; background: rgba(0,0,0,0.1); }
+        .survivor { color: #f1c40f; border-color: #f1c40f; left: 30%; top: 20%; text-shadow: 0 0 15px #f1c40f; }
+
+        /* 4. Pro vs Gratis (Gyllen glød på Wanted-plakat for Pro) */
+        .wanted-glow { 
+            box-shadow: inset 0 0 20px rgba(241, 196, 15, 0.4); 
+            background: linear-gradient(90deg, rgba(21,13,8,1) 0%, rgba(45,35,20,1) 100%) !important;
+        }
+
+        .player-row {
+            display: none; align-items: center; width: 100%; height: 110px; 
+            background: #150d08; border-bottom: 2px solid #2a1a0f;
+            position: absolute; transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+        }
+
+        .name { font-size: 42px; color: #fdfaf0; text-transform: uppercase; padding-left: 15px; font-family: 'Rye', serif; }
         
-        /* Aktiv hylse (patron) */
-        .chamber.active {
-            background: radial-gradient(circle at 35% 35%, #fff7ad 0%, #f1c40f 40%, #b8860b 100%);
-            border: 1px solid #fdfaf0;
-            box-shadow: 0 0 10px rgba(241, 196, 15, 0.6), inset -2px -2px 3px rgba(0,0,0,0.5);
-        }
-
-        /* Advarsel risting ved 2 fouls */
-        .revolver-cylinder.warning { animation: cylinder-shake 0.2s infinite; }
-        @keyframes cylinder-shake { 0% {transform: rotate(0deg);} 50% {transform: rotate(2deg);} 100% {transform: rotate(0deg);} }
-
-        /* Sheriff stjerne for leder (Rank 0) */
-        .rank-0 .name::before {
-            content: '⭐';
-            margin-right: 15px; font-size: 30px;
-            color: #bd9b5b; filter: drop-shadow(0 0 5px rgba(189, 155, 91, 0.8));
-        }
-
-        .name { font-size: 42px; color: #fdfaf0; text-transform: uppercase; padding-left: 10px; font-family: 'Rye', serif; }
-
         .score-block { 
             min-width: 220px; height: 100%; margin-left: auto;
             background: rgba(0,0,0,0.7); border-left: 3px solid #6e5932;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding-top: 15px; 
         }
+
+        /* Metallfarger for Pro */
+        .pro-val { background: var(--brass); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .free-val { color: #fdfaf0; }
 
         .score-val { 
             font-size: 72px; font-family: 'Rye', serif; line-height: 0.7;
-            background: linear-gradient(to bottom, #fff 0%, #bd9b5b 50%, #6e5932 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(3px 3px 2px rgba(0,0,0,1));
-            margin-bottom: 20px; 
+            filter: drop-shadow(3px 3px 2px rgba(0,0,0,1)); margin-bottom: 12px; 
         }
 
-        /* Gradienter for Topp 3 - Nøyaktig fargevalg */
-        .rank-0 .score-val { background: linear-gradient(180deg, #fffceb 0%, #f1c40f 40%, #b8860b 60%, #4a3600 100%); -webkit-background-clip: text; }
-        .rank-1 .score-val { background: linear-gradient(180deg, #ffffff 0%, #bdc3c7 40%, #7f8c8d 60%, #1a1c1d 100%); -webkit-background-clip: text; }
-        .rank-2 .score-val { background: linear-gradient(180deg, #fff2e6 0%, #cd7f32 40%, #8b4513 60%, #301800 100%); -webkit-background-clip: text; }
+        .pers-val { font-size: 13px; color: #bd9b5b; font-family: 'Anton', sans-serif; text-transform: uppercase; }
+        .pers-val b { font-family: Arial, sans-serif !important; color: #fdfaf0; }
 
-        .pers-val { font-size: 13px; color: #bd9b5b; font-family: 'Anton', sans-serif; text-transform: uppercase; letter-spacing: 1.5px; }
-        /* RENE TALL PÅ NÅ/PERS */
-        .pers-val b { font-family: Arial, sans-serif !important; color: #fdfaf0; font-size: 14px; margin-left: 2px; }
-
-        .player-eliminated { filter: grayscale(1) brightness(0.2); }
+        .header-balls { position: absolute; right: 0; width: 220px; display: flex; justify-content: center; align-items: center; gap: 12px; }
     </style>
 </head>
 <body>
@@ -129,47 +111,30 @@
 <div class="scoreline-wrapper">
     <div class="scoreline-header">
         <div class="inning-text" id="inning-text">ROUND 1</div>
-        <div style="color: #6e5932; font-size: 24px; margin-left: 15px;">|</div>
-        <div class="status-msg" id="status-msg">LOADING...</div>
+        <div class="status-msg" id="status-msg" style="margin-left:20px; font-family:'Rye'; color:#bd9b5b;">OPPDATERER...</div>
         <div class="header-balls">
-            <div id="hdr-b1" class="ball f-1"><div class="ball-num">1</div><div class="ball-overlay-3d"></div></div>
-            <div id="hdr-b5" class="ball f-5"><div class="ball-num">5</div><div class="ball-overlay-3d"></div></div>
-            <div id="hdr-b3" class="ball f-3"><div class="ball-num">3</div><div class="ball-overlay-3d"></div></div>
-        </div>
+            </div>
     </div>
 
     <div class="scoreline-body" id="main-body">
         <div class="player-row" id="p0-row">
+            <div class="stamp dead">DEAD</div>
+            <div class="stamp caught">CAUGHT</div>
+            <div class="stamp survivor">SURVIVOR</div>
             <div style="display:flex; align-items:center; padding:0 25px;">
-                <div class="revolver-cylinder"><div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div><div class="chamber c4"></div><div class="chamber c5"></div><div class="chamber c6"></div></div>
+                <div class="revolver-triangle">
+                    <div class="chamber ch-1"></div>
+                    <div class="chamber ch-2"></div>
+                    <div class="chamber ch-3"></div>
+                </div>
                 <div class="name" id="p0-name">PLAYER 1</div>
             </div>
             <div class="score-block">
-                <div class="score-val" id="p0-score">0</div>
+                <div class="score-val pro-val" id="p0-score">0</div>
                 <div class="pers-val">NÅ <b id="p0-now">0</b> | PERS <b id="best-0">0</b></div>
             </div>
         </div>
-        <div class="player-row" id="p1-row">
-            <div style="display:flex; align-items:center; padding:0 25px;">
-                <div class="revolver-cylinder"><div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div><div class="chamber c4"></div><div class="chamber c5"></div><div class="chamber c6"></div></div>
-                <div class="name" id="p1-name">PLAYER 2</div>
-            </div>
-            <div class="score-block">
-                <div class="score-val" id="p1-score">0</div>
-                <div class="pers-val">NÅ <b id="p1-now">0</b> | PERS <b id="best-1">0</b></div>
-            </div>
         </div>
-        <div class="player-row" id="p2-row">
-            <div style="display:flex; align-items:center; padding:0 30px;">
-                <div class="revolver-cylinder"><div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div><div class="chamber c4"></div><div class="chamber c5"></div><div class="chamber c6"></div></div>
-                <div class="name" id="p2-name">PLAYER 3</div>
-            </div>
-            <div class="score-block">
-                <div class="score-val" id="p2-score">0</div>
-                <div class="pers-val">NÅ <b id="p2-now">0</b> | PERS <b id="best-2">0</b></div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <script>
@@ -177,24 +142,18 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('gameData');
 
-    const i18n = {
-        no: { inn: "ROUND", break: "STARTSTØT (3-BALL)", open: "VALG: CAROM / POCKET", rc: "KRAV: CAROM", rp: "KRAV: POCKET" },
-        en: { inn: "ROUND", break: "BREAKSHOT (3-BALL)", open: "CHOICE: CAROM / POCKET", rc: "REQ: CAROM", rp: "REQ: POCKET" }
-    };
-
     db.on('value', snap => {
         const data = snap.val();
         if (!data) return;
 
-        const lang = data.lang || 'no';
-        const t = i18n[lang];
+        const isPro = data.userTier === 'pro'; // Logikk for Pro/Free
         const curP = data.currentPlayer;
         const rowH = 110;
-        document.getElementById('main-body').style.height = (data.playerCount * rowH) + "px";
 
+        // Sortering og rangering
         let pList = [];
         for (let i = 0; i < data.playerCount; i++) {
-            pList.push({ idx: i, score: data.scores[i], elim: data.foulCounts[i] >= 3 });
+            pList.push({ idx: i, score: data.scores[i], fouls: data.foulCounts[i], name: data.names[i] });
         }
         pList.sort((a, b) => b.score - a.score);
 
@@ -203,46 +162,49 @@
             const row = document.getElementById(`p${p}-row`);
             if (!row) return;
 
-            row.className = `player-row rank-${rank}`;
             row.style.display = "flex";
             row.style.transform = `translateY(${rank * rowH}px)`;
-
-            document.getElementById(`p${p}-name`).innerText = data.names[p] || `PLAYER ${p+1}`;
-            document.getElementById(`p${p}-score`).innerText = data.scores[p];
-
-            // --- REVOLVER-CYLINDER LOGIKK ---
-            const cylinder = row.querySelector('.revolver-cylinder');
-            const chambers = cylinder.querySelectorAll('.chamber');
-            const fCount = data.foulCounts[p];
             
-            // Fyll hylser i rekkefølge (0, 1, 2 for 3 fouls)
-            chambers.forEach((c, i) => {
-                c.classList.toggle('active', i < fCount);
+            // 1. Leder-markering (Wanted glød for Pro)
+            if (rank === 0) {
+                row.classList.add('wanted-glow');
+            } else {
+                row.classList.remove('wanted-glow');
+            }
+
+            // 2. Revolver-systemet
+            const chambers = row.querySelectorAll('.chamber');
+            const cylinder = row.querySelector('.revolver-triangle');
+            chambers.forEach((ch, i) => {
+                ch.classList.toggle('filled', i < pData.fouls);
             });
+            cylinder.classList.toggle('shake', pData.fouls === 2);
 
-            // Vibrasjon ved 2 fouls
-            cylinder.classList.toggle('warning', fCount === 2);
+            // 3. Stempler og Status
+            const deadStamp = row.querySelector('.dead');
+            const caughtStamp = row.querySelector('.caught');
+            const survivorStamp = row.querySelector('.survivor');
 
-            // NÅ, PERS, OPPDATERING
-            const scoreStart = (data.scoreAtStart && data.scoreAtStart[p] !== undefined) ? data.scoreAtStart[p] : 0;
-            const nowVal = (curP === p && !pData.elim) ? (data.scores[p] - scoreStart) : 0;
-            document.getElementById(`p${p}-now`).innerText = nowVal;
-            document.getElementById(`best-${p}`).innerText = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
+            // Nullstill stempler
+            deadStamp.style.display = 'none';
+            caughtStamp.style.display = 'none';
+            survivorStamp.style.display = 'none';
 
-            row.classList.toggle('player-eliminated', pData.elim);
-            row.style.opacity = (curP === p || pData.elim) ? "1" : "0.5";
+            if (pData.fouls >= 3) {
+                deadStamp.style.display = 'block';
+                row.style.opacity = "0.3";
+            } else if (data.matchEnded) {
+                if (rank === 0) survivorStamp.style.display = 'block';
+                else caughtStamp.style.display = 'block';
+            }
+
+            // 4. Pro vs Free farger
+            const scoreEl = document.getElementById(`p${p}-score`);
+            scoreEl.className = isPro ? 'score-val pro-val' : 'score-val free-val';
+            scoreEl.innerText = pData.score;
+            
+            document.getElementById(`p${p}-name`).innerText = pData.name || `P${p+1}`;
         });
-
-        // Krav og Round
-        document.getElementById('inning-text').innerText = `${t.inn} ${Math.floor(data.innings / data.playerCount) + 1}`;
-        let statusText = t.break;
-        if (data.breakDone) { statusText = (data.tableStatus === 'locked') ? (data.lastType === 'pocket' ? t.rc : t.rp) : t.open; }
-        document.getElementById('status-msg').innerText = statusText;
-
-        // KULER
-        const b1 = document.getElementById('hdr-b1'), b3 = document.getElementById('hdr-b3'), b5 = document.getElementById('hdr-b5');
-        [b1, b3, b5].forEach(b => b.classList.remove('ball-dimmed'));
-        if (!data.breakDone) { b1.classList.add('ball-dimmed'); b5.classList.add('ball-dimmed'); }
     });
 </script>
 </body>
