@@ -1,235 +1,153 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel+Decorative:wght@700&family=Rye&display=swap" rel="stylesheet">
-    
-    <style>
-        body { 
-            background-color: rgba(0, 0, 0, 0); 
-            margin: 0; padding: 0; overflow: hidden; 
-            height: 1080px; width: 1920px; 
-            display: flex; flex-direction: column; justify-content: flex-end; align-items: center; 
-        }
+    <meta charset="UTF-8">
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Cinzel+Decorative:wght@700&family=Rye&display=swap" rel="stylesheet">
+    
+    <style>
+        body { 
+            background-color: rgba(0, 0, 0, 0); 
+            margin: 0; padding: 0; overflow: hidden; 
+            height: 1080px; width: 1920px; 
+            display: flex; flex-direction: column; justify-content: flex-end; align-items: center; 
+        }
 
-        .scoreline-wrapper { 
-            width: 1000px; margin-bottom: 50px; 
-            background: #0a0502;
-            border: 4px solid #bd9b5b;
-            border-radius: 12px; 
-            box-shadow: 0 25px 60px rgba(0,0,0,1);
-            overflow: hidden; position: relative;
-        }
+        .scoreline-wrapper { 
+            width: 1000px; margin-bottom: 50px; 
+            background: #0a0502;
+            border: 4px solid #bd9b5b;
+            border-radius: 12px; 
+            box-shadow: 0 25px 60px rgba(0,0,0,1);
+            overflow: hidden; position: relative;
+        }
 
-        .scoreline-header { 
-            display: flex; align-items: center; 
-            background: linear-gradient(180deg, #1d0f06 0%, #000 100%);
-            border-bottom: 2px solid #6e5932;
-            height: 70px; width: 100%; position: relative; z-index: 10;
-        }
+        .scoreline-header { 
+            display: flex; align-items: center; 
+            background: linear-gradient(180deg, #1d0f06 0%, #000 100%);
+            border-bottom: 2px solid #6e5932;
+            height: 70px; width: 100%; position: relative; z-index: 10;
+        }
 
-        .inning-text { color: #fdfaf0; font-family: 'Rye', serif; font-size: 22px; padding-left: 25px; text-transform: uppercase; }
-        .status-msg { color: #bd9b5b; font-size: 16px; font-family: 'Rye', serif; text-transform: uppercase; margin-left: 15px; letter-spacing: 1px; }
+        .inning-text { color: #fdfaf0; font-family: 'Rye', serif; font-size: 22px; padding-left: 25px; text-transform: uppercase; }
+        .status-msg { color: #bd9b5b; font-size: 16px; font-family: 'Rye', serif; text-transform: uppercase; margin-left: 15px; letter-spacing: 1px; }
 
-        .header-balls { 
-            position: absolute; right: 0; width: 220px; 
-            display: flex; justify-content: center; align-items: center; gap: 12px; height: 100%;
-        }
-        .ball { width: 32px; height: 32px; border-radius: 50%; position: relative; box-shadow: 2px 2px 5px rgba(0,0,0,0.8); border: 2px solid #000; }
-        .ball-num { font-size: 13px; font-weight: 900; font-family: 'Anton', sans-serif; color: black; background: white; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5; }
-        .f-1 { background: radial-gradient(circle at 30% 30%, #f1c40f 0%, #a67c00 100%); }
-        .f-5 { background: radial-gradient(circle at 30% 30%, #e67e22 0%, #834c16 100%); }
-        .f-3 { background: radial-gradient(circle at 30% 30%, #e74c3c 0%, #962d22 100%); }
+        .scoreline-body { position: relative; width: 100%; background: #0a0502; min-height: 110px; }
 
-        .scoreline-body { position: relative; width: 100%; background: #0a0502; min-height: 110px; }
+        .player-row {
+            display: flex; align-items: center; width: 100%; height: 110px; 
+            background: #150d08; border-bottom: 2px solid #2a1a0f;
+            position: absolute; box-sizing: border-box;
+            transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+        }
 
-        .player-row {
-            display: flex; align-items: center; width: 100%; height: 110px; 
-            background: #150d08; border-bottom: 2px solid #2a1a0f;
-            position: absolute; box-sizing: border-box;
-            transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
-        }
+        /* --- KUN 3 KAMRE OG TAKKETE KANT --- */
+        .revolver-cylinder {
+            width: 78px; height: 78px;
+            background: radial-gradient(circle, #333 0%, #1a1a1a 80%, #000 100%);
+            position: relative; margin-right: 25px;
+            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            clip-path: polygon(
+                50% 0%, 80% 10%, 100% 35%, 100% 65%, 80% 90%, 
+                50% 100%, 20% 90%, 0% 65%, 0% 35%, 20% 10%
+            );
+            border: 2px solid #5d4e37;
+            box-shadow: inset 0 0 15px #000;
+        }
 
-        /* --- FORBEDRET REVOLVER-DESIGN --- */
-        .revolver-cylinder {
-            width: 85px; height: 85px;
-            background: radial-gradient(circle, #333 0%, #1a1a1a 80%, #000 100%);
-            border: 3px solid #5d4e37; 
-            border-radius: 50%; position: relative; margin-right: 25px;
-            box-shadow: inset 0 0 15px #000, 4px 4px 10px rgba(0,0,0,0.8);
-            flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center;
-        }
-        
-        /* Senterbolt for mer realistisk utseende */
-        .revolver-cylinder::after {
-            content: '';
-            position: absolute;
-            width: 26px; height: 26px;
-            background: radial-gradient(circle, #222 0%, #050505 100%);
-            border-radius: 50%;
-            border: 1.5px solid #333;
-            z-index: 2;
-        }
+        .revolver-cylinder::after {
+            content: '';
+            position: absolute;
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #222 0%, #050505 100%);
+            border: 1.5px solid #333;
+            z-index: 2;
+        }
+        
+        .chamber { 
+            width: 17px; height: 17px; 
+            background: #000; border-radius: 50%; 
+            position: absolute; border: 1.5px solid #2a2a2a; 
+            box-shadow: inset 2px 2px 4px rgba(0,0,0,1);
+            z-index: 3;
+        }
 
-        .chamber { 
-            width: 17px; height: 17px; 
-            background: #000; border-radius: 50%; 
-            position: absolute; border: 1.5px solid #2a2a2a; 
-            box-shadow: inset 2px 2px 5px rgba(0,0,0,1);
-            z-index: 3;
-        }
+        /* Trekantformasjon over hullene i bilde 2 og 11 */
+        .c1 { top: 10px; left: 31px; } 
+        .c2 { bottom: 15px; left: 14px; } 
+        .c3 { bottom: 15px; right: 14px; }
+        
+        .chamber.active { 
+            background: radial-gradient(circle at 35% 35%, #fff7ad 0%, #f1c40f 45%, #b8860b 60%, #4a3600 100%); 
+            border: 1.5px solid #fdfaf0; 
+            box-shadow: 0 0 15px rgba(241, 196, 15, 0.9), inset -2px -2px 3px rgba(0,0,0,0.5); 
+            z-index: 5;
+        }
 
-        /* Hull-posisjoner (6 kamre i sirkel) */
-        .c1 { top: 9px; left: 32px; } 
-        .c2 { top: 23px; right: 11px; } 
-        .c3 { bottom: 23px; right: 11px; }
-        .c4 { bottom: 9px; left: 32px; } 
-        .c5 { bottom: 23px; left: 11px; } 
-        .c6 { top: 23px; left: 11px; }
-        
-        /* Messing-hylse (Active foul) */
-        .chamber.active { 
-            background: radial-gradient(circle at 35% 35%, #fff7ad 0%, #f1c40f 45%, #b8860b 60%, #4a3600 100%); 
-            border: 1.5px solid #fdfaf0; 
-            box-shadow: 0 0 15px #f1c40f, inset -2px -2px 3px rgba(0,0,0,0.5); 
-            z-index: 5;
-        }
+        .warning { animation: cylinder-shake 0.2s infinite; }
+        @keyframes cylinder-shake { 0% {transform: rotate(0deg);} 50% {transform: rotate(2deg);} 100% {transform: rotate(0deg);} }
 
-        .warning { animation: cylinder-shake 0.2s infinite; }
-        @keyframes cylinder-shake { 0% {transform: rotate(0deg);} 50% {transform: rotate(2deg);} 100% {transform: rotate(0deg);} }
-
-        .name { font-size: 42px; color: #fdfaf0; text-transform: uppercase; padding-left: 10px; font-family: 'Rye', serif; }
-
-        .score-block { 
-            min-width: 220px; height: 100%; margin-left: auto;
-            background: rgba(0,0,0,0.7); border-left: 3px solid #6e5932;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding-top: 15px; 
-        }
-
-        .score-val { 
-            font-size: 72px; font-family: 'Rye', serif; line-height: 0.7;
-            background: linear-gradient(180deg, #fff 0%, #f1c40f 45%, #b8860b 55%, #4a3600 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(3px 3px 2px rgba(0,0,0,1));
-            margin-bottom: 20px; 
-        }
-
-        /* Gull, Sølv, Bronse topper */
-        .rank-0 .score-val { background: linear-gradient(180deg, #fffceb 0%, #f1c40f 45%, #b8860b 55%, #4a3600 100%); -webkit-background-clip: text; }
-        .rank-1 .score-val { background: linear-gradient(180deg, #ffffff 0%, #bdc3c7 45%, #7f8c8d 55%, #1a1c1d 100%); -webkit-background-clip: text; }
-        .rank-2 .score-val { background: linear-gradient(180deg, #fff2e6 0%, #cd7f32 45%, #8b4513 55%, #301800 100%); -webkit-background-clip: text; }
-
-        .pers-val { font-size: 13px; color: #bd9b5b; font-family: 'Anton', sans-serif; text-transform: uppercase; letter-spacing: 1.5px; }
-        .pers-val b { font-family: Arial, sans-serif !important; color: #fdfaf0; font-size: 14px; margin-left: 2px; }
-
-        .player-eliminated { filter: grayscale(1) brightness(0.2); }
-    </style>
+        .name { font-size: 42px; color: #fdfaf0; text-transform: uppercase; padding-left: 10px; font-family: 'Rye', serif; }
+        .score-val { font-size: 72px; font-family: 'Rye', serif; line-height: 0.7; background: linear-gradient(180deg, #fff 0%, #f1c40f 45%, #b8860b 55%, #4a3600 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(3px 3px 2px rgba(0,0,0,1)); margin-bottom: 20px; }
+    </style>
 </head>
 <body>
 
 <div class="scoreline-wrapper">
-    <div class="scoreline-header">
-        <div class="inning-text" id="inning-text">ROUND 1</div>
-        <div style="color: #6e5932; font-size: 24px; margin-left: 15px;">|</div>
-        <div class="status-msg" id="status-msg">HENTER...</div>
-        <div class="header-balls">
-            <div id="hdr-b1" class="ball f-1"><div class="ball-num">1</div></div>
-            <div id="hdr-b5" class="ball f-5"><div class="ball-num">5</div></div>
-            <div id="hdr-b3" class="ball f-3"><div class="ball-num">3</div></div>
-        </div>
-    </div>
+    <div class="scoreline-header">
+        <div class="inning-text" id="inning-text">ROUND 1</div>
+        <div style="color: #6e5932; font-size: 24px; margin-left: 15px;">|</div>
+        <div class="status-msg" id="status-msg">HENTER...</div>
+    </div>
 
-    <div class="scoreline-body" id="main-body">
-        <div class="player-row" id="p0-row" style="display:none;">
-            <div style="display:flex; align-items:center; padding:0 25px;">
-                <div class="revolver-cylinder">
-                    <div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div>
-                    <div class="chamber c4"></div><div class="chamber c5"></div><div class="chamber c6"></div>
-                </div>
-                <div class="name" id="p0-name">PLAYER 1</div>
-            </div>
-            <div class="score-block">
-                <div class="score-val" id="p0-score">0</div>
-                <div class="pers-val">NÅ <b id="p0-now">0</b> | PERS <b id="best-0">0</b></div>
-            </div>
-        </div>
-        <div class="player-row" id="p1-row" style="display:none;">
-            <div style="display:flex; align-items:center; padding:0 25px;">
-                <div class="revolver-cylinder">
-                    <div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div>
-                    <div class="chamber c4"></div><div class="chamber c5"></div><div class="chamber c6"></div>
-                </div>
-                <div class="name" id="p1-name">PLAYER 2</div>
-            </div>
-            <div class="score-block">
-                <div class="score-val" id="p1-score">0</div>
-                <div class="pers-val">NÅ <b id="p1-now">0</b> | PERS <b id="best-1">0</b></div>
-            </div>
-        </div>
-        <div class="player-row" id="p2-row" style="display:none;">
-            <div style="display:flex; align-items:center; padding:0 25px;">
-                <div class="revolver-cylinder">
-                    <div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div>
-                    <div class="chamber c4"></div><div class="chamber c5"></div><div class="chamber c6"></div>
-                </div>
-                <div class="name" id="p2-name">PLAYER 3</div>
-            </div>
-            <div class="score-block">
-                <div class="score-val" id="p2-score">0</div>
-                <div class="pers-val">NÅ <b id="p2-now">0</b> | PERS <b id="best-2">0</b></div>
-            </div>
-        </div>
-    </div>
+    <div class="scoreline-body" id="main-body">
+        <div class="player-row" id="p0-row" style="display:none;">
+            <div style="display:flex; align-items:center; padding:0 25px;">
+                <div class="revolver-cylinder">
+                    <div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div>
+                </div>
+                <div class="name" id="p0-name">PLAYER 1</div>
+            </div>
+        </div>
+        </div>
 </div>
 
 <script>
-    const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database().ref('gameData');
+    const firebaseConfig = { databaseURL: "https://cowboy-pool-default-rtdb.europe-west1.firebasedatabase.app" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database().ref('gameData');
 
-    db.on('value', snap => {
-        const data = snap.val();
-        if (!data) return;
+    db.on('value', snap => {
+        const data = snap.val();
+        if (!data) return;
 
-        const curP = data.currentPlayer;
-        const rowH = 110;
+        const curP = data.currentPlayer;
+        const rowH = 110;
+        let pList = [];
+        for (let i = 0; i < data.playerCount; i++) {
+            pList.push({ idx: i, score: data.scores[i], fouls: data.foulCounts[i] });
+        }
+        pList.sort((a, b) => b.score - a.score);
 
-        let pList = [];
-        for (let i = 0; i < data.playerCount; i++) {
-            pList.push({ idx: i, score: data.scores[i], fouls: data.foulCounts[i] });
-        }
-        pList.sort((a, b) => b.score - a.score);
+        pList.forEach((pData, rank) => {
+            const p = pData.idx;
+            const row = document.getElementById(`p${p}-row`);
+            if (!row) return;
 
-        pList.forEach((pData, rank) => {
-            const p = pData.idx;
-            const row = document.getElementById(`p${p}-row`);
-            if (!row) return;
-
-            row.className = `player-row rank-${rank}`;
-            row.style.display = "flex";
-            row.style.transform = `translateY(${rank * rowH}px)`;
-
-            document.getElementById(`p${p}-name`).innerText = data.names[p] || `P${p+1}`;
-            document.getElementById(`p${p}-score`).innerText = data.scores[p];
-
-            // Revolver-logikk
-            const cylinder = row.querySelector('.revolver-cylinder');
-            const chambers = cylinder.querySelectorAll('.chamber');
-            chambers.forEach((c, i) => c.classList.toggle('active', i < pData.fouls));
-            cylinder.classList.toggle('warning', pData.fouls === 2);
-
-            const scoreStart = (data.scoreAtStart && data.scoreAtStart[p] !== undefined) ? data.scoreAtStart[p] : 0;
-            document.getElementById(`p${p}-now`).innerText = (curP === p) ? (data.scores[p] - scoreStart) : 0;
-            document.getElementById(`best-${p}`).innerText = data.bestSeries ? (data.bestSeries[p] || 0) : 0;
-
-            row.classList.toggle('player-eliminated', pData.fouls >= 3);
-            row.style.opacity = (curP === p || pData.fouls >= 3) ? "1" : "0.5";
-        });
-    });
+            row.className = `player-row rank-${rank}`;
+            row.style.display = "flex";
+            row.style.transform = `translateY(${rank * rowH}px)`;
+            
+            // Revolver-logikk (KUN 3 KAMRE)
+            const cylinder = row.querySelector('.revolver-cylinder');
+            const chambers = cylinder.querySelectorAll('.chamber');
+            chambers.forEach((c, i) => c.classList.toggle('active', i < pData.fouls));
+            cylinder.classList.toggle('warning', pData.fouls === 2);
+        });
+    });
 </script>
 </body>
 </html>
