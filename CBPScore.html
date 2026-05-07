@@ -108,7 +108,13 @@
 
         /* Småtallene under poengsummen */
         .pers-val { font-size: 13px; color: #bd9b5b; font-family: 'Anton', sans-serif; text-transform: uppercase; letter-spacing: 1px; }
-        .pers-val b { color: #fdfaf0; }
+        .pers-val b { 
+            color: #fdfaf0; 
+            margin-left: 2px; 
+            /* Vi tvinger kun tallene til en ren font */
+            font-family: Arial, Helvetica, sans-serif !important; 
+            font-size: 14px; /* Gjør dem gjerne et hakk større for lesbarhet */
+            letter-spacing: 0px; /* Tall trenger ikke ekstra mellomrom *}
 
         /* RØDE FOUL-PRIKKER */
         .dot { width: 16px; height: 16px; border-radius: 50%; background: #111; border: 2px solid #333; margin-bottom: 6px; transition: 0.3s; }
