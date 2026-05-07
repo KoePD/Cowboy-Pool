@@ -42,9 +42,8 @@
             transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease, filter 0.4s ease;
         }
 
-        /* INAKTIV/ELIMINERT RAD */
         .player-row.eliminated {
-            filter: grayscale(1) brightness(0.3); /* Gjør raden mørk og grå */
+            filter: grayscale(1) brightness(0.3);
             opacity: 0.5;
         }
 
@@ -54,7 +53,6 @@
             background-size: contain;
             position: relative; margin-right: 25px; margin-left: 20px;
             flex-shrink: 0;
-            transform-origin: center center;
         }
 
         .spinning { animation: cylinder-spin 0.6s cubic-bezier(0.15, 0.88, 0.3, 1.05) forwards; }
@@ -78,46 +76,62 @@
             100% { transform: scale(1); opacity: 1; filter: brightness(1); }
         }
 
-        /* --- NY STEMPEL ANIMASJON FOR ELIMINATED --- */
+        /* STEMPEL */
         .stamp {
             position: absolute; font-family: 'Rye', serif; font-size: 40px;
             padding: 8px 25px; border: 6px solid; border-radius: 8px;
             text-transform: uppercase; z-index: 200; transform: rotate(-12deg);
-            display: none; pointer-events: none; left: 200px;
-            top: 15px; /* Posisjoner over navne-området */
+            display: none; pointer-events: none; left: 200px; top: 15px;
             box-shadow: 0 0 20px rgba(0,0,0,0.8);
         }
 
-        /* Rødt ELIMINATED stempel */
         .stamp.eliminated-stamp {
-            color: #d63031;
-            border-color: #d63031;
-            background-color: rgba(0,0,0,0.5); /* Litt gjennomsiktig bakgrunn */
+            color: #d63031; border-color: #d63031; background-color: rgba(0,0,0,0.5);
             text-shadow: 0 0 15px rgba(214, 48, 49, 0.8);
-            filter: drop-shadow(0 0 10px rgba(214, 48, 49, 0.5));
-            /* Smelle-animasjon */
             animation: stamp-slam 0.3s ease-out forwards, stamp-pulse 2s infinite 0.3s;
         }
 
         @keyframes stamp-slam {
             0% { transform: rotate(-12deg) scale(3); opacity: 0; }
-            80% { transform: rotate(-12deg) scale(0.9); opacity: 1; }
-            100% { transform: rotate(-12deg) scale(1); }
+            100% { transform: rotate(-12deg) scale(1); opacity: 1; }
         }
 
         @keyframes stamp-pulse {
-            0% { filter: drop-shadow(0 0 10px rgba(214, 48, 49, 0.5)); }
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(214, 48, 49, 0.5)); }
             50% { filter: drop-shadow(0 0 20px rgba(214, 48, 49, 0.9)); }
-            100% { filter: drop-shadow(0 0 10px rgba(214, 48, 49, 0.5)); }
         }
-        /* --- SLUTT STEMPEL-CSS --- */
 
-        .dead { color: #8b0000; border-color: #8b0000; display: none !important; } /* Skjul det gamle stempler */
         .survivor { color: #f1c40f; border-color: #f1c40f; text-shadow: 0 0 15px #f1c40f; top: 15px; left: 200px; font-size: 40px;}
 
         .name { font-size: 42px; color: #fdfaf0; text-transform: uppercase; padding-left: 10px; font-family: 'Rye', serif; flex-grow: 1; }
-        .score-block { min-width: 220px; height: 100%; margin-left: auto; background: rgba(0,0,0,0.7); border-left: 3px solid #6e5932; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 50; }
-        .score-val { font-size: 64px; font-family: 'Rye', serif; line-height: 0.7; background: linear-gradient(180deg, #fff 0%, #f1c40f 45%, #b8860b 55%, #4a3600 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(3px 3px 2px rgba(0,0,0,1)); }
+        
+        .score-block { 
+            min-width: 220px; height: 100%; margin-left: auto; 
+            background: rgba(0,0,0,0.7); border-left: 3px solid #6e5932; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+        }
+
+        /* --- METALLISKE POENG-STILER --- */
+        .score-val { 
+            font-size: 64px; font-family: 'Rye', serif; line-height: 0.7; 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+            filter: drop-shadow(3px 3px 2px rgba(0,0,0,1)); 
+        }
+
+        /* Gull - 1. plass */
+        .rank-0 .score-val {
+            background: linear-gradient(180deg, #fffceb 0%, #f1c40f 45%, #b8860b 55%, #4a3600 100%);
+        }
+
+        /* Sølv - 2. plass */
+        .rank-1 .score-val {
+            background: linear-gradient(180deg, #ffffff 0%, #bdc3c7 45%, #7f8c8d 55%, #1a1c1d 100%);
+        }
+
+        /* Bronse - 3. plass */
+        .rank-2 .score-val {
+            background: linear-gradient(180deg, #fff2e6 0%, #cd7f32 45%, #8b4513 55%, #301800 100%);
+        }
     </style>
 </head>
 <body>
@@ -131,24 +145,27 @@
 
     <div class="scoreline-body" id="main-body">
         <div class="player-row" id="p0-row" data-last-fouls="0">
-            <div class="stamp dead">DEAD</div><div class="stamp survivor">SURVIVOR</div>
-            <div class="stamp eliminated-stamp">ELIMINATED</div> <div class="revolver-cylinder">
+            <div class="stamp survivor">SURVIVOR</div>
+            <div class="stamp eliminated-stamp">ELIMINATED</div>
+            <div class="revolver-cylinder">
                 <div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div>
             </div>
             <div class="name" id="p0-name">PLAYER 1</div>
             <div class="score-block"><div class="score-val" id="p0-score">0</div></div>
         </div>
         <div class="player-row" id="p1-row" data-last-fouls="0">
-            <div class="stamp dead">DEAD</div><div class="stamp survivor">SURVIVOR</div>
-            <div class="stamp eliminated-stamp">ELIMINATED</div> <div class="revolver-cylinder">
+            <div class="stamp survivor">SURVIVOR</div>
+            <div class="stamp eliminated-stamp">ELIMINATED</div>
+            <div class="revolver-cylinder">
                 <div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div>
             </div>
             <div class="name" id="p1-name">PLAYER 2</div>
             <div class="score-block"><div class="score-val" id="p1-score">0</div></div>
         </div>
         <div class="player-row" id="p2-row" data-last-fouls="0">
-            <div class="stamp dead">DEAD</div><div class="stamp survivor">SURVIVOR</div>
-            <div class="stamp eliminated-stamp">ELIMINATED</div> <div class="revolver-cylinder">
+            <div class="stamp survivor">SURVIVOR</div>
+            <div class="stamp eliminated-stamp">ELIMINATED</div>
+            <div class="revolver-cylinder">
                 <div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div>
             </div>
             <div class="name" id="p2-name">PLAYER 3</div>
@@ -187,12 +204,15 @@
             const row = document.getElementById(`p${pId}-row`);
             if (!row) return;
 
+            // Oppdater rangering-klasse for farge (Gull, Sølv, Bronse)
+            row.className = `player-row rank-${rank}`;
             row.style.display = "flex";
             row.style.transform = `translateY(${rank * rowH}px)`;
             
             document.getElementById(`p${pId}-name`).innerText = pData.name;
             document.getElementById(`p${pId}-score`).innerText = pData.score;
 
+            // Animasjon
             const cylinder = row.querySelector('.revolver-cylinder');
             const currentFouls = pData.fouls;
             const previousFouls = parseInt(row.getAttribute('data-last-fouls'));
@@ -202,30 +222,21 @@
                 void cylinder.offsetWidth; 
                 cylinder.classList.add('spinning');
             }
-            
             row.setAttribute('data-last-fouls', currentFouls);
 
             const chambers = cylinder.querySelectorAll('.chamber');
-            chambers.forEach((c, i) => {
-                c.classList.toggle('active', i < currentFouls);
-            });
+            chambers.forEach((c, i) => c.classList.toggle('active', i < currentFouls));
 
-            // --- OPPDATERT STATUS-LOGIKK FOR ELIMINERING ---
+            // Status
             const stamps = row.querySelectorAll('.stamp');
             stamps.forEach(s => s.style.display = 'none');
-            
-            // Fjerner den inaktive klassen som standard
             row.classList.remove('eliminated');
 
             if (currentFouls >= 3) {
-                // Trigger ELIMINATED stempel
                 row.querySelector('.eliminated-stamp').style.display = 'block';
-                // Gjør raden inaktiv
                 row.classList.add('eliminated');
-                row.style.opacity = "1"; /* Beholder 1, CSS-filteret tar over */
-            } else if (data.matchEnded) {
-                if (rank === 0) row.querySelector('.survivor').style.display = 'block';
-                row.style.opacity = "1";
+            } else if (data.matchEnded && rank === 0) {
+                row.querySelector('.survivor').style.display = 'block';
             } else {
                 row.style.opacity = (data.currentPlayer === pId) ? "1" : "0.6";
             }
