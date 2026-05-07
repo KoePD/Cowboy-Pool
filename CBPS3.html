@@ -85,7 +85,6 @@
         .rank-1 .score-val { background-image: linear-gradient(180deg, #ffffff 0%, #bdc3c7 100%); }
         .rank-2 .score-val { background-image: linear-gradient(180deg, #fff2e6 0%, #cd7f32 100%); }
 
-        /* --- HER ER OPPDATERINGEN FOR LESBARHET --- */
         .pers-val { 
             font-size: 14px; 
             color: #bd9b5b; 
@@ -94,12 +93,12 @@
         }
         
         .pers-val b { 
-            font-family: 'Arial', sans-serif; /* Endret til ren font */
-            color: #ffffff; /* Ren hvit for maks kontrast */
-            font-size: 18px; /* Litt større enn teksten rundt */
+            font-family: 'Arial', sans-serif; 
+            color: #ffffff; 
+            font-size: 18px; 
             margin-left: 2px;
             margin-right: 5px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.8); /* Gjør det lettere å lese mot mørk bakgrunn */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8); 
         }
 
         .stamp { position: absolute; font-size: 35px; border: 5px solid; border-radius: 6px; padding: 5px 15px; text-transform: uppercase; z-index: 50; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-15deg); display: none; }
@@ -111,6 +110,14 @@
             display: flex; justify-content: space-between; align-items: center;
             border-top: 3px solid #8b5a2b; font-size: 18px;
             position: relative; z-index: 20;
+        }
+
+        #status-msg {
+            font-family: 'Anton', sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #fdfaf0;
+            text-shadow: 1px 1px 2px #000;
         }
     </style>
 </head>
@@ -144,7 +151,7 @@
 
     <div class="board-footer">
         <div id="inning-text">ROUND 1</div>
-        <div id="status-msg">OPPDATERER...</div>
+        <div id="status-msg">KRAV: CAROM</div>
     </div>
 </div>
 
@@ -161,6 +168,15 @@
     db.on('value', snap => {
         const data = snap.val();
         if (!data) return;
+
+        // --- STATUS-MELDING LOGIKK (Krav: Carom, etc) ---
+        const statusEl = document.getElementById('status-msg');
+        if (data.status) {
+            // Hvis det står "Open" i basen, kan vi f.eks. legge til "Krav:" foran
+            statusEl.innerText = data.status.toUpperCase().includes('ROUND') ? data.status : `KRAV: ${data.status}`;
+        } else {
+            statusEl.innerText = "VENTER...";
+        }
 
         const rowH = 150; 
         const playerCount = data.playerCount || 3;
