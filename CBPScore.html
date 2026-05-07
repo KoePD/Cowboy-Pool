@@ -48,9 +48,9 @@
             background-size: contain;
             position: relative; margin-right: 25px; margin-left: 20px;
             flex-shrink: 0;
+            transform: rotate(0deg);
         }
 
-        /* Spinn-animasjon */
         .spinning { animation: cylinder-spin 0.6s cubic-bezier(0.15, 0.88, 0.3, 1.05); }
         @keyframes cylinder-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
@@ -84,9 +84,6 @@
         .name { font-size: 42px; color: #fdfaf0; text-transform: uppercase; padding-left: 10px; font-family: 'Rye', serif; flex-grow: 1; }
         .score-block { min-width: 220px; height: 100%; margin-left: auto; background: rgba(0,0,0,0.7); border-left: 3px solid #6e5932; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .score-val { font-size: 64px; font-family: 'Rye', serif; line-height: 0.7; background: linear-gradient(180deg, #fff 0%, #f1c40f 45%, #b8860b 55%, #4a3600 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(3px 3px 2px rgba(0,0,0,1)); }
-        
-        .warning { animation: cylinder-shake 0.2s infinite; }
-        @keyframes cylinder-shake { 0% {transform: rotate(0deg);} 50% {transform: rotate(2deg);} 100% {transform: rotate(0deg);} }
     </style>
 </head>
 <body>
@@ -131,8 +128,8 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('gameData');
 
-    // Vi lagrer forrige kjente foul-status i et objekt utenfor loopen
     let lastKnownFouls = {};
+    let isFirstLoad = true;
 
     db.on('value', snap => {
         const data = snap.val();
@@ -165,22 +162,21 @@
             document.getElementById(`p${p}-name`).innerText = pData.name;
             document.getElementById(`p${p}-score`).innerText = pData.score;
 
-            // --- KORRIGERT ANIMASJON LOGIKK ---
             const cylinder = row.querySelector('.revolver-cylinder');
             
-            // Sjekk om denne spesifikke spilleren har fått en ny foul
-            if (lastKnownFouls[p] !== undefined && pData.fouls > lastKnownFouls[p]) {
-                cylinder.classList.remove('spinning');
-                void cylinder.offsetWidth; // Force restart
-                cylinder.classList.add('spinning');
+            // Sjekk fouls for animasjon
+            if (!isFirstLoad) {
+                if (lastKnownFouls[p] !== undefined && pData.fouls > lastKnownFouls[p]) {
+                    cylinder.classList.remove('spinning');
+                    void cylinder.offsetWidth; 
+                    cylinder.classList.add('spinning');
+                }
             }
             
-            // Oppdater den globale trackeren for denne spilleren
             lastKnownFouls[p] = pData.fouls;
 
             const chambers = cylinder.querySelectorAll('.chamber');
             chambers.forEach((c, i) => c.classList.toggle('active', i < pData.fouls));
-            cylinder.classList.toggle('warning', pData.fouls === 2);
 
             // Stempler
             const stamps = row.querySelectorAll('.stamp');
@@ -197,6 +193,7 @@
             }
         });
 
+        isFirstLoad = false;
         const roundNum = Math.floor((data.innings || 0) / playerCount) + 1;
         document.getElementById('inning-text').innerText = `ROUND ${roundNum}`;
     });
