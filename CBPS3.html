@@ -14,102 +14,76 @@
             height: 1080px; width: 1920px;
         }
 
-        /* --- HOVEDRAMME (WANTED BOARD) --- */
         .wanted-board {
             width: 500px; 
-            background: #0e0a07; /* Mørkere treverk */
+            background: #0e0a07; 
             border: 12px solid #1a120b;
             border-radius: 4px;
             box-shadow: 0 30px 80px rgba(0,0,0,0.9);
             position: relative;
             z-index: 10;
-            display: flex;
-            flex-direction: column;
         }
 
         /* Stål-hjørner */
-        .corner {
-            position: absolute; width: 35px; height: 35px;
-            background: linear-gradient(135deg, #777 0%, #333 100%);
-            border: 1px solid #555;
-            z-index: 100;
-        }
+        .corner { position: absolute; width: 35px; height: 35px; background: linear-gradient(135deg, #777 0%, #333 100%); border: 1px solid #555; z-index: 100; }
         .top-left { top: -6px; left: -6px; border-radius: 4px 0 15px 0; }
         .top-right { top: -6px; right: -6px; border-radius: 0 4px 0 15px; }
         .bottom-left { bottom: -6px; left: -6px; border-radius: 0 15px 0 4px; }
         .bottom-right { bottom: -6px; right: -6px; border-radius: 15px 0 4px 0; }
 
-        /* HEADER */
         .board-header {
             width: 100%; padding: 20px 0;
-            background: #d9c5a0; /* Papirfarge */
+            background: #d9c5a0;
             border-bottom: 4px solid #8b5a2b;
             text-align: center;
             position: relative;
+            z-index: 20;
         }
         .wanted-title { font-size: 65px; color: #1a120b; margin: 0; line-height: 0.9; }
-        .wanted-sub { font-size: 14px; color: #4a3621; text-transform: uppercase; letter-spacing: 2px; }
         
-        .header-balls { position: absolute; top: 15px; right: 15px; display: flex; gap: 5px; }
-        .ball { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #000; box-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
-        .f-1 { background: #f1c40f; } .f-5 { background: #e67e22; } .f-3 { background: #e74c3c; }
+        .players-container { 
+            position: relative; 
+            width: 100%; 
+            /* Høyden her justeres dynamisk i JS basert på antall spillere */
+            min-height: 150px; 
+            background: #0e0a07;
+        }
 
-        /* SPILLER-RAD */
         .player-row {
-            display: none; /* Vises via JS */
-            flex-direction: row;
+            display: none; 
+            width: 100%;
+            height: 150px; /* Fast høyde for enkel animasjon */
             align-items: center;
-            padding: 20px;
+            padding: 0 20px;
+            box-sizing: border-box;
             border-bottom: 2px solid #1d140c;
             background: linear-gradient(90deg, #150e09 0%, #0e0a07 100%);
-            position: relative;
+            position: absolute; /* Påkrevd for translateY-flytting */
+            top: 0;
+            left: 0;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
         }
 
-        /* REVOLVER-TØNNE */
-        .revolver-zone {
-            width: 110px; height: 110px;
-            display: flex; justify-content: center; align-items: center;
-            position: relative;
-        }
+        .revolver-zone { width: 110px; height: 110px; position: relative; flex-shrink: 0; }
         .revolver-cylinder {
             width: 100px; height: 100px;
             background: url('https://koepd.github.io/Cowboy-Pool/image_b55599.png') no-repeat center center;
             background-size: contain;
-            position: relative;
-            transform-origin: center center;
         }
         .spinning { animation: cylinder-spin 0.6s cubic-bezier(0.15, 0.88, 0.3, 1.05); }
         @keyframes cylinder-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* HYLSER */
         .chamber { width: 20px; height: 20px; border-radius: 50%; position: absolute; }
         .c1 { top: 10px; left: 40px; }
         .c2 { bottom: 22px; left: 16px; }
         .c3 { bottom: 22px; right: 16px; }
-        .chamber.active { 
-            background: radial-gradient(circle at 35% 35%, #fff7ad 0%, #f1c40f 100%); 
-            border: 1.5px solid #fff; box-shadow: 0 0 10px #f1c40f;
-            animation: load-in 0.3s ease-out;
-        }
-        @keyframes load-in { 0% { transform: scale(2.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .chamber.active { background: radial-gradient(circle at 35% 35%, #fff7ad 0%, #f1c40f 100%); border: 1.5px solid #fff; box-shadow: 0 0 10px #f1c40f; animation: load-in 0.3s; }
 
-        /* NAVN OG SCORE */
-        .info-zone {
-            flex: 1;
-            padding-left: 20px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden; /* Holder tekst inni */
-        }
-        .player-name {
-            font-size: 34px; color: #fdfaf0; text-transform: uppercase; margin: 0;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .score-val { 
-            font-size: 60px; margin: 5px 0; line-height: 0.8;
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            filter: drop-shadow(2px 2px 2px #000);
-        }
+        .info-zone { flex: 1; padding-left: 20px; overflow: hidden; }
+        .player-name { font-size: 30px; color: #fdfaf0; text-transform: uppercase; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .score-val { font-size: 55px; margin: 2px 0; line-height: 0.8; -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(2px 2px 2px #000); }
+        
+        /* Metalliske farger basert på rangering */
         .rank-0 .score-val { background-image: linear-gradient(180deg, #fffceb 0%, #f1c40f 100%); }
         .rank-1 .score-val { background-image: linear-gradient(180deg, #ffffff 0%, #bdc3c7 100%); }
         .rank-2 .score-val { background-image: linear-gradient(180deg, #fff2e6 0%, #cd7f32 100%); }
@@ -117,21 +91,15 @@
         .pers-val { font-size: 14px; color: #bd9b5b; font-family: 'Anton', sans-serif; }
         .pers-val b { color: #fff; margin-left: 3px; }
 
-        /* STEMPEL */
-        .stamp {
-            position: absolute; font-size: 40px; border: 5px solid; border-radius: 6px;
-            padding: 5px 15px; text-transform: uppercase; z-index: 50; 
-            left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-15deg);
-            display: none; pointer-events: none;
-        }
+        .stamp { position: absolute; font-size: 35px; border: 5px solid; border-radius: 6px; padding: 5px 15px; text-transform: uppercase; z-index: 50; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-15deg); display: none; }
         .elim-stamp { color: #d63031; border-color: #d63031; background: rgba(0,0,0,0.8); animation: slam 0.3s ease-out; }
         @keyframes slam { 0% { transform: translate(-50%, -50%) scale(4); opacity: 0; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
 
-        /* FOOTER */
         .board-footer {
             background: #000; color: #bd9b5b; padding: 15px 25px;
             display: flex; justify-content: space-between; align-items: center;
             border-top: 3px solid #8b5a2b; font-size: 18px;
+            position: relative; z-index: 20;
         }
     </style>
 </head>
@@ -143,45 +111,29 @@
 
     <div class="board-header">
         <h1 class="wanted-title">WANTED</h1>
-        <div class="wanted-sub">Outlaws & Bounty Hunters</div>
-        <div class="header-balls">
-            <div class="ball f-1"></div><div class="ball f-5"></div><div class="ball f-3"></div>
-        </div>
     </div>
 
-    <div id="players-container">
+    <div class="players-container" id="players-container">
         <div class="player-row" id="p0-row" data-last-fouls="0">
             <div class="stamp elim-stamp">DEAD</div>
             <div class="revolver-zone"><div class="revolver-cylinder"><div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div></div></div>
-            <div class="info-zone">
-                <div class="player-name" id="p0-name">PLAYER 1</div>
-                <div class="score-val" id="p0-score">0</div>
-                <div class="pers-val">NÅ <b id="p0-now">0</b> | PERS <b id="best-0">0</b></div>
-            </div>
+            <div class="info-zone"><div class="player-name" id="p0-name">PLAYER 1</div><div class="score-val" id="p0-score">0</div><div class="pers-val">NÅ <b id="p0-now">0</b> | PERS <b id="best-0">0</b></div></div>
         </div>
         <div class="player-row" id="p1-row" data-last-fouls="0">
             <div class="stamp elim-stamp">DEAD</div>
             <div class="revolver-zone"><div class="revolver-cylinder"><div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div></div></div>
-            <div class="info-zone">
-                <div class="player-name" id="p1-name">PLAYER 2</div>
-                <div class="score-val" id="p1-score">0</div>
-                <div class="pers-val">NÅ <b id="p1-now">0</b> | PERS <b id="best-1">0</b></div>
-            </div>
+            <div class="info-zone"><div class="player-name" id="p1-name">PLAYER 2</div><div class="score-val" id="p1-score">0</div><div class="pers-val">NÅ <b id="p1-now">0</b> | PERS <b id="best-1">0</b></div></div>
         </div>
         <div class="player-row" id="p2-row" data-last-fouls="0">
             <div class="stamp elim-stamp">DEAD</div>
             <div class="revolver-zone"><div class="revolver-cylinder"><div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div></div></div>
-            <div class="info-zone">
-                <div class="player-name" id="p2-name">PLAYER 3</div>
-                <div class="score-val" id="p2-score">0</div>
-                <div class="pers-val">NÅ <b id="p2-now">0</b> | PERS <b id="best-2">0</b></div>
-            </div>
+            <div class="info-zone"><div class="player-name" id="p2-name">PLAYER 3</div><div class="score-val" id="p2-score">0</div><div class="pers-val">NÅ <b id="p2-now">0</b> | PERS <b id="best-2">0</b></div></div>
         </div>
     </div>
 
     <div class="board-footer">
         <div id="inning-text">ROUND 1</div>
-        <div id="status-msg" style="font-size: 14px;">OPPDATERER...</div>
+        <div id="status-msg">OPPDATERER...</div>
     </div>
 </div>
 
@@ -199,7 +151,12 @@
         const data = snap.val();
         if (!data) return;
 
+        const rowH = 150; // Høyden på hver rad
         const playerCount = data.playerCount || 3;
+        
+        // Sett høyden på containeren basert på antall spillere
+        document.getElementById('players-container').style.height = (playerCount * rowH) + "px";
+
         let pList = [];
         for (let i = 0; i < playerCount; i++) {
             pList.push({
@@ -210,15 +167,21 @@
             });
         }
 
+        // Sorter etter poeng (høyeste først)
         pList.sort((a, b) => b.score - a.score);
 
         pList.forEach((pData, rank) => {
             const row = document.getElementById(`p${pData.id}-row`);
             if (!row) return;
 
+            // FLYTT RADEN: Bruk translateY basert på rangering
             row.style.display = "flex";
+            row.style.transform = `translateY(${rank * rowH}px)`;
+            
+            // Sett fargeklasse (Gull, Sølv, Bronse)
             row.className = `player-row rank-${rank}`;
             
+            // Oppdater data
             document.getElementById(`p${pData.id}-name`).innerText = pData.name;
             document.getElementById(`p${pData.id}-score`).innerText = pData.score;
             document.getElementById(`best-${pData.id}`).innerText = data.bestSeries ? (data.bestSeries[pData.id] || 0) : 0;
