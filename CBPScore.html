@@ -27,13 +27,17 @@
             display: flex; align-items: center; 
             background: linear-gradient(180deg, #1d0f06 0%, #000 100%);
             border-bottom: 2px solid #6e5932;
-            height: 65px; width: 100%; position: relative; z-index: 10;
+            height: 70px; width: 100%; position: relative; z-index: 10;
         }
 
         .inning-text { color: #fdfaf0; font-family: 'Rye', serif; font-size: 22px; padding-left: 25px; text-transform: uppercase; }
         .status-msg { color: #bd9b5b; font-size: 16px; font-family: 'Rye', serif; text-transform: uppercase; margin-left: 15px; letter-spacing: 1px; }
 
-        .header-balls { position: absolute; right: 0; width: 220px; display: flex; justify-content: center; align-items: center; gap: 12px; height: 100%; }
+        /* HEADER BALLER SENTRERT OVER SCORE */
+        .header-balls { 
+            position: absolute; right: 0; width: 220px; 
+            display: flex; justify-content: center; align-items: center; gap: 12px; height: 100%;
+        }
         .ball { width: 32px; height: 32px; border-radius: 50%; position: relative; box-shadow: 2px 2px 5px rgba(0,0,0,0.8); border: 2px solid #000; }
         .ball-num { font-size: 13px; font-weight: 900; font-family: 'Anton', sans-serif; color: black; background: white; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5; }
         .f-1 { background: radial-gradient(circle at 30% 30%, #f1c40f 0%, #a67c00 100%); }
@@ -49,17 +53,26 @@
             transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
         }
 
+        /* REVOLVER MED 3 KAMRE */
         .revolver-cylinder {
-            width: 60px; height: 60px;
+            width: 65px; height: 65px;
             background: radial-gradient(circle, #333 0%, #111 100%);
             border: 2px solid #5d4037;
-            border-radius: 50%; position: relative; margin-right: 20px;
+            border-radius: 50%; position: relative; margin-right: 25px;
             box-shadow: inset 0 0 10px #000;
         }
-        .chamber { width: 14px; height: 14px; background: #000; border-radius: 50%; position: absolute; border: 1px solid #222; }
-        .c1 { top: 6px; left: 23px; } .c2 { top: 18px; right: 8px; } .c3 { bottom: 18px; right: 8px; }
-        .c4 { bottom: 6px; left: 23px; } .c5 { bottom: 18px; left: 8px; } .c6 { top: 18px; left: 8px; }
-        .chamber.active { background: radial-gradient(circle at 35% 35%, #fff7ad 0%, #f1c40f 40%, #b8860b 100%); border: 1px solid #fdfaf0; box-shadow: 0 0 10px #f1c40f; }
+        .chamber { width: 16px; height: 16px; background: #000; border-radius: 50%; position: absolute; border: 1px solid #222; }
+        .c1 { top: 8px; left: 24px; } 
+        .c2 { bottom: 12px; left: 10px; } 
+        .c3 { bottom: 12px; right: 10px; }
+        
+        .chamber.active { 
+            background: linear-gradient(180deg, #fffceb 0%, #f1c40f 40%, #b8860b 60%, #4a3600 100%); 
+            border: 1px solid #fdfaf0; box-shadow: 0 0 12px #f1c40f; 
+        }
+
+        .warning { animation: cylinder-shake 0.2s infinite; }
+        @keyframes cylinder-shake { 0% {transform: rotate(0deg);} 50% {transform: rotate(3deg);} 100% {transform: rotate(0deg);} }
 
         .name { font-size: 42px; color: #fdfaf0; text-transform: uppercase; padding-left: 10px; font-family: 'Rye', serif; }
 
@@ -75,15 +88,15 @@
             background: linear-gradient(180deg, #fff 0%, #f1c40f 45%, #b8860b 55%, #4a3600 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             filter: drop-shadow(3px 3px 2px rgba(0,0,0,1));
-            margin-bottom: 20px; 
+            margin-bottom: 18px; 
         }
-
-        .pers-val { font-size: 13px; color: #bd9b5b; font-family: 'Anton', sans-serif; text-transform: uppercase; letter-spacing: 1.5px; }
-        .pers-val b { font-family: Arial, sans-serif !important; color: #fdfaf0; font-size: 14px; margin-left: 2px; }
 
         .rank-0 .score-val { background: linear-gradient(180deg, #fffceb 0%, #f1c40f 45%, #b8860b 55%, #4a3600 100%); -webkit-background-clip: text; }
         .rank-1 .score-val { background: linear-gradient(180deg, #ffffff 0%, #bdc3c7 45%, #7f8c8d 55%, #1a1c1d 100%); -webkit-background-clip: text; }
         .rank-2 .score-val { background: linear-gradient(180deg, #fff2e6 0%, #cd7f32 45%, #8b4513 55%, #301800 100%); -webkit-background-clip: text; }
+
+        .pers-val { font-size: 13px; color: #bd9b5b; font-family: 'Anton', sans-serif; text-transform: uppercase; letter-spacing: 1.5px; }
+        .pers-val b { font-family: Arial, sans-serif !important; color: #fdfaf0; font-size: 14px; margin-left: 2px; }
 
         .player-eliminated { filter: grayscale(1) brightness(0.2); }
     </style>
@@ -94,7 +107,7 @@
     <div class="scoreline-header">
         <div class="inning-text" id="inning-text">ROUND 1</div>
         <div style="color: #6e5932; font-size: 24px; margin-left: 15px;">|</div>
-        <div class="status-msg" id="status-msg">HENTER KRAV...</div>
+        <div class="status-msg" id="status-msg">LASTING...</div>
         <div class="header-balls">
             <div id="hdr-b1" class="ball f-1"><div class="ball-num">1</div></div>
             <div id="hdr-b5" class="ball f-5"><div class="ball-num">5</div></div>
@@ -105,10 +118,7 @@
     <div class="scoreline-body" id="main-body">
         <div class="player-row" id="p0-row" style="display:none;">
             <div style="display:flex; align-items:center; padding:0 25px;">
-                <div class="revolver-cylinder">
-                    <div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div>
-                    <div class="chamber c4"></div><div class="chamber c5"></div><div class="chamber c6"></div>
-                </div>
+                <div class="revolver-cylinder"><div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div></div>
                 <div class="name" id="p0-name">PLAYER 1</div>
             </div>
             <div class="score-block">
@@ -118,10 +128,7 @@
         </div>
         <div class="player-row" id="p1-row" style="display:none;">
             <div style="display:flex; align-items:center; padding:0 25px;">
-                <div class="revolver-cylinder">
-                    <div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div>
-                    <div class="chamber c4"></div><div class="chamber c5"></div><div class="chamber c6"></div>
-                </div>
+                <div class="revolver-cylinder"><div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div></div>
                 <div class="name" id="p1-name">PLAYER 2</div>
             </div>
             <div class="score-block">
@@ -131,10 +138,7 @@
         </div>
         <div class="player-row" id="p2-row" style="display:none;">
             <div style="display:flex; align-items:center; padding:0 25px;">
-                <div class="revolver-cylinder">
-                    <div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div>
-                    <div class="chamber c4"></div><div class="chamber c5"></div><div class="chamber c6"></div>
-                </div>
+                <div class="revolver-cylinder"><div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div></div>
                 <div class="name" id="p2-name">PLAYER 3</div>
             </div>
             <div class="score-block">
@@ -184,8 +188,11 @@
             document.getElementById(`p${p}-name`).innerText = data.names[p] || `P${p+1}`;
             document.getElementById(`p${p}-score`).innerText = data.scores[p];
 
-            const chambers = row.querySelectorAll('.chamber');
+            // Revolver-logikk (3 kamre)
+            const cylinder = row.querySelector('.revolver-cylinder');
+            const chambers = cylinder.querySelectorAll('.chamber');
             chambers.forEach((c, i) => c.classList.toggle('active', i < pData.fouls));
+            cylinder.classList.toggle('warning', pData.fouls === 2);
 
             const scoreStart = (data.scoreAtStart && data.scoreAtStart[p] !== undefined) ? data.scoreAtStart[p] : 0;
             document.getElementById(`p${p}-now`).innerText = (curP === p) ? (data.scores[p] - scoreStart) : 0;
@@ -195,6 +202,7 @@
             row.style.opacity = (curP === p || pData.fouls >= 3) ? "1" : "0.5";
         });
 
+        // DYNAMISK KRAV-LOGIKK
         document.getElementById('inning-text').innerText = `${t.inn} ${Math.floor(data.innings / data.playerCount) + 1}`;
         let statusText = t.break;
         if (data.breakDone) {
