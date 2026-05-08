@@ -16,187 +16,178 @@
             height: 1080px; width: 1920px;
         }
 
-        /* --- HOVEDRAMME (WANTED BOARD) --- */
+        /* --- HOVEDRAMME MED DITT BILDE --- */
         .wanted-board {
             width: 535px; 
-            background: radial-gradient(circle, #2a1a0f 0%, #0a0502 100%); /* Mørkt tre-effekt */
-            border: 15px solid;
-            border-image: linear-gradient(180deg, #1d1109 0%, #000 100%) 1; /* Mørk tre-ytterkant */
-            border-radius: 8px;
-            box-shadow: 0 40px 100px rgba(0,0,0,1);
-            overflow: hidden; /* Holder alt inne */
+            height: 750px; 
+            background: url('https://koepd.github.io/Cowboy-Pool/ScoreboardFrame.png') no-repeat center center;
+            background-size: contain;
             position: relative;
             z-index: 10;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Stål-hjørner */
-        .corner {
-            position: absolute; width: 40px; height: 40px;
-            background: linear-gradient(135deg, #eee 0%, #666 40%, #000 100%);
-            border-radius: 5px; z-index: 100;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.8);
-        }
-        .top-left { top: -8px; left: -8px; }
-        .top-right { top: -8px; right: -8px; transform: rotate(90deg); }
-        .bottom-left { bottom: -8px; left: -8px; transform: rotate(-90deg); }
-        .bottom-right { bottom: -8px; right: -8px; transform: rotate(180deg); }
-
-        /* HEADER */
         .board-header {
-            width: 100%; height: 100px;
-            background: linear-gradient(180deg, #1d0f06 0%, #000 100%);
-            border-bottom: 2px solid #bd9b5b;
-            display: flex; align-items: center; justify-content: center;
-            position: relative;
-            z-index: 20;
+            width: 100%;
+            height: 130px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 10px;
         }
-        .wanted-title { font-size: 56px; color: #fdfaf0; text-transform: uppercase; margin: 0; line-height: 0.8; }
+        .wanted-title { font-size: 55px; color: #1a120b; margin: 0; }
         
         .players-container { 
             position: relative; 
             width: 100%; 
-            min-height: 150px; 
-            background: #0e0a07;
+            height: 480px; 
+            margin-top: 15px;
+            padding: 0 40px; /* Holder innholdet innenfor bilderammen */
+            box-sizing: border-box;
         }
 
-        /* --- SPILLER-KORT (TILBAKEFØRT TIL HORISONTALT DESIGN) --- */
         .player-row {
             display: none; 
-            width: 100%;
-            height: 150px; 
+            width: 455px;
+            height: 155px; 
             align-items: center;
-            padding: 0 25px;
+            padding: 0 10px;
             box-sizing: border-box;
-            border-bottom: 2px solid #2a1a0f;
-            background: linear-gradient(90deg, #150e09 0%, #0a0502 100%);
-            position: absolute; 
-            top: 0;
-            left: 0;
-            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease, background-color 0.4s ease;
-            opacity: 0.6;
+            position: absolute;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+            opacity: 0.7;
         }
 
-        /* Marker lederen med en gyllen glød */
         .player-row.active-turn {
             opacity: 1;
-            background: linear-gradient(90deg, #2a1a0f 0%, #1a120b 100%);
-            box-shadow: inset 0 0 30px rgba(241, 196, 15, 0.2);
+            background: rgba(241, 196, 15, 0.08);
+            border-radius: 15px;
             animation: active-pulse 2s infinite ease-in-out;
-            z-index: 30;
         }
 
         @keyframes active-pulse {
-            0% { box-shadow: 0 0 10px rgba(241, 196, 15, 0.1), inset 0 0 30px rgba(241, 196, 15, 0.1); }
-            50% { box-shadow: 0 0 25px rgba(241, 196, 15, 0.3), inset 0 0 40px rgba(241, 196, 15, 0.2); }
-            100% { box-shadow: 0 0 10px rgba(241, 196, 15, 0.1), inset 0 0 30px rgba(241, 196, 15, 0.1); }
+            0% { box-shadow: 0 0 15px rgba(241, 196, 15, 0.1); }
+            50% { box-shadow: 0 0 30px rgba(241, 196, 15, 0.3); }
+            100% { box-shadow: 0 0 15px rgba(241, 196, 15, 0.1); }
         }
 
-        /* --- TØNNE TIL HØYRE --- */
-        .revolver-zone { 
-            width: 110px; height: 110px; position: relative; flex-shrink: 0; margin-left: auto; margin-right: 15px; 
-        }
+        /* --- TØNNE TIL VENSTRE --- */
+        .revolver-zone { width: 120px; height: 120px; position: relative; flex-shrink: 0; }
         .revolver-cylinder {
-            width: 100px; height: 100px;
+            width: 110px; height: 110px;
             background: url('https://koepd.github.io/Cowboy-Pool/image_b55599.png') no-repeat center center;
             background-size: contain;
-            overflow: hidden; 
         }
-        .spinning { animation: cylinder-spin 0.6s cubic-bezier(0.15, 0.88, 0.3, 1.05); }
-        @keyframes cylinder-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* --- HYLSER (Perfekt posisjonert) --- */
+        /* --- HYLSER (Finjustert posisjon) --- */
         .chamber { 
-            width: 20px; height: 20px; border-radius: 50%; position: absolute; z-index: 3;
+            width: 22px; height: 22px; 
+            position: absolute; z-index: 3;
             background: url('https://koepd.github.io/Cowboy-Pool/Hylse.png') no-repeat center center;
             background-size: contain;
-            display: none; 
+            display: none;
         }
-        /* Posisjoner (Finjustert) */
-        .c1 { top: 9px; left: 39.5px; } /* Topp */
-        .c2 { bottom: 23px; left: 16px; } /* Nederst venstre */
-        .c3 { bottom: 23px; right: 16px; } /* Nederst høyre */
+        /* Posisjoner korrigert for de nederste hylsene */
+        .c1 { top: 11px; left: 44px; }
+        .c2 { bottom: 27px; left: 21px; } /* Flyttet litt inn og opp */
+        .c3 { bottom: 27px; right: 21px; } /* Flyttet litt inn og opp */
         
-        .chamber.active { display: block; box-shadow: 0 0 15px rgba(241, 196, 15, 0.7); animation: load-in 0.3s ease-out; }
+        .chamber.active { display: block; animation: load-in 0.3s ease-out; }
         @keyframes load-in { 0% { transform: scale(2.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-        /* --- NAVN TIL VENSTRE --- */
-        .info-zone { display: flex; flex-direction: column; overflow: hidden; padding-left: 10px; }
-        .player-name { font-size: 30px; color: #fdfaf0; text-transform: uppercase; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 280px; }
-        .active-turn .player-name { color: #fff; text-shadow: 0 0 10px rgba(241, 196, 15, 0.8); }
-
-        .score-val { font-size: 55px; margin: 2px 0; line-height: 0.8; -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(2px 2px 2px #000); }
+        /* --- INFO TIL HØYRE --- */
+        .info-zone { flex: 1; padding-left: 20px; display: flex; flex-direction: column; }
+        .player-name { font-size: 28px; color: #fdfaf0; text-transform: uppercase; margin: 0; letter-spacing: 1px; }
+        .score-val { font-size: 52px; margin: -5px 0; line-height: 0.9; -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(2px 2px 2px #000); }
         
-        /* Metall-gradienter */
         .rank-0 .score-val { background-image: linear-gradient(180deg, #fffceb 0%, #f1c40f 100%); }
         .rank-1 .score-val { background-image: linear-gradient(180deg, #ffffff 0%, #bdc3c7 100%); }
         .rank-2 .score-val { background-image: linear-gradient(180deg, #fff2e6 0%, #cd7f32 100%); }
 
-        .pers-val { font-size: 14px; color: #bd9b5b; font-family: 'Anton', sans-serif; text-transform: uppercase; }
-        .pers-val b { font-family: 'Arial', sans-serif; color: #ffffff; font-size: 18px; margin-left: 2px; margin-right: 5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
+        .pers-val { font-size: 13px; color: #bd9b5b; font-family: 'Anton', sans-serif; text-transform: uppercase; }
+        .pers-val b { font-family: 'Arial', sans-serif; color: #fff; font-size: 16px; margin: 0 3px; }
 
-        /* ELIMINATED STEMPEL */
-        .stamp { position: absolute; font-size: 35px; border: 5px solid; border-radius: 6px; padding: 5px 15px; text-transform: uppercase; z-index: 50; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-15deg); display: none; }
-        .elim-stamp { 
-            color: #d63031; 
-            border-color: #d63031; 
-            background: rgba(0,0,0,0.8); 
-            animation: stamp-slam 0.3s ease-out forwards, stamp-pulse 2s infinite 0.3s;
+        /* --- ELIMINATED STEMPEL --- */
+        .stamp {
+            position: absolute; width: 320px; z-index: 100;
+            left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-12deg);
+            display: none; pointer-events: none;
         }
-        @keyframes stamp-slam { 0% { transform: translate(-50%, -50%) scale(4); opacity: 0; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
-        @keyframes stamp-pulse { 0% { box-shadow: 0 0 10px rgba(214, 48, 49, 0.3); } 50% { box-shadow: 0 0 25px rgba(214, 48, 49, 0.6); } 100% { box-shadow: 0 0 10px rgba(214, 48, 49, 0.3); } }
+        .stamp svg { width: 100%; filter: drop-shadow(0 0 15px rgba(0,0,0,0.9)); }
 
-        /* BUNNSTATUS (FOOTER) */
         .board-footer {
-            background: #000; color: #bd9b5b; padding: 15px 25px;
+            height: 100px;
             display: flex; justify-content: space-between; align-items: center;
-            border-top: 3px solid #8b5a2b; font-size: 18px;
-            position: relative; z-index: 20;
+            padding: 0 50px; margin-top: auto; margin-bottom: 25px;
         }
+
+        #inning-text { color: #fdfaf0; font-size: 18px; font-family: 'Anton', sans-serif; }
+        .footer-balls { display: flex; gap: 12px; }
+        .ball { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #000; box-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
+        .f-1 { background: radial-gradient(circle at 30% 30%, #f1c40f, #a67c00); }
+        .f-5 { background: radial-gradient(circle at 30% 30%, #e67e22, #834c16); }
+        .f-3 { background: radial-gradient(circle at 30% 30%, #e74c3c, #962d22); }
+        #status-msg { color: #fdfaf0; font-family: 'Anton', sans-serif; font-size: 16px; text-transform: uppercase; }
+
+        .spinning { animation: cylinder-spin 0.6s cubic-bezier(0.15, 0.88, 0.3, 1.05); }
+        @keyframes cylinder-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
 <div class="wanted-board">
-    <div class="corner top-left"></div><div class="corner top-right"></div>
-    <div class="corner bottom-left"></div><div class="corner bottom-right"></div>
-
     <div class="board-header">
         <h1 class="wanted-title">WANTED</h1>
     </div>
 
     <div class="players-container" id="players-container">
         <div class="player-row" id="p0-row" data-last-fouls="0">
-            <div class="stamp elim-stamp">ELIMINATED</div>
+            <div class="stamp elim-stamp">
+                <svg viewBox="0 0 400 120">
+                    <rect x="10" y="10" width="380" height="100" rx="10" fill="rgba(180, 0, 0, 0.85)" stroke="#600" stroke-width="5"/>
+                    <text x="50%" y="78" text-anchor="middle" font-family="Anton" font-size="65" fill="white" font-weight="bold" letter-spacing="2">ELIMINATED</text>
+                </svg>
+            </div>
+            <div class="revolver-zone">
+                <div class="revolver-cylinder"><div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div></div>
+            </div>
             <div class="info-zone">
-                <h2 class="player-name" id="p0-name">PLAYER 1</h2>
+                <div class="player-name" id="p0-name">PLAYER 1</div>
                 <div class="score-val" id="p0-score">0</div>
                 <div class="pers-val">NÅ <b id="p0-now">0</b> | PERS <b id="best-0">0</b></div>
             </div>
-            <div class="revolver-zone"><div class="revolver-cylinder"><div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div></div></div>
         </div>
         <div class="player-row" id="p1-row" data-last-fouls="0">
-            <div class="stamp elim-stamp">ELIMINATED</div>
+            <div class="stamp elim-stamp">
+                <svg viewBox="0 0 400 120"><rect x="10" y="10" width="380" height="100" rx="10" fill="rgba(180, 0, 0, 0.85)" stroke="#600" stroke-width="5"/><text x="50%" y="78" text-anchor="middle" font-family="Anton" font-size="65" fill="white" font-weight="bold" letter-spacing="2">ELIMINATED</text></svg>
+            </div>
+            <div class="revolver-zone"><div class="revolver-cylinder"><div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div></div></div>
             <div class="info-zone">
-                <h2 class="player-name" id="p1-name">PLAYER 2</h2>
+                <div class="player-name" id="p1-name">PLAYER 2</div>
                 <div class="score-val" id="p1-score">0</div>
                 <div class="pers-val">NÅ <b id="p1-now">0</b> | PERS <b id="best-1">0</b></div>
             </div>
-            <div class="revolver-zone"><div class="revolver-cylinder"><div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div></div></div>
         </div>
         <div class="player-row" id="p2-row" data-last-fouls="0">
-            <div class="stamp elim-stamp">ELIMINATED</div>
+            <div class="stamp elim-stamp">
+                <svg viewBox="0 0 400 120"><rect x="10" y="10" width="380" height="100" rx="10" fill="rgba(180, 0, 0, 0.85)" stroke="#600" stroke-width="5"/><text x="50%" y="78" text-anchor="middle" font-family="Anton" font-size="65" fill="white" font-weight="bold" letter-spacing="2">ELIMINATED</text></svg>
+            </div>
+            <div class="revolver-zone"><div class="revolver-cylinder"><div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div></div></div>
             <div class="info-zone">
-                <h2 class="player-name" id="p2-name">PLAYER 3</h2>
+                <div class="player-name" id="p2-name">PLAYER 3</div>
                 <div class="score-val" id="p2-score">0</div>
                 <div class="pers-val">NÅ <b id="p2-now">0</b> | PERS <b id="best-2">0</b></div>
             </div>
-            <div class="revolver-zone"><div class="revolver-cylinder"><div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div></div></div>
         </div>
     </div>
 
     <div class="board-footer">
-        <div id="inning-text">Round 1</div>
-        <div id="status-msg">OPPDATERER...</div>
+        <div id="inning-text">ROUND 1</div>
+        <div class="footer-balls">
+            <div class="ball f-1"></div><div class="ball f-5"></div><div class="ball f-3"></div>
+        </div>
+        <div id="status-msg">KRAV: CAROM</div>
     </div>
 </div>
 
@@ -205,19 +196,16 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database().ref('gameData');
 
-    // Lyder (Bytt ut med dine Firebase-linker)
-    const spinSound = new Audio('LINK_TIL_KLIKK_LYD'); 
-    const shotSound = new Audio('LINK_TIL_SKUDD_LYD');
+    const spinSound = new Audio('DIN_LYD_URL_HER'); 
+    const shotSound = new Audio('DIN_LYD_URL_HER');
 
     db.on('value', snap => {
         const data = snap.val();
         if (!data) return;
 
-        const rowH = 150; 
+        const rowH = 155; 
         const playerCount = data.playerCount || 3;
-        document.getElementById('players-container').style.height = (playerCount * rowH) + "px";
 
-        // Lag og sorter spillerliste
         let pList = [];
         for (let i = 0; i < playerCount; i++) {
             pList.push({
@@ -229,67 +217,41 @@
         }
         pList.sort((a, b) => b.score - a.score);
 
-        // Skjul alle rader først
-        document.querySelectorAll('.player-row').forEach(r => r.style.display = 'none');
-
-        // Loop gjennom og oppdater rader
         pList.forEach((pData, rank) => {
-            const pId = pData.id;
-            const row = document.getElementById(`p${pId}-row`);
+            const row = document.getElementById(`p${pData.id}-row`);
             if (!row) return;
 
-            // Oppdater stil og visning
-            row.className = `player-row rank-${rank}`;
             row.style.display = "flex";
-            
-            // FLYTT RADEN: Bruk translateY basert på rangering
             row.style.transform = `translateY(${rank * rowH}px)`;
+            row.className = `player-row rank-${rank} ${data.currentPlayer === pData.id ? 'active-turn' : ''}`;
             
-            // Oppdater tekst
-            document.getElementById(`p${pId}-name`).innerText = pData.name;
+            document.getElementById(`p${pData.id}-name`).innerText = pData.name;
             document.getElementById(`p${pData.id}-score`).innerText = pData.score;
             document.getElementById(`best-${pData.id}`).innerText = data.bestSeries ? (data.bestSeries[pData.id] || 0) : 0;
             
             const scoreStart = (data.scoreAtStart && data.scoreAtStart[pData.id] !== undefined) ? data.scoreAtStart[pData.id] : 0;
             document.getElementById(`p${pData.id}-now`).innerText = (data.currentPlayer === pData.id) ? (pData.score - scoreStart) : 0;
 
-            // Animasjon
             const cylinder = row.querySelector('.revolver-cylinder');
-            const currentFouls = pData.fouls;
-            const previousFouls = parseInt(row.getAttribute('data-last-fouls') || 0);
-
-            if (currentFouls > previousFouls) {
+            const prevFouls = parseInt(row.getAttribute('data-last-fouls') || 0);
+            if (pData.fouls > prevFouls) {
                 cylinder.classList.remove('spinning');
                 void cylinder.offsetWidth; 
                 cylinder.classList.add('spinning');
-                if (currentFouls < 3) { spinSound.currentTime = 0; spinSound.play().catch(e => {}); } 
-                else { shotSound.currentTime = 0; shotSound.play().catch(e => {}); }
+                if (pData.fouls < 3) { spinSound.currentTime = 0; spinSound.play().catch(e=>{}); }
+                else { shotSound.currentTime = 0; shotSound.play().catch(e=>{}); }
             }
-            row.setAttribute('data-last-fouls', currentFouls);
+            row.setAttribute('data-last-fouls', pData.fouls);
 
-            // Hylser
             const chambers = cylinder.querySelectorAll('.chamber');
-            chambers.forEach((c, i) => c.classList.toggle('active', i < currentFouls));
+            chambers.forEach((c, i) => c.classList.toggle('active', i < pData.fouls));
 
-            // Status og Opacity
             const stamp = row.querySelector('.elim-stamp');
-            if (currentFouls >= 3) {
-                stamp.style.display = 'block';
-                row.style.opacity = "0.4";
-                row.classList.remove('active-turn');
-            } else {
-                stamp.style.display = 'none';
-                if (data.currentPlayer === pId) {
-                    row.classList.add('active-turn');
-                    row.style.opacity = "1";
-                } else {
-                    row.style.opacity = "0.6";
-                }
-            }
+            stamp.style.display = (pData.fouls >= 3) ? 'block' : 'none';
         });
 
-        const roundNum = Math.floor((data.innings || 0) / playerCount) + 1;
-        document.getElementById('inning-text').innerText = `Round ${roundNum}`;
+        if (data.status) document.getElementById('status-msg').innerText = `KRAV: ${data.status.toUpperCase()}`;
+        document.getElementById('inning-text').innerText = `ROUND ${Math.floor((data.innings || 0) / playerCount) + 1}`;
     });
 </script>
 </body>
