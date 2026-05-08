@@ -16,7 +16,7 @@
             height: 1080px; width: 1920px;
         }
 
-        /* --- HOVEDRAMME MED DIN BAKGRUNN --- */
+        /* --- HOVEDRAMME --- */
         .wanted-board {
             width: 535px; 
             height: 750px; 
@@ -24,10 +24,9 @@
             background-size: contain;
             position: relative;
             z-index: 10;
-            display: flex;
-            flex-direction: column;
         }
 
+        /* HEADER */
         .board-header {
             width: 100%;
             height: 135px;
@@ -43,15 +42,16 @@
             width: 100%; 
             height: 480px; 
             margin-top: 10px;
-            padding: 0 45px; /* Justert for å holde alt innenfor treramma */
+            padding: 0 45px;
             box-sizing: border-box;
         }
 
+        /* --- SPILLER-RAD LAYOUT --- */
         .player-row {
             display: none; 
             width: 445px;
             height: 155px; 
-            align-items: center;
+            align-items: center; /* Sentrerer tønne og tekst vertikalt */
             padding: 0 10px;
             box-sizing: border-box;
             position: absolute;
@@ -59,29 +59,27 @@
             opacity: 0.7;
         }
 
-        /* --- AKTIV SPILLER GLØD --- */
         .player-row.active-turn {
             opacity: 1;
             background: rgba(241, 196, 15, 0.1);
             border-radius: 15px;
-            box-shadow: 0 0 20px rgba(241, 196, 15, 0.2);
         }
 
-        /* --- TØNNE TIL VENSTRE --- */
+        /* TØNNE TIL VENSTRE */
         .revolver-zone { 
-            width: 120px; 
-            height: 120px; 
+            width: 115px; 
+            height: 115px; 
             position: relative; 
             flex-shrink: 0; 
         }
         .revolver-cylinder {
-            width: 110px; 
-            height: 110px;
+            width: 105px; 
+            height: 105px;
             background: url('https://koepd.github.io/Cowboy-Pool/image_b55599.png') no-repeat center center;
             background-size: contain;
         }
 
-        /* --- HYLSER (Perfekt posisjonert) --- */
+        /* HYLSER (Flyttet 2-3px inn fra kanten) */
         .chamber { 
             width: 22px; height: 22px; 
             position: absolute; z-index: 3;
@@ -89,27 +87,27 @@
             background-size: contain;
             display: none;
         }
-        .c1 { top: 11px; left: 44px; }
-        .c2 { bottom: 27px; left: 21px; } 
-        .c3 { bottom: 27px; right: 21px; } 
+        .c1 { top: 10px; left: 41.5px; } /* Topp */
+        .c2 { bottom: 25px; left: 20px; } /* Nede venstre */
+        .c3 { bottom: 25px; right: 20px; } /* Nede høyre */
         
         .chamber.active { display: block; animation: load-in 0.3s ease-out; }
         @keyframes load-in { 0% { transform: scale(2.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-        /* --- NAVN OG SCORE TIL HØYRE --- */
+        /* TEKST OG SCORE TIL HØYRE FOR TØNNE */
         .info-zone { 
             flex: 1; 
-            padding-left: 15px; 
+            padding-left: 20px; 
             display: flex; 
             flex-direction: column; 
             justify-content: center;
         }
-        .player-name { font-size: 28px; color: #fdfaf0; text-transform: uppercase; margin: 0; letter-spacing: 1px; }
+        .player-name { font-size: 26px; color: #fdfaf0; text-transform: uppercase; margin: 0; letter-spacing: 1px; line-height: 1; }
         
         .score-val { 
-            font-size: 52px; 
-            margin: -5px 0; 
-            line-height: 0.9; 
+            font-size: 54px; 
+            margin: 0px 0; 
+            line-height: 0.85; 
             -webkit-background-clip: text; 
             -webkit-text-fill-color: transparent; 
             filter: drop-shadow(2px 2px 2px #000); 
@@ -119,23 +117,23 @@
         .rank-1 .score-val { background-image: linear-gradient(180deg, #ffffff 0%, #bdc3c7 100%); }
         .rank-2 .score-val { background-image: linear-gradient(180deg, #fff2e6 0%, #cd7f32 100%); }
 
-        .pers-val { font-size: 13px; color: #bd9b5b; font-family: 'Anton', sans-serif; text-transform: uppercase; }
+        .pers-val { font-size: 13px; color: #bd9b5b; font-family: 'Anton', sans-serif; text-transform: uppercase; margin-top: 2px; }
         .pers-val b { font-family: 'Arial', sans-serif; color: #fff; font-size: 16px; }
 
-        /* --- ELIMINATED STEMPEL --- */
+        /* ELIMINATED STEMPEL (Ligger midt over raden) */
         .stamp {
             position: absolute; 
             width: 320px; 
             z-index: 100;
             left: 50%; 
-            top: 55%; 
-            transform: translate(-50%, -50%) rotate(-12deg);
+            top: 50%; 
+            transform: translate(-50%, -50%) rotate(-10deg);
             display: none; 
             pointer-events: none;
         }
         .stamp svg { width: 100%; filter: drop-shadow(0 0 15px rgba(0,0,0,0.9)); }
 
-        /* --- FOOTER --- */
+        /* FOOTER */
         .board-footer {
             height: 100px;
             display: flex; 
@@ -143,10 +141,10 @@
             align-items: center;
             padding: 0 50px; 
             margin-top: auto; 
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
-        #inning-text { color: #fdfaf0; font-size: 18px; font-family: 'Anton', sans-serif; }
+        #inning-text { color: #fdfaf0; font-size: 18px; font-family: 'Anton', sans-serif; text-transform: uppercase; }
         .footer-balls { display: flex; gap: 12px; }
         .ball { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #000; box-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
         .f-1 { background: radial-gradient(circle at 30% 30%, #f1c40f, #a67c00); }
