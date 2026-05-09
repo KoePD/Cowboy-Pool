@@ -16,147 +16,208 @@
             height: 1080px; width: 1920px;
         }
 
-        /* --- HOVEDRAMME --- */
         .wanted-board {
-            width: 535px; 
-            height: 750px; 
+            width: 320px; 
+            height: 620px; 
             background: url('https://koepd.github.io/Cowboy-Pool/ScoreboardFrame.png') no-repeat center center;
-            background-size: contain;
+            background-size: 100% 100%;
             position: relative;
             z-index: 10;
         }
 
-        /* HEADER */
         .board-header {
-            width: 100%;
-            height: 135px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
+            width: 100%; height: 90px;
+            display: flex; justify-content: center; align-items: flex-end;
             padding-bottom: 5px;
         }
-        .wanted-title { font-size: 55px; color: #1a120b; margin: 0; }
+        .wanted-title { font-size: 35px; color: #1a120b; margin: 0; letter-spacing: 1px; }
         
         .players-container { 
-            position: relative; 
-            width: 100%; 
-            height: 480px; 
-            margin-top: 10px;
-            padding: 0 45px;
-            box-sizing: border-box;
+            position: relative; width: 100%; height: 420px; 
+            margin-top: 5px; padding: 0 10px; box-sizing: border-box;
         }
 
-        /* --- SPILLER-RAD LAYOUT --- */
         .player-row {
-            display: none; 
-            width: 445px;
-            height: 155px; 
-            align-items: center; /* Sentrerer tønne og tekst vertikalt */
-            padding: 0 10px;
-            box-sizing: border-box;
-            position: absolute;
-            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+            display: none; width: 300px; height: 135px; 
+            align-items: center; padding: 0 5px; box-sizing: border-box;
+            position: absolute; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
             opacity: 0.7;
+            background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0) 15%, rgba(0,0,0,0) 85%, rgba(0,0,0,0.15) 100%);
         }
 
         .player-row.active-turn {
-            opacity: 1;
-            background: rgba(241, 196, 15, 0.1);
-            border-radius: 15px;
+            opacity: 1; background: rgba(241, 196, 15, 0.05); border-radius: 8px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.3);
         }
 
-        /* TØNNE TIL VENSTRE */
-        .revolver-zone { 
-            width: 115px; 
-            height: 115px; 
-            position: relative; 
-            flex-shrink: 0; 
-        }
+        .revolver-zone { width: 110px; height: 110px; position: relative; flex-shrink: 0; }
         .revolver-cylinder {
-            width: 105px; 
-            height: 105px;
+            width: 105px; height: 105px;
             background: url('https://koepd.github.io/Cowboy-Pool/image_b55599.png') no-repeat center center;
-            background-size: contain;
+            background-size: contain; position: relative;
+            filter: drop-shadow(4px 6px 5px rgba(0,0,0,0.8));
         }
 
-        /* HYLSER (Flyttet 2-3px inn fra kanten) */
+        /* DINE PERFEKTE HYLSE-KOORDINATER (URØRT) */
         .chamber { 
             width: 22px; height: 22px; 
-            position: absolute; z-index: 3;
+            position: absolute; z-index: 5;
             background: url('https://koepd.github.io/Cowboy-Pool/Hylse.png') no-repeat center center;
-            background-size: contain;
-            display: none;
+            background-size: contain; display: none;
+            transform: translate(-50%, -50%);
         }
-        .c1 { top: 10px; left: 41.5px; } /* Topp */
-        .c2 { bottom: 25px; left: 20px; } /* Nede venstre */
-        .c3 { bottom: 25px; right: 20px; } /* Nede høyre */
+        .c1 { top: 20px; left: 52.5px; }     
+        .c2 { top: 68px; left: 24.5px; }     
+        .c3 { top: 68px; left: 80.5px; }     
         
         .chamber.active { display: block; animation: load-in 0.3s ease-out; }
-        @keyframes load-in { 0% { transform: scale(2.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes load-in { 0% { transform: translate(-50%, -50%) scale(2); opacity: 0; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
 
-        /* TEKST OG SCORE TIL HØYRE FOR TØNNE */
         .info-zone { 
-            flex: 1; 
-            padding-left: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center;
+            flex: 1; height: 105px; 
+            display: flex; flex-direction: column; 
+            align-items: flex-start; justify-content: space-between; 
+            padding-left: 12px; padding-top: 5px; padding-bottom: 5px;
+            text-align: left; box-sizing: border-box;
+            overflow: hidden;
         }
-        .player-name { font-size: 26px; color: #fdfaf0; text-transform: uppercase; margin: 0; letter-spacing: 1px; line-height: 1; }
+        
+        .player-name { 
+            font-size: 19px; color: #fdfaf0; text-transform: uppercase; margin: 0; line-height: 1.1; 
+            text-shadow: 2px 2px 2px rgba(0,0,0,0.8);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 165px;
+        }
         
         .score-val { 
-            font-size: 54px; 
-            margin: 0px 0; 
-            line-height: 0.85; 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-            filter: drop-shadow(2px 2px 2px #000); 
+            font-size: 46px; margin: 2px 0; line-height: 0.8; font-family: 'Rye', serif; 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+            filter: drop-shadow(3px 4px 3px rgba(0,0,0,0.8)); letter-spacing: -1px;
         }
         
         .rank-0 .score-val { background-image: linear-gradient(180deg, #fffceb 0%, #f1c40f 100%); }
         .rank-1 .score-val { background-image: linear-gradient(180deg, #ffffff 0%, #bdc3c7 100%); }
         .rank-2 .score-val { background-image: linear-gradient(180deg, #fff2e6 0%, #cd7f32 100%); }
 
-        .pers-val { font-size: 13px; color: #bd9b5b; font-family: 'Anton', sans-serif; text-transform: uppercase; margin-top: 2px; }
-        .pers-val b { font-family: 'Arial', sans-serif; color: #fff; font-size: 16px; }
+        .pers-val { 
+            font-size: 10px; color: #bd9b5b; font-family: 'Anton', sans-serif; 
+            text-transform: uppercase; line-height: 1; margin-top: 2px;
+        }
+        .pers-val b { font-family: 'Arial', sans-serif; color: #fff; font-size: 13px; margin-left: 1px; margin-right: 6px; }
 
-        /* ELIMINATED STEMPEL (Ligger midt over raden) */
         .stamp {
-            position: absolute; 
-            width: 320px; 
-            z-index: 100;
-            left: 50%; 
-            top: 50%; 
-            transform: translate(-50%, -50%) rotate(-10deg);
-            display: none; 
+            position: absolute; width: 260px; z-index: 100;
+            left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-8deg);
+            display: none; pointer-events: none;
+        }
+        .stamp-box {
+            border: 3px double #800000; background: rgba(50, 0, 0, 0.9);
+            padding: 5px 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+            display: flex; justify-content: center; align-items: center;
+        }
+        .stamp-text {
+            color: #d63031; font-family: 'Rye', serif; font-size: 22px;
+            letter-spacing: 2px; text-shadow: 1px 1px 0px #000;
+            text-transform: uppercase; border: 1px solid #d63031; padding: 3px 8px;
+        }
+
+        .board-footer {
+            height: 0px; 
+            width: 100%; 
+            left: 0%;
+            display: flex;
+            flex-direction: row; 
+            justify-content: center; 
+            align-items: center; 
+            position: absolute;
+            bottom: 37px; 
+            background: rgba(0, 0, 0, 0.5); 
+            border-radius: 2px;
+            padding: 0 5px;
+            box-sizing: border-box;
+            gap: 30px; 
+            z-index: 20;
+        }
+
+        #inning-text, #status-msg { 
+            color: #fdfaf0; 
+            font-size: 11px; 
+            font-family: 'Rye', serif; 
+            margin: 0;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 1px #000;
+            white-space: nowrap;
+        }
+
+        .footer-balls { 
+            display: flex; 
+            gap: 5px;
+            align-items: center;
+        }
+
+        .ball { 
+            width: 25px; 
+            height: 25px; 
+            border-radius: 50%; 
+            position: relative;
+            box-sizing: border-box;
+            filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.5));
+            cursor: pointer;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        /* EFFEKT NÅR KULA SENKES */
+        .ball.pressed {
+            opacity: 0;
+            transform: scale(0.5);
             pointer-events: none;
         }
-        .stamp svg { width: 100%; filter: drop-shadow(0 0 15px rgba(0,0,0,0.9)); }
-
-        /* FOOTER */
-        .board-footer {
-            height: 100px;
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            padding: 0 50px; 
-            margin-top: auto; 
-            margin-bottom: 25px;
+        
+        .ball:before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 14px; height: 14px;
+            background: white;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, 0.8); 
+            z-index: 2;
+            box-sizing: border-box; 
+        }
+        
+        .ball:after {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: black;
+            font-family: 'Anton', sans-serif;
+            font-size: 7px;
+            z-index: 3;
+            line-height: 1;
         }
 
-        #inning-text { color: #fdfaf0; font-size: 18px; font-family: 'Anton', sans-serif; text-transform: uppercase; }
-        .footer-balls { display: flex; gap: 12px; }
-        .ball { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #000; box-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
-        .f-1 { background: radial-gradient(circle at 30% 30%, #f1c40f, #a67c00); }
-        .f-5 { background: radial-gradient(circle at 30% 30%, #e67e22, #834c16); }
-        .f-3 { background: radial-gradient(circle at 30% 30%, #e74c3c, #962d22); }
-        #status-msg { color: #fdfaf0; font-family: 'Anton', sans-serif; font-size: 16px; text-transform: uppercase; }
+        .f-1 { background: radial-gradient(circle at 35% 35%, #fffceb 0%, #f1c40f 40%, #a67c00 100%); }
+        .f-1:after { content: '1'; }
+
+        .f-5 { background: radial-gradient(circle at 35% 35%, #fff2e6 0%, #e67e22 40%, #834c16 100%); }
+        .f-5:after { content: '5'; }
+
+        .f-3 { background: radial-gradient(circle at 35% 35%, #fff0f0 0%, #e74c3c 40%, #962d22 100%); }
+        .f-3:after { content: '3'; }
+
+        .texture-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            pointer-events: none; opacity: 0.04; z-index: 999;
+            background: url('https://www.transparenttextures.com/patterns/dark-matter.png');
+        }
 
         .spinning { animation: cylinder-spin 0.6s cubic-bezier(0.15, 0.88, 0.3, 1.05); }
         @keyframes cylinder-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
+
+<div class="texture-overlay"></div>
 
 <div class="wanted-board">
     <div class="board-header">
@@ -165,43 +226,42 @@
 
     <div class="players-container" id="players-container">
         <div class="player-row" id="p0-row" data-last-fouls="0">
-            <div class="stamp elim-stamp">
-                <svg viewBox="0 0 400 120">
-                    <rect x="10" y="10" width="380" height="100" rx="10" fill="rgba(180, 0, 0, 0.85)" stroke="#600" stroke-width="5"/>
-                    <text x="50%" y="78" text-anchor="middle" font-family="Anton" font-size="65" fill="white" font-weight="bold" letter-spacing="2">ELIMINATED</text>
-                </svg>
-            </div>
+            <div class="stamp elim-stamp"><div class="stamp-box"><span class="stamp-text">ELIMINATED</span></div></div>
             <div class="revolver-zone">
                 <div class="revolver-cylinder"><div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div></div>
             </div>
             <div class="info-zone">
                 <div class="player-name" id="p0-name">PLAYER 1</div>
                 <div class="score-val" id="p0-score">0</div>
-                <div class="pers-val">NÅ <b id="p0-now">0</b> | PERS <b id="best-0">0</b></div>
+                <div class="pers-val">NÅ <b id="p0-now">0</b> PERS <b id="best-0">0</b></div>
             </div>
         </div>
-
         <div class="player-row" id="p1-row" data-last-fouls="0">
-            <div class="stamp elim-stamp">
-                <svg viewBox="0 0 400 120"><rect x="10" y="10" width="380" height="100" rx="10" fill="rgba(180, 0, 0, 0.85)" stroke="#600" stroke-width="5"/><text x="50%" y="78" text-anchor="middle" font-family="Anton" font-size="65" fill="white" font-weight="bold" letter-spacing="2">ELIMINATED</text></svg>
-            </div>
+            <div class="stamp elim-stamp"><div class="stamp-box"><span class="stamp-text">ELIMINATED</span></div></div>
             <div class="revolver-zone"><div class="revolver-cylinder"><div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div></div></div>
-            <div class="info-zone"><div class="player-name" id="p1-name">PLAYER 2</div><div class="score-val" id="p1-score">0</div><div class="pers-val">NÅ <b id="p1-now">0</b> | PERS <b id="best-1">0</b></div></div>
+            <div class="info-zone">
+                <div class="player-name" id="p1-name">PLAYER 2</div>
+                <div class="score-val" id="p1-score">0</div>
+                <div class="pers-val">NÅ <b id="p1-now">0</b> PERS <b id="best-1">0</b></div>
+            </div>
         </div>
-
         <div class="player-row" id="p2-row" data-last-fouls="0">
-            <div class="stamp elim-stamp">
-                <svg viewBox="0 0 400 120"><rect x="10" y="10" width="380" height="100" rx="10" fill="rgba(180, 0, 0, 0.85)" stroke="#600" stroke-width="5"/><text x="50%" y="78" text-anchor="middle" font-family="Anton" font-size="65" fill="white" font-weight="bold" letter-spacing="2">ELIMINATED</text></svg>
-            </div>
+            <div class="stamp elim-stamp"><div class="stamp-box"><span class="stamp-text">ELIMINATED</span></div></div>
             <div class="revolver-zone"><div class="revolver-cylinder"><div class="chamber c1"></div><div class="chamber c2"></div><div class="chamber c3"></div></div></div>
-            <div class="info-zone"><div class="player-name" id="p2-name">PLAYER 3</div><div class="score-val" id="p2-score">0</div><div class="pers-val">NÅ <b id="p2-now">0</b> | PERS <b id="best-2">0</b></div></div>
+            <div class="info-zone">
+                <div class="player-name" id="p2-name">PLAYER 3</div>
+                <div class="score-val" id="p2-score">0</div>
+                <div class="pers-val">NÅ <b id="p2-now">0</b> PERS <b id="best-2">0</b></div>
+            </div>
         </div>
     </div>
 
     <div class="board-footer">
         <div id="inning-text">ROUND 1</div>
         <div class="footer-balls">
-            <div class="ball f-1"></div><div class="ball f-5"></div><div class="ball f-3"></div>
+            <div class="ball f-1" onclick="pocketBall(this)"></div>
+            <div class="ball f-5" onclick="pocketBall(this)"></div>
+            <div class="ball f-3" onclick="pocketBall(this)"></div>
         </div>
         <div id="status-msg">KRAV: CAROM</div>
     </div>
@@ -215,59 +275,53 @@
     const spinSound = new Audio('https://koepd.github.io/Cowboy-Pool/cylinder_spin.mp3'); 
     const shotSound = new Audio('https://koepd.github.io/Cowboy-Pool/revolver_shot.mp3');
 
+    // Funksjon for å skjule kuler i 2 sekunder
+    function pocketBall(element) {
+        element.classList.add('pressed');
+        setTimeout(() => {
+            element.classList.remove('pressed');
+        }, 2000);
+    }
+
     db.on('value', snap => {
         const data = snap.val();
         if (!data) return;
 
-        const rowH = 155; 
+        const rowH = 135; 
         const playerCount = data.playerCount || 3;
 
         let pList = [];
         for (let i = 0; i < playerCount; i++) {
-            pList.push({
-                id: i,
-                score: (data.scores && data.scores[i] !== undefined) ? data.scores[i] : 0,
-                fouls: (data.foulCounts && data.foulCounts[i] !== undefined) ? data.foulCounts[i] : 0,
-                name: (data.names && data.names[i]) ? data.names[i] : `PLAYER ${i+1}`
-            });
+            pList.push({ id: i, score: (data.scores && data.scores[i] !== undefined) ? data.scores[i] : 0, fouls: (data.foulCounts && data.foulCounts[i] !== undefined) ? data.foulCounts[i] : 0, name: (data.names && data.names[i]) ? data.names[i] : `PLAYER ${i+1}` });
         }
         pList.sort((a, b) => b.score - a.score);
 
         pList.forEach((pData, rank) => {
             const row = document.getElementById(`p${pData.id}-row`);
             if (!row) return;
-
             row.style.display = "flex";
             row.style.transform = `translateY(${rank * rowH}px)`;
             row.className = `player-row rank-${rank} ${data.currentPlayer === pData.id ? 'active-turn' : ''}`;
-            
             document.getElementById(`p${pData.id}-name`).innerText = pData.name;
             document.getElementById(`p${pData.id}-score`).innerText = pData.score;
             document.getElementById(`best-${pData.id}`).innerText = data.bestSeries ? (data.bestSeries[pData.id] || 0) : 0;
-            
             const scoreStart = (data.scoreAtStart && data.scoreAtStart[pData.id] !== undefined) ? data.scoreAtStart[pData.id] : 0;
             document.getElementById(`p${pData.id}-now`).innerText = (data.currentPlayer === pData.id) ? (pData.score - scoreStart) : 0;
-
             const cylinder = row.querySelector('.revolver-cylinder');
             const prevFouls = parseInt(row.getAttribute('data-last-fouls') || 0);
             if (pData.fouls > prevFouls) {
-                cylinder.classList.remove('spinning');
-                void cylinder.offsetWidth; 
-                cylinder.classList.add('spinning');
-                if (pData.fouls < 3) { spinSound.currentTime = 0; spinSound.play().catch(e=>{}); }
-                else { shotSound.currentTime = 0; shotSound.play().catch(e=>{}); }
+                cylinder.classList.remove('spinning'); void cylinder.offsetWidth; cylinder.classList.add('spinning');
+                if (pData.fouls < 3) { spinSound.currentTime = 0; spinSound.play().catch(e=>{}); } else { shotSound.currentTime = 0; shotSound.play().catch(e=>{}); }
             }
             row.setAttribute('data-last-fouls', pData.fouls);
-
             const chambers = cylinder.querySelectorAll('.chamber');
             chambers.forEach((c, i) => c.classList.toggle('active', i < pData.fouls));
-
             const stamp = row.querySelector('.elim-stamp');
             stamp.style.display = (pData.fouls >= 3) ? 'block' : 'none';
         });
 
         if (data.status) document.getElementById('status-msg').innerText = `KRAV: ${data.status.toUpperCase()}`;
-        document.getElementById('inning-text').innerText = `ROUND ${Math.floor((data.innings || 0) / playerCount) + 1}`;
+        document.getElementById('inning-text').innerText = `INNING ${Math.floor((data.innings || 0) / playerCount) + 1}`;
     });
 </script>
 </body>
