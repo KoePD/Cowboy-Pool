@@ -8,20 +8,19 @@
     
     <style>
         body { 
-			background-color: rgba(0, 0, 0, 0); 
-			margin: 0; padding: 0; overflow: hidden; 
-			font-family: 'Rye', serif;
-			display: flex; 
-			justify-content: flex-start; /* Flytter til venstre */
-			align-items: flex-start;    /* Flytter til toppen */
-			padding-left: 30px;         /* Avstand fra venstre kant */
-			padding-top: 30px;          /* Avstand fra øverste kant */
-			height: 1080px; width: 1920px;
-		}
+            background-color: rgba(0, 0, 0, 0); 
+            margin: 0; padding: 0; overflow: hidden; 
+            font-family: 'Rye', serif;
+            display: flex; 
+            justify-content: flex-start; 
+            align-items: flex-start; 
+            padding-left: 30px; 
+            padding-top: 30px; 
+            height: 1080px; width: 1920px;
+        }
 
         .wanted-board {
             width: 320px; 
-            /* Start-høyde (blir overstyrt av JS) */
             height: 620px; 
             background: url('https://koepd.github.io/Cowboy-Pool/ScoreboardFrame.png') no-repeat center center;
             background-size: 100% 100%;
@@ -35,7 +34,10 @@
             display: flex; justify-content: center; align-items: flex-end;
             padding-bottom: 5px;
         }
-        .wanted-title { font-size: 35px; color: #ffffff; margin: 0; letter-spacing: 1px; }
+        .wanted-title { 
+            font-size: 35px; color: #1a120b; margin: 0; letter-spacing: 1px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 280px;
+        }
         
         .players-container { 
             position: relative; width: 100%; 
@@ -148,8 +150,7 @@
             justify-content: center; 
             align-items: center; 
             position: absolute;
-            background: rgba(0, 0, 0, 0.5); 
-            border-radius: 2px;
+            background: transparent; 
             padding: 0 5px;
             box-sizing: border-box;
             gap: 27px; 
@@ -185,7 +186,7 @@
 
 <div class="wanted-board" id="main-board">
     <div class="board-header">
-        <h1 class="wanted-title">WANTED</h1>
+        <h1 class="wanted-title" id="main-title">WANTED</h1>
     </div>
 
     <div class="players-container" id="players-container">
@@ -253,21 +254,33 @@
         const board = document.getElementById('main-board');
         const footer = document.getElementById('board-footer');
         const adArea = document.getElementById('ad-area');
+        const mainTitle = document.getElementById('main-title');
 
-        /* DYNAMISK HØYDE-LOGIKK FOR 1, 2 ELLER 3 SPILLERE */
-		if (playerCount === 1) {
-			board.style.height = "350px";
-			footer.style.bottom = "20px";   // Sett til 8px for å ligge i det svarte feltet
-			adArea.style.bottom = "42px";  // Juster reklamen så den ligger rett over
-		} else if (playerCount === 2) {
-			board.style.height = "485px";
-			footer.style.bottom = "20px";   // Samme her
-			adArea.style.bottom = "42px"; 
-		} else {
-			board.style.height = "620px";
-			footer.style.bottom = "20px";   // Og her
-			adArea.style.bottom = "42px"; 
-		}
+        /* DYNAMISK TITTEL */
+        if (data.gameType === 'tournament') {
+            mainTitle.innerText = data.tournamentName || "TOURNAMENT";
+        } else if (playerCount === 1) {
+            mainTitle.innerText = "CHALLENGE";
+        } else if (playerCount === 2) {
+            mainTitle.innerText = "DUEL";
+        } else {
+            mainTitle.innerText = "WANTED";
+        }
+
+        /* DYNAMISK HØYDE OG PLASSERING */
+        if (playerCount === 1) {
+            board.style.height = "350px";
+            footer.style.bottom = "18px";
+            adArea.style.bottom = "42px";
+        } else if (playerCount === 2) {
+            board.style.height = "485px";
+            footer.style.bottom = "18px";
+            adArea.style.bottom = "42px";
+        } else {
+            board.style.height = "620px";
+            footer.style.bottom = "18px";
+            adArea.style.bottom = "42px";
+        }
 
         const rowH = 135; 
         let pList = [];
