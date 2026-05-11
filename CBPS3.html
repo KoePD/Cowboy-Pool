@@ -53,18 +53,20 @@
         .ad-container { position: absolute; width: 260px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; z-index: 15; }
         .ad-label { font-size: 8px; color: rgba(26, 18, 11, 0.5); text-transform: uppercase; font-family: 'Anton', sans-serif; margin-bottom: 2px; }
         .ad-box { width: 100%; height: 32px; background: rgba(0, 0, 0, 0.05); border-top: 5px solid rgba(26, 18, 11, 0.15); border-bottom: 1px solid rgba(26, 18, 11, 0.15); display: flex; justify-content: center; align-items: center; overflow: hidden; }
-        .board-footer { height: 25px; width: 100%; left: 0; display: flex; flex-direction: row; justify-content: space-between; align-items: center; position: absolute; z-index: 20; bottom: 24px; padding: 0px 33px 0 20px; box-sizing: border-box; }
+        .board-footer { height: 25px; width: 100%; left: 0; display: flex; flex-direction: row; justify-content: space-between; align-items: center; position: absolute; z-index: 20; bottom: 24px; padding: 0px 48px 0 35px; box-sizing: border-box; }
         #inning-text { color: #fdfaf0; font-size: 11px; font-family: 'Rye', serif; margin: 0; text-transform: uppercase; text-shadow: 1px 1px 1px #000; white-space: nowrap; width: 85px; text-align: left; }
         #status-msg { color: #fdfaf0; font-size: 10px; font-family: 'Rye', serif; margin: 0; text-transform: uppercase; text-shadow: 1px 1px 1px #000; white-space: nowrap; width: 125px; text-align: right; }
         .footer-balls { display: flex; gap: 4px; padding: 0px 4px 0px 0px; align-items: center; width: auto; justify-content: center; }
         .ball { width: 20px; height: 20px; border-radius: 50%; position: relative; box-sizing: border-box; filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.5)); }
         .ball:before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; background: white; border-radius: 50%; border: 1px solid rgba(0, 0, 0, 0.8); z-index: 2; box-sizing: border-box; }
         .ball:after { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: black; font-family: 'Anton', sans-serif; font-size: 7px; z-index: 3; line-height: 1; }
+        
         .revolver-zone { width: 110px; height: 110px; position: relative; flex-shrink: 0; }
-        .revolver-cylinder { width: 105px; height: 105px; background: url('https://koepd.github.io/Cowboy-Pool/image_b55599.png') no-repeat center center; background-size: contain; position: relative; filter: drop-shadow(4px 6px 5px rgba(0,0,0,0.8)); transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1.2); }
+        .revolver-cylinder { width: 105px; height: 105px; background: url('https://koepd.github.io/Cowboy-Pool/image_b55599.png') no-repeat center center; background-size: contain; position: relative; filter: drop-shadow(4px 6px 5px rgba(0,0,0,0.8)); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1.2); }
         .chamber { width: 22px; height: 22px; position: absolute; z-index: 5; background: url('https://koepd.github.io/Cowboy-Pool/Hylse.png') no-repeat center center; background-size: contain; display: none; transform: translate(-50%, -50%); }
         .c1 { top: 20px; left: 52.5px; } .c2 { top: 68px; left: 24.5px; } .c3 { top: 68px; left: 80.5px; }
         .chamber.active { display: block; }
+        
         .f-1 { background: radial-gradient(circle at 35% 35%, #fffceb 0%, #f1c40f 40%, #a67c00 100%); } .f-1:after { content: '1'; }
         .f-5 { background: radial-gradient(circle at 35% 35%, #fff2e6 0%, #e67e22 40%, #834c16 100%); } .f-5:after { content: '5'; }
         .f-3 { background: radial-gradient(circle at 35% 35%, #fff0f0 0%, #e74c3c 40%, #962d22 100%); } .f-3:after { content: '3'; }
@@ -88,9 +90,12 @@
 </div>
 
 <script>
-    // Konfigurasjon for Pistolskudd
     const gunShot = new Audio('https://koepd.github.io/Cowboy-Pool/Gunshot.mp3');
-    const firedStatus = [false, false, false]; // Holder styr på om skuddet er avfyrt for hver spiller
+    
+    // --- MANUELL JUSTERING AV LYD ---
+    gunShot.playbackRate = 1.3;  // Litt raskere smell
+    const lydStartTid = 0.05;    // Hopper over evt stillhet i starten
+    const firedStatus = [false, false, false]; 
 
     const firebaseConfig = { 
         apiKey: "AIzaSyDabrKfEjl3rx7QyTmMDPjk6v5R0kVNvz8",
@@ -156,31 +161,38 @@
             let currentRun = (data.currentPlayer === pData.id) ? (pData.score - (data.scoreAtStart ? data.scoreAtStart[pData.id] || 0 : 0)) : 0;
             document.getElementById(`p${pData.id}-now`).innerText = currentRun;
             
-            // LOGIKK FOR PISTOLSKUDD
+            // SNURRING OG SKUDD VED 3 FOULS
             if (pData.fouls === 3 && !firedStatus[pData.id]) {
                 firedStatus[pData.id] = true;
+                
+                // Start snurring umiddelbart sammen med stempel-tanken
+                const cylinder = document.getElementById(`cyl-${pData.id}`);
+                if (cylinder) {
+                    cylinder.style.transform = `rotate(${pData.fouls * 120}deg)`;
+                }
+
+                // Avfyr lyden raskere (300ms delay i stedet for 600ms)
                 setTimeout(() => {
-                    gunShot.currentTime = 0;
-                    gunShot.play();
+                    gunShot.currentTime = lydStartTid;
+                    gunShot.play().catch(e => console.log("Lyd blokkert"));
                     board.classList.add('shake');
                     setTimeout(() => board.classList.remove('shake'), 400);
-                }, 600); // Synkronisert med eliminert-stempel
+                }, 350); 
             }
 
-            // Resett status ved nytt spill
-            if (pData.fouls === 0) firedStatus[pData.id] = false;
+            // Normal snurring for 1 og 2 fouls
+            if (pData.fouls < 3) {
+                firedStatus[pData.id] = false; // Tillat skudd på nytt hvis f.eks. foul resettes
+                const cylinder = document.getElementById(`cyl-${pData.id}`);
+                if (cylinder) {
+                    setTimeout(() => {
+                        cylinder.style.transform = `rotate(${pData.fouls * 120}deg)`;
+                    }, 150);
+                }
+            }
 
-            // 1. Vis hylsen umiddelbart
             const chambers = wrap.querySelectorAll('.chamber');
             chambers.forEach((c, idx) => c.classList.toggle('active', idx < pData.fouls));
-
-            // 2. Snurr tønna 120 grader etter hylsen er satt inn
-            const cylinder = document.getElementById(`cyl-${pData.id}`);
-            if (cylinder) {
-                setTimeout(() => {
-                    cylinder.style.transform = `rotate(${pData.fouls * 120}deg)`;
-                }, 150);
-            }
         });
 
         document.getElementById('inning-text').innerText = `INNING ${Math.floor((data.innings || 0) / playerCount) + 1}`;
